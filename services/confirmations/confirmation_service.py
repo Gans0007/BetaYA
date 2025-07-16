@@ -1,0 +1,80 @@
+# services/confirmations/confirmation_service.py
+
+from aiogram import Bot
+from aiogram.types import User
+from config import PUBLIC_CHAT_ID
+
+from repositories.confirmations.confirmation_repo import (
+    log_confirmation,
+    was_confirmed_today,
+    update_confirmation_file,
+)
+from repositories.habits.habit_repo import get_progress_by_habit_id
+from repositories.habits.habit_repo import increment_done_day
+
+import random
+
+
+async def process_confirmation(
+    user_id: int,
+    habit_id: int,
+    file_id: str | None,
+    file_type: str | None,
+    bot: Bot
+) -> bool:
+    """
+    Обрабатывает подтверждение привычки:
+    - Если уже было подтверждение сегодня — просто обновляет медиа
+    - Если нет — увеличивает прогресс и логирует подтверждение
+
+    Возвращает True, если прогресс увеличен, иначе False
+    """
+    if await was_confirmed_today(user_id, habit_id):
+        await update_confirmation_file(user_id, habit_id, file_id, file_type)
+        return False
+    else:
+        await increment_done_day(habit_id)
+        await log_confirmation(user_id, habit_id, file_id, file_type)
+        return True
+
+def get_display_name(user: User) -> str:
+    return f"@{user.username}" if user.username else user.full_name
+
+def get_random_caption(user: User, habit_name: str, done: int, total: int) -> str:
+    display_name = f"@{user.username}" if user.username else user.full_name
+    percent = round((done / total) * 100) if total > 0 else 0
+
+    return random.choice([
+        f"✅ <b>{display_name}</b> только что подтвердил привычку <b>«{habit_name}»</b> – уважение 💪",
+        f"🔥 <b>{display_name}</b> не отступает – привычка подтверждена!",
+        f"📌 <b>{display_name}</b> снова на пути к цели ({done}/{total}) – красавчик!",
+        f"⚡️ <b>{display_name}</b> сделал шаг вперёд – дисциплина рулит.",
+        f"🏁 <b>{display_name}</b> держит темп – <b>{percent}%</b> привычки уже пройдено!",
+        f"🎯 <b>{display_name}</b> подтвердил привычку <b>«{habit_name}»</b> — уже <b>{percent}%</b> пути пройдено!",
+        f"💥 <b>{display_name}</b> бьёт точно в цель: <b>«{habit_name}»</b> ({done}/{total}) — идёт по плану!",
+        f"📊 <b>{display_name}</b> делает стабильный прогресс по привычке <b>«{habit_name}»</b>: <b>{percent}%</b> завершено!",
+        f"🚀 <b>{display_name}</b> только что продвинул <b>«{habit_name}»</b> до <b>{done} из {total}</b> — сила в постоянстве!",
+        f"🙌 <b>{display_name}</b> не сдается! <b>«{habit_name}»</b> уверенно движется к финишу — <b>{percent}%</b> на счету!"
+    ])
+
+async def send_to_public_chat(
+    user: User,
+    habit_id: int,
+    file_id: str | None,
+    file_type: str,
+    bot: Bot
+):
+    """
+    Отправляет подтверждение привычки в публичный канал с подписью.
+    """
+    name, done, total = await get_progress_by_habit_id(habit_id)
+    caption = get_random_caption(user, name, done, total)
+
+    if file_type == "photo":
+        await bot.send_photo(chat_id=PUBLIC_CHAT_ID, photo=file_id, caption=caption, parse_mode="HTML")
+    elif file_type == "video":
+        await bot.send_video(chat_id=PUBLIC_CHAT_ID, video=file_id, caption=caption, parse_mode="HTML")
+    elif file_type == "video_note":
+        await bot.send_video_note(chat_id=PUBLIC_CHAT_ID, video_note=file_id)
+        await bot.send_message(chat_id=PUBLIC_CHAT_ID, text=caption, parse_mode="HTML")
+
