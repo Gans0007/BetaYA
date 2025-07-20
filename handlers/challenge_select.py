@@ -1,10 +1,11 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.exceptions import TelegramBadRequest
-from utils.reminder_task import schedule_reminder
+
 
 from services.habits.habit_service import save_habit
 from repositories.habits.habit_repo import get_habits_by_user, habit_exists
+from repositories.habits.habit_repo import count_user_habits
 
 import logging
 logger = logging.getLogger(__name__)
@@ -94,7 +95,13 @@ def build_levels_keyboard():
     for key, label in LEVELS.items():
         btn = InlineKeyboardButton(text=label, callback_data=f"select_level:{key}")
         kb.inline_keyboard.append([btn])
+
+    # ✅ Добавим кнопку назад в главное меню
+    kb.inline_keyboard.append([
+        InlineKeyboardButton(text="⬅️ Назад в меню привычек", callback_data="back_to_habit_menu")
+    ])
     return kb
+
 
 def build_challenges_keyboard(level_key: str):
     items = CHALLENGES.get(level_key, [])
@@ -192,6 +199,12 @@ async def add_challenge(callback: CallbackQuery):
     user_id = callback.from_user.id
     await callback.answer()
 
+    from repositories.habits.habit_repo import count_user_habits  # (если ещё не импортирован)
+    total_habits = await count_user_habits(user_id)
+    if total_habits >= 5:
+        await callback.message.answer("❌ У тебя уже 5 активных привычек или челленджей. Удали одну, чтобы добавить новую.")
+        return
+
     try:
         _, level_key, idx_str = callback.data.split(":", 2)
         idx = int(idx_str)
@@ -216,11 +229,6 @@ async def add_challenge(callback: CallbackQuery):
         habits = await get_habits_by_user(user_id)
         habit_id = habits[-1][0] if habits else None
 
-        if habit_id and ctype == "media":
-            logger.info(f"[{user_id}] Планируется напоминание для habit_id={habit_id}")
-            await schedule_reminder(callback.bot, user_id, habit_id)
-            logger.info(f"[{user_id}] Напоминание установлено для habit_id={habit_id}")
-
         logger.info(f"[{user_id}] Челлендж '{title}' успешно добавлен, habit_id={habit_id}")
         await callback.message.edit_text("✅ Челлендж добавлен в активные привычки!")
 
@@ -230,3 +238,23 @@ async def add_challenge(callback: CallbackQuery):
             await callback.message.answer("❌ Не удалось добавить челлендж")
         except Exception:
             pass
+
+
+@router.callback_query(lambda c: c.data == "back_to_habit_menu")
+async def back_to_habit_menu(callback: CallbackQuery):
+    from repositories.habits.habit_repo import count_user_habits
+    total = await count_user_habits(callback.from_user.id)
+
+    text = (
+        "📌 В привычке ты можешь сам добавить свою привычку.\n"
+        "🔥 А в Challenge — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
+        f"{total}/5"
+    )
+
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➕ Добавить привычку", callback_data="add_habit_custom")],
+        [InlineKeyboardButton(text="🔥 Взять Challenge", callback_data="take_challenge")]
+    ])
+
+    await callback.message.edit_text(text, reply_markup=keyboard, parse_mode="HTML")
+    await callback.answer()

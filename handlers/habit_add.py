@@ -7,6 +7,7 @@ from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 
 from states.habit_states import HabitForm
 from services.habits.habit_service import save_habit
+from repositories.habits.habit_repo import count_user_habits  # ✅ добавлено
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -19,6 +20,14 @@ cancel_keyboard = InlineKeyboardMarkup(
 @router.callback_query(lambda c: c.data == "add_habit_custom")
 async def callback_start_habit(callback: CallbackQuery, state: FSMContext):
     logger.info(f"[{callback.from_user.id}] Нажал на ➕ Добавить привычку")
+    
+    # ✅ Проверка лимита привычек/челленджей
+    total_habits = await count_user_habits(callback.from_user.id)
+    if total_habits >= 5:
+        await callback.message.answer("❌ У тебя уже 5 активных привычек или челленджей. Удали одну, чтобы добавить новую.")
+        await callback.answer()
+        return
+
     await callback.message.answer("✍️ Введи название привычки (например: Бег):", reply_markup=cancel_keyboard)
     await state.set_state(HabitForm.name)
     await callback.answer()

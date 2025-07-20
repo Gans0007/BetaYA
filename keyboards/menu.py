@@ -4,13 +4,17 @@ from aiogram import Bot, types
 from aiogram import Router
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton
-
+from aiogram import F
+from aiogram.types import CallbackQuery
 
 from services.confirmations.confirmation_service import was_confirmed_today
 from repositories.habits.habit_repo import get_habits_by_user
 from services.challenge_service.complete_challenge import complete_challenge
 from repositories.habits.habit_repo import should_show_delete_button
+from repositories.habits.habit_repo import count_user_habits
+from keyboards.monetization import get_main_monetization_menu
 from config import ADMIN_ID
+from handlers.rules_text import rules_text
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +40,15 @@ def get_main_menu() -> ReplyKeyboardMarkup:
 # Обработка кнопки "➕ Добавить привычку / челлендж"
 @router.message(lambda msg: msg.text == "➕ Добавить привычку / челлендж")
 async def handle_add_habit(message: types.Message):
+    user_id = message.from_user.id
+    total = await count_user_habits(user_id)
+
     text = (
         "📌 В привычке ты можешь сам добавить свою привычку.\n"
-        "🔥 А в Challenge — выбрать одно из заданий от команды <b>Your Ambitions</b>."
+        "🔥 А в Challenge — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
+        f"{total}/5"
     )
+
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="➕ Добавить привычку", callback_data="add_habit_custom")],
         [InlineKeyboardButton(text="🔥 Взять Challenge", callback_data="take_challenge")]
@@ -114,36 +123,66 @@ async def show_active_tasks(message: types.Message, bot: Bot):
         )
 
 #обработка кнопки МОНЕТИЗАЦИЯ
-@router.message(lambda msg: msg.text == "💰 Монетизация")
-async def handle_monetization(message: types.Message):
-    user_id = message.from_user.id
-    logger.info(f"[{user_id}] Открыл меню монетизации")
-
+# Универсальная функция показа меню монетизации
+async def send_monetization_menu(bot: Bot, chat_id: int, is_admin: bool):
     text = (
         "💸 <b>Монетизация</b>\n\n"
         "Твой путь к заработку с <b>Your Ambitions</b> 💼\n\n"
         "Выбери, с чего начать:"
     )
 
-    # Основные кнопки
     keyboard = [
         [
-            InlineKeyboardButton(text="💰 Баланс", callback_data="monetization_balance"),
+            InlineKeyboardButton(text="💰 Баланс", callback_data="balance"),
             InlineKeyboardButton(text="👥 Реферальная ссылка", callback_data="monetization_referral")
         ],
         [
-            InlineKeyboardButton(text="📤 Загрузить видео", callback_data="monetization_upload"),
+            InlineKeyboardButton(text="📤 Загрузить видео", callback_data="upload_video"),
             InlineKeyboardButton(text="📚 Правила", callback_data="monetization_rules")
         ]
     ]
 
-    # Если пользователь — админ, добавляем кнопку "Одобрение"
-    if user_id == config.ADMIN_ID:
-        logger.info(f"[{user_id}] Является админом — добавлена кнопка 'Одобрение'")
-        keyboard.append(
-            [InlineKeyboardButton(text="✅ Одобрение", callback_data="monetization_approval")]
-        )
+    if is_admin:
+        keyboard.append([InlineKeyboardButton(text="✅ Одобрение", callback_data="review_pending_videos")])
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
+    await bot.send_message(chat_id, text, reply_markup=markup, parse_mode="HTML")
 
-    await message.answer(text, reply_markup=markup, parse_mode="HTML")
+
+# Обработка команды "💰 Монетизация"
+@router.message(lambda msg: msg.text == "💰 Монетизация")
+async def handle_monetization(message: types.Message, bot: Bot):
+    user_id = message.from_user.id
+    logger.info(f"[{user_id}] Открыл меню монетизации")
+
+    keyboard = get_main_monetization_menu(is_admin=(user_id == config.ADMIN_ID))
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text="💸 <b>Монетизация</b>\n\nТвой путь к заработку с <b>Your Ambitions</b> 💼\n\nВыбери, с чего начать:",
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
+
+@router.callback_query(F.data == "monetization_back")
+async def handle_monetization_back(callback: types.CallbackQuery, bot: Bot):
+    user_id = callback.from_user.id
+    is_admin = (user_id == config.ADMIN_ID)
+    keyboard = get_main_monetization_menu(is_admin=is_admin)
+
+    await callback.answer()
+    await bot.send_message(
+        chat_id=callback.message.chat.id,
+        text="💸 <b>Монетизация</b>\n\nТвой путь к заработку с <b>Your Ambitions</b> 💼\n\nВыбери, с чего начать:",
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
+
+@router.callback_query(F.data == "monetization_rules")
+async def handle_monetization_rules(callback: CallbackQuery):
+    await callback.answer()
+
+    back_btn = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="◀️ Назад", callback_data="monetization_back")]
+    ])
+
+    await callback.message.answer(rules_text, reply_markup=back_btn, parse_mode="HTML")

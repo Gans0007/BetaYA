@@ -45,10 +45,13 @@ async def get_unconfirmed_today(user_id: int) -> list[Habit]:
               )
         """, (user_id, today))
 
-    async for row in cursor:
-        habits.append(Habit(*row))  # ✅ теперь передаём все 10 полей
+        async for row in cursor:
+            habits.append(Habit(*row))  # ✅ передаём все 10 полей
+
+        await cursor.close()  # 💡 по желанию, но good practice
 
     return habits
+
 
 async def get_progress_by_habit_id(habit_id: int) -> tuple[str, int, int]:
     async with aiosqlite.connect(DB_PATH) as db:
@@ -186,3 +189,14 @@ async def extend_habit_by_id(habit_id: int):
     async with aiosqlite.connect(DB_PATH) as conn:
         await conn.execute("UPDATE habits SET days = days + 5 WHERE id = ?", (habit_id,))
         await conn.commit()
+
+
+async def count_user_habits(user_id: int) -> int:
+    async with aiosqlite.connect(DB_PATH) as conn:
+        cursor = await conn.execute(
+            "SELECT COUNT(*) FROM habits WHERE user_id = ?",
+            (user_id,)
+        )
+        result = await cursor.fetchone()
+        return result[0] if result else 0
+

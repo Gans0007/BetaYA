@@ -17,4 +17,9 @@ if not public_chat_id:
 PUBLIC_CHAT_ID = int(public_chat_id)
 ADMIN_ID = 900410719  # Замени на свой Telegram user ID
 
+REFERRAL_BANNER_PATH = "media/referral_banner.jpg"
+REFERRAL_BASE_URL = "https://t.me/litevambitionbot"
+
+ADMIN_IDS = [900410719]
+
 DB_PATH = Path(__file__).resolve().parent / "data" / "habits.db"

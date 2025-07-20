@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from aiogram import Bot
 
 import pytz
 from aiogram import Router, types, F

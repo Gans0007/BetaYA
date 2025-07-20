@@ -34,7 +34,7 @@ async def process_confirmation(
         return False
     else:
         await increment_done_day(habit_id)
-        await log_confirmation(user_id, habit_id, file_id, file_type)
+        await log_confirmation(user_id, habit_id, file_id, file_type, bot)
         return True
 
 def get_display_name(user: User) -> str:

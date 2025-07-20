@@ -9,52 +9,68 @@ from config import BOT_TOKEN
 from init_db import init_db
 from utils.reset_task import start_reset_scheduler
 from routers_register import register_all_routers
+from middlewares.db import DatabaseMiddleware
+from services.reminder import reminder  # <-- импорт внизу, но до использования
 
-# 🔧 Настройка логгирования
 os.makedirs("logs", exist_ok=True)
 
-# Основной лог-файл (всё подряд)
+# 📄 Настройка логов (если у тебя ещё не настроено)
+logging.basicConfig(level=logging.INFO)
+
+# ✅ Создаём бота и диспетчер
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+dp = Dispatcher()
+
+# 📄 Обычный лог — INFO и выше
 main_handler = logging.FileHandler("logs/bot.log", encoding='utf-8')
 main_handler.setLevel(logging.INFO)
 
-# Отдельный лог-файл для ошибок
+# ❗ Критический лог — только ERROR и выше
 error_handler = logging.FileHandler("logs/critical.log", encoding='utf-8')
 error_handler.setLevel(logging.ERROR)
 
-# Консольный лог
+# 🖥️ Консоль — всё от INFO и выше
 console_handler = logging.StreamHandler()
 console_handler.setLevel(logging.INFO)
 
-# Регистрируем логгеры
+# 🎯 Общий формат
+formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+main_handler.setFormatter(formatter)
+error_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# 🔧 Настройка логгера
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    handlers=[
-        main_handler,
-        error_handler,
-        console_handler
-    ]
+    handlers=[main_handler, error_handler, console_handler]
 )
 
 logger = logging.getLogger(__name__)
 
+# ✅ Dispatcher СОЗДАЁМ ЗДЕСЬ (и только здесь)
+dp = Dispatcher()
+# ✅ Добавляем middleware
+dp.message.middleware(DatabaseMiddleware())
+dp.callback_query.middleware(DatabaseMiddleware())
 
 async def main():
     await init_db()
     logger.info("📦 База данных инициализирована.")
 
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-    dp = Dispatcher()
 
-    # 🔁 Регистрация всех роутеров
+    # 🔔 Запускаем таск напоминаний
+    asyncio.create_task(reminder.scheduled_reminder_loop(bot))
+
+    # 🔁 Регистрируем роутеры
     await register_all_routers(dp)
     logger.info("🔁 Роутеры зарегистрированы.")
 
-    # ⏰ Периодический сброс привычек
+    # ⏰ Планировщик сброса привычек
     asyncio.create_task(start_reset_scheduler(bot))
     logger.info("⏰ Планировщик сброса привычек запущен.")
 
-    # 🚀 Запуск бота
+    # 🚀 Запуск
     logger.info("🚀 Бот запущен.")
     await dp.start_polling(bot)
 
