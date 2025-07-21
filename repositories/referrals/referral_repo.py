@@ -3,11 +3,14 @@
 import aiosqlite
 from config import DB_PATH
 from utils.timezones import get_current_time
+from services.monetization.reward_service import add_reward
 
 import logging
 logger = logging.getLogger(__name__)
 
-async def save_referral(referrer_id: int, invited_id: int):
+from aiogram import Bot
+
+async def save_referral(referrer_id: int, invited_id: int, bot: Bot):
     if referrer_id == invited_id:
         logger.info(f"[REFERRAL] ❌ Пользователь {invited_id} попытался пригласить сам себя")
         return
@@ -24,18 +27,20 @@ async def save_referral(referrer_id: int, invited_id: int):
             "INSERT INTO referrals (referrer_id, invited_id, created_at) VALUES (?, ?, ?)",
             (referrer_id, invited_id, get_current_time())
         )
+
+        await add_reward(referrer_id, 2, "xp", "Приглашён друг по ссылке", conn=db)
         await db.commit()
+
         logger.info(f"[REFERRAL] ✅ Сохранена связь: {referrer_id} → {invited_id}")
 
+        try:
+            await bot.send_message(
+                referrer_id,
+                "⭐ +2 XP в твою копилку 🧠"
+            )
+        except Exception as e:
+            logger.warning(f"[REFERRAL] ❌ Не удалось отправить сообщение пользователю {referrer_id}: {e}")
 
-async def mark_referral_active(invited_id: int, db: aiosqlite.Connection) -> bool:
-    cursor = await db.execute("""
-        UPDATE referrals SET is_active = 1 WHERE invited_id = ? AND is_active = 0
-    """, (invited_id,))
-    if cursor.rowcount > 0:
-        logger.info(f"[REFERRAL] 🎯 Приглашённый {invited_id} стал активным рефералом")
-        return True
-    return False
 
 
 async def get_referral_stats(referrer_id: int) -> tuple[int, int]:

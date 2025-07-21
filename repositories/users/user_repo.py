@@ -31,8 +31,6 @@ async def get_confirmed_count(user_id: int) -> int:
         row = await cursor.fetchone()
         return row[0] if row else 0
 
-from config import DB_PATH
-import aiosqlite
 
 async def get_all_user_ids() -> list[int]:
     async with aiosqlite.connect(DB_PATH) as db:

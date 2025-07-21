@@ -187,7 +187,12 @@ async def complete_and_remove_habit(habit: Habit):
 
 async def extend_habit_by_id(habit_id: int):
     async with aiosqlite.connect(DB_PATH) as conn:
-        await conn.execute("UPDATE habits SET days = days + 5 WHERE id = ?", (habit_id,))
+        await conn.execute("""
+            UPDATE habits
+            SET days = days + 5,
+                is_active = 1
+            WHERE id = ?
+        """, (habit_id,))
         await conn.commit()
 
 

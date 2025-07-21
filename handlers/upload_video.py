@@ -4,11 +4,13 @@ from aiogram.fsm.state import State, StatesGroup
 from repositories.video.video_repo import save_pending_video, get_pending_videos, approve_video
 from states.upload_video import UploadVideoFSM 
 import logging
+from aiogram import Bot
 from datetime import datetime
 from config import ADMIN_IDS
 from utils.ui import safe_replace_message, try_edit_message
+from repositories.video.video_repo import get_pending_video_by_id
 from repositories.video.video_repo import delete_video, approve_video, count_pending_videos_by_user
-
+from services.monetization.reward_service import add_reward
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -89,23 +91,66 @@ async def cancel_upload(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data.startswith("reject_video:"))
-async def handle_reject_video(callback: types.CallbackQuery):
+async def handle_reject_video(callback: types.CallbackQuery, bot: Bot):
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Только для админов", show_alert=True)
         return
 
     video_id = int(callback.data.split(":")[1])
+
+    # Получаем автора видео
+    video = await get_pending_video_by_id(video_id)
+    if video:
+        try:
+            await bot.send_message(
+                video["user_id"],
+                "❌ Ваше видео было отклонено администратором. Попробуйте загрузить другой вариант."
+            )
+        except Exception as e:
+            logger.error(f"[VIDEO] ❌ Ошибка при отправке отклонения пользователю {video['user_id']}: {e}")
+
     await delete_video(video_id)  # удаляем видео из базы
     await try_edit_message(callback, text="❌ Видео отклонено.")
     await callback.answer("Видео удалено")
 
+
+
 @router.callback_query(F.data.startswith("approve_video:"))
-async def handle_approve_video(callback: types.CallbackQuery):
+async def handle_approve_video(callback: types.CallbackQuery, bot: Bot):
     if callback.from_user.id not in ADMIN_IDS:
         await callback.answer("⛔ Только для админов", show_alert=True)
         return
 
     video_id = int(callback.data.split(":")[1])
-    await approve_video(video_id)
+    await approve_video(video_id)  # здесь уже начисляется XP внутри
+
+    video = await get_pending_video_by_id(video_id)
+    if video:
+        user_id = video["user_id"]
+
+        # ✅ Начисляем USDT за одобренное видео
+        await add_reward(user_id=user_id, amount=0.10, reason="Видео одобрено", reward_type="usdt")
+
+        try:
+            # Первое сообщение: подтверждение
+            await bot.send_message(
+                user_id,
+                "✅ Ваше видео было одобрено администратором!"
+            )
+
+            # Второе сообщение: награды
+            await bot.send_message(
+                user_id,
+                "Тебе благодарность от YA \n\n⭐ <b>+3 XP</b> за старание\n\n💸 <b>+0.10 USDT</b> за вклад в комьюнити!",
+                parse_mode="HTML"
+            )
+
+            logger.info(f"[VIDEO] ✅ Отправлены 2 сообщения о наградах пользователю {user_id}")
+
+        except Exception as e:
+            logger.error(f"[VIDEO] ❌ Не удалось отправить уведомления пользователю {user_id}: {e}")
+  
     await try_edit_message(callback, text="✅ Видео одобрено.")
     await callback.answer("Одобрено")
+
+

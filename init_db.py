@@ -80,7 +80,7 @@ async def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             video_link TEXT NOT NULL,
-            submitted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            submitted_at TEXT,
             approved INTEGER DEFAULT 0,
             FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
         );

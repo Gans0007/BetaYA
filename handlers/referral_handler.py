@@ -24,15 +24,33 @@ async def show_referral_info(callback: types.CallbackQuery, bot: Bot, db):
     total_referrals = len(referrals)
     active_referrals = sum(1 for _, is_active in referrals if is_active)
 
+    # Формируем список активных друзей
+    active_friends = []
+    for invited_id, is_active in referrals:
+        if is_active:
+            try:
+                user = await bot.get_chat(invited_id)
+                name = user.full_name
+                username = f"(@{user.username})" if user.username else ""
+                active_friends.append(f"• {name} {username}")
+            except Exception as e:
+                active_friends.append(f"• Пользователь {invited_id}")
+
     referral_link = f"{REFERRAL_BASE_URL}?start={user_id}"
 
+    # Базовый текст
     caption = (
         "<b>👥 Твоя реферальная программа</b>\n\n"
         f"🔗 <b>Ссылка:</b> {referral_link}\n\n"
         f"📊 Всего приглашено: <b>{total_referrals}</b>\n"
-        f"🔥 Активных: <b>{active_referrals}</b>\n\n"
-        "🤑 Приглашай друзей и получай бонусы за активность!"
+        f"🔥 Активных: <b>{active_referrals}</b>"
     )
+
+    # Добавляем блок с именами активных друзей
+    if active_friends:
+        caption += "\n\n<b>✅ Активные друзья:</b>\n" + "\n".join(active_friends)
+
+    caption += "\n\n🤑 Приглашай друзей и получай бонусы за активность!"
 
     await callback.message.edit_media(
         media=types.InputMediaPhoto(

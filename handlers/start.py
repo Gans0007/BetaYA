@@ -15,7 +15,7 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 @router.message(Command("start"))
-async def start_cmd(message: types.Message):
+async def start_cmd(message: types.Message, bot: Bot):
     user_id = message.from_user.id
     logger.info(f"[START] Пользователь {user_id} начал работу")
 
@@ -26,7 +26,7 @@ async def start_cmd(message: types.Message):
         logger.info(f"[REFERRAL] Новый пользователь {user_id} перешёл по ссылке от {referrer_id}")
 
         try:
-            await save_referral(referrer_id, user_id)
+            await save_referral(referrer_id, user_id, bot)
             logger.info(f"[REFERRAL] ✅ Сохранена связь: {referrer_id} → {user_id}")
 
             # ✅ Уведомление пригласившему
@@ -35,7 +35,7 @@ async def start_cmd(message: types.Message):
                     f"🔥 По твоей ссылке пришёл новый брат: <b>{message.from_user.full_name}</b>\n"
                     f"Теперь он с нами 💪"
                 )
-                await message.bot.send_message(referrer_id, inviter_msg, parse_mode="HTML")
+                await bot.send_message(referrer_id, inviter_msg, parse_mode="HTML")
                 logger.info(f"[REFERRAL] ✅ Уведомление отправлено пригласившему {referrer_id}")
             except TelegramBadRequest as e:
                 logger.warning(f"[REFERRAL] ⚠️ Не удалось отправить уведомление {referrer_id}: {e}")
