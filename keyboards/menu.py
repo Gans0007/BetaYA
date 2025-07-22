@@ -64,7 +64,15 @@ async def show_active_tasks(message: types.Message, bot: Bot):
         await message.answer("😐 У тебя пока нет активных привычек.")
         return
 
-    for habit_id, name, days, description, done_days, is_challenge, confirm_type in habits:
+    for habit in habits:
+        habit_id = habit.id
+        name = habit.name
+        days = habit.days
+        description = habit.description
+        done_days = habit.done_days
+        is_challenge = habit.is_challenge
+        confirm_type = habit.confirm_type
+
         # 🔁 Автоудаление завершённых челленджей
         if is_challenge and done_days >= days:
             await complete_challenge(habit_id, message.from_user.id, bot)

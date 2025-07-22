@@ -227,7 +227,7 @@ async def add_challenge(callback: CallbackQuery):
         )
 
         habits = await get_habits_by_user(user_id)
-        habit_id = habits[-1][0] if habits else None
+        habit_id = habits[-1].id if habits else None
 
         logger.info(f"[{user_id}] Челлендж '{title}' успешно добавлен, habit_id={habit_id}")
         await callback.message.edit_text("✅ Челлендж добавлен в активные привычки!")

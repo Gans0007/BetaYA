@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
-from models.habit import Habit
+from models.habit_model import Habit
 from db.db import database
+from utils.timezones import get_current_time
 
 
 async def get_habits_by_user(user_id: int):
@@ -21,7 +22,7 @@ async def habit_exists(user_id: int, name: str) -> bool:
 
 
 async def get_unconfirmed_today(user_id: int) -> list[Habit]:
-    today = datetime.now().date().isoformat()
+    today = get_current_time().date()
     rows = await database.fetch_all("""
         SELECT h.* FROM habits h
         WHERE h.user_id = :user_id
@@ -57,7 +58,7 @@ async def increment_done_day(habit_id: int):
 
 
 async def should_show_delete_button(user_id: int, habit_id: int) -> bool:
-    today = datetime.now().date()
+    today = get_current_time().date()
     yesterday = today - timedelta(days=1)
 
     confirmed = await database.fetch_all("""
@@ -65,7 +66,7 @@ async def should_show_delete_button(user_id: int, habit_id: int) -> bool:
         WHERE user_id = :user_id AND habit_id = :habit_id AND confirmed = TRUE
     """, {"user_id": user_id, "habit_id": habit_id})
 
-    confirmed_dates = {datetime.strptime(row["date"], "%Y-%m-%d").date() for row in confirmed}
+    confirmed_dates = {row["date"] for row in confirmed}
 
     if confirmed_dates:
         return today not in confirmed_dates and yesterday not in confirmed_dates
@@ -77,7 +78,7 @@ async def should_show_delete_button(user_id: int, habit_id: int) -> bool:
     if not created:
         return False
 
-    created_date = datetime.strptime(created["created"], "%Y-%m-%d").date()
+    created_date = created["created"]
     return (today - created_date).days >= 2
 
 

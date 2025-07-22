@@ -45,7 +45,7 @@ async def handle_media_no_state(message: Message, state: FSMContext):
 
     try:
         habits = await get_habits_by_user(user_id)
-        media_habits = [(h[0], h[1]) for h in habits if h[6] in ("media", "wake_time")]
+        media_habits = [(h.id, h.name) for h in habits if h.confirm_type in ("media", "wake_time")]
 
         if not media_habits:
             logger.info(f"[{user_id}] Нет подходящих привычек для подтверждения")

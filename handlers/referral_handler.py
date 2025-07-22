@@ -14,12 +14,13 @@ async def show_referral_info(callback: types.CallbackQuery, bot: Bot, db):
     user_id = callback.from_user.id
 
     # Получаем всех рефералов
-    cursor = await db.execute("""
+    query = """
         SELECT invited_id, is_active 
         FROM referrals 
-        WHERE referrer_id = ?
-    """, (user_id,))
-    referrals = await cursor.fetchall()
+        WHERE referrer_id = :referrer_id
+    """
+    rows = await db.fetch_all(query, {"referrer_id": user_id})
+    referrals = [(row["invited_id"], row["is_active"]) for row in rows]
 
     total_referrals = len(referrals)
     active_referrals = sum(1 for _, is_active in referrals if is_active)

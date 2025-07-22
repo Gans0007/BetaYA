@@ -31,7 +31,7 @@ async def handle_review_videos(callback: types.CallbackQuery):
     for video in videos:
         user_id = video["user_id"]
         video_link = video["video_link"]
-        submitted_at = datetime.fromisoformat(video["submitted_at"]).strftime("%Y-%m-%d %H:%M")
+        submitted_at = video["submitted_at"].strftime("%Y-%m-%d %H:%M")
         approved = "✅ Да" if video["approved"] else "❌ Нет"
 
         text = (

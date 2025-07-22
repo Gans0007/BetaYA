@@ -4,14 +4,13 @@ from services.monetization.reward_service import add_reward
 
 
 async def save_pending_video(user_id: int, video_link: str):
-    submitted_at = get_current_time().strftime("%Y-%m-%d %H:%M:%S")
     await database.execute("""
         INSERT INTO pending_videos (user_id, video_link, submitted_at)
         VALUES (:user_id, :video_link, :submitted_at)
     """, {
         "user_id": user_id,
         "video_link": video_link,
-        "submitted_at": submitted_at
+        "submitted_at": get_current_time()  # ✅
     })
 
 
@@ -47,8 +46,14 @@ async def approve_video(video_id: int):
     result = await database.fetch_one("""
         SELECT user_id FROM pending_videos WHERE id = :id
     """, {"id": video_id})
+
     if result:
-        await add_xp(result["user_id"], 3, "Одобрено видео")
+        await add_reward(
+            user_id=result["user_id"],
+            amount=3,  # ⬅️ это XP
+            reward_type="xp",  # ⬅️ обязательный параметр
+            reason="Одобрено видео"
+        )
 
 
 async def get_pending_video_by_id(video_id: int) -> dict | None:

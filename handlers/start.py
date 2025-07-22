@@ -8,6 +8,7 @@ from keyboards.menu import get_main_menu
 from aiogram.exceptions import TelegramBadRequest
 import config
 import random
+from aiogram.fsm.context import FSMContext
 from handlers.rules_text import JOIN_MESSAGES
 
 from repositories.profiles.profile_repository import save_user, get_user
@@ -17,33 +18,23 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 @router.message(Command("start"))
-async def start_cmd(message: types.Message, bot: Bot):
+async def start_cmd(message: types.Message, bot: Bot, state: FSMContext):
     user_id = message.from_user.id
     logger.info(f"[START] Пользователь {user_id} начал работу")
 
     user = await get_user(user_id)
 
+    # Попробуем достать реферальный ID, если он передан
+    referrer_id = None
     if user is None and message.text and len(parts := message.text.split()) == 2 and parts[1].isdigit():
         referrer_id = int(parts[1])
         logger.info(f"[REFERRAL] Новый пользователь {user_id} перешёл по ссылке от {referrer_id}")
-
-        try:
-            await save_referral(referrer_id, user_id, bot)
-            logger.info(f"[REFERRAL] ✅ Сохранена связь: {referrer_id} → {user_id}")
-
-            # ✅ Уведомление пригласившему
-            try:
-                inviter_msg = random.choice(JOIN_MESSAGES).format(name=message.from_user.full_name)
-                await bot.send_message(referrer_id, inviter_msg, parse_mode="HTML")
-
-                logger.info(f"[REFERRAL] ✅ Уведомление отправлено пригласившему {referrer_id}")
-            except TelegramBadRequest as e:
-                logger.warning(f"[REFERRAL] ⚠️ Не удалось отправить уведомление {referrer_id}: {e}")
-
-        except Exception as e:
-            logger.error(f"[REFERRAL] ❌ Ошибка при сохранении связи {referrer_id} → {user_id}: {e}")
+        await state.update_data(referrer_id=referrer_id)
     else:
         logger.info(f"[REFERRAL] Пользователь {user_id} уже зарегистрирован — пропускаем сохранение реферала")
+
+    # ⚠️ Уведомление и сохранение связи теперь происходит в handle_check_subscription()
+
     keyboard = InlineKeyboardBuilder()
     keyboard.row(
         types.InlineKeyboardButton(
@@ -81,7 +72,7 @@ async def start_cmd(message: types.Message, bot: Bot):
 
 
 @router.callback_query(lambda c: c.data == "check_subs")
-async def handle_check_subscription(callback: types.CallbackQuery, bot: Bot):
+async def handle_check_subscription(callback: types.CallbackQuery, bot: Bot, state: FSMContext):
     user_id = callback.from_user.id
     logger.info(f"[SUB_CHECK] Проверка подписки для пользователя {user_id}")
 
@@ -106,8 +97,29 @@ async def handle_check_subscription(callback: types.CallbackQuery, bot: Bot):
         try:
             await save_user(user_id, full_name)
             logger.info(f"[DB] Пользователь {user_id} сохранён в базе")
+
+            # 👥 Попробуем достать referrer_id из FSM
+            data = await state.get_data()
+            referrer_id = data.get("referrer_id")
+
+            if referrer_id:
+                try:
+                    await save_referral(referrer_id, user_id, bot)
+                    logger.info(f"[REFERRAL] ✅ Сохранена связь: {referrer_id} → {user_id}")
+
+                    # ✅ Уведомление пригласившему
+                    try:
+                        inviter_msg = random.choice(JOIN_MESSAGES).format(name=callback.from_user.full_name)
+                        await bot.send_message(referrer_id, inviter_msg, parse_mode="HTML")
+                        logger.info(f"[REFERRAL] ✅ Уведомление отправлено пригласившему {referrer_id}")
+                    except TelegramBadRequest as e:
+                        logger.warning(f"[REFERRAL] ⚠️ Не удалось отправить уведомление {referrer_id}: {e}")
+
+                except Exception as e:
+                    logger.error(f"[REFERRAL] ❌ Ошибка при сохранении связи {referrer_id} → {user_id}: {e}")
+
         except Exception as e:
-            logger.error(f"[DB] Ошибка сохранения пользователя {user_id}: {e}")
+            logger.error(f"[DB] Ошибка сохранения пользователя {user_id}: {e}") 
 
         await callback.message.answer(
             text=(

@@ -43,6 +43,8 @@ def get_display_name(user: User) -> str:
 
 def get_random_caption(user: User, habit_name: str, done: int, total: int) -> str:
     display_name = get_display_name(user)
+    done = int(done)
+    total = int(total)
     percent = round((done / total) * 100) if total > 0 else 0
 
     return random.choice(CONFIRMATION_CAPTIONS).format(
@@ -63,7 +65,11 @@ async def send_to_public_chat(
     """
     Отправляет подтверждение привычки в публичный канал с подписью.
     """
-    name, done, total = await get_progress_by_habit_id(habit_id)
+    progress = await get_progress_by_habit_id(habit_id)
+    name = progress["name"]
+    done = progress["done_days"]
+    total = progress["days"]
+
     caption = get_random_caption(user, name, done, total)
 
     if file_type == "photo":
