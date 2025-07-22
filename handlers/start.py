@@ -7,6 +7,8 @@ from utils.check_subs import check_subscription
 from keyboards.menu import get_main_menu
 from aiogram.exceptions import TelegramBadRequest
 import config
+import random
+from handlers.rules_text import JOIN_MESSAGES
 
 from repositories.profiles.profile_repository import save_user, get_user
 from repositories.referrals.referral_repo import save_referral
@@ -31,11 +33,9 @@ async def start_cmd(message: types.Message, bot: Bot):
 
             # ✅ Уведомление пригласившему
             try:
-                inviter_msg = (
-                    f"🔥 По твоей ссылке пришёл новый брат: <b>{message.from_user.full_name}</b>\n"
-                    f"Теперь он с нами 💪"
-                )
+                inviter_msg = random.choice(JOIN_MESSAGES).format(name=message.from_user.full_name)
                 await bot.send_message(referrer_id, inviter_msg, parse_mode="HTML")
+
                 logger.info(f"[REFERRAL] ✅ Уведомление отправлено пригласившему {referrer_id}")
             except TelegramBadRequest as e:
                 logger.warning(f"[REFERRAL] ⚠️ Не удалось отправить уведомление {referrer_id}: {e}")

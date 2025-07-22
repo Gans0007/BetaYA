@@ -3,17 +3,18 @@
 from aiogram import Bot
 from aiogram.types import User
 from config import PUBLIC_CHAT_ID
+import random
+from repositories.habits.habit_repo import get_progress_by_habit_id
+from repositories.habits.habit_repo import increment_done_day
+from handlers.rules_text import CONFIRMATION_CAPTIONS
+
+
 
 from repositories.confirmations.confirmation_repo import (
     log_confirmation,
     was_confirmed_today,
     update_confirmation_file,
 )
-from repositories.habits.habit_repo import get_progress_by_habit_id
-from repositories.habits.habit_repo import increment_done_day
-
-import random
-
 
 async def process_confirmation(
     user_id: int,
@@ -41,21 +42,16 @@ def get_display_name(user: User) -> str:
     return f"@{user.username}" if user.username else user.full_name
 
 def get_random_caption(user: User, habit_name: str, done: int, total: int) -> str:
-    display_name = f"@{user.username}" if user.username else user.full_name
+    display_name = get_display_name(user)
     percent = round((done / total) * 100) if total > 0 else 0
 
-    return random.choice([
-        f"✅ <b>{display_name}</b> только что подтвердил привычку <b>«{habit_name}»</b> – уважение 💪",
-        f"🔥 <b>{display_name}</b> не отступает – привычка подтверждена!",
-        f"📌 <b>{display_name}</b> снова на пути к цели ({done}/{total}) – красавчик!",
-        f"⚡️ <b>{display_name}</b> сделал шаг вперёд – дисциплина рулит.",
-        f"🏁 <b>{display_name}</b> держит темп – <b>{percent}%</b> привычки уже пройдено!",
-        f"🎯 <b>{display_name}</b> подтвердил привычку <b>«{habit_name}»</b> — уже <b>{percent}%</b> пути пройдено!",
-        f"💥 <b>{display_name}</b> бьёт точно в цель: <b>«{habit_name}»</b> ({done}/{total}) — идёт по плану!",
-        f"📊 <b>{display_name}</b> делает стабильный прогресс по привычке <b>«{habit_name}»</b>: <b>{percent}%</b> завершено!",
-        f"🚀 <b>{display_name}</b> только что продвинул <b>«{habit_name}»</b> до <b>{done} из {total}</b> — сила в постоянстве!",
-        f"🙌 <b>{display_name}</b> не сдается! <b>«{habit_name}»</b> уверенно движется к финишу — <b>{percent}%</b> на счету!"
-    ])
+    return random.choice(CONFIRMATION_CAPTIONS).format(
+        name=display_name,
+        habit=habit_name,
+        done=done,
+        total=total,
+        percent=percent
+    )
 
 async def send_to_public_chat(
     user: User,

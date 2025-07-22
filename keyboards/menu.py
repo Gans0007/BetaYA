@@ -29,7 +29,8 @@ def get_main_menu() -> ReplyKeyboardMarkup:
                 KeyboardButton(text="📋 Активные задания")
             ],
             [
-                KeyboardButton(text="💰 Монетизация")
+                KeyboardButton(text="💰 Монетизация"),
+                KeyboardButton(text="📥 Полная версия")
             ]
         ],
         resize_keyboard=True,
@@ -181,8 +182,10 @@ async def handle_monetization_back(callback: types.CallbackQuery, bot: Bot):
 async def handle_monetization_rules(callback: CallbackQuery):
     await callback.answer()
 
-    back_btn = InlineKeyboardMarkup(inline_keyboard=[
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📌 Примеры медиа", callback_data="rules_examples")],
         [InlineKeyboardButton(text="◀️ Назад", callback_data="monetization_back")]
     ])
 
-    await callback.message.answer(rules_text, reply_markup=back_btn, parse_mode="HTML")
+    await callback.message.answer(rules_text, reply_markup=keyboard, parse_mode="HTML")
+
