@@ -1,39 +1,20 @@
 # repositories/users/user_repo.py
 
-import aiosqlite
-from config import DB_PATH
-
-async def get_all_users():
-    async with aiosqlite.connect(DB_PATH) as conn:
-        cursor = await conn.execute("SELECT DISTINCT user_id FROM habits")
-        rows = await cursor.fetchall()
-        await cursor.close()
-        return [row[0] for row in rows]
-
+from db.db import database
 
 async def get_all_users_with_active_habits() -> list[int]:
-    async with aiosqlite.connect(DB_PATH) as db:
-        async with db.execute("SELECT DISTINCT user_id FROM habits") as cursor:
-            rows = await cursor.fetchall()
-            return [row[0] for row in rows]
+    rows = await database.fetch_all("SELECT DISTINCT user_id FROM habits")
+    return [row["user_id"] for row in rows]
 
 async def get_confirmed_count(user_id: int) -> int:
+    query = """
+        SELECT COUNT(*) 
+        FROM habits 
+        WHERE user_id = :user_id AND done_days >= days
     """
-    Возвращает количество завершённых привычек у пользователя.
-    Завершённая = done_days >= days
-    """
-    async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("""
-            SELECT COUNT(*)
-            FROM habits
-            WHERE user_id = ? AND done_days >= days
-        """, (user_id,))
-        row = await cursor.fetchone()
-        return row[0] if row else 0
-
+    row = await database.fetch_one(query, {"user_id": user_id})
+    return row[0] if row else 0
 
 async def get_all_user_ids() -> list[int]:
-    async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute("SELECT user_id FROM users")
-        rows = await cursor.fetchall()
-        return [row[0] for row in rows]
+    rows = await database.fetch_all("SELECT user_id FROM users")
+    return [row["user_id"] for row in rows]

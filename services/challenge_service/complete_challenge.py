@@ -1,28 +1,33 @@
-import sqlite3
-from config import DB_PATH
+from db.db import database
 from aiogram import Bot
 
+
 async def complete_challenge(habit_id: int, user_id: int, bot: Bot):
-    with sqlite3.connect(DB_PATH) as conn:
-        # Получаем данные о челлендже ДО удаления
-        cursor = conn.execute("SELECT name, done_days, days FROM habits WHERE id = ? AND user_id = ?", (habit_id, user_id))
-        row = cursor.fetchone()
-        if not row:
-            return  # Если привычка уже удалена, ничего не делаем
+    # Получаем данные о челлендже до удаления
+    row = await database.fetch_one("""
+        SELECT name, done_days, days FROM habits
+        WHERE id = :habit_id AND user_id = :user_id
+    """, {"habit_id": habit_id, "user_id": user_id})
 
-        name, done_days, total_days = row
+    if not row:
+        return  # Если привычка уже удалена
 
-        # Увеличиваем счётчик завершённых челленджей
-        conn.execute("""
-            UPDATE users
-            SET finished_challenges = finished_challenges + 1
-            WHERE user_id = ?
-        """, (user_id,))
+    name, done_days, total_days = row["name"], row["done_days"], row["days"]
 
-        # Удаляем привычку
-        conn.execute("DELETE FROM habits WHERE id = ? AND user_id = ?", (habit_id, user_id))
+    # Увеличиваем счётчик завершённых челленджей
+    await database.execute("""
+        UPDATE users
+        SET finished_challenges = finished_challenges + 1
+        WHERE user_id = :user_id
+    """, {"user_id": user_id})
 
-    # 📢 Уведомление сразу в чат
+    # Удаляем привычку
+    await database.execute("""
+        DELETE FROM habits
+        WHERE id = :habit_id AND user_id = :user_id
+    """, {"habit_id": habit_id, "user_id": user_id})
+
+    # 📢 Уведомление
     await bot.send_message(
         user_id,
         f"🏆 <b>Челлендж «{name}» завершён!</b>\n\n"

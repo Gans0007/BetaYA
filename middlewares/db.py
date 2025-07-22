@@ -1,8 +1,7 @@
 from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
-from aiosqlite import connect
-from config import DB_PATH
+from db.db import database  # <-- подключаем новый database объект
 
 class DatabaseMiddleware(BaseMiddleware):
     async def __call__(
@@ -11,6 +10,6 @@ class DatabaseMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any]
     ) -> Any:
-        async with connect(DB_PATH) as db:
-            data["db"] = db
-            return await handler(event, data)
+        # Можно прокинуть доступ к базе, если надо
+        data["db"] = database
+        return await handler(event, data)

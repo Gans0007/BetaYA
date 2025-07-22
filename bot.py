@@ -6,11 +6,13 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config import BOT_TOKEN
-from init_db import init_db
+from init_pg_db import init_postgres_db
 from utils.reset_task import start_reset_scheduler
 from routers_register import register_all_routers
 from middlewares.db import DatabaseMiddleware
 from services.reminder import reminder  # <-- импорт внизу, но до использования
+
+from db.db import database
 
 os.makedirs("logs", exist_ok=True)
 
@@ -54,25 +56,28 @@ dp.message.middleware(DatabaseMiddleware())
 dp.callback_query.middleware(DatabaseMiddleware())
 
 async def main():
-    await init_db()
-    logger.info("📦 База данных инициализирована.")
+    # 🔌 Подключение к PostgreSQL
+    await database.connect()
+    logger.info("📦 Подключение к PostgreSQL установлено.")
 
-    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    await init_postgres_db()  # можно временно отключить, если переводишь всё вручную
 
-    # 🔔 Запускаем таск напоминаний
+    # ✅ Бот и диспетчер уже созданы выше
+    # 🔔 Напоминания
     asyncio.create_task(reminder.scheduled_reminder_loop(bot))
 
-    # 🔁 Регистрируем роутеры
     await register_all_routers(dp)
     logger.info("🔁 Роутеры зарегистрированы.")
 
-    # ⏰ Планировщик сброса привычек
     asyncio.create_task(start_reset_scheduler(bot))
     logger.info("⏰ Планировщик сброса привычек запущен.")
 
-    # 🚀 Запуск
     logger.info("🚀 Бот запущен.")
     await dp.start_polling(bot)
+
+    # 🔌 Отключение от базы
+    await database.disconnect()
+    logger.info("📴 PostgreSQL отключён.")
 
 if __name__ == "__main__":
     asyncio.run(main())

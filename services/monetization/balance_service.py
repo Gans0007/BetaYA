@@ -1,39 +1,31 @@
-# services/monetization/balance_service.py
+from db.db import database
 
-import aiosqlite
-from config import DB_PATH
 
 async def get_user_balance_and_history(user_id: int) -> tuple[float, int, list[dict]]:
-    async with aiosqlite.connect(DB_PATH) as db:
-        # Получаем текущий баланс
-        cursor = await db.execute(
-            "SELECT usdt_balance, xp_balance FROM users WHERE user_id = ?",
-            (user_id,)
-        )
-        user_row = await cursor.fetchone()
-        usdt, xp = user_row if user_row else (0.0, 0)
+    # Получаем текущий баланс
+    user_row = await database.fetch_one("""
+        SELECT usdt_balance, xp_balance FROM users WHERE user_id = :user_id
+    """, {"user_id": user_id})
 
-        # Получаем последние 10 записей истории
-        history_cursor = await db.execute(
-            """
-            SELECT amount, type, reason, strftime('%d.%m', timestamp) as date
-            FROM reward_history
-            WHERE user_id = ?
-            ORDER BY timestamp DESC
-            LIMIT 6
-            """,
-            (user_id,)
-        )
-        history_rows = await history_cursor.fetchall()
+    usdt, xp = user_row["usdt_balance"], user_row["xp_balance"] if user_row else (0.0, 0)
 
-        history = [
-            {
-                "amount": row[0],
-                "type": row[1],
-                "reason": row[2],
-                "date": row[3]
-            }
-            for row in history_rows
-        ]
+    # Получаем последние 6 записей истории
+    history_rows = await database.fetch_all("""
+        SELECT amount, type, reason, TO_CHAR(timestamp, 'DD.MM') as date
+        FROM reward_history
+        WHERE user_id = :user_id
+        ORDER BY timestamp DESC
+        LIMIT 6
+    """, {"user_id": user_id})
 
-        return usdt, xp, history
+    history = [
+        {
+            "amount": row["amount"],
+            "type": row["type"],
+            "reason": row["reason"],
+            "date": row["date"]
+        }
+        for row in history_rows
+    ]
+
+    return usdt, xp, history

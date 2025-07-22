@@ -1,50 +1,39 @@
-import aiosqlite
-from config import DB_PATH
+from db.db import database
 from utils.timezones import get_current_time
 import logging
 
 logger = logging.getLogger(__name__)
 
-async def add_reward(user_id: int, amount: float, reward_type: str, reason: str = "Без причины", conn: aiosqlite.Connection = None):
+async def add_reward(user_id: int, amount: float, reward_type: str, reason: str = "Без причины"):
     if reward_type not in ["xp", "usdt"]:
         logger.error(f"[REWARD] ❌ Некорректный тип награды: {reward_type} → user_id={user_id}")
         raise ValueError("Тип награды должен быть 'xp' или 'usdt'")
 
-    internal_conn = False
-    if conn is None:
-        conn = await aiosqlite.connect(DB_PATH)
-        internal_conn = True
-
     try:
-        # Обновляем баланс
         if reward_type == "xp":
-            cursor = await conn.execute(
-                "UPDATE users SET xp_balance = xp_balance + ? WHERE user_id = ?", 
-                (amount, user_id)
-            )
+            result = await database.execute("""
+                UPDATE users SET xp_balance = xp_balance + :amount WHERE user_id = :user_id
+            """, {"amount": amount, "user_id": user_id})
         else:
-            cursor = await conn.execute(
-                "UPDATE users SET usdt_balance = usdt_balance + ? WHERE user_id = ?", 
-                (amount, user_id)
-            )
+            result = await database.execute("""
+                UPDATE users SET usdt_balance = usdt_balance + :amount WHERE user_id = :user_id
+            """, {"amount": amount, "user_id": user_id})
 
-        if cursor.rowcount == 0:
+        if result == 0:
             logger.warning(f"[REWARD] ⚠️ Не удалось обновить баланс: user_id={user_id} не найден")
 
-        # Пишем в историю
-        await conn.execute("""
+        await database.execute("""
             INSERT INTO reward_history (user_id, amount, type, reason, timestamp)
-            VALUES (?, ?, ?, ?, ?)
-        """, (user_id, amount, reward_type, reason, get_current_time()))
-
-        if internal_conn:
-            await conn.commit()
+            VALUES (:user_id, :amount, :type, :reason, :timestamp)
+        """, {
+            "user_id": user_id,
+            "amount": amount,
+            "type": reward_type,
+            "reason": reason,
+            "timestamp": get_current_time()
+        })
 
         logger.info(f"[REWARD] ✅ Начислено +{amount} {reward_type.upper()} → user_id={user_id}, причина: {reason}")
 
     except Exception as e:
         logger.exception(f"[REWARD] ❌ Ошибка при начислении награды: {e}")
-
-    finally:
-        if internal_conn:
-            await conn.close()

@@ -1,5 +1,4 @@
-import aiosqlite
-from config import DB_PATH
+from db.db import database
 from utils.timezones import get_current_time
 
 async def save_habit(
@@ -11,9 +10,15 @@ async def save_habit(
     confirm_type: str = 'media'
 ):
     created_at = get_current_time()
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute("""
-            INSERT INTO habits (user_id, name, days, description, done_days, is_challenge, confirm_type, created_at)
-            VALUES (?, ?, ?, ?, 0, ?, ?, ?)
-        """, (user_id, name, days, description, int(is_challenge), confirm_type, created_at))
-        await db.commit()
+    await database.execute("""
+        INSERT INTO habits (user_id, name, days, description, done_days, is_challenge, confirm_type, created_at)
+        VALUES (:user_id, :name, :days, :description, 0, :is_challenge, :confirm_type, :created_at)
+    """, {
+        "user_id": user_id,
+        "name": name,
+        "days": days,
+        "description": description,
+        "is_challenge": is_challenge,
+        "confirm_type": confirm_type,
+        "created_at": created_at
+    })

@@ -22,4 +22,4 @@ REFERRAL_BASE_URL = "https://t.me/litevambitionbot"
 
 ADMIN_IDS = [900410719]
 
-DB_PATH = Path(__file__).resolve().parent / "data" / "habits.db"
+
