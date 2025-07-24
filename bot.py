@@ -13,6 +13,7 @@ from middlewares.db import DatabaseMiddleware
 from services.reminder import reminder  # <-- импорт внизу, но до использования
 
 from db.db import database
+from db.db import DATABASE_URL
 
 os.makedirs("logs", exist_ok=True)
 
@@ -56,6 +57,7 @@ dp.message.middleware(DatabaseMiddleware())
 dp.callback_query.middleware(DatabaseMiddleware())
 
 async def main():
+    logger.info(f"📡 DATABASE_URL: {DATABASE_URL}")  # 👈 логируем подключение
     # 🔌 Подключение к PostgreSQL
     await database.connect()
     logger.info("📦 Подключение к PostgreSQL установлено.")
