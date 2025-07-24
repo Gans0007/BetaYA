@@ -1,12 +1,6 @@
-import asyncio
-from databases import Database
-
-DATABASE_URL = "postgresql://postgres:FQLO2o3Hztd15dreWkml@yourambition.pgwc9a5k3t4j6h15kvjqjse7t0.postgres.ubicloud.com:5432/postgres"
-database = Database(DATABASE_URL)
+from db.db import database 
 
 async def init_postgres_db():
-    await database.connect()
-
     await database.execute("""
     CREATE TABLE IF NOT EXISTS users (
         user_id BIGINT PRIMARY KEY,
@@ -106,8 +100,4 @@ async def init_postgres_db():
     );
     """)
 
-    await database.disconnect()
     print("✅ PostgreSQL таблицы инициализированы.")
-
-if __name__ == "__main__":
-    asyncio.run(init_postgres_db())
