@@ -58,14 +58,13 @@ dp.callback_query.middleware(DatabaseMiddleware())
 
 async def main():
     logger.info(f"📡 DATABASE_URL: {DATABASE_URL}")
-    # 🔌 Подключение к PostgreSQL
+
     await database.connect()
     logger.info("📦 Подключение к PostgreSQL установлено.")
 
     await init_postgres_db()
     logger.info("🛠 Таблицы проверены/созданы (init_postgres_db).")
 
-    # >>> ПРОВЕРКА ТАБЛИЦЫ USERS <<<
 #    try:
 #        rows = await database.fetch_all("SELECT * FROM users;")
 #        logger.info(f"👀 Данные из таблицы users (первые 10): {rows[:10]}")
