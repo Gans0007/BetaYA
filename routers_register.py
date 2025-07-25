@@ -5,6 +5,7 @@ from handlers import referral_handler
 from handlers import upload_video
 from handlers.full_version_handler import router as full_version_router
 from handlers.example_video import router as example_video_router
+from middlewares.antispam import AntiSpamMiddleware
 
 from handlers import (
     start,
@@ -30,3 +31,4 @@ async def register_all_routers(dp: Dispatcher):
     dp.include_router(upload_video.router)
     dp.include_router(full_version_router)
     dp.include_router(example_video_router)
+    dp.update.middleware(AntiSpamMiddleware(delay=1))

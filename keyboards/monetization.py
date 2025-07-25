@@ -7,7 +7,7 @@ def get_balance_keyboard(show_withdraw: bool = False) -> InlineKeyboardMarkup:
         buttons.append(
             InlineKeyboardButton(
                 text="💸 Вывести USDT",
-                url="https://t.me/yourambitions"
+                url="https://t.me/ssprvz01"
             )
         )
 

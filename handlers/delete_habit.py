@@ -42,6 +42,7 @@ async def delete_habit(callback: CallbackQuery):
         logger.exception(f"[{user_id}] Ошибка при удалении привычки habit_id={habit_id}: {e}")
         await callback.answer("Не удалось удалить привычку", show_alert=True)
 
+
 # 🔹 Отмена удаления и возврат к карточке
 @router.callback_query(F.data == "cancel_delete")
 async def cancel_delete(callback: CallbackQuery):
@@ -57,7 +58,15 @@ async def cancel_delete(callback: CallbackQuery):
             await callback.answer()
             return
 
-        habit_id, name, days, description, done_days, is_challenge, confirm_type = habit
+        # Исправлено: доступ к полям объекта Habit
+        habit_id = habit.id
+        name = habit.name
+        days = habit.days
+        description = habit.description
+        done_days = habit.done_days
+        is_challenge = habit.is_challenge
+        confirm_type = habit.confirm_type
+
         title = "🔥<b>Активный челлендж:</b>" if is_challenge else "⚡️<b>Активная привычка:</b>"
         percent = round((done_days / days) * 100) if days > 0 else 0
 
