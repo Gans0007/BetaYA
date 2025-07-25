@@ -57,14 +57,22 @@ dp.message.middleware(DatabaseMiddleware())
 dp.callback_query.middleware(DatabaseMiddleware())
 
 async def main():
-    logger.info(f"📡 DATABASE_URL: {DATABASE_URL}")  # 👈 логируем подключение
+    logger.info(f"📡 DATABASE_URL: {DATABASE_URL}")  # Логируем подключение
     # 🔌 Подключение к PostgreSQL
     await database.connect()
     logger.info("📦 Подключение к PostgreSQL установлено.")
 
-    await init_postgres_db()  # можно временно отключить, если переводишь всё вручную
+    # Создание/проверка таблиц
+    await init_postgres_db()
+    logger.info("🛠 Таблицы проверены/созданы (init_postgres_db).")
 
-    # ✅ Бот и диспетчер уже созданы выше
+    # >>> ПРОВЕРКА ТАБЛИЦЫ USERS <<<
+    try:
+        rows = await database.fetch_all("SELECT * FROM users;")
+        logger.info(f"👀 Данные из таблицы users (первые 10): {rows[:10]}")
+    except Exception as e:
+        logger.error(f"❌ Ошибка при SELECT * FROM users: {e}")
+
     # 🔔 Напоминания
     asyncio.create_task(reminder.scheduled_reminder_loop(bot))
 
@@ -81,5 +89,7 @@ async def main():
     await database.disconnect()
     logger.info("📴 PostgreSQL отключён.")
 
+
 if __name__ == "__main__":
     asyncio.run(main())
+
