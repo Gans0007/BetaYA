@@ -68,7 +68,7 @@ async def log_confirmation(user_id: int, habit_id: int, file_id: str, file_type:
 
             if row and row["is_active"] == 0:
                 await database.execute("""
-                    UPDATE referrals SET is_active = 1 WHERE invited_id = :user_id
+                    UPDATE referrals SET is_active = TRUE WHERE invited_id = :user_id
                 """, {"user_id": user_id})
                 logger.info(f"[REFERRAL] 🎯 Обновили is_active для {user_id}")
 

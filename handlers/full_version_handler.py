@@ -7,6 +7,11 @@ router = Router()
 
 @router.message(F.text == "📥 Полная версия")
 async def handle_full_version(message: types.Message):
+    import logging
+    logging.getLogger(__name__).info(
+        f"[DEBUG] Кнопка 'Полная версия' нажата. text={repr(message.text)}, user_id={message.from_user.id}"
+    )
+
     text = (
         "🔓 <b>Полная версия Your Ambitions</b> — это не просто бот, а <b>социальная сеть</b> для тех, кто:\n\n"
         "• Хочет выработать сильные привычки\n"
