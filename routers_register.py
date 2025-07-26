@@ -19,24 +19,16 @@ from keyboards import menu
 
 async def register_all_routers(dp: Dispatcher):
     dp.include_router(start.router)
-
-# Узконаправленные отдельные сценарии
     dp.include_router(full_version_router)
-    dp.include_router(balance_handler.router)
-    dp.include_router(referral_handler.router)
-    dp.include_router(upload_video.router)
-    dp.include_router(example_video_router)
-
-# Основной функционал
+    dp.include_router(menu.router)
     dp.include_router(habit_add.router)
     dp.include_router(challenge_select.router)
     dp.include_router(habit_confirm.router)
     dp.include_router(habit_auto_confirm.router)
     dp.include_router(delete_habit.router)
     dp.include_router(complete_router)
-
-# И только в конце меню (самый широкий набор)
-    dp.include_router(menu.router)
-
-# Middleware в самом конце
+    dp.include_router(balance_handler.router)
+    dp.include_router(referral_handler.router)
+    dp.include_router(upload_video.router)
+    dp.include_router(example_video_router)
     dp.update.middleware(AntiSpamMiddleware(delay=1))
