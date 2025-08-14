@@ -30,6 +30,9 @@ def get_main_menu() -> ReplyKeyboardMarkup:
             ],
             [
                 KeyboardButton(text="💰 Монетизация"),
+                KeyboardButton(text="⚡️ Мотивация")
+            ],
+            [
                 KeyboardButton(text="📥 Полная версия")
             ]
         ],
@@ -45,9 +48,9 @@ async def handle_add_habit(message: types.Message):
     total = await count_user_habits(user_id)
 
     text = (
-        "📌 В привычке ты можешь сам добавить свою привычку.\n"
-        "🔥 А в Challenge — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
-        f"{total}/5"
+        "📌  «Добавить привычку» - cоздай здесь свою собственную привычку или задачу.\n"
+        "🔥  «Взять Challenge» — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
+        f"{total}/3"
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[

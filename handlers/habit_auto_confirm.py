@@ -3,10 +3,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 import logging
 
-from services.habits.habit_auto_confirmation_service import (
-    list_media_habits,
-    confirm_selected_habit,
-)
+from services.habits.habit_auto_confirmation_service import list_media_habits
+from services.habits.confirmation_common import confirm_media_habit  # заменили импорт
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -65,7 +63,8 @@ async def handle_habit_selection(callback: CallbackQuery, state: FSMContext):
 
     habit_id = int(callback.data.split("_")[-1])
 
-    result_text = await confirm_selected_habit(
+    # Используем общую функцию confirm_media_habit вместо confirm_selected_habit
+    result_text = await confirm_media_habit(
         user=callback.from_user,
         habit_id=habit_id,
         file_id=file_id,
@@ -73,6 +72,7 @@ async def handle_habit_selection(callback: CallbackQuery, state: FSMContext):
         bot=callback.bot,
     )
 
+    logger.info(f"[AUTO-CONFIRM] user_id={user_id}, habit_id={habit_id}, result={result_text}")
     await callback.message.answer(result_text)
     await callback.answer()
     await state.clear()

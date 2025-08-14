@@ -108,6 +108,32 @@ async def init_postgres_db():
         );
         """)
 
+        await database.execute("""
+        CREATE TABLE IF NOT EXISTS completed_challenges (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            name TEXT NOT NULL,
+            description TEXT,
+            days INTEGER,
+            done_days INTEGER,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        );
+        """)
+
+        await database.execute("""
+        CREATE TABLE IF NOT EXISTS achievements (
+            id SERIAL PRIMARY KEY,
+            user_id BIGINT NOT NULL,
+            code TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, code),
+            FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        );
+        """)
+
+
+
         print("✅ PostgreSQL таблицы инициализированы.")
 
 

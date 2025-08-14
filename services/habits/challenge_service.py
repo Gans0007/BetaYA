@@ -8,7 +8,7 @@ from services.habits.habit_service import save_habit
 
 logger = logging.getLogger(__name__)
 
-MAX_HABITS = 5
+MAX_HABITS = 3
 
 async def can_add_challenge(user_id: int):
     """

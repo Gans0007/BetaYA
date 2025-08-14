@@ -8,6 +8,7 @@ from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton
 from states.habit_states import HabitForm
 from services.habits.habit_service import save_habit
 from repositories.habits.habit_repo import count_user_habits  # ✅ добавлено
+from services.achievements.simple_achievements import show_achievement
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -23,8 +24,8 @@ async def callback_start_habit(callback: CallbackQuery, state: FSMContext):
     
     # ✅ Проверка лимита привычек/челленджей
     total_habits = await count_user_habits(callback.from_user.id)
-    if total_habits >= 5:
-        await callback.message.answer("❌ У тебя уже 5 активных привычек или челленджей. Удали одну, чтобы добавить новую.")
+    if total_habits >= 3:
+        await callback.message.answer("❌ Ты достиг максимума активных привычек в бесплатной версии.\nУдали одну или оформи подписку и не имей ограничений")
         await callback.answer()
         return
 
@@ -92,6 +93,12 @@ async def confirm_habit(callback: CallbackQuery, state: FSMContext):
             description=data['description']
         )
         await callback.message.edit_text("🔥 Привычка сохранена и добавлена в активные задания!")
+
+
+        # Новая строка — показываем ачивку
+        await show_achievement(callback.bot, user_id, "first_habit")
+
+
         logger.info(f"[{user_id}] Привычка сохранена успешно в БД")
 
     except Exception as e:

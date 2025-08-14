@@ -75,9 +75,16 @@ async def confirm_selected_habit(user, habit_id: int, file_id: str, file_type: s
 
     if progress_increased:
         habit = await get_habit_by_id(habit_id)
+
+        # Ачивка за 3 подтверждения подряд
+        from services.achievements.simple_achievements import show_achievement
+        if habit.done_days == 3:
+            await show_achievement(bot, user.id, "streak_3")
+
         if habit.is_challenge and int(habit.done_days) >= int(habit.days):
             await complete_challenge(habit_id, user.id, bot)
             return "🏆 Челлендж завершён!"
+
 
     return (
         "✅ Привычка успешно подтверждена! Прогресс обновлён."

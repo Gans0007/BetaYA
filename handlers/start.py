@@ -135,6 +135,23 @@ async def handle_check_subscription(callback: types.CallbackQuery, bot: Bot, sta
             parse_mode="HTML",
             reply_markup=get_main_menu()
         )
+
+
+        # Второе сообщение
+        await callback.message.answer(
+            text=(
+                "🎥 <b>Короткая видео-инструкция</b>\n\n"
+                "Её можно найти в меню: <b>Монетизация → Раздел «Правила»</b>.\n\n"
+                "Если меню не видно — нажми на кнопку как на фото ниже 👇"
+            ),
+            parse_mode="HTML"
+        )
+
+        # Отправляем картинку (file_id)
+        await callback.message.answer_photo(
+            photo="AgACAgIAAxkBAAKbkWiHaIrMmCXdrkE1kQ8mX8VL-zf7AALA8DEbQlNASDAUHmqJO7TyAQADAgADeQADNgQ"
+        )
+
         return
 
     logger.info(f"[SUB_CHECK] Пользователь {user_id} ещё не подписан (канал: {sub_channel}, чат: {sub_chat})")

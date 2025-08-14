@@ -53,43 +53,6 @@ async def log_confirmation(user_id: int, habit_id: int, file_id: str, file_type:
     })
     logger.info(f"[CONFIRMATION] ✅ Сохранили подтверждение habit_id={habit_id} для user_id={user_id}")
 
-    if new_active_day:
-        row = await database.fetch_one("""
-            SELECT active_days FROM users WHERE user_id = :user_id
-        """, {"user_id": user_id})
-        active_days = row["active_days"] if row else 0
-        logger.info(f"[CONFIRMATION] У пользователя {user_id} сейчас {active_days} active_days")
-
-        if active_days == 3:
-            row = await database.fetch_one("""
-                SELECT is_active FROM referrals WHERE invited_id = :user_id
-            """, {"user_id": user_id})
-            logger.info(f"[DEBUG] Запись в referrals для {user_id}: {row}")
-
-            if row and row["is_active"] == 0:
-                await database.execute("""
-                    UPDATE referrals SET is_active = TRUE WHERE invited_id = :user_id
-                """, {"user_id": user_id})
-                logger.info(f"[REFERRAL] 🎯 Обновили is_active для {user_id}")
-
-                row = await database.fetch_one("""
-                    SELECT referrer_id FROM referrals WHERE invited_id = :user_id
-                """, {"user_id": user_id})
-                if row:
-                    referrer_id = row["referrer_id"]
-                    await add_reward(referrer_id, 0.25, "usdt", "Активный реферал (USDT)")
-
-                    try:
-                        user = await bot.get_chat(user_id)
-                        username = user.username or f"id{user_id}"
-                        await bot.send_message(
-                            referrer_id,
-                            f"🥳 Пользователь @{username}, приглашённый по твоей ссылке, стал активным!\n\n💰 Ты получил за активного друга +0,25 USDT"
-                        )
-                        logger.info(f"[REFERRAL] ✅ Уведомление отправлено пригласившему {referrer_id}")
-                    except Exception as e:
-                        logger.error(f"[REFERRAL] ❌ Ошибка при отправке уведомления {referrer_id}: {e}")
-
 
 async def was_confirmed_today(user_id: int, habit_id: int) -> bool:
     today = get_current_time().date()

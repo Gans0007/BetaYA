@@ -6,6 +6,7 @@ from handlers import upload_video
 from handlers.full_version_handler import router as full_version_router
 from handlers.example_video import router as example_video_router
 from middlewares.antispam import AntiSpamMiddleware
+from handlers import motivation
 
 from handlers import (
     start,
@@ -21,6 +22,7 @@ async def register_all_routers(dp: Dispatcher):
     dp.include_router(start.router)
     dp.include_router(full_version_router)
     dp.include_router(menu.router)
+    dp.include_router(motivation.router)
     dp.include_router(habit_add.router)
     dp.include_router(challenge_select.router)
     dp.include_router(habit_confirm.router)

@@ -1,11 +1,13 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.exceptions import TelegramBadRequest
-
+from db.db import database  # в начале файла добавь импорт
 
 from services.habits.habit_service import save_habit
 from repositories.habits.habit_repo import get_habits_by_user, habit_exists
 from repositories.habits.habit_repo import count_user_habits
+
+from services.achievements.simple_achievements import show_achievement
 
 import logging
 logger = logging.getLogger(__name__)
@@ -103,17 +105,38 @@ def build_levels_keyboard():
     return kb
 
 
-def build_challenges_keyboard(level_key: str):
+async def build_challenges_keyboard(level_key: str, user_id: int):
     items = CHALLENGES.get(level_key, [])
     kb = InlineKeyboardMarkup(inline_keyboard=[], row_width=1)
+
+    # Активные челленджи
+    active_habits = await get_habits_by_user(user_id)
+    active_titles = {h.name for h in active_habits if h.is_challenge}
+
+    # Завершённые челленджи
+    rows = await database.fetch_all("""
+        SELECT name FROM completed_challenges WHERE user_id = :user_id
+    """, {"user_id": user_id})
+    completed_titles = {row["name"] for row in rows}
+
     for idx, (title, desc, days, ctype) in enumerate(items):
+        suffix = ""
+        if title in active_titles:
+            suffix = " 🔥"
+        elif title in completed_titles:
+            suffix = " ✅"
+
         btn = InlineKeyboardButton(
-            text=f"{title} ({days} дн.)",
+            text=f"{title} ({days} дн.){suffix}",
             callback_data=f"select_challenge:{level_key}:{idx}"
         )
         kb.inline_keyboard.append([btn])
-    kb.inline_keyboard.append([InlineKeyboardButton(text="⬅️ Назад", callback_data="take_challenge")])
+
+    kb.inline_keyboard.append(
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="take_challenge")]
+    )
     return kb
+
 
 # --- Обработчики ---
 
@@ -154,7 +177,7 @@ async def show_challenges(callback: CallbackQuery):
 
         await callback.message.edit_text(
             f"🏅 Челленджи уровня {LEVELS[level_key]}",
-            reply_markup=build_challenges_keyboard(level_key)
+            reply_markup=await build_challenges_keyboard(level_key, user_id)
         )
     except Exception as e:
         logger.exception(f"[{user_id}] Ошибка при отображении челленджей уровня {level_key}: {e}")
@@ -201,8 +224,8 @@ async def add_challenge(callback: CallbackQuery):
 
     from repositories.habits.habit_repo import count_user_habits  # (если ещё не импортирован)
     total_habits = await count_user_habits(user_id)
-    if total_habits >= 5:
-        await callback.message.answer("❌ У тебя уже 5 активных привычек или челленджей. Удали одну, чтобы добавить новую.")
+    if total_habits >= 3:
+        await callback.message.answer("❌ Ты достиг максимума активных привычек в бесплатной версии.\nУдали одну или оформи подписку и не имей ограничений")
         return
 
     try:
@@ -232,6 +255,13 @@ async def add_challenge(callback: CallbackQuery):
         logger.info(f"[{user_id}] Челлендж '{title}' успешно добавлен, habit_id={habit_id}")
         await callback.message.edit_text("✅ Челлендж добавлен в активные привычки!")
 
+
+
+        # Новая строка — показываем ачивку
+        await show_achievement(callback.bot, user_id, "first_challenge")
+
+
+
     except Exception as e:
         logger.exception(f"[{user_id}] Ошибка при добавлении челленджа: {e}")
         try:
@@ -246,9 +276,9 @@ async def back_to_habit_menu(callback: CallbackQuery):
     total = await count_user_habits(callback.from_user.id)
 
     text = (
-        "📌 В привычке ты можешь сам добавить свою привычку.\n"
-        "🔥 А в Challenge — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
-        f"{total}/5"
+        "📌  «Добавить привычку» - cоздай здесь свою собственную привычку или задачу.\n"
+        "🔥  «Взять Challenge» — выбрать одно из заданий от команды <b>Your Ambitions</b>.\n\n"
+        f"{total}/3"
     )
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[

@@ -3,7 +3,8 @@ from aiogram.fsm.context import FSMContext
 from states.habit_states import ConfirmHabit
 import logging
 
-from services.habits.habit_confirmation_service import start_confirmation, confirm_with_media
+from services.habits.habit_confirmation_service import start_confirmation
+from services.habits.confirmation_common import confirm_media_habit  # заменили импорт
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -49,7 +50,8 @@ async def handle_habit_video(message: types.Message, state: FSMContext):
     else:
         file_id, file_type = message.photo[-1].file_id, "photo"
 
-    result_text = await confirm_with_media(
+    # Вызов общей функции
+    result_text = await confirm_media_habit(
         user=message.from_user,
         habit_id=habit_id,
         file_id=file_id,
@@ -57,6 +59,7 @@ async def handle_habit_video(message: types.Message, state: FSMContext):
         bot=message.bot
     )
 
+    logger.info(f"[CONFIRM] user_id={message.from_user.id}, habit_id={habit_id}, result={result_text}")
     await message.answer(result_text)
     await state.clear()
 
