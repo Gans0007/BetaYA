@@ -137,12 +137,12 @@ async def handle_check_subscription(callback: types.CallbackQuery, bot: Bot, sta
         )
 
 
-        # Второе сообщение
-        await callback.message.answer(
-            text=(
-                "🎥 <b>Короткая видео-инструкция</b>\n\n"
-                "Её можно найти в меню: <b>Монетизация → Раздел «Правила»</b>.\n\n"
-                "Если меню не видно — нажми на кнопку как на фото ниже 👇"
+        # Второе сообщение — отправляем видео вместо текста
+        await callback.message.answer_video(
+            video="BAACAgIAAxkBAAKqGminVppCTxUTWqx7yd4Po_MaLRJ-AAJpfwAC3vo5SSjjbJD4pumnNgQ",
+            caption=(
+                "🎥 <b>Короткая видео-инструкция</b> которую ты больше не увидишь👆\n\n\n"
+                "Если меню кнопок не видно — нажми на кнопку как на фото ниже 👇"
             ),
             parse_mode="HTML"
         )
