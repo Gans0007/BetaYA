@@ -1,0 +1,83 @@
+from database import get_pool
+
+async def create_users_table():
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        # -------------------------------
+        # 🔹 Таблица пользователей
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT UNIQUE NOT NULL,
+                username TEXT,
+                first_name TEXT,
+                language TEXT DEFAULT 'ru',
+                timezone TEXT DEFAULT 'Europe/Kyiv',
+                joined_at TIMESTAMP DEFAULT NOW()
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Таблица привычек (habits)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS habits (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                name TEXT NOT NULL,
+                days INTEGER NOT NULL,
+                description TEXT,
+                done_days INTEGER DEFAULT 0,
+                is_challenge BOOLEAN DEFAULT FALSE,
+                confirm_type TEXT DEFAULT 'media',
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+                is_active BOOLEAN DEFAULT TRUE,
+                challenge_id TEXT,
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Таблица подтверждений (confirmations)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS confirmations (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                habit_id INTEGER NOT NULL,
+                datetime TIMESTAMPTZ DEFAULT NOW(),
+                file_id TEXT,
+                file_type TEXT,
+                confirmed BOOLEAN,
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                FOREIGN KEY(habit_id) REFERENCES habits(id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Таблица завершённых челленджей (completed_challenges)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS completed_challenges (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                challenge_name TEXT NOT NULL,
+                level_key TEXT NOT NULL,
+                challenge_id TEXT,
+                repeat_count INTEGER DEFAULT 1,
+                completed_at TIMESTAMPTZ DEFAULT NOW(),
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                UNIQUE(user_id, challenge_id)
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Индексы для ускорения запросов
+        # -------------------------------
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_completed_user_id ON completed_challenges(user_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_challenge_id ON habits(challenge_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_completed_challenge_id ON completed_challenges(challenge_id)")
+
+        print("✅ Таблицы успешно созданы или уже существуют.")
