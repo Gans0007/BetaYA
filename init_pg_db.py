@@ -12,6 +12,9 @@ async def create_users_table():
                 user_id BIGINT UNIQUE NOT NULL,
                 username TEXT,
                 first_name TEXT,
+                finished_habits INTEGER DEFAULT 0,
+                finished_challenges INTEGER DEFAULT 0,
+                total_stars INTEGER DEFAULT 0,
                 language TEXT DEFAULT 'ru',
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW()

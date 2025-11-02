@@ -12,6 +12,7 @@ from handlers.challenges_handler import router as challenges_router
 from handlers.add_custom_habit_handler import router as add_custom_habit_router
 from handlers import confirm_habit_handler
 from handlers import active_tasks_handler 
+from handlers import profile_handler
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,6 +41,11 @@ async def main():
     dp.include_router(add_custom_habit_router)
     dp.include_router(confirm_habit_handler.router)
     dp.include_router(active_tasks_handler.router)
+    dp.include_router(profile_handler.router)
+
+    # 5) Запускаем фоновую задачу напоминаний (с учётом часовых поясов)
+    from daily_reminder_task import send_daily_reminders
+    asyncio.create_task(send_daily_reminders(bot))
 
     logging.info("🤖 Bot started...")
     try:

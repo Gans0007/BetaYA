@@ -1,4 +1,3 @@
-# handlers/add_custom_habit_handler.py
 from aiogram import Router, types, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -18,12 +17,31 @@ class AddHabit(StatesGroup):
 
 
 # -------------------------------
+# 🔹 Универсальная клавиатура отмены
+# -------------------------------
+def cancel_kb():
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_fsm")]]
+    )
+
+
+# -------------------------------
+# 🔹 Обработка нажатия “Отмена”
+# -------------------------------
+@router.callback_query(F.data == "cancel_fsm")
+async def cancel_fsm(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.edit_text("❎ Создание привычки отменено.")
+    await callback.answer()
+
+
+# -------------------------------
 # 🔹 Запуск процесса добавления
 # -------------------------------
 @router.callback_query(F.data == "add_custom_habit")
 async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(AddHabit.name)
-    await callback.message.edit_text("✏️ Введи название своей привычки:")
+    await callback.message.edit_text("✏️ Введи название своей привычки:", reply_markup=cancel_kb())
     await callback.answer()
 
 
@@ -34,7 +52,7 @@ async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
 async def set_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(AddHabit.description)
-    await message.answer("💬 Опиши коротко свою привычку:")
+    await message.answer("💬 Опиши коротко свою привычку:", reply_markup=cancel_kb())
 
 
 # -------------------------------
@@ -44,7 +62,7 @@ async def set_name(message: types.Message, state: FSMContext):
 async def set_description(message: types.Message, state: FSMContext):
     await state.update_data(description=message.text)
     await state.set_state(AddHabit.days)
-    await message.answer("📅 На сколько дней хочешь взять эту привычку?")
+    await message.answer("📅 На сколько дней хочешь взять эту привычку? (минимум 7)", reply_markup=cancel_kb())
 
 
 # -------------------------------
@@ -54,10 +72,10 @@ async def set_description(message: types.Message, state: FSMContext):
 async def set_days(message: types.Message, state: FSMContext):
     try:
         days = int(message.text)
-        if days <= 0 or days > 365:
+        if days < 7 or days > 365:
             raise ValueError
     except ValueError:
-        await message.answer("⚠️ Введи число от 1 до 365.")
+        await message.answer("⚠️ Введи число от 7 до 365. Минимум — неделя 💪", reply_markup=cancel_kb())
         return
 
     await state.update_data(days=days)

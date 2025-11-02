@@ -16,6 +16,15 @@ class ConfirmHabitFSM(StatesGroup):
 
 
 # -------------------------------
+# 🔹 Кнопка отмены
+# -------------------------------
+def cancel_kb(habit_id: int):
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="❌ Отмена", callback_data=f"cancel_media_{habit_id}")]]
+    )
+
+
+# -------------------------------
 # 🔹 Кнопки "Подтвердить" / "Удалить" (динамические)
 # -------------------------------
 async def get_habit_buttons(habit_id: int, user_id: int):
@@ -26,26 +35,83 @@ async def get_habit_buttons(habit_id: int, user_id: int):
         user_timezone = pytz.timezone(user_tz)
         user_now = datetime.now(user_timezone)
 
-        row = await conn.fetchrow("""
-            SELECT datetime FROM confirmations
-            WHERE user_id = $1 AND habit_id = $2
-            ORDER BY datetime DESC LIMIT 1
-        """, user_id, habit_id)
+        habit = await conn.fetchrow("""
+            SELECT done_days, days, is_challenge
+            FROM habits
+            WHERE id = $1
+        """, habit_id)
 
-        button_text = "✅ Подтвердить"
-        if row:
-            last_time = row["datetime"].astimezone(user_timezone)
-            if last_time.date() == user_now.date():
-                button_text = "♻️ Переподтвердить"
+        if not habit:
+            return InlineKeyboardMarkup(inline_keyboard=[])
 
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text=button_text, callback_data=f"confirm_{habit_id}"),
-                InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
-            ]
-        ]
-    )
+        done_days = habit["done_days"]
+        total_days = habit["days"]
+        is_challenge = habit["is_challenge"]
+
+        # 🏆 Если это челлендж
+        if is_challenge:
+            # если челлендж завершён — кнопок нет (автозавершение)
+            if done_days >= total_days:
+                return InlineKeyboardMarkup(inline_keyboard=[])
+            else:
+                # Проверяем последнее подтверждение (чтобы заменить текст кнопки)
+                row = await conn.fetchrow("""
+                    SELECT datetime FROM confirmations
+                    WHERE user_id = $1 AND habit_id = $2
+                    ORDER BY datetime DESC LIMIT 1
+                """, user_id, habit_id)
+
+                button_text = "✅ Подтвердить"
+                if row:
+                    last_time = row["datetime"].astimezone(user_timezone)
+                    if last_time.date() == user_now.date():
+                        button_text = "♻️ Переподтвердить"
+
+                # активный челлендж → кнопки Подтвердить / Переподтвердить и Удалить
+                keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(text=button_text, callback_data=f"confirm_{habit_id}"),
+                            InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
+                        ]
+                    ]
+                )
+                return keyboard
+
+        # 💪 Если это привычка и она завершена — показать “Продлить / Завершить”
+        if done_days >= total_days:
+            keyboard = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(text="🔁 Продлить", callback_data=f"extend_{habit_id}"),
+                        InlineKeyboardButton(text="✅ Завершить", callback_data=f"finish_{habit_id}")
+                    ]
+                ]
+            )
+
+        else:
+            # ⚙️ Обычный случай — активная привычка
+            row = await conn.fetchrow("""
+                SELECT datetime FROM confirmations
+                WHERE user_id = $1 AND habit_id = $2
+                ORDER BY datetime DESC LIMIT 1
+            """, user_id, habit_id)
+
+            button_text = "✅ Подтвердить"
+            if row:
+                last_time = row["datetime"].astimezone(user_timezone)
+                if last_time.date() == user_now.date():
+                    button_text = "♻️ Переподтвердить"
+
+            keyboard = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [
+                        InlineKeyboardButton(text=button_text, callback_data=f"confirm_{habit_id}"),
+                        InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
+                    ]
+                ]
+            )
+
     return keyboard
 
 
@@ -77,7 +143,9 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
                 await state.set_state(ConfirmHabitFSM.waiting_for_media)
                 await callback.message.answer(
                     "♻️ Ты уже подтверждал сегодня.\n"
-                    "Пришли новое фото/видео, чтобы *переподтвердить* привычку."
+                    "Пришли новое фото/видео, чтобы *переподтвердить* привычку.",
+                    parse_mode="Markdown",
+                    reply_markup=cancel_kb(habit_id)
                 )
                 await callback.answer()
                 return
@@ -85,9 +153,20 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(habit_id=habit_id, reverify=False)
         await state.set_state(ConfirmHabitFSM.waiting_for_media)
         await callback.message.answer(
-            "📸 Пришли фото, видео или кружочек, подтверждающий выполнение привычки 💪"
+            "📸 Пришли фото, видео или кружочек, подтверждающий выполнение привычки 💪",
+            reply_markup=cancel_kb(habit_id)
         )
 
+    await callback.answer()
+
+
+# -------------------------------
+# 🔹 Отмена во время ожидания медиа
+# -------------------------------
+@router.callback_query(F.data.startswith("cancel_media_"))
+async def cancel_media(callback: types.CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.message.edit_text("❎ Подтверждение отменено.")
     await callback.answer()
 
 
@@ -119,6 +198,13 @@ async def receive_media(message: types.Message, state: FSMContext):
         return
 
     async with pool.acquire() as conn:
+        # 🧩 Проверяем, существует ли привычка / челлендж (может быть уже завершён)
+        habit_exists = await conn.fetchval("SELECT COUNT(*) FROM habits WHERE id = $1", habit_id)
+        if habit_exists == 0:
+            await message.answer("⚠️ Эта привычка или челлендж уже завершён и больше не активен.")
+            await state.clear()
+            return
+
         if reverify:
             await conn.execute("""
                 UPDATE confirmations
@@ -129,21 +215,91 @@ async def receive_media(message: types.Message, state: FSMContext):
             await message.answer("♻️ Видео обновлено. Переподтверждение сохранено 💪")
 
         else:
+            # Добавляем новое подтверждение
             await conn.execute("""
                 INSERT INTO confirmations (user_id, habit_id, datetime, file_id, file_type, confirmed)
                 VALUES ($1, $2, NOW(), $3, $4, TRUE)
             """, user_id, habit_id, file_id, file_type)
 
+            # Увеличиваем количество выполненных дней
             await conn.execute("""
                 UPDATE habits
                 SET done_days = done_days + 1
                 WHERE id = $1
             """, habit_id)
 
-            await message.answer("✅ Привычка подтверждена! Отличная работа 💪")
+            # 🔥 Проверка автозавершения челленджа
+            habit = await conn.fetchrow("""
+                SELECT user_id, name, description, days, done_days, is_challenge, challenge_id
+                FROM habits
+                WHERE id = $1
+            """, habit_id)
+
+            if habit["is_challenge"] and habit["done_days"] >= habit["days"]:
+                # Проверяем, был ли челлендж уже завершён раньше
+                existing = await conn.fetchrow("""
+                    SELECT repeat_count FROM completed_challenges
+                    WHERE user_id = $1 AND challenge_id = $2
+                """, habit["user_id"], habit["challenge_id"])
+
+                if existing:
+                    new_count = min(existing["repeat_count"] + 1, 3)
+                    await conn.execute("""
+                        UPDATE completed_challenges
+                        SET repeat_count = $1, completed_at = NOW()
+                        WHERE user_id = $2 AND challenge_id = $3
+                    """, new_count, habit["user_id"], habit["challenge_id"])
+                    stars = new_count
+                else:
+                    await conn.execute("""
+                        INSERT INTO completed_challenges (user_id, challenge_name, level_key, challenge_id, repeat_count)
+                        VALUES ($1, $2, 'auto', $3, 1)
+                    """, habit["user_id"], habit["name"], habit["challenge_id"])
+                    stars = 1
+
+                # 🔹 Увеличиваем общий счётчик завершённых челленджей
+                await conn.execute("""
+                    UPDATE users
+                    SET finished_challenges = finished_challenges + 1
+                    WHERE user_id = $1
+                """, habit["user_id"])
+
+                # 🌟 Добавляем звёзды пользователю (по реальной разнице)
+                if existing:
+                    stars_gained = new_count - existing["repeat_count"]
+                else:
+                    stars_gained = 1  # если челлендж впервые завершён
+
+                await conn.execute("""
+                    UPDATE users
+                    SET total_stars = total_stars + $1
+                    WHERE user_id = $2
+                """, stars_gained, habit["user_id"])
+
+                # Удаляем челлендж из активных привычек
+                await conn.execute("DELETE FROM habits WHERE id = $1", habit_id)
+
+                # Получаем обновлённое количество завершённых челленджей и звёзд
+                user_stats = await conn.fetchrow("""
+                    SELECT finished_challenges, total_stars
+                    FROM users
+                    WHERE user_id = $1
+                """, habit["user_id"])
+                total_finished = user_stats["finished_challenges"]
+                total_stars = user_stats["total_stars"]
+
+                stars_display = "⭐" * stars + "☆" * (3 - stars)
+                await message.answer(
+                    f"🔥 Ты красавчик!\n\n"
+                    f"Челлендж *{habit['name']}* выполнен и закрыт на {stars_display}\n\n"
+                    f"🏆 Он добавлен в твою статистику!\n"
+                    f"Продолжай в том же духе 💪",
+                    parse_mode="Markdown"
+                )
+            else:
+                await message.answer("✅ Привычка подтверждена! Отличная работа 💪")
 
     await state.clear()
-
 
 # -------------------------------
 # 🔹 Шаг 1: Запрос подтверждения удаления
@@ -239,3 +395,129 @@ async def cancel_delete(callback: types.CallbackQuery):
 
     await callback.answer()
 
+
+# -------------------------------
+# 🔹 Продление привычки
+# -------------------------------
+@router.callback_query(F.data.regexp(r"^extend_\d+$"))
+async def extend_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[1])
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Да", callback_data=f"extend_yes_{habit_id}"),
+                InlineKeyboardButton(text="❌ Нет", callback_data="extend_no")
+            ]
+        ]
+    )
+
+    await callback.message.edit_text(
+        "🔁 Хочешь продлить привычку на 5 дней?",
+        reply_markup=keyboard
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data.regexp(r"^extend_yes_\d+$"))
+async def extend_habit_yes(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE habits
+            SET days = days + 5
+            WHERE id = $1
+        """, habit_id)
+
+        habit = await conn.fetchrow("""
+            SELECT name, description, days, done_days
+            FROM habits
+            WHERE id = $1
+        """, habit_id)
+
+    text = (
+        f"⚡️ Активная привычка:\n\n"
+        f"📖 {habit['description']}\n"
+        f"📅 Продлено: теперь {habit['days']} дней!\n"
+        f"📊 Прогресс: {habit['done_days']} / {habit['days']}"
+    )
+    keyboard = await get_habit_buttons(habit_id, callback.from_user.id)
+
+    await callback.message.edit_text(text, reply_markup=keyboard)
+    await callback.answer("🔁 Привычка продлена на 5 дней!")
+
+
+@router.callback_query(F.data == "extend_no")
+async def extend_habit_no(callback: types.CallbackQuery):
+    await callback.message.edit_text("❎ Продление отменено.")
+    await callback.answer()
+
+
+# -------------------------------
+# 🔹 Завершение привычки (с подтверждением)
+# -------------------------------
+@router.callback_query(F.data.regexp(r"^finish_\d+$"))
+async def finish_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[1])
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Да", callback_data=f"finish_yes_{habit_id}"),
+                InlineKeyboardButton(text="❌ Нет", callback_data="finish_no")
+            ]
+        ]
+    )
+
+    await callback.message.edit_text(
+        "🏁 Привычка будет завершена и добавлена в твою статистику.\n\n"
+        "Ты уверен, что хочешь завершить?",
+        reply_markup=keyboard
+    )
+    await callback.answer()
+
+
+@router.callback_query(F.data.regexp(r"^finish_yes_\d+$"))
+async def finish_habit_yes(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        # Увеличиваем счётчик завершённых привычек
+        await conn.execute("""
+            UPDATE users
+            SET finished_habits = finished_habits + 1
+            WHERE user_id = $1
+        """, user_id)
+
+        # Удаляем привычку
+        habit = await conn.fetchrow("""
+            DELETE FROM habits
+            WHERE id = $1
+            RETURNING name
+        """, habit_id)
+
+        name = habit["name"] if habit else "Привычка"
+
+        # Получаем обновлённое количество завершённых привычек
+        user_stats = await conn.fetchrow("""
+            SELECT finished_habits FROM users WHERE user_id = $1
+        """, user_id)
+
+    total_finished = user_stats["finished_habits"]
+
+    await callback.message.edit_text(
+        f"✅ {name} завершена и добавлена в твою статистику!\n\n"
+        f"📊 Всего завершённых привычек: *{total_finished}*",
+        parse_mode="Markdown"
+    )
+    await callback.answer("🎉 Привычка завершена!")
+
+
+@router.callback_query(F.data == "finish_no")
+async def finish_habit_no(callback: types.CallbackQuery):
+    await callback.message.edit_text("❎ Завершение отменено.")
+    await callback.answer()

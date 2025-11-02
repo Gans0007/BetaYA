@@ -4,19 +4,35 @@ from database import get_pool
 
 router = Router()
 
+
+# -------------------------------
+# 🌟 Требования по звёздам для разблокировки уровней
+# -------------------------------
+LEVEL_UNLOCKS = {
+    "level_0": 0,   # Новичок — всегда доступен
+    "level_1": 4,   # Активность — 3 звезды
+    "level_2": 8,   # Фокус и энергия — 6 звёзд
+    "level_3": 13,  # Самодисциплина — 13 звёзд
+    "level_4": 20,  # Преодоление — 21 звезда
+    "level_5": 22   # Предприниматели — 30 звёзд
+}
+
+
+
 # -------------------------------
 # 🔹 Уровни челленджей
 # -------------------------------
 CHALLENGE_LEVELS = {
     "ru": {
         "level_0": "🔰 Новичок",
-        "level_1": "🚶 Активность",
-        "level_2": "🧠 Фокус и энергия",
-        "level_3": "🔒 Самодисциплина",
-        "level_4": "🧱 Преодоление",
-        "level_5": "💻 Для будущих предпринимателей",
+        "level_1": "Активность",
+        "level_2": "Фокус и энергия",
+        "level_3": "Самодисциплина",
+        "level_4": "Преодоление",
+        "level_5": "Для будущих предпринимателей",
     }
 }
+
 
 # -------------------------------
 # 🔹 Цитаты для каждого уровня
@@ -110,13 +126,37 @@ CHALLENGES = {
 # -------------------------------
 @router.callback_query(F.data == "choose_from_list")
 async def show_levels(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        stars = await conn.fetchval("""
+            SELECT total_stars FROM users WHERE user_id = $1
+        """, user_id)
+
     lang = "ru"
     levels = CHALLENGE_LEVELS[lang]
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text=name, callback_data=level_key)] for level_key, name in levels.items()]
+
+    keyboard = []
+    for level_key, level_name in levels.items():
+        required = LEVEL_UNLOCKS.get(level_key, 0)
+
+        # Если звёзд меньше — добавляем замочек ПЕРЕД текстом
+        if stars < required and level_key != "level_0":
+            level_name = f"🔒 {level_name}"
+        else:
+            level_name = f"{level_name}"
+
+        keyboard.append([
+            InlineKeyboardButton(text=level_name, callback_data=level_key)
+        ])
+
+    await callback.message.edit_text(
+        "💪 Выбери уровень челленджей:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard)
     )
-    await callback.message.edit_text("💪 Выбери уровень челленджей:", reply_markup=keyboard)
     await callback.answer()
+
 
 # -------------------------------
 # 🔹 Список челленджей с отображением ⭐
@@ -125,6 +165,40 @@ async def show_levels(callback: types.CallbackQuery):
 async def show_challenges(callback: types.CallbackQuery):
     level_key = callback.data
     user_id = callback.from_user.id
+    # Проверяем, хватает ли звёзд для открытия уровня
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        total_stars = await conn.fetchval("""
+            SELECT total_stars FROM users WHERE user_id = $1
+        """, user_id)
+
+    required_stars = LEVEL_UNLOCKS.get(level_key, 0)
+
+    if total_stars < required_stars:
+        # Названия уровней для читаемого вывода
+        level_names = {
+            "level_0": "Новичок",
+            "level_1": "Активность",
+            "level_2": "Фокус и энергия",
+            "level_3": "Самодисциплина",
+            "level_4": "Преодоление",
+            "level_5": "Предприниматели"
+        }
+        level_name = level_names.get(level_key, "этот уровень")
+
+        # Отправляем новое сообщение (меню остаётся)
+        await callback.message.answer(
+            f"🔒 Раздел *«{level_name}»* пока недоступен!\n"
+            f"🌟 Нужно: *{required_stars}* звёзд\n"
+            f"⭐ У тебя: *{total_stars}*",
+            parse_mode="Markdown"
+        )
+
+        await callback.answer()
+        return
+
+
+
     level_name = CHALLENGE_LEVELS["ru"].get(level_key, "Неизвестный уровень")
     challenges = CHALLENGES.get(level_key, [])
     quote = LEVEL_QUOTES.get(level_key, "")

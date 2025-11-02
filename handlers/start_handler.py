@@ -65,15 +65,10 @@ async def start_command(message: types.Message):
 # -------------------------------
 # 🔹 Обработка кнопок меню
 # -------------------------------
-@router.message(lambda m: m.text in {"🏆 Рейтинг", "👤 Профиль"})
+@router.message(lambda m: m.text in {"🏆 Рейтинг"})
 async def process_reply_buttons(message: types.Message):
     text = message.text
 
     # ---- 🏆 РЕЙТИНГ ----
     if text == "🏆 Рейтинг":
         await message.answer("🏆 Рейтинг: скоро будет.")
-
-    # ---- 👤 ПРОФИЛЬ ----
-    elif text == "👤 Профиль":
-        await message.answer("👤 Твой профиль: в разработке.")
-
