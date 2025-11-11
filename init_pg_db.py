@@ -15,6 +15,9 @@ async def create_users_table():
                 finished_habits INTEGER DEFAULT 0,
                 finished_challenges INTEGER DEFAULT 0,
                 total_stars INTEGER DEFAULT 0,
+                total_confirmed_days INTEGER DEFAULT 0,
+                notification_tone TEXT DEFAULT 'mixed',
+                share_confirmation_media BOOLEAN DEFAULT TRUE,
                 language TEXT DEFAULT 'ru',
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW()

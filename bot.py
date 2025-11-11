@@ -12,7 +12,9 @@ from handlers.challenges_handler import router as challenges_router
 from handlers.add_custom_habit_handler import router as add_custom_habit_router
 from handlers import confirm_habit_handler
 from handlers import active_tasks_handler 
-from handlers import profile_handler
+from handlers.profile_menu_handler import router as profile_menu_router
+from handlers.profile_settings_handler import router as profile_settings_router
+from handlers.profile_stats_handler import router as profile_stats_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -41,7 +43,9 @@ async def main():
     dp.include_router(add_custom_habit_router)
     dp.include_router(confirm_habit_handler.router)
     dp.include_router(active_tasks_handler.router)
-    dp.include_router(profile_handler.router)
+    dp.include_router(profile_menu_router)
+    dp.include_router(profile_settings_router)
+    dp.include_router(profile_stats_router)
 
     # 5) Запускаем фоновую задачу напоминаний (с учётом часовых поясов)
     from daily_reminder_task import send_daily_reminders
