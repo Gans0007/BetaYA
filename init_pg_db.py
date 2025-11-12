@@ -10,6 +10,7 @@ async def create_users_table():
             CREATE TABLE IF NOT EXISTS users (
                 id SERIAL PRIMARY KEY,
                 user_id BIGINT UNIQUE NOT NULL,
+                nickname TEXT,
                 username TEXT,
                 first_name TEXT,
                 finished_habits INTEGER DEFAULT 0,
@@ -40,6 +41,7 @@ async def create_users_table():
                 created_at TIMESTAMPTZ DEFAULT NOW(),
                 is_active BOOLEAN DEFAULT TRUE,
                 challenge_id TEXT,
+                difficulty INTEGER DEFAULT 1,
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)

@@ -2,10 +2,18 @@ import pytz
 from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import CommandStart
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from database import get_pool
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 
 router = Router()
+
+# -------------------------------
+# 🔹 FSM для ввода никнейма
+# -------------------------------
+class NicknameFSM(StatesGroup):
+    waiting_for_nickname = State()
 
 
 # -------------------------------
@@ -28,9 +36,8 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
 # 🔹 Команда /start
 # -------------------------------
 @router.message(CommandStart())
-async def start_command(message: types.Message):
-    # Определяем часовой пояс пользователя
-    user_timezone = "Europe/Kyiv"  # по умолчанию
+async def start_command(message: types.Message, state: FSMContext):
+    user_timezone = "Europe/Kyiv"
     if message.from_user and message.from_user.language_code == "en":
         user_timezone = "Europe/London"
     elif message.from_user and message.from_user.language_code == "uk":
@@ -55,20 +62,70 @@ async def start_command(message: types.Message):
             user_timezone,
         )
 
-    text = (
+        nickname = await conn.fetchval(
+            "SELECT nickname FROM users WHERE user_id = $1", message.from_user.id
+        )
+
+    # Если никнейма нет — просим ввести и убираем все кнопки
+    if not nickname:
+        await message.answer(
+            "Привет! ✌️ Перед тем как начать, введи свой никнейм (имя, под которым тебя будут видеть другие):",
+            reply_markup=ReplyKeyboardRemove(),  # ❌ убираем все кнопки
+        )
+        await state.set_state(NicknameFSM.waiting_for_nickname)
+        return
+
+    # Если ник уже есть — показываем меню
+    await message.answer(
         "Привет! ✌️ Я Your Ambitions бот.\n\n"
         "Здесь ты можешь добавлять привычки, брать челленджи и следить за прогрессом.\n"
-        "Теперь я запомнил твой часовой пояс, и все привычки будут считать дни именно по твоему времени 🌍"
+        "Теперь я запомнил твой часовой пояс 🌍",
+        reply_markup=main_menu_kb()
     )
-    await message.answer(text, reply_markup=main_menu_kb())
+
 
 # -------------------------------
-# 🔹 Обработка кнопок меню
+# 🔹 Обработка никнейма
 # -------------------------------
-@router.message(lambda m: m.text in {"🏆 Рейтинг"})
-async def process_reply_buttons(message: types.Message):
-    text = message.text
+@router.message(NicknameFSM.waiting_for_nickname)
+async def process_nickname(message: types.Message, state: FSMContext):
+    nickname = message.text.strip()
 
-    # ---- 🏆 РЕЙТИНГ ----
-    if text == "🏆 Рейтинг":
-        await message.answer("🏆 Рейтинг: скоро будет.")
+    # Убираем @ если пользователь ввёл его
+    if nickname.startswith("@"):
+        nickname = nickname[1:]
+
+    # Проверяем длину и пустоту
+    if not nickname:
+        await message.answer("❗️Никнейм не может быть пустым. Попробуй снова:")
+        return
+    if len(nickname) > 20:
+        await message.answer("❗️Никнейм слишком длинный. Введи короче (до 20 символов):")
+        return
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        # Проверяем, занят ли ник
+        existing_user = await conn.fetchval(
+            "SELECT user_id FROM users WHERE LOWER(nickname) = LOWER($1)",
+            nickname
+        )
+        if existing_user and existing_user != message.from_user.id:
+            await message.answer(
+                f"❗️Ник '{nickname}' уже используется другим пользователем.\n"
+                f"Попробуй другой вариант:"
+            )
+            return
+
+        # Если ник свободен — сохраняем
+        await conn.execute(
+            "UPDATE users SET nickname = $1 WHERE user_id = $2",
+            nickname,
+            message.from_user.id
+        )
+
+    await message.answer(
+        f"Отлично, {nickname}! ✅\nТеперь можешь пользоваться ботом.",
+        reply_markup=main_menu_kb()
+    )
+    await state.clear()

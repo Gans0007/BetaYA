@@ -15,6 +15,7 @@ from handlers import active_tasks_handler
 from handlers.profile_menu_handler import router as profile_menu_router
 from handlers.profile_settings_handler import router as profile_settings_router
 from handlers.profile_stats_handler import router as profile_stats_router
+from challenge_reset_task import check_challenge_resets
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,9 +48,12 @@ async def main():
     dp.include_router(profile_settings_router)
     dp.include_router(profile_stats_router)
 
-    # 5) Запускаем фоновую задачу напоминаний (с учётом часовых поясов)
+    # 5) Запускаем фоновые задачи
     from daily_reminder_task import send_daily_reminders
     asyncio.create_task(send_daily_reminders(bot))
+
+    # 🔥 Запускаем автоматическую проверку аннулирований (челленджи + привычки)
+    asyncio.create_task(check_challenge_resets())
 
     logging.info("🤖 Bot started...")
     try:

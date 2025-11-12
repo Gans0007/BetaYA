@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database import get_pool
 from datetime import datetime
+from services.user_service import recalculate_total_confirmed_days
 import pytz
 
 router = Router()
@@ -228,6 +229,10 @@ async def receive_media(message: types.Message, state: FSMContext):
                 WHERE id = $1
             """, habit_id)
 
+            # 📅 Обновляем общее количество уникальных подтверждённых дней
+            new_total = await recalculate_total_confirmed_days(user_id)
+            await message.answer(f"📅 Обновлённый счётчик уникальных дней: {new_total}")
+
             # 🔥 Проверка автозавершения челленджа
             habit = await conn.fetchrow("""
                 SELECT user_id, name, description, days, done_days, is_challenge, challenge_id
@@ -326,74 +331,41 @@ async def ask_delete_confirmation(callback: types.CallbackQuery):
 
 
 # -------------------------------
-# 🔹 Шаг 2: Подтверждение удаления
+# 🔹 Шаг 2: Подтверждение удаления + автообновление списка
 # -------------------------------
 @router.callback_query(F.data.startswith("delete_habit_"))
 async def delete_habit(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
     pool = await get_pool()
 
     async with pool.acquire() as conn:
         await conn.execute("DELETE FROM confirmations WHERE habit_id = $1", habit_id)
         await conn.execute("DELETE FROM habits WHERE id = $1", habit_id)
 
-    await callback.message.edit_text("🗑 Привычка удалена вместе с прогрессом.")
-    await callback.answer()
+    # 🔁 После удаления — обновляем список активных привычек
+    from handlers.active_tasks_handler import build_active_list
+    text, kb, rows = await build_active_list(user_id)
+    if not rows:
+        await callback.message.edit_text("😴 У тебя пока нет активных привычек или челленджей.")
+    else:
+        await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.answer("🗑 Привычка удалена.")
 
 
 # -------------------------------
-# 🔹 Шаг 3: Отмена удаления
+# 🔹 Отмена удаления (возврат к списку)
 # -------------------------------
 @router.callback_query(F.data == "cancel_delete")
 async def cancel_delete(callback: types.CallbackQuery):
-    # Восстанавливаем карточку привычки
-    # Получаем habit_id из текста предыдущего сообщения
-    # (из callback'а перед этим — ask_delete_confirmation)
-    message_text = callback.message.text
-
-    # Пробуем извлечь ID привычки из предыдущего callback_data
-    # (берем из inline-кнопок, если они остались)
-    keyboard = callback.message.reply_markup
-    habit_id = None
-
-    if keyboard and keyboard.inline_keyboard:
-        for row in keyboard.inline_keyboard:
-            for button in row:
-                if button.callback_data and button.callback_data.startswith("delete_habit_"):
-                    habit_id = int(button.callback_data.split("_")[2])
-                    break
-
-    if not habit_id:
-        await callback.message.edit_text("❎ Ошибка восстановления карточки.")
-        return
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        habit = await conn.fetchrow("""
-            SELECT name, description, days, done_days
-            FROM habits
-            WHERE id = $1
-        """, habit_id)
-
-    if habit:
-        name = habit["name"]
-        desc = habit["description"]
-        total_days = habit["days"]
-        done = habit["done_days"]
-        progress = int((done / total_days) * 100) if total_days > 0 else 0
-
-        text = (
-            f"🏁 {name}\n\n"
-            f"📖 {desc}\n\n"
-            f"📅 Прогресс: {done} из {total_days} дней ({progress}%)"
-        )
-
-        keyboard = await get_habit_buttons(habit_id, callback.from_user.id)
-        await callback.message.edit_text(text, reply_markup=keyboard)
+    user_id = callback.from_user.id
+    from handlers.active_tasks_handler import build_active_list
+    text, kb, rows = await build_active_list(user_id)
+    if not rows:
+        await callback.message.edit_text("😴 У тебя пока нет активных привычек или челленджей.")
     else:
-        await callback.message.edit_text("❎ Привычка не найдена.")
-
-    await callback.answer()
+        await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.answer("Отмена удаления.")
 
 
 # -------------------------------
@@ -418,37 +390,52 @@ async def extend_habit(callback: types.CallbackQuery):
     )
     await callback.answer()
 
-
+# -------------------------------
+# 🔹 Продление привычки (с подтверждением)
+# -------------------------------
 @router.callback_query(F.data.regexp(r"^extend_yes_\d+$"))
 async def extend_habit_yes(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
     pool = await get_pool()
 
     async with pool.acquire() as conn:
+        # 🔹 Продлеваем привычку на 5 дней
         await conn.execute("""
             UPDATE habits
             SET days = days + 5
             WHERE id = $1
         """, habit_id)
 
+        # 🔹 Получаем обновлённые данные привычки
         habit = await conn.fetchrow("""
-            SELECT name, description, days, done_days
-            FROM habits
-            WHERE id = $1
-        """, habit_id)
+            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge, h.difficulty,
+                   (SELECT datetime FROM confirmations WHERE habit_id = h.id ORDER BY datetime DESC LIMIT 1) AS last_date,
+                   u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id = h.user_id
+            WHERE h.id = $1 AND h.user_id = $2
+        """, habit_id, user_id)
 
-    text = (
-        f"⚡️ Активная привычка:\n\n"
-        f"📖 {habit['description']}\n"
-        f"📅 Продлено: теперь {habit['days']} дней!\n"
-        f"📊 Прогресс: {habit['done_days']} / {habit['days']}"
-    )
-    keyboard = await get_habit_buttons(habit_id, callback.from_user.id)
+    if not habit:
+        await callback.message.edit_text("❌ Привычка не найдена или уже завершена.")
+        await callback.answer()
+        return
 
-    await callback.message.edit_text(text, reply_markup=keyboard)
+    # 🔁 Импортируем функцию карточки прямо здесь, чтобы избежать кругового импорта
+    from handlers.active_tasks_handler import send_habit_card
+
+    # ⚡️ Обновляем карточку привычки прямо на месте
+    await callback.message.delete()  # удаляем старое сообщение “Хочешь продлить...”
+    await send_habit_card(callback.message, habit, user_id)
+
     await callback.answer("🔁 Привычка продлена на 5 дней!")
 
 
+
+# -------------------------------
+# 🔹 Отмена продления привычки
+# -------------------------------
 @router.callback_query(F.data == "extend_no")
 async def extend_habit_no(callback: types.CallbackQuery):
     await callback.message.edit_text("❎ Продление отменено.")
@@ -479,6 +466,9 @@ async def finish_habit(callback: types.CallbackQuery):
     await callback.answer()
 
 
+# -------------------------------
+# 🔹 Завершение привычки (автообновление списка)
+# -------------------------------
 @router.callback_query(F.data.regexp(r"^finish_yes_\d+$"))
 async def finish_habit_yes(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[2])
@@ -500,23 +490,22 @@ async def finish_habit_yes(callback: types.CallbackQuery):
             RETURNING name
         """, habit_id)
 
-        name = habit["name"] if habit else "Привычка"
+    name = habit["name"] if habit else "Привычка"
 
-        # Получаем обновлённое количество завершённых привычек
-        user_stats = await conn.fetchrow("""
-            SELECT finished_habits FROM users WHERE user_id = $1
-        """, user_id)
-
-    total_finished = user_stats["finished_habits"]
-
-    await callback.message.edit_text(
-        f"✅ {name} завершена и добавлена в твою статистику!\n\n"
-        f"📊 Всего завершённых привычек: *{total_finished}*",
-        parse_mode="Markdown"
-    )
+    # ⚡ После завершения — обновляем список
+    from handlers.active_tasks_handler import build_active_list
+    text, kb, rows = await build_active_list(user_id)
+    if not rows:
+        await callback.message.edit_text(f"✅ {name} завершена!\n\nТеперь у тебя нет активных привычек.")
+    else:
+        await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
     await callback.answer("🎉 Привычка завершена!")
 
 
+
+# -------------------------------
+# 🔹 Отмена завершения привычки
+# -------------------------------
 @router.callback_query(F.data == "finish_no")
 async def finish_habit_no(callback: types.CallbackQuery):
     await callback.message.edit_text("❎ Завершение отменено.")

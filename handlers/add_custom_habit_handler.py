@@ -13,11 +13,12 @@ class AddHabit(StatesGroup):
     name = State()
     description = State()
     days = State()
-    confirm = State()  # финальное подтверждение
+    difficulty = State()  # 🔥 новая стадия выбора сложности
+    confirm = State()
 
 
 # -------------------------------
-# 🔹 Универсальная клавиатура отмены
+# 🔹 Клавиатура отмены
 # -------------------------------
 def cancel_kb():
     return InlineKeyboardMarkup(
@@ -46,7 +47,7 @@ async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
 
 
 # -------------------------------
-# 🔹 Шаг 1 — Название привычки
+# 🔹 Шаг 1 — Название
 # -------------------------------
 @router.message(AddHabit.name)
 async def set_name(message: types.Message, state: FSMContext):
@@ -66,7 +67,7 @@ async def set_description(message: types.Message, state: FSMContext):
 
 
 # -------------------------------
-# 🔹 Шаг 3 — Длительность и подтверждение
+# 🔹 Шаг 3 — Длительность
 # -------------------------------
 @router.message(AddHabit.days)
 async def set_days(message: types.Message, state: FSMContext):
@@ -79,17 +80,49 @@ async def set_days(message: types.Message, state: FSMContext):
         return
 
     await state.update_data(days=days)
-    data = await state.get_data()
+    await state.set_state(AddHabit.difficulty)
 
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="⭐ Легко", callback_data="diff_1"),
+                InlineKeyboardButton(text="⭐⭐ Средне", callback_data="diff_2"),
+                InlineKeyboardButton(text="⭐⭐⭐ Сложно", callback_data="diff_3"),
+            ],
+            [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_fsm")]
+        ]
+    )
+
+    await message.answer(
+        "🎯 Выбери уровень сложности привычки:\n\n"
+        "⭐ — можно пропускать, без аннулирования\n"
+        "⭐⭐ — сброс, если пропущено 2 дня подряд\n"
+        "⭐⭐⭐ — сброс, если пропущен хоть 1 день\n",
+        reply_markup=keyboard
+    )
+
+
+# -------------------------------
+# 🔹 Шаг 4 — Выбор сложности
+# -------------------------------
+@router.callback_query(F.data.startswith("diff_"))
+async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
+    diff = int(callback.data.split("_")[1])
+    await state.update_data(difficulty=diff)
+
+    data = await state.get_data()
     name = data["name"]
     desc = data["description"]
+    days = data["days"]
 
-    # Формируем текст подтверждения
+    diff_text = {1: "⭐ Легко", 2: "⭐⭐ Средне", 3: "⭐⭐⭐ Сложно"}[diff]
+
     text = (
         f"📝 *Проверь данные привычки:*\n\n"
         f"🏁 *Название:* {name}\n"
         f"📖 *Описание:* {desc}\n"
-        f"📅 *Длительность:* {days} дней\n\n"
+        f"📅 *Длительность:* {days} дней\n"
+        f"🎯 *Сложность:* {diff_text}\n\n"
         f"Сохранить эту привычку?"
     )
 
@@ -97,17 +130,18 @@ async def set_days(message: types.Message, state: FSMContext):
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="✅ Сохранить", callback_data="save_habit"),
-                InlineKeyboardButton(text="❌ Удалить", callback_data="cancel_habit")
+                InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_fsm")
             ]
         ]
     )
 
-    await message.answer(text, parse_mode="Markdown", reply_markup=keyboard)
+    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=keyboard)
     await state.set_state(AddHabit.confirm)
+    await callback.answer()
 
 
 # -------------------------------
-# 🔹 Кнопка ✅ Сохранить
+# 🔹 Сохранение привычки
 # -------------------------------
 @router.callback_query(F.data == "save_habit")
 async def save_habit(callback: types.CallbackQuery, state: FSMContext):
@@ -115,13 +149,14 @@ async def save_habit(callback: types.CallbackQuery, state: FSMContext):
     name = data["name"]
     desc = data["description"]
     days = data["days"]
+    diff = data["difficulty"]
 
     pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.execute("""
-            INSERT INTO habits (user_id, name, description, days, confirm_type, is_challenge)
-            VALUES ($1, $2, $3, $4, 'media', FALSE)
-        """, callback.from_user.id, name, desc, days)
+            INSERT INTO habits (user_id, name, description, days, confirm_type, is_challenge, difficulty)
+            VALUES ($1, $2, $3, $4, 'media', FALSE, $5)
+        """, callback.from_user.id, name, desc, days, diff)
 
     await callback.message.edit_text(
         f"✅ Привычка *{name}* успешно сохранена!\n"
@@ -129,16 +164,4 @@ async def save_habit(callback: types.CallbackQuery, state: FSMContext):
         parse_mode="Markdown"
     )
     await state.clear()
-    await callback.answer()
-
-
-# -------------------------------
-# 🔹 Кнопка ❌ Удалить
-# -------------------------------
-@router.callback_query(F.data == "cancel_habit")
-async def cancel_habit(callback: types.CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.edit_text(
-        "❌ Привычка удалена. Можешь начать заново, если передумаешь 🙂"
-    )
     await callback.answer()
