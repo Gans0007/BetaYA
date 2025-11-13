@@ -17,7 +17,8 @@ async def show_stats(callback: types.CallbackQuery):
     async with pool.acquire() as conn:
         user = await conn.fetchrow("""
             SELECT username, nickname, finished_habits, finished_challenges, 
-                   total_stars, total_confirmed_days, joined_at
+                   total_stars, total_confirmed_days, joined_at,
+                   current_streak, max_streak
             FROM users
             WHERE user_id = $1
         """, user_id)
@@ -31,6 +32,8 @@ async def show_stats(callback: types.CallbackQuery):
     if nickname.startswith("@"):  # 👈 убираем @, если он есть
         nickname = nickname[1:]
 
+    current = user["current_streak"] or 0
+    maximum = user["max_streak"] or 0
     habits = user["finished_habits"] or 0
     challenges = user["finished_challenges"] or 0
     stars = user["total_stars"] or 0
@@ -41,6 +44,8 @@ async def show_stats(callback: types.CallbackQuery):
         f"📊 *Твоя статистика*\n\n"
         f"🪪 Nickname: *{nickname}*\n"
         f"📅 Дата вступления: *{joined_at}*\n\n"
+        f"🔥 Текущий стрик: *{current}*\n"
+        f"🏆 Максимальный стрик: *{maximum}*\n\n"
         f"💪 Завершённых привычек: *{habits}*\n"
         f"🏆 Завершённых челленджей: *{challenges}*\n"
         f"🌟 Всего звёзд: *{stars}*\n"

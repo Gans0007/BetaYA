@@ -5,6 +5,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database import get_pool
 from datetime import datetime
 from services.user_service import recalculate_total_confirmed_days
+from services.user_service import update_user_streak
 import pytz
 
 router = Router()
@@ -221,6 +222,9 @@ async def receive_media(message: types.Message, state: FSMContext):
                 INSERT INTO confirmations (user_id, habit_id, datetime, file_id, file_type, confirmed)
                 VALUES ($1, $2, NOW(), $3, $4, TRUE)
             """, user_id, habit_id, file_id, file_type)
+            
+            # 🔥 Обновляем стрик
+            await update_user_streak(user_id)
 
             # Увеличиваем количество выполненных дней
             await conn.execute("""
