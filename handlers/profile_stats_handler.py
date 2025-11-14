@@ -4,7 +4,6 @@ from database import get_pool
 
 router = Router()
 
-
 # -------------------------------
 # 📊 Статистика (бывший профиль)
 # -------------------------------
@@ -12,13 +11,17 @@ router = Router()
 async def show_stats(callback: types.CallbackQuery):
     """Показывает статистику пользователя"""
     user_id = callback.from_user.id
+
+    # 💥 Отвечаем сразу, чтобы Telegram НЕ ругался
+    await callback.answer()
+
     pool = await get_pool()
 
     async with pool.acquire() as conn:
         user = await conn.fetchrow("""
             SELECT username, nickname, finished_habits, finished_challenges, 
                    total_stars, total_confirmed_days, joined_at,
-                   current_streak, max_streak
+                   current_streak, max_streak, xp
             FROM users
             WHERE user_id = $1
         """, user_id)
@@ -29,7 +32,7 @@ async def show_stats(callback: types.CallbackQuery):
         return
 
     nickname = user["nickname"] or "—"
-    if nickname.startswith("@"):  # 👈 убираем @, если он есть
+    if nickname.startswith("@"):
         nickname = nickname[1:]
 
     current = user["current_streak"] or 0
@@ -38,20 +41,34 @@ async def show_stats(callback: types.CallbackQuery):
     challenges = user["finished_challenges"] or 0
     stars = user["total_stars"] or 0
     confirmed_days = user["total_confirmed_days"] or 0
+    xp = round(user["xp"] or 0, 1)
     joined_at = user["joined_at"].strftime("%d.%m.%Y") if user["joined_at"] else "—"
 
+    # ----------------------------
+    # 🔥 Таблица как в Honor Board
+    # ----------------------------
+    table = (
+        "<pre>"
+        f"🪪 Nickname:          {nickname}\n"
+        f"📅 Дата вступления:   {joined_at}\n"
+        "----------------------------------\n"
+        f"🌟 Звёзды   | XP      | $\n"
+        f"{stars:<10} {xp:<8}  {0}\n"
+        "----------------------------------\n"
+        f"🔥 Текущий стрик:          {current}\n"
+        f"🏆 Максимальный стрик:      {maximum}\n"
+        f"💪 Завершённых привычек:    {habits}\n"
+        f"🏆 Завершённых челленджей:  {challenges}\n"
+        f"📅 Подтверждённых дней:     {confirmed_days}\n"
+        "</pre>"
+    )
+
     text = (
-        f"📊 *Твоя статистика*\n\n"
-        f"🪪 Nickname: *{nickname}*\n"
-        f"📅 Дата вступления: *{joined_at}*\n\n"
-        f"🔥 Текущий стрик: *{current}*\n"
-        f"🏆 Максимальный стрик: *{maximum}*\n\n"
-        f"💪 Завершённых привычек: *{habits}*\n"
-        f"🏆 Завершённых челленджей: *{challenges}*\n"
-        f"🌟 Всего звёзд: *{stars}*\n"
-        f"📅 Всего подтверждённых дней: *{confirmed_days}*\n\n"
+        f"📊 <b>Твоя статистика</b>\n\n"
+        f"{table}\n"
         f"Продолжай в том же духе! 💥"
     )
+
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -59,5 +76,8 @@ async def show_stats(callback: types.CallbackQuery):
         ]
     )
 
-    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
-    await callback.answer()
+    await callback.message.edit_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=kb
+    )

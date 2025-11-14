@@ -6,6 +6,8 @@ from database import get_pool
 from datetime import datetime
 from services.user_service import recalculate_total_confirmed_days
 from services.user_service import update_user_streak
+from services.xp_service import add_xp_for_confirmation
+
 import pytz
 
 router = Router()
@@ -225,6 +227,10 @@ async def receive_media(message: types.Message, state: FSMContext):
             
             # 🔥 Обновляем стрик
             await update_user_streak(user_id)
+
+            # ⭐ Начисляем XP за уникальное подтверждение
+            xp_gain = await add_xp_for_confirmation(user_id, habit_id)
+            await message.answer(f"✨ Ты получил {xp_gain} XP!")
 
             # Увеличиваем количество выполненных дней
             await conn.execute("""
