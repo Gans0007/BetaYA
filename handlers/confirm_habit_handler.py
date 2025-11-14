@@ -129,11 +129,33 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
 
     pool = await get_pool()
     async with pool.acquire() as conn:
+        # Получаем время и последний подтверждённый день
         user_row = await conn.fetchrow("SELECT timezone FROM users WHERE user_id = $1", user_id)
         user_tz = user_row["timezone"] if user_row and user_row["timezone"] else "Europe/Kyiv"
         user_timezone = pytz.timezone(user_tz)
         user_now = datetime.now(user_timezone)
 
+        # Забираем имя привычки / челленджа
+        habit_row = await conn.fetchrow("""
+            SELECT name, is_challenge
+            FROM habits
+            WHERE id = $1
+        """, habit_id)
+
+        if not habit_row:
+            await callback.answer("❌ Привычка не найдена.", show_alert=True)
+            return
+
+        habit_name = habit_row["name"]
+        is_challenge = habit_row["is_challenge"]
+
+        # Формируем красивую подпись
+        if is_challenge:
+            habit_title = f"челленджа *{habit_name}*"
+        else:
+            habit_title = f"привычки *{habit_name}*"
+
+        # Проверка на переподтверждение
         row = await conn.fetchrow("""
             SELECT id, datetime FROM confirmations
             WHERE user_id = $1 AND habit_id = $2
@@ -143,25 +165,31 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
         if row:
             last_time = row["datetime"].astimezone(user_timezone)
             if last_time.date() == user_now.date():
+                # Уже подтверждал сегодня → режим переподтверждения
                 await state.update_data(habit_id=habit_id, reverify=True)
                 await state.set_state(ConfirmHabitFSM.waiting_for_media)
+
                 await callback.message.answer(
-                    "♻️ Ты уже подтверждал сегодня.\n"
-                    "Пришли новое фото/видео, чтобы *переподтвердить* привычку.",
+                    f"♻️ Ты уже подтверждал сегодня.\n"
+                    f"Пришли новое фото/видео, чтобы *переподтвердить* {habit_title}.",
                     parse_mode="Markdown",
                     reply_markup=cancel_kb(habit_id)
                 )
                 await callback.answer()
                 return
 
+        # Обычное подтверждение
         await state.update_data(habit_id=habit_id, reverify=False)
         await state.set_state(ConfirmHabitFSM.waiting_for_media)
+
         await callback.message.answer(
-            "📸 Пришли фото, видео или кружочек, подтверждающий выполнение привычки 💪",
+            f"📸 Пришли фото, видео или кружочек, подтверждающий выполнение {habit_title} 💪",
+            parse_mode="Markdown",
             reply_markup=cancel_kb(habit_id)
         )
 
     await callback.answer()
+
 
 
 # -------------------------------
@@ -230,18 +258,65 @@ async def receive_media(message: types.Message, state: FSMContext):
 
             # ⭐ Начисляем XP за уникальное подтверждение
             xp_gain = await add_xp_for_confirmation(user_id, habit_id)
-            await message.answer(f"✨ Ты получил {xp_gain} XP!")
 
-            # Увеличиваем количество выполненных дней
+            # Ищем текущий уровень
+            idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == cur_league), 0)
+
+            # Есть следующая лига?
+            if idx < len(LEAGUES) - 1:
+                nxt = LEAGUES[idx + 1]
+
+                if xp_user >= nxt["xp"] and stars_user >= nxt["stars"]:
+                    await message.answer(
+                        f"🎉 <b>Условия следующей лиги выполнены!</b>\n"
+                        f"Ты можешь перейти на уровень {nxt['emoji']} <b>{nxt['name']}</b>.\n\n"
+                        f"Перейди в статистику и нажми 🚀 <b>Level Up</b>.",
+                        parse_mode="HTML"
+                    )
+
+            # Обновляем прогресс привычки
             await conn.execute("""
                 UPDATE habits
                 SET done_days = done_days + 1
                 WHERE id = $1
             """, habit_id)
 
-            # 📅 Обновляем общее количество уникальных подтверждённых дней
-            new_total = await recalculate_total_confirmed_days(user_id)
-            await message.answer(f"📅 Обновлённый счётчик уникальных дней: {new_total}")
+            # 🔥 Обновляем счётчик уникальных подтверждений (НО БЕЗ ВЫВОДА)
+            await recalculate_total_confirmed_days(user_id)
+
+            # 🎯 Финальное единое сообщение
+            await message.answer(
+                f"✨ +{xp_gain} XP\n"
+                f"✅ Привычка подтверждена! Отличная работа 💪"
+            )
+
+# ---------------------------------------------
+# ТЕПЕРЬ проверяем лигу (после подтверждения!)
+# ---------------------------------------------
+            from services.xp_service import LEAGUES
+
+            u = await conn.fetchrow("""
+                SELECT xp, total_stars, league
+                FROM users
+                WHERE user_id = $1
+            """, user_id)
+
+            cur_league = u["league"]
+            xp_user = float(u["xp"])
+            stars_user = int(u["total_stars"])
+
+            idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == cur_league), 0)
+
+            if idx < len(LEAGUES) - 1:
+                next_l = LEAGUES[idx + 1]
+
+                if xp_user >= next_l["xp"] and stars_user >= next_l["stars"]:
+                    await message.answer(
+                        f"🎉 <b>Условия следующей лиги выполнены!</b>\n"
+                        f"Ты можешь перейти на уровень {next_l['emoji']} <b>{next_l['name']}</b>.\n\n"
+                        f"Перейди в статистику и нажми 🚀 <b>Level Up</b>.",
+                        parse_mode="HTML"
+                    )
 
             # 🔥 Проверка автозавершения челленджа
             habit = await conn.fetchrow("""
@@ -311,8 +386,6 @@ async def receive_media(message: types.Message, state: FSMContext):
                     f"Продолжай в том же духе 💪",
                     parse_mode="Markdown"
                 )
-            else:
-                await message.answer("✅ Привычка подтверждена! Отличная работа 💪")
 
     await state.clear()
 
