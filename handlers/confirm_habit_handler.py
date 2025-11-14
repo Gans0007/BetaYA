@@ -397,17 +397,40 @@ async def delete_habit(callback: types.CallbackQuery):
     pool = await get_pool()
 
     async with pool.acquire() as conn:
+        # Удаляем подтверждения + привычку
         await conn.execute("DELETE FROM confirmations WHERE habit_id = $1", habit_id)
         await conn.execute("DELETE FROM habits WHERE id = $1", habit_id)
 
-    # 🔁 После удаления — обновляем список активных привычек
+        # Считаем, сколько осталось активных
+        rows = await conn.fetch("""
+            SELECT id, name, is_challenge
+            FROM habits
+            WHERE user_id = $1 AND is_active = TRUE
+        """, user_id)
+
+    count = len(rows)
+
+    # 🔥 1) Если привычек не осталось
+    if count == 0:
+        await callback.message.edit_text(
+            "😴 У тебя пока нет активных привычек или челленджей."
+        )
+        await callback.answer("🗑 Привычка удалена.", show_alert=True)
+        return
+
+    # 🔥 2) Если осталось 1 или 2 — показываем сообщение вместо карточки
+    if count <= 2:
+        await callback.message.edit_text("🗑 Привычка удалена.")
+        await callback.answer("Удалено", show_alert=True)
+        return
+
+    # 🔥 3) Если осталось 3 или больше — выводим список
     from handlers.active_tasks_handler import build_active_list
-    text, kb, rows = await build_active_list(user_id)
-    if not rows:
-        await callback.message.edit_text("😴 У тебя пока нет активных привычек или челленджей.")
-    else:
-        await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
-    await callback.answer("🗑 Привычка удалена.")
+    text, kb, _ = await build_active_list(user_id)
+
+    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.answer("Удалено", show_alert=True)
+
 
 
 # -------------------------------

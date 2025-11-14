@@ -10,9 +10,9 @@ router = Router()
 # Варианты уведомлений и языков
 # -------------------------------
 NOTIFICATION_TONES = {
-    "soft": "🧘 Мягкие",
-    "hard": "🥊 Жёсткие",
-    "mixed": "😈 Очень",
+    "friend": "Друг🤝",
+    "gamer": "Игровой🎮",
+    "spartan": "Спартанец⚔️",
 }
 
 LANGUAGES = {
@@ -42,15 +42,15 @@ async def show_about_options(callback: CallbackQuery):
     share_on = user["share_confirmation_media"] if user and user["share_confirmation_media"] is not None else True
     lang_code = user["language"] if user and user["language"] else "ru"
 
-    tone_label = NOTIFICATION_TONES.get(tone_code, "😈 Очень")
+    tone_label = NOTIFICATION_TONES.get(tone_code, "Друг🤝")
     share_label = "🟢 Вкл" if share_on else "⚪ Выкл"
     lang_label = LANGUAGES.get(lang_code, "🇷🇺 Русский")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="🧘 Мягкие", callback_data="tone_soft"),
-            InlineKeyboardButton(text="🥊 Жёсткие", callback_data="tone_hard"),
-            InlineKeyboardButton(text="😈 Очень", callback_data="tone_mixed"),
+            InlineKeyboardButton(text="Друг🤝", callback_data="tone_friend"),
+            InlineKeyboardButton(text="Игровой🎮", callback_data="tone_gamer"),
+            InlineKeyboardButton(text="Спартанец⚔️", callback_data="tone_spartan"),
         ],
         [
             InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru"),
@@ -87,7 +87,8 @@ async def show_about_options(callback: CallbackQuery):
 async def set_notification_tone(callback: CallbackQuery):
     """Изменение тона уведомлений"""
     user_id = callback.from_user.id
-    tone_code = callback.data.replace("tone_", "")
+
+    tone_code = callback.data.replace("tone_", "")  # friend / gamer / spartan
 
     if tone_code not in NOTIFICATION_TONES:
         await callback.answer("❌ Неверный выбор", show_alert=True)
@@ -102,6 +103,7 @@ async def set_notification_tone(callback: CallbackQuery):
 
     await callback.answer("✅ Стиль уведомлений обновлён")
     await show_about_options(callback)
+
 
 
 # -------------------------------
