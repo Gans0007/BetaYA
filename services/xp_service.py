@@ -135,3 +135,64 @@ async def add_xp_for_confirmation(user_id: int, habit_id: int):
         """, xp_gain, user_id)
 
         return xp_gain
+
+
+# ------------------------------------------
+# 🔥 Централизованная проверка возможности повышения лиги
+# ------------------------------------------
+async def check_next_league(user_id: int):
+    """
+    Проверяет, доступна ли следующая лига.
+    Возвращает:
+    {
+        "can_level_up": bool,
+        "current_league": str,
+        "next_league": dict | None,
+        "need_stars": int,
+        "need_xp": float
+    }
+    """
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        user = await conn.fetchrow("""
+            SELECT xp, total_stars, league
+            FROM users
+            WHERE user_id = $1
+        """, user_id)
+
+    if not user:
+        return {"can_level_up": False, "next_league": None}
+
+    xp_user = float(user["xp"])
+    stars_user = int(user["total_stars"])
+    current_league = user["league"]
+
+    # индекс текущей лиги
+    idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
+
+    # последняя лига
+    if idx >= len(LEAGUES) - 1:
+        return {
+            "can_level_up": False,
+            "current_league": current_league,
+            "next_league": None,
+            "need_stars": 0,
+            "need_xp": 0
+        }
+
+    next_l = LEAGUES[idx + 1]
+
+    need_stars = max(0, next_l["stars"] - stars_user)
+    need_xp = max(0, next_l["xp"] - xp_user)
+
+    can_level_up = (need_stars == 0 and need_xp == 0)
+
+    return {
+        "can_level_up": can_level_up,
+        "current_league": current_league,
+        "next_league": next_l,
+        "need_stars": need_stars,
+        "need_xp": need_xp,
+    }
+

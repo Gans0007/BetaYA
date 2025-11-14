@@ -6,7 +6,8 @@ from database import get_pool
 from datetime import datetime
 from services.user_service import recalculate_total_confirmed_days
 from services.user_service import update_user_streak
-from services.xp_service import add_xp_for_confirmation
+from services.xp_service import add_xp_for_confirmation, check_next_league
+
 
 import pytz
 
@@ -238,6 +239,7 @@ async def receive_media(message: types.Message, state: FSMContext):
             return
 
         if reverify:
+            # ♻️ Обновляем существующее подтверждение за сегодня
             await conn.execute("""
                 UPDATE confirmations
                 SET file_id = $1, file_type = $2, datetime = NOW()
@@ -247,7 +249,7 @@ async def receive_media(message: types.Message, state: FSMContext):
             await message.answer("♻️ Видео обновлено. Переподтверждение сохранено 💪")
 
         else:
-            # Добавляем новое подтверждение
+            # ✅ Добавляем НОВОЕ подтверждение
             await conn.execute("""
                 INSERT INTO confirmations (user_id, habit_id, datetime, file_id, file_type, confirmed)
                 VALUES ($1, $2, NOW(), $3, $4, TRUE)
@@ -259,22 +261,7 @@ async def receive_media(message: types.Message, state: FSMContext):
             # ⭐ Начисляем XP за уникальное подтверждение
             xp_gain = await add_xp_for_confirmation(user_id, habit_id)
 
-            # Ищем текущий уровень
-            idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == cur_league), 0)
-
-            # Есть следующая лига?
-            if idx < len(LEAGUES) - 1:
-                nxt = LEAGUES[idx + 1]
-
-                if xp_user >= nxt["xp"] and stars_user >= nxt["stars"]:
-                    await message.answer(
-                        f"🎉 <b>Условия следующей лиги выполнены!</b>\n"
-                        f"Ты можешь перейти на уровень {nxt['emoji']} <b>{nxt['name']}</b>.\n\n"
-                        f"Перейди в статистику и нажми 🚀 <b>Level Up</b>.",
-                        parse_mode="HTML"
-                    )
-
-            # Обновляем прогресс привычки
+            # Обновляем прогресс привычки (done_days + 1)
             await conn.execute("""
                 UPDATE habits
                 SET done_days = done_days + 1
@@ -284,39 +271,26 @@ async def receive_media(message: types.Message, state: FSMContext):
             # 🔥 Обновляем счётчик уникальных подтверждений (НО БЕЗ ВЫВОДА)
             await recalculate_total_confirmed_days(user_id)
 
-            # 🎯 Финальное единое сообщение
+            # 🎯 Сообщение о подтверждении и XP
             await message.answer(
                 f"✨ +{xp_gain} XP\n"
                 f"✅ Привычка подтверждена! Отличная работа 💪"
             )
 
-# ---------------------------------------------
-# ТЕПЕРЬ проверяем лигу (после подтверждения!)
-# ---------------------------------------------
-            from services.xp_service import LEAGUES
 
-            u = await conn.fetchrow("""
-                SELECT xp, total_stars, league
-                FROM users
-                WHERE user_id = $1
-            """, user_id)
+            # -------------------------------------------------------
+            # 📈 Проверка лиги (новая централизованная версия)
+            # -------------------------------------------------------
+            result = await check_next_league(user_id)
 
-            cur_league = u["league"]
-            xp_user = float(u["xp"])
-            stars_user = int(u["total_stars"])
-
-            idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == cur_league), 0)
-
-            if idx < len(LEAGUES) - 1:
-                next_l = LEAGUES[idx + 1]
-
-                if xp_user >= next_l["xp"] and stars_user >= next_l["stars"]:
-                    await message.answer(
-                        f"🎉 <b>Условия следующей лиги выполнены!</b>\n"
-                        f"Ты можешь перейти на уровень {next_l['emoji']} <b>{next_l['name']}</b>.\n\n"
-                        f"Перейди в статистику и нажми 🚀 <b>Level Up</b>.",
-                        parse_mode="HTML"
-                    )
+            if result["can_level_up"]:
+                nxt = result["next_league"]
+                await message.answer(
+                    f"🎉 <b>Условия следующей лиги выполнены!</b>\n"
+                    f"Ты можешь перейти на уровень {nxt['emoji']} <b>{nxt['name']}</b>.\n\n"
+                    f"Перейди в статистику и нажми 🚀 <b>Level Up</b>.",
+                    parse_mode="HTML"
+                )
 
             # 🔥 Проверка автозавершения челленджа
             habit = await conn.fetchrow("""
@@ -325,7 +299,7 @@ async def receive_media(message: types.Message, state: FSMContext):
                 WHERE id = $1
             """, habit_id)
 
-            if habit["is_challenge"] and habit["done_days"] >= habit["days"]:
+            if habit and habit["is_challenge"] and habit["done_days"] >= habit["days"]:
                 # Проверяем, был ли челлендж уже завершён раньше
                 existing = await conn.fetchrow("""
                     SELECT repeat_count FROM completed_challenges
@@ -369,7 +343,7 @@ async def receive_media(message: types.Message, state: FSMContext):
                 # Удаляем челлендж из активных привычек
                 await conn.execute("DELETE FROM habits WHERE id = $1", habit_id)
 
-                # Получаем обновлённое количество завершённых челленджей и звёзд
+                # Получаем обновлённую статистику
                 user_stats = await conn.fetchrow("""
                     SELECT finished_challenges, total_stars
                     FROM users
