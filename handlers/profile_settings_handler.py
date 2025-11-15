@@ -16,7 +16,7 @@ NOTIFICATION_TONES = {
 }
 
 LANGUAGES = {
-    "ru": "🇷🇺 Русский",
+    "ru": "Рус",
     "uk": "🇺🇦 Українська",
     "en": "🇬🇧 English",
 }
@@ -44,7 +44,7 @@ async def show_about_options(callback: CallbackQuery):
 
     tone_label = NOTIFICATION_TONES.get(tone_code, "Друг🤝")
     share_label = "🟢 Вкл" if share_on else "⚪ Выкл"
-    lang_label = LANGUAGES.get(lang_code, "🇷🇺 Русский")
+    lang_label = LANGUAGES.get(lang_code, "Рус")
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
@@ -53,7 +53,7 @@ async def show_about_options(callback: CallbackQuery):
             InlineKeyboardButton(text="Спартанец⚔️", callback_data="tone_spartan"),
         ],
         [
-            InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru"),
+            InlineKeyboardButton(text="Рус", callback_data="lang_ru"),
             InlineKeyboardButton(text="🇺🇦 Українська", callback_data="lang_uk"),
             InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en"),
         ],
