@@ -2,6 +2,7 @@ from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from database import get_pool
 from services.xp_service import LEAGUES
+from services.xp_service import check_next_league
 
 router = Router()
 
@@ -119,21 +120,12 @@ async def process_level_up(callback: types.CallbackQuery):
     await callback.answer()
 
     pool = await get_pool()
-    async with pool.acquire() as conn:
-        user = await conn.fetchrow("""
-            SELECT xp, total_stars, league
-            FROM users
-            WHERE user_id = $1
-        """, user_id)
 
-    xp = float(user["xp"])
-    stars = int(user["total_stars"])
-    current_league = user["league"]
+    # проверяем возможность
+    result = await check_next_league(user_id)
 
-    idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
-
-    # Если максимальная лига
-    if idx >= len(LEAGUES) - 1:
+    # максимальная лига
+    if not result["next_league"]:
         await callback.message.edit_text(
             "🔥 Ты уже достиг максимальной лиги!",
             reply_markup=InlineKeyboardMarkup(
@@ -142,14 +134,11 @@ async def process_level_up(callback: types.CallbackQuery):
         )
         return
 
-    next_league = LEAGUES[idx + 1]
-    need_stars = max(0, next_league["stars"] - stars)
-    need_xp = max(0, next_league["xp"] - xp)
+    # условия НЕ выполнены → вернуть расчёт времени
+    if not result["can_level_up"]:
 
-    # -------------------------------------------------
-    # Если условий НЕ достаточно → показать срок
-    # -------------------------------------------------
-    if need_stars > 0 or need_xp > 0:
+        need_stars = result["need_stars"]
+        need_xp = result["need_xp"]
 
         async with pool.acquire() as conn:
             conf_count = await conn.fetchval("""
@@ -160,37 +149,41 @@ async def process_level_up(callback: types.CallbackQuery):
         if not conf_count:
             estimate = "Сделай хотя бы одно подтверждение, чтобы я рассчитал темп 💪"
         else:
+            # Средний XP за неделю
             avg_xp = float((conf_count * 1.4) / 7)
             days = float(need_xp) / avg_xp if avg_xp > 0 else 999
+
             low = max(1, int(days * 0.85))
             high = max(1, int(days * 1.15))
+
             estimate = f"~ {low}–{high} дней при твоём текущем темпе 🔥"
 
         await callback.message.answer(
-            f"⏳ Примерно до новой лиги:\n"
+            f"⏳ <b>Примерно до новой лиги:</b>\n"
             f"{estimate}\n\n"
-            f"⭐ Осталось: {need_stars}⭐\n"
-            f"✨ Осталось: {need_xp} XP"
+            f"⭐ Осталось: <b>{need_stars}⭐</b>\n"
+            f"✨ Осталось: <b>{need_xp} XP</b>",
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup(
+                inline_keyboard=[[InlineKeyboardButton(text="⬅️ Назад", callback_data="profile_stats")]]
+            )
         )
         return
 
-    # -------------------------------------------------
-    # Условия выполнены → ПОВЫШАЕМ
-    # -------------------------------------------------
+    # условия выполнены → повышаем
+    next_l = result["next_league"]
+
     async with pool.acquire() as conn:
         await conn.execute("""
             UPDATE users
             SET league = $1,
                 league_emoji = $2
             WHERE user_id = $3
-        """, next_league["name"], next_league["emoji"], user_id)
+        """, next_l["name"], next_l["emoji"], user_id)
 
     await callback.message.answer(
         f"🏆 Новая лига!\n"
-        f"Ты поднялся до уровня: {next_league['emoji']} {next_league['name']}\n\n"
-        f"«{next_league['quote']}»\n"
+        f"Ты поднялся до уровня: {next_l['emoji']} {next_l['name']}\n\n"
+        f"«{next_l['quote']}»\n"
         f"Продолжай в том же духе 🚀"
     )
-    return
-
-

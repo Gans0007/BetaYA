@@ -46,7 +46,7 @@ async def build_active_list(user_id: int):
         """, user_id)
 
     if not rows:
-        return None, None
+        return None, None, []   # ← ИСПРАВЛЕНО
 
     kb_rows = []
     for r in rows:
@@ -54,9 +54,12 @@ async def build_active_list(user_id: int):
         kb_rows.append([InlineKeyboardButton(text=title, callback_data=f"habit_{r['id']}")])
 
     kb = InlineKeyboardMarkup(inline_keyboard=kb_rows)
-    text = ("📋 *Твои активные привычки и челленджи:*\n\n"
-            "Нажми на любую, чтобы открыть карточку 👇")
+    text = (
+        "📋 *Твои активные привычки и челленджи:*\n\n"
+        "Нажми на любую, чтобы открыть карточку 👇"
+    )
     return text, kb, rows
+
 
 
 # ---------- список активных: message-хендлер ----------

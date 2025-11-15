@@ -167,73 +167,76 @@ async def show_levels(callback: types.CallbackQuery):
 async def show_challenges(callback: types.CallbackQuery):
     level_key = callback.data
     user_id = callback.from_user.id
-    # Проверяем, хватает ли звёзд для открытия уровня
+
     pool = await get_pool()
     async with pool.acquire() as conn:
+
         total_stars = await conn.fetchval("""
             SELECT total_stars FROM users WHERE user_id = $1
         """, user_id)
 
-    required_stars = LEVEL_UNLOCKS.get(level_key, 0)
+        required_stars = LEVEL_UNLOCKS.get(level_key, 0)
 
-    if total_stars < required_stars:
-        # Названия уровней для читаемого вывода
-        level_names = {
-            "level_0": "Новичок",
-            "level_1": "Активность",
-            "level_2": "Фокус и энергия",
-            "level_3": "Самодисциплина",
-            "level_4": "Преодоление",
-            "level_5": "Предприниматели"
-        }
-        level_name = level_names.get(level_key, "этот уровень")
+        if total_stars < required_stars:
+            await callback.message.answer(
+                f"🔒 Раздел пока недоступен!\n"
+                f"🌟 Нужно: *{required_stars}* звёзд\n"
+                f"⭐ У тебя: *{total_stars}*",
+                parse_mode="Markdown"
+            )
+            await callback.answer()
+            return
 
-        # Отправляем новое сообщение (меню остаётся)
-        await callback.message.answer(
-            f"🔒 Раздел *«{level_name}»* пока недоступен!\n"
-            f"🌟 Нужно: *{required_stars}* звёзд\n"
-            f"⭐ У тебя: *{total_stars}*",
-            parse_mode="Markdown"
-        )
+        level_name = CHALLENGE_LEVELS["ru"][level_key]
+        challenges = CHALLENGES[level_key]
+        quote = LEVEL_QUOTES[level_key]
 
-        await callback.answer()
-        return
-
-
-
-    level_name = CHALLENGE_LEVELS["ru"].get(level_key, "Неизвестный уровень")
-    challenges = CHALLENGES.get(level_key, [])
-    quote = LEVEL_QUOTES.get(level_key, "")
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
         active_rows = await conn.fetch("""
-            SELECT challenge_id FROM habits
+            SELECT challenge_id, difficulty FROM habits
             WHERE user_id = $1 AND is_challenge = TRUE
         """, user_id)
+
         completed_rows = await conn.fetch("""
             SELECT challenge_id, repeat_count FROM completed_challenges
             WHERE user_id = $1
         """, user_id)
 
-    active_ids = {r["challenge_id"] for r in active_rows if r["challenge_id"]}
-    completed_dict = {r["challenge_id"]: r["repeat_count"] for r in completed_rows if r["challenge_id"]}
+    # ВНИМАНИЕ: дальше conn НЕ используется ❗
+
+    active_ids = {row["challenge_id"] for row in active_rows}
+    diff_dict = {row["challenge_id"]: row["difficulty"] for row in active_rows}
+    completed_dict = {row["challenge_id"]: row["repeat_count"] for row in completed_rows}
 
     keyboard = []
     for i, (cid, title, *_rest) in enumerate(challenges):
-        prefix = ""
+
         if cid in active_ids:
-            prefix = "🔥"
+            diff = diff_dict.get(cid, 1)
+            prefix = f"🔥 ⭐{diff}"
+
         elif cid in completed_dict:
             stars = min(completed_dict[cid], 3)
             prefix = "⭐" * stars + "☆" * (3 - stars)
-        keyboard.append([InlineKeyboardButton(text=f"{prefix} {title}".strip(), callback_data=f"challenge_{level_key}_{i}")])
+
+        else:
+            prefix = ""
+
+        keyboard.append([
+            InlineKeyboardButton(
+                text=f"{prefix} {title}".strip(),
+                callback_data=f"challenge_{level_key}_{i}"
+            )
+        ])
 
     keyboard.append([InlineKeyboardButton(text="⬅ Назад", callback_data="choose_from_list")])
 
-    text = f"📋 Уровень *{level_name}*\n\n💬 {quote}\n\nВыбери челлендж:"
-    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+    await callback.message.edit_text(
+        f"📋 Уровень *{level_name}*\n\n💬 {quote}\n\nВыбери челлендж:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard),
+        parse_mode="Markdown"
+    )
     await callback.answer()
+
 
 
 # -------------------------------
@@ -292,26 +295,42 @@ async def accept_challenge(callback: types.CallbackQuery):
     cid, title, desc, days, ctype = CHALLENGES.get(level_key, [])[index]
 
     pool = await get_pool()
+    user_id = callback.from_user.id
+
     async with pool.acquire() as conn:
+        # Проверяем, активен ли сейчас
         active_exists = await conn.fetchval("""
             SELECT 1 FROM habits
             WHERE user_id = $1 AND is_challenge = TRUE AND challenge_id = $2
-        """, callback.from_user.id, cid)
+        """, user_id, cid)
 
         if active_exists:
             await callback.answer("Этот челлендж уже активен! 🚫", show_alert=True)
             return
 
+        # Проверяем, сколько раз завершён до этого
+        row = await conn.fetchrow("""
+            SELECT repeat_count FROM completed_challenges
+            WHERE user_id = $1 AND challenge_id = $2
+        """, user_id, cid)
+
+        repeat_count = row["repeat_count"] if row else 0
+        difficulty = min(repeat_count + 1, 3)
+
+        # Добавляем новый челлендж с учётом сложности
         await conn.execute("""
-            INSERT INTO habits (user_id, name, description, days, confirm_type, is_challenge, challenge_id)
-            VALUES ($1, $2, $3, $4, $5, TRUE, $6)
-        """, callback.from_user.id, title, desc, days, ctype, cid)
+            INSERT INTO habits (user_id, name, description, days, confirm_type, is_challenge, challenge_id, difficulty)
+            VALUES ($1, $2, $3, $4, $5, TRUE, $6, $7)
+        """, user_id, title, desc, days, ctype, cid, difficulty)
 
     await callback.message.edit_text(
-        f"🔥 Ты начал челлендж: *{title}*!\n\nОн добавлен в твои активные задания 💪",
+        f"🔥 Ты начал челлендж: *{title}*!\n"
+        f"⭐ Текущая сложность: {difficulty} из 3\n\n"
+        f"Он добавлен в твои активные задания 💪",
         parse_mode="Markdown"
     )
     await callback.answer()
+
 
 # -------------------------------
 # 🔹 Завершить челлендж (⭐ до 5)
