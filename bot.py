@@ -16,6 +16,7 @@ from handlers.profile_menu_handler import router as profile_menu_router
 from handlers.profile_settings_handler import router as profile_settings_router
 from handlers.profile_stats_handler import router as profile_stats_router
 from challenge_reset_task import check_challenge_resets
+from handlers.honor_handler import router as honor_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +48,7 @@ async def main():
     dp.include_router(profile_menu_router)
     dp.include_router(profile_settings_router)
     dp.include_router(profile_stats_router)
+    dp.include_router(honor_router)
 
     # 5) Запускаем фоновые задачи
     from daily_reminder_task import send_daily_reminders
