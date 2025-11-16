@@ -17,6 +17,7 @@ from handlers.profile_settings_handler import router as profile_settings_router
 from handlers.profile_stats_handler import router as profile_stats_router
 from challenge_reset_task import check_challenge_resets
 from handlers.honor_handler import router as honor_router
+from habit_reset_task import check_habit_resets
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,6 +57,7 @@ async def main():
 
     # 🔥 Запускаем автоматическую проверку аннулирований (челленджи + привычки)
     asyncio.create_task(check_challenge_resets())
+    asyncio.create_task(check_habit_resets())
 
     logging.info("🤖 Bot started...")
     try:

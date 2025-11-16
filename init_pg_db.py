@@ -45,6 +45,7 @@ async def create_users_table():
                 is_active BOOLEAN DEFAULT TRUE,
                 challenge_id TEXT,
                 difficulty INTEGER DEFAULT 1,
+                reset_streak INTEGER DEFAULT 0,
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)
