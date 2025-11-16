@@ -81,6 +81,7 @@ CHALLENGES = {
             },
             "media"
         ),
+        (
             "0_pushups",
             "Отжимания",
             {
