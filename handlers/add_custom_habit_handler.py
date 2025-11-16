@@ -2,9 +2,11 @@ from aiogram import Router, types, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
-from database import get_pool
+
+from services.habit_create_service import create_custom_habit
 
 router = Router()
+
 
 # -------------------------------
 # 🔹 Состояния FSM
@@ -146,20 +148,14 @@ async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "save_habit")
 async def save_habit(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    name = data["name"]
-    desc = data["description"]
-    days = data["days"]
-    diff = data["difficulty"]
 
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        await conn.execute("""
-            INSERT INTO habits (user_id, name, description, days, confirm_type, is_challenge, difficulty)
-            VALUES ($1, $2, $3, $4, 'media', FALSE, $5)
-        """, callback.from_user.id, name, desc, days, diff)
+    await create_custom_habit(
+        user_id=callback.from_user.id,
+        data=data
+    )
 
     await callback.message.edit_text(
-        f"✅ Привычка *{name}* успешно сохранена!\n"
+        f"✅ Привычка *{data['name']}* успешно сохранена!\n"
         f"Теперь она появится в твоих 📋 *Активных заданиях*.",
         parse_mode="Markdown"
     )
