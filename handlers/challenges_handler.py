@@ -33,6 +33,11 @@ async def show_levels(callback: types.CallbackQuery):
             InlineKeyboardButton(text=name, callback_data=level_key)
         ])
 
+    # 🔥 ДОБАВЛЕНА КНОПКА НАЗАД
+    keyboard.append([
+        InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_add_menu")
+    ])
+
     await callback.message.edit_text(
         "💪 Выбери уровень челленджей:",
         reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard)

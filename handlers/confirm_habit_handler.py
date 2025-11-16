@@ -151,11 +151,20 @@ async def receive_media(message: types.Message, state: FSMContext):
         # ♻️ REVERIFY
         # =============================
         if reverify:
+            # Обновляем ТОЛЬКО последнюю запись подтверждения
             await conn.execute("""
                 UPDATE confirmations
-                SET file_id=$1, file_type=$2, datetime=NOW()
-                WHERE user_id=$3 AND habit_id=$4
+                SET file_id=$1, file_type=$2, datetime=NOW(), confirmed=TRUE
+                WHERE id = (
+                    SELECT id FROM confirmations
+                    WHERE user_id=$3 AND habit_id=$4
+                    ORDER BY datetime DESC
+                    LIMIT 1
+                )
             """, file_id, file_type, user_id, habit_id)
+
+            # Пересчитываем уникальные дни
+            await recalculate_total_confirmed_days(user_id)
 
             await message.answer("♻️ Переподтверждение обновлено 💪")
 
@@ -276,24 +285,28 @@ async def delete_habit(callback: types.CallbackQuery):
     user_id = callback.from_user.id
 
     pool = await get_pool()
+
     async with pool.acquire() as conn:
 
-        # 1) Удаляем подтверждения этой привычки
-        await conn.execute(
-            "DELETE FROM confirmations WHERE habit_id=$1",
-            habit_id
-        )
+        # 🟦 1. Считаем количество привычек ДО удаления
+        before_rows = await conn.fetch("""
+            SELECT id FROM habits
+            WHERE user_id=$1 AND is_active=TRUE
+        """, user_id)
+        before_count = len(before_rows)
 
-        # 2) Удаляем саму привычку
-        await conn.execute(
-            "DELETE FROM habits WHERE id=$1 AND user_id=$2",
-            habit_id, user_id
-        )
+        # ---------------------------------------------------
+        # 🟦 2. Удаляем привычку + её подтверждения
+        # ---------------------------------------------------
+        await conn.execute("DELETE FROM confirmations WHERE habit_id=$1", habit_id)
+        await conn.execute("DELETE FROM habits WHERE id=$1 AND user_id=$2", habit_id, user_id)
 
-        # 3) Получаем оставшиеся привычки после удаления
+        # ---------------------------------------------------
+        # 🟦 3. Грузим привычки ПОСЛЕ удаления
+        # ---------------------------------------------------
         habits = await conn.fetch("""
-            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge,
-                   h.difficulty,
+            SELECT h.id, h.name, h.description, h.days, h.done_days,
+                   h.is_challenge, h.difficulty,
                    (SELECT datetime FROM confirmations
                         WHERE habit_id=h.id
                         ORDER BY datetime DESC LIMIT 1) AS last_date,
@@ -304,36 +317,52 @@ async def delete_habit(callback: types.CallbackQuery):
             ORDER BY h.is_challenge DESC, h.created_at DESC
         """, user_id)
 
-    # === 0 привычек: просто выводим текст ===
-    if not habits:
-        await callback.message.edit_text("🗑 Привычка удалена.\n\n😴 Больше нет активных привычек.")
+    # ---------------------------------------------------
+    # 🟥 0 привычек осталось
+    # ---------------------------------------------------
+    if before_count == 1:
+        await callback.message.edit_text(
+            "🗑 Привычка удалена.\n\n😴 Больше нет активных привычек."
+        )
         await callback.answer()
         return
 
-    chat = callback.message.chat  # запоминаем чат для отправки сообщений
 
-    # === 1–2 привычки: показываем их как карточки ===
-    if len(habits) <= 2:
-        # Сначала сообщаем об удалении
-        await callback.message.edit_text("🗑 Привычка удалена.")
-
-        # Выводим оставшиеся карточки
-        for habit in habits:
-            await send_habit_card(chat, habit, user_id)
-
+    # ---------------------------------------------------
+    # 🟧 Было 2 → стало 1 → показываем карточка удалена
+    # ---------------------------------------------------
+    if before_count == 2:
+        await callback.message.edit_text(
+            "🗑 Привычка удалена."
+        )
         await callback.answer()
         return
 
-    # === 3+ привычек: показываем список ===
-    text, kb, _ = await build_active_list(user_id)
 
-    await callback.message.edit_text(
-        text,
-        parse_mode="Markdown",
-        reply_markup=kb
-    )
+    # ---------------------------------------------------
+    # 🟨 Было 3 → стало 2 → показываем 2 карточки
+    # ---------------------------------------------------
+    if before_count == 3:
+        await callback.message.delete()
+        for h in habits:
+            await send_habit_card(callback.message.chat, h, user_id)
+        await callback.answer()
+        return
 
-    await callback.answer("🗑 Привычка удалена.")
+
+    # ---------------------------------------------------
+    # 🟩 Было 4+ → показываем список
+    # ---------------------------------------------------
+    if before_count >= 4:
+        try:
+            await callback.message.delete()
+        except:
+            pass
+
+        text, kb, _ = await build_active_list(user_id)
+        await callback.message.answer(text, parse_mode="Markdown", reply_markup=kb)
+        await callback.answer()
+        return
 
 
 # ================================
