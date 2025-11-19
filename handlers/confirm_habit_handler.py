@@ -13,6 +13,12 @@ from services.xp_service import add_xp_for_confirmation
 
 from services.habit_view_service import send_habit_card, build_active_list
 
+from repositories.affiliate_repository import (
+    get_affiliate_for_user,
+    mark_referral_active,
+    add_payment_to_affiliate
+)
+
 router = Router()
 
 
@@ -189,6 +195,35 @@ async def receive_media(message: types.Message, state: FSMContext):
             await recalculate_total_confirmed_days(user_id)
 
             await message.answer(f"✨ +{xp_gain} XP\n✅ Готово! Продолжаем 💪")
+
+
+        # ============================
+        # 🔥 ШАГ 3: Активация реферала
+        # ============================
+        # Считаем подтверждённые дни ещё раз
+        total_days = await recalculate_total_confirmed_days(user_id)
+
+        if total_days >= 3:
+            affiliate_id = await get_affiliate_for_user(user_id)
+
+            if affiliate_id:
+                # отмечаем как активного
+                await mark_referral_active(user_id)
+                await add_payment_to_affiliate(affiliate_id, 1.0)
+
+                # пробуем достать ник
+                nickname = message.from_user.username or message.from_user.first_name or user_id
+
+                # отправляем уведомление рефереру
+                try:
+                    await message.bot.send_message(
+                        affiliate_id,
+                        f"🔥 Твой реферал @{nickname} стал активным!\n"
+                        f"💰 Начислено: 1$"
+                    )
+                except Exception:
+                    pass
+
 
         # =============================
         # 🔥 Проверка автозавершения челленджа

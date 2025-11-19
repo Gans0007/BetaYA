@@ -24,7 +24,10 @@ async def create_users_table():
                 share_confirmation_media BOOLEAN DEFAULT TRUE,
                 language TEXT DEFAULT 'ru',
                 timezone TEXT DEFAULT 'Europe/Kyiv',
-                joined_at TIMESTAMP DEFAULT NOW()
+                joined_at TIMESTAMP DEFAULT NOW(),
+                referral_code TEXT,
+                is_affiliate BOOLEAN DEFAULT FALSE,
+                payments DOUBLE PRECISION DEFAULT 0
             )
         """)
 
@@ -81,6 +84,25 @@ async def create_users_table():
                 completed_at TIMESTAMPTZ DEFAULT NOW(),
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
                 UNIQUE(user_id, challenge_id)
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 ТАБЛИЦА РЕФЕРАЛКИ (referrals)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS referrals (
+                id SERIAL PRIMARY KEY,
+                affiliate_id BIGINT NOT NULL,
+                user_id BIGINT NOT NULL,
+                registered_at TIMESTAMPTZ DEFAULT NOW(),
+                is_active BOOLEAN DEFAULT FALSE,
+                active_at TIMESTAMPTZ,
+
+                UNIQUE(affiliate_id, user_id),
+
+                FOREIGN KEY(affiliate_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)
 

@@ -7,6 +7,13 @@ from database import get_pool
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
+from repositories.affiliate_repository import (
+    get_affiliate_by_code,
+    create_referral,
+    user_already_has_affiliate,
+    user_exists_in_users_table,
+)
+
 router = Router()
 
 # -------------------------------
@@ -33,6 +40,26 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
 
 
 # -------------------------------
+# 🔹 Вытаскиваем реферальный код из /start
+# -------------------------------
+def extract_referral_code(message: types.Message) -> str | None:
+    """
+    Примеры:
+    /start
+    /start a3f9d1c2
+    /start@LiteVAmbitionBot a3f9d1c2
+    """
+    if not message.text:
+        return None
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        return None
+
+    return parts[1].strip() or None
+
+
+# -------------------------------
 # 🔹 Команда /start
 # -------------------------------
 @router.message(CommandStart())
@@ -45,8 +72,28 @@ async def start_command(message: types.Message, state: FSMContext):
     elif message.from_user and message.from_user.language_code == "ru":
         user_timezone = "Europe/Moscow"
 
+    ref_code = extract_referral_code(message)
+
+    from repositories.affiliate_repository import (
+        get_affiliate_by_code,
+        create_referral,
+        user_already_has_affiliate,
+        user_exists_in_users_table,
+    )
+
+    user_id = message.from_user.id
+
+    # ------------------------------------
+    # 🟩 1) Проверяем — существовал ли пользователь ДО вставки
+    # ------------------------------------
+    existed_before = await user_exists_in_users_table(user_id)
+
     pool = await get_pool()
     async with pool.acquire() as conn:
+
+        # ------------------------------------
+        # 🟩 2) Создаём или обновляем пользователя
+        # ------------------------------------
         await conn.execute(
             """
             INSERT INTO users (user_id, username, first_name, timezone)
@@ -56,15 +103,47 @@ async def start_command(message: types.Message, state: FSMContext):
                   first_name = EXCLUDED.first_name,
                   timezone = EXCLUDED.timezone
             """,
-            message.from_user.id,
+            user_id,
             message.from_user.username,
             message.from_user.first_name,
             user_timezone,
         )
 
+        # ------------------------------------
+        # 🟩 3) ЖЁСТКАЯ ЛОГИКА РЕФЕРАЛКИ
+        # ------------------------------------
+        if ref_code:
+            affiliate_id = await get_affiliate_by_code(ref_code)
+
+            if affiliate_id and affiliate_id != user_id:
+
+                # если пользователь существовал ДО старта → нельзя присвоить
+                if existed_before:
+                    pass  # ❌ старый пользователь → не даём рефералку
+
+                else:
+                    # новый пользователь → можно присвоить
+                    already = await user_already_has_affiliate(user_id)
+
+                    if not already:
+                        await create_referral(
+                            affiliate_id=affiliate_id,
+                            user_id=user_id
+                        )
+
+                        # уведомляем партнёра
+                        try:
+                            await message.bot.send_message(
+                                affiliate_id,
+                                f"🎉 У тебя новый реферал: @{message.from_user.username or user_id}"
+                            )
+                        except:
+                            pass
+
         nickname = await conn.fetchval(
-            "SELECT nickname FROM users WHERE user_id = $1", message.from_user.id
+            "SELECT nickname FROM users WHERE user_id = $1", user_id
         )
+
 
     # Если никнейма нет — просим ввести и убираем все кнопки
     if not nickname:
@@ -91,8 +170,6 @@ async def start_command(message: types.Message, state: FSMContext):
         reply_markup=main_menu_kb(),
         parse_mode="HTML"
     )
-
-
 
 # -------------------------------
 # 🔹 Обработка никнейма

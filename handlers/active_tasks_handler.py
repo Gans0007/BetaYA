@@ -82,6 +82,47 @@ async def show_habit_card(callback: types.CallbackQuery):
     await callback.answer()
 
 
+
+@router.callback_query(F.data == "back_from_card")
+async def back_from_card(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge,
+                   h.difficulty,
+                   (SELECT datetime FROM confirmations
+                        WHERE habit_id = h.id
+                        ORDER BY datetime DESC LIMIT 1) AS last_date,
+                   u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id=h.user_id
+            WHERE h.user_id=$1 AND h.is_active=TRUE
+            ORDER BY h.is_challenge DESC, h.created_at DESC
+        """, user_id)
+
+    # 🔹 0 привычек
+    if not rows:
+        await callback.message.edit_text("😴 У тебя пока нет активных привычек или челленджей.")
+        await callback.answer()
+        return
+
+    # 🔹 1–2 привычки → показываем карточки
+    if len(rows) <= 2:
+        await callback.message.delete()
+        for h in rows:
+            await send_habit_card(callback.message.chat, h, user_id)
+        await callback.answer()
+        return
+
+    # 🔹 3+ привычек → показываем список
+    text, kb, _ = await build_active_list(user_id)
+    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.answer()
+
+
+
 # =====================================================
 # 🔹 Возврат к списку (callback)
 # =====================================================

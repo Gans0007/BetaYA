@@ -19,6 +19,8 @@ from challenge_reset_task import check_challenge_resets
 from handlers.honor_handler import router as honor_router
 from habit_reset_task import check_habit_resets
 
+from handlers.affiliate_menu_handler import router as affiliate_menu_router
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
@@ -50,6 +52,7 @@ async def main():
     dp.include_router(profile_settings_router)
     dp.include_router(profile_stats_router)
     dp.include_router(honor_router)
+    dp.include_router(affiliate_menu_router)
 
     # 5) Запускаем фоновые задачи
     from daily_reminder_task import send_daily_reminders

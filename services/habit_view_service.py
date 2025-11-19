@@ -35,6 +35,8 @@ async def get_habit_buttons(habit_id: int, user_id: int) -> InlineKeyboardMarkup
         total = habit["days"]
         is_challenge = habit["is_challenge"]
 
+        keyboard_rows = []
+
         # ------------------------------------------------
         # 🔥 Челлендж
         # ------------------------------------------------
@@ -42,60 +44,66 @@ async def get_habit_buttons(habit_id: int, user_id: int) -> InlineKeyboardMarkup
 
             # Если челлендж выполнен — кнопок нет
             if done >= total:
-                return InlineKeyboardMarkup(inline_keyboard=[])
+                pass
+            else:
+                last = await conn.fetchrow("""
+                    SELECT datetime FROM confirmations
+                    WHERE user_id=$1 AND habit_id=$2
+                    ORDER BY datetime DESC LIMIT 1
+                """, user_id, habit_id)
 
-            last = await conn.fetchrow("""
-                SELECT datetime FROM confirmations
-                WHERE user_id=$1 AND habit_id=$2
-                ORDER BY datetime DESC LIMIT 1
-            """, user_id, habit_id)
+                btn = "✅ Подтвердить"
+                if last:
+                    last_dt = last["datetime"].astimezone(tz)
+                    if last_dt.date() == today:
+                        btn = "♻️ Переподтвердить"
 
-            btn = "✅ Подтвердить"
-            if last:
-                last_dt = last["datetime"].astimezone(tz)
-                if last_dt.date() == today:
-                    btn = "♻️ Переподтвердить"
-
-            return InlineKeyboardMarkup(inline_keyboard=[
-                [
+                keyboard_rows.append([
                     InlineKeyboardButton(text=btn, callback_data=f"confirm_{habit_id}"),
                     InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
-                ]
-            ])
+                ])
 
-        # ------------------------------------------------
-        # 🔹 Привычка выполнена — показываем Продлить/Завершить
-        # ------------------------------------------------
-        if done >= total:
-            return InlineKeyboardMarkup(inline_keyboard=[
-                [
+        else:
+            # ------------------------------------------------
+            # 🔹 Привычка выполнена — Продлить/Завершить
+            # ------------------------------------------------
+            if done >= total:
+                keyboard_rows.append([
                     InlineKeyboardButton(text="🔁 Продлить", callback_data=f"extend_{habit_id}"),
                     InlineKeyboardButton(text="✅ Завершить", callback_data=f"finish_{habit_id}")
-                ]
-            ])
+                ])
+            else:
+                # ------------------------------------------------
+                # 🔹 Обычная привычка
+                # ------------------------------------------------
+                last = await conn.fetchrow("""
+                    SELECT datetime FROM confirmations
+                    WHERE user_id=$1 AND habit_id=$2
+                    ORDER BY datetime DESC LIMIT 1
+                """, user_id, habit_id)
+
+                btn = "✅ Подтвердить"
+                if last:
+                    last_dt = last["datetime"].astimezone(tz)
+                    if last_dt.date() == today:
+                        btn = "♻️ Переподтвердить"
+
+                keyboard_rows.append([
+                    InlineKeyboardButton(text=btn, callback_data=f"confirm_{habit_id}"),
+                    InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
+                ])
 
         # ------------------------------------------------
-        # 🔹 Обычная привычка
+        # 🔹 Кнопка "Вернуться к списку"
         # ------------------------------------------------
-        last = await conn.fetchrow("""
-            SELECT datetime FROM confirmations
-            WHERE user_id=$1 AND habit_id=$2
-            ORDER BY datetime DESC LIMIT 1
-        """, user_id, habit_id)
-
-        btn = "✅ Подтвердить"
-        if last:
-            last_dt = last["datetime"].astimezone(tz)
-            if last_dt.date() == today:
-                btn = "♻️ Переподтвердить"
-
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text=btn, callback_data=f"confirm_{habit_id}"),
-                InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
-            ]
+        keyboard_rows.append([
+            InlineKeyboardButton(
+                text="⬅️ Вернуться к списку",
+                callback_data="back_from_card"
+            )
         ])
 
+        return InlineKeyboardMarkup(inline_keyboard=keyboard_rows)
 
 # =====================================================
 # 🔹 Карточка привычки/челленджа
