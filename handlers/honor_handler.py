@@ -42,9 +42,6 @@ def rating_keyboard(current: str):
     # Строго первая линия — горизонтальная
     kb.row(*row1)
 
-    # Вторая линия — назад
-    kb.row(InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_about"))
-
     return kb.as_markup()
 
 
