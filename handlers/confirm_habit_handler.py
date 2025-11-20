@@ -176,10 +176,10 @@ async def receive_media(message: types.Message, state: FSMContext):
 
             await message.answer("♻️ Переподтверждение обновлено 💪")
 
+        # =============================
+        # ✔ Новое подтверждение
+        # =============================
         else:
-            # =============================
-            # ✔ Новое подтверждение
-            # =============================
             await conn.execute("""
                 INSERT INTO confirmations (user_id, habit_id, datetime, file_id, file_type, confirmed)
                 VALUES ($1, $2, NOW(), $3, $4, TRUE)
@@ -188,15 +188,38 @@ async def receive_media(message: types.Message, state: FSMContext):
             await update_user_streak(user_id)
             xp_gain = await add_xp_for_confirmation(user_id, habit_id)
 
-            await conn.execute("""
-                UPDATE habits
-                SET done_days = done_days + 1
-                WHERE id=$1
-            """, habit_id)
-
+            await conn.execute(
+                "UPDATE habits SET done_days = done_days + 1 WHERE id=$1",
+                habit_id
+            )
             await recalculate_total_confirmed_days(user_id)
 
-            await message.answer(f"✨ +{xp_gain} XP\n✅ Готово! Продолжаем 💪")
+
+            # ============================================
+            # 🔥 АНТИ-ФАРМ XP (готовая логика)
+            # ============================================
+            count_today = await conn.fetchval("""
+                SELECT COUNT(DISTINCT habit_id)
+                FROM confirmations
+                WHERE user_id = $1
+                  AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
+            """, user_id)
+
+            # 1) Первые 3 уникальных → обычный текст с XP
+            if count_today <= 3 and xp_gain > 0:
+                await message.answer(f"✨ +{xp_gain} XP\n✅ Готово! Продолжаем 💪")
+
+            # 2) Ровно 4-е → предупреждение
+            elif count_today == 4 and xp_gain == 0:
+                await message.answer(
+                    "⚠️ Максимум 3 уникальных подтверждения в сутки!\n"
+                    "Подтверждение засчитано, но XP не начислено."
+                )
+
+            # 3) 5-е, 6-е, 7-е... → только позитивный текст
+            else:
+                await message.answer("✅ Подтверждено. Работаешь на результат!")
+
 
 
         # ============================

@@ -17,7 +17,7 @@ async def create_users_table():
                 finished_challenges INTEGER DEFAULT 0,
                 total_stars INTEGER DEFAULT 0,
                 total_confirmed_days INTEGER DEFAULT 0,
-                notification_tone TEXT DEFAULT 'mixed',
+                notification_tone TEXT DEFAULT 'friend',
                 xp DOUBLE PRECISION DEFAULT 0,
                 league TEXT DEFAULT 'Безответственный',
                 league_emoji TEXT DEFAULT '🕳️',
