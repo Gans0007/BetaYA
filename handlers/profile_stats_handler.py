@@ -127,10 +127,7 @@ async def process_level_up(callback: types.CallbackQuery):
     # максимальная лига
     if not result["next_league"]:
         await callback.message.edit_text(
-            "🔥 Ты уже достиг максимальной лиги!",
-            reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text="⬅️ Назад", callback_data="profile_stats")]]
-            )
+            "🔥 Ты уже достиг максимальной лиги!"
         )
         return
 

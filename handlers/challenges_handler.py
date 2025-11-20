@@ -166,7 +166,7 @@ async def accept_challenge_handler(callback: types.CallbackQuery):
 
     await callback.message.edit_text(
         f"🔥 Ты начал челлендж: *{title}*\n"
-        f"⭐ Сложность: {difficulty} из 3\n"
+        f"⭐ Уровень: {difficulty} из 3\n"
         f"📅 Длительность: {days} дней\n\n"
         f"Теперь он в твоих Активных заданиях 💪🔥",
         parse_mode="Markdown"

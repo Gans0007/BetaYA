@@ -3,6 +3,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime
+from data.challenges_data import FINAL_MESSAGES
+
 import pytz
 
 from database import get_pool
@@ -271,14 +273,23 @@ async def receive_media(message: types.Message, state: FSMContext):
             # Удаляем челлендж из активных
             await conn.execute("DELETE FROM habits WHERE id=$1", habit_id)
 
+            # ⭐ Формируем финальное сообщение (одно!)
+            cid = habit["challenge_id"]
+            final_msg = FINAL_MESSAGES.get(cid, {}).get(stars, "")
+
             stars_display = "⭐" * stars + "☆" * (3 - stars)
 
-            await message.answer(
+            text = (
                 f"🔥 Челлендж *{habit['name']}* завершён!\n"
                 f"🏆 Результат: {stars_display}\n\n"
-                f"Продолжаем доминировать 💪",
-                parse_mode="Markdown"
             )
+
+            if final_msg:
+                text += final_msg + "\n\n"
+
+            text += "Продолжаем доминировать 💪"
+
+            await message.answer(text, parse_mode="Markdown")
 
     await state.clear()
 
