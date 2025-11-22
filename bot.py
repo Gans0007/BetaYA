@@ -18,6 +18,8 @@ from handlers.profile_stats_handler import router as profile_stats_router
 from challenge_reset_task import check_challenge_resets
 from handlers.honor_handler import router as honor_router
 from habit_reset_task import check_habit_resets
+from middlewares.subscription_middleware import SubscriptionMiddleware
+from handlers.subscription_handler import router as subscription_router
 
 from handlers.affiliate_menu_handler import router as affiliate_menu_router
 
@@ -33,6 +35,9 @@ async def main():
     # 1) Бот и диспетчер
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
+
+    dp.message.middleware(SubscriptionMiddleware())
+    dp.callback_query.middleware(SubscriptionMiddleware())
 
     # 2) Подключение к БД (asyncpg pool)
     await create_pool()
@@ -53,10 +58,15 @@ async def main():
     dp.include_router(profile_stats_router)
     dp.include_router(honor_router)
     dp.include_router(affiliate_menu_router)
+    dp.include_router(subscription_router)
 
     # 5) Запускаем фоновые задачи
     from daily_reminder_task import send_daily_reminders
     asyncio.create_task(send_daily_reminders(bot))
+
+    # 🆕 Проверка подписки
+    from subscriprion_check_task import subscription_checker
+    asyncio.create_task(subscription_checker())
 
     # 🔥 Запускаем автоматическую проверку аннулирований (челленджи + привычки)
     asyncio.create_task(check_challenge_resets())
