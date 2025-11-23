@@ -1,4 +1,5 @@
 from aiogram import Router, F, types
+from datetime import datetime, timezone
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -220,6 +221,82 @@ async def receive_media(message: types.Message, state: FSMContext):
             else:
                 await message.answer("✅ Подтверждено. Работаешь на результат!")
 
+
+        # =============================
+        # 🔥 ОТПРАВКА МЕДИА В ЧАТ (public / private)
+        # =============================
+
+        # Узнаём статус подписки
+        user_row = await conn.fetchrow("""
+            SELECT has_access, access_until, total_confirmed_days 
+            FROM users WHERE user_id=$1
+        """, user_id)
+
+        has_access = user_row["has_access"]
+        access_until = user_row["access_until"]
+
+        # Проверяем активность подписки
+        sub_active = bool(
+            has_access and 
+            access_until and 
+            access_until > datetime.now(timezone.utc)
+        )
+
+        # Выбираем чат
+        if sub_active:
+            target_chat = -1002392347850   # приватный
+        else:
+            target_chat = -1002375148535   # бесплатный
+
+        # =============================
+        # 🧮 Формируем текст сообщения
+        # =============================
+        habit_info = await conn.fetchrow("""
+            SELECT name, days, done_days 
+            FROM habits WHERE id=$1
+        """, habit_id)
+
+        habit_name = habit_info["name"]
+        total_days = habit_info["days"]
+
+        # при новом подтверждении done_days уже увеличено
+        current_day = habit_info["done_days"]
+
+        percent = round((current_day / total_days) * 100)
+
+        nickname = message.from_user.username or message.from_user.first_name or f"ID:{user_id}"
+
+        caption_text = (
+            f"💪 *{nickname}* подтвердил привычку *“{habit_name}”*\n"
+            f"📅 День {current_day} из {total_days} ({percent}%)"
+        )
+
+        # Отправляем медиа-файл
+        try:
+            if file_type == "photo":
+                await message.bot.send_photo(
+                    target_chat, file_id, 
+                    caption=caption_text,
+                    parse_mode="Markdown"
+                )
+            elif file_type == "video":
+                await message.bot.send_video(
+                    target_chat, file_id, 
+                    caption=caption_text,
+                    parse_mode="Markdown"
+                )
+            elif file_type == "circle":
+                # Кружочек caption не поддерживает → отправляем ДОП. текст отдельным сообщением
+                await message.bot.send_video_note(target_chat, file_id)
+                await message.bot.send_message(
+                    target_chat,
+                    caption_text,
+                    parse_mode="Markdown"
+                )
+                return  # чтобы не отправлять второй раз ниже
+
+        except Exception as e:
+            print(f"Ошибка отправки медиа: {e}")
 
 
         # ============================

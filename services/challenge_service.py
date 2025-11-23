@@ -16,7 +16,10 @@ from repositories.challenge_repository import (
 #     - не использует Telegram
 # =====================================================
 def is_level_unlocked(level_key: str, user_stars: int) -> bool:
+    # Если у пользователя нет звёзд (None), считаем 0
+    user_stars = user_stars or 0
     return user_stars >= LEVEL_UNLOCKS.get(level_key, 0)
+
 
 
 # =====================================================

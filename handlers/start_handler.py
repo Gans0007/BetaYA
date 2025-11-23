@@ -1,4 +1,5 @@
 import pytz
+from aiogram import F
 from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import CommandStart
@@ -228,3 +229,5 @@ async def process_nickname(message: types.Message, state: FSMContext):
         parse_mode="HTML"
     )
     await state.clear()
+
+

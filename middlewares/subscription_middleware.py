@@ -23,6 +23,7 @@ class SubscriptionMiddleware(BaseMiddleware):
             if event.data == "subscription_check":
                 return await handler(event, data)
 
+
         # --- Общая логика блокировки ---
 
         user_id = event.from_user.id
@@ -35,8 +36,17 @@ class SubscriptionMiddleware(BaseMiddleware):
                 WHERE user_id=$1
             """, user_id)
 
+        # ===========================================
+        # 🔥 ЕСЛИ ПОЛЬЗОВАТЕЛЯ НЕТ — АВТОЗАПУСК /start
+        # ===========================================
         if not user:
-            return await handler(event, data)
+            await event.bot.send_message(
+                chat_id=event.from_user.id,
+                text="/start"
+            )
+            return
+            
+
 
         total_days = user["total_confirmed_days"]
         has_access = user["has_access"]
