@@ -239,7 +239,13 @@ async def receive_media(message: types.Message, state: FSMContext):
             current_day = habit_info["done_days"]
             percent = round((current_day / total_days) * 100)
 
-            nickname = message.from_user.username or message.from_user.first_name or f"ID:{user_id}"
+            # Берём nickname строго из БД
+            user_profile = await conn.fetchrow(
+                "SELECT nickname FROM users WHERE user_id=$1",
+                user_id
+            )
+
+            nickname = user_profile["nickname"]
 
             caption_text = (
                 f"💪 *{nickname}* подтвердил привычку *“{habit_name}”*\n"
