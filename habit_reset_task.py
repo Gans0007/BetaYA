@@ -98,7 +98,7 @@ async def run_user_habit_reset(user_id: int, tz_str: str, delay: float):
             continue
 
         last_local = last_confirm.astimezone(user_tz)
-        days_missed = (user_now.date() - last_local.date()).days
+        days_since = (user_now.date() - last_local.date()).days
 
         diff = hb["difficulty"]  # 1,2,3
         reset_streak = hb["reset_streak"]
@@ -109,13 +109,16 @@ async def run_user_habit_reset(user_id: int, tz_str: str, delay: float):
 
         need_reset = False
 
-        # ⭐⭐ — ≥2 дней пропуска
-        if diff == 2 and days_missed >= 2:
+        # ⭐⭐ — сброс, если ПРОШЛО >= 3 дней с последнего подтверждения
+        # (это значит, что было минимум 2 полных дня без подтверждений)
+        if diff == 2 and days_since >= 3:
             need_reset = True
 
-        # ⭐⭐⭐ — ≥1 дня пропуска
-        elif diff == 3 and days_missed >= 1:
-            need_reset = True
+        # ⭐⭐⭐ — сброс, если ВЧЕРА не было подтверждения
+        elif diff == 3:
+            yesterday = user_now.date() - timedelta(days=1)
+            if last_local.date() != yesterday:
+                need_reset = True
 
         if need_reset:
             await process_reset(pool, hb, reset_streak)

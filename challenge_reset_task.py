@@ -93,7 +93,7 @@ async def run_user_reset(user_id: int, tz_str: str, delay: float):
             continue  # челлендж ещё ни разу не подтверждался
 
         last_local = last_confirm.astimezone(user_tz)
-        days_missed = (user_now.date() - last_local.date()).days
+        days_since = (user_now.date() - last_local.date()).days
 
         repeat = ch["repeat_count"]  # 1..3
 
@@ -101,13 +101,16 @@ async def run_user_reset(user_id: int, tz_str: str, delay: float):
         if repeat == 1:
             continue
 
-        # ⭐⭐ — сброс, если >= 2 пропущенных дня
-        if repeat == 2 and days_missed >= 2:
+        # ⭐⭐ — сброс, если прошло >= 3 дней с последнего подтверждения
+        # (то есть было минимум 2 полных дня без подтверждений)
+        if repeat == 2 and days_since >= 3:
             await reset_challenge_progress(pool, ch, "2 дня без подтверждения")
 
-        # ⭐⭐⭐ — сброс, если >= 1 дня пропуска
-        elif repeat == 3 and days_missed >= 1:
-            await reset_challenge_progress(pool, ch, "1 день пропуска")
+        # ⭐⭐⭐ — сброс, если вчера не было подтверждения
+        elif repeat == 3:
+            yesterday = user_now.date() - timedelta(days=1)
+            if last_local.date() != yesterday:
+                await reset_challenge_progress(pool, ch, "1 день пропуска")
 
 
 async def reset_challenge_progress(pool, ch, reason: str):
