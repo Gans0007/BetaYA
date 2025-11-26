@@ -1,4 +1,5 @@
 from aiogram import Router, F, types
+import random
 from datetime import datetime, timezone
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -201,14 +202,28 @@ async def receive_media(message: types.Message, state: FSMContext):
                 """, user_id)
 
                 if count_today <= 3 and xp_gain > 0:
-                    await message.answer(f"✨ +{xp_gain} XP\n✅ Готово! Продолжаем 💪")
+                    variants = [
+                        f"✨ +{xp_gain} XP\n🔥 Мощно! Следующий шаг — ещё сильнее.",
+                        f"✨ +{xp_gain} XP\n💪 Вот это дисциплина. Продолжаем!",
+                        f"✨ +{xp_gain} XP\n⚡ Каждый день приносит результат!",
+                        f"✨ +{xp_gain} XP\n🏆 Ты укрепляешь свои амбиции."
+                    ]
+                    text = random.choice(variants)
+                    await message.answer(text)
+
                 elif count_today == 4 and xp_gain == 0:
                     await message.answer(
                         "⚠️ Максимум 3 уникальных подтверждения в сутки!\n"
                         "Подтверждение засчитано, но XP не начислено."
                     )
                 else:
-                    await message.answer("✅ Подтверждено. Работаешь на результат!")
+                    variants_no_xp = [
+                        "✅ Подтверждено. Двигаемся дальше!",
+                        "🔥 День закрыт. Ты на пути к цели.",
+                        "⚡ Дисциплина соблюдена!",
+                        "🏆 Отлично. Поставил галочку — идём выше."
+                    ]
+                    await message.answer(random.choice(variants_no_xp))
 
             # =============================
             # 🔥 ОТПРАВКА МЕДИА В ЧАТ
