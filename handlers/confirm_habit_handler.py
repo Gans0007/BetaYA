@@ -1,11 +1,11 @@
 from aiogram import Router, F, types
-import random
+import random  # может больше не нужен, но оставлю как в оригинале
 from datetime import datetime, timezone
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime
-from data.challenges_data import FINAL_MESSAGES
+from data.challenges_data import FINAL_MESSAGES  # используется теперь в сервисе, но оставлю импорт
 
 import pytz
 
@@ -22,6 +22,9 @@ from repositories.affiliate_repository import (
     mark_referral_active,
     add_payment_to_affiliate
 )
+
+from services.confirm_habit_service import habit_service
+
 
 router = Router()
 
@@ -54,59 +57,20 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
 
     pool = await get_pool()
     async with pool.acquire() as conn:
-        user_row = await conn.fetchrow(
-            "SELECT timezone FROM users WHERE user_id=$1",
-            user_id
-        )
-        user_tz = user_row["timezone"] if user_row else "Europe/Kyiv"
-        tz = pytz.timezone(user_tz)
-        now = datetime.now(tz)
+        result = await habit_service.start_confirmation(conn, user_id, habit_id)
 
-        habit = await conn.fetchrow("""
-            SELECT name, is_challenge
-            FROM habits
-            WHERE id=$1
-        """, habit_id)
-
-        if not habit:
+        if result.get("error") == "HABIT_NOT_FOUND":
             await callback.answer("❌ Привычка не найдена.", show_alert=True)
             return
 
-        habit_name = habit["name"]
-        is_challenge = habit["is_challenge"]
+        reverify = result["reverify"]
 
-        title = f"челленджа *{habit_name}*" if is_challenge else f"привычки *{habit_name}*"
-
-        # Проверяем, было ли подтверждение сегодня
-        last = await conn.fetchrow("""
-            SELECT datetime FROM confirmations
-            WHERE user_id=$1 AND habit_id=$2
-            ORDER BY datetime DESC LIMIT 1
-        """, user_id, habit_id)
-
-        if last:
-            last_dt = last["datetime"].astimezone(tz)
-            if last_dt.date() == now.date():
-                # Reverify
-                await state.update_data(habit_id=habit_id, reverify=True)
-                await state.set_state(ConfirmHabitFSM.waiting_for_media)
-
-                await callback.message.answer(
-                    f"♻️ Уже есть подтверждение сегодня.\n"
-                    f"Пришли новое медиа, чтобы *переподтвердить* {title}.",
-                    parse_mode="Markdown",
-                    reply_markup=cancel_kb(habit_id)
-                )
-                await callback.answer()
-                return
-
-        # Обычное подтверждение
-        await state.update_data(habit_id=habit_id, reverify=False)
+        await state.update_data(habit_id=habit_id, reverify=reverify)
         await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
         await callback.message.answer(
-            f"📸 Пришли фото, видео или кружочек для подтверждения {title} 💪",
-            parse_mode="Markdown",
+            result["text"],
+            parse_mode=result.get("parse_mode"),
             reply_markup=cancel_kb(habit_id)
         )
 
@@ -151,221 +115,63 @@ async def receive_media(message: types.Message, state: FSMContext):
 
     async with pool.acquire() as conn:
         try:
-            # Проверяем, существует ли ещё привычка
-            exists = await conn.fetchval("SELECT COUNT(*) FROM habits WHERE id=$1", habit_id)
-            if exists == 0:
+            result = await habit_service.process_confirmation_media(
+                conn=conn,
+                user_id=user_id,
+                habit_id=habit_id,
+                file_id=file_id,
+                file_type=file_type,
+                reverify=reverify,
+            )
+
+            if result.get("error") == "HABIT_NOT_FOUND":
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
-            # =============================
-            # ♻️ REVERIFY
-            # =============================
-            if reverify:
-                await conn.execute("""
-                    UPDATE confirmations
-                    SET file_id=$1, file_type=$2, datetime=NOW(), confirmed=TRUE
-                    WHERE id = (
-                        SELECT id FROM confirmations
-                        WHERE user_id=$3 AND habit_id=$4
-                        ORDER BY datetime DESC
-                        LIMIT 1
-                    )
-                """, file_id, file_type, user_id, habit_id)
-
-                await recalculate_total_confirmed_days(user_id)
-                await message.answer("♻️ Переподтверждение обновлено 💪")
+            # Сообщение пользователю (XP / переподтверждение и т.п.)
+            await message.answer(result["self_message"])
 
             # =============================
-            # ✔ Новое подтверждение
+            # 🔥 ОТПРАВКА В ЧАТ
             # =============================
-            else:
-                await conn.execute("""
-                    INSERT INTO confirmations (user_id, habit_id, datetime, file_id, file_type, confirmed)
-                    VALUES ($1, $2, NOW(), $3, $4, TRUE)
-                """, user_id, habit_id, file_id, file_type)
+            caption_text = result["caption_text"]
+            target_chat = result["target_chat"]
+            share_allowed = result["share_allowed"]
 
-                await update_user_streak(user_id)
-                xp_gain = await add_xp_for_confirmation(user_id, habit_id)
-
-                await conn.execute(
-                    "UPDATE habits SET done_days = done_days + 1 WHERE id=$1",
-                    habit_id
-                )
-                await recalculate_total_confirmed_days(user_id)
-
-                # АНТИ-ФАРМ XP
-                count_today = await conn.fetchval("""
-                    SELECT COUNT(DISTINCT habit_id)
-                    FROM confirmations
-                    WHERE user_id = $1
-                      AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
-                """, user_id)
-
-                if count_today <= 3 and xp_gain > 0:
-                    variants = [
-                        f"✨ +{xp_gain} XP\n🔥 Мощно! Следующий шаг — ещё сильнее.",
-                        f"✨ +{xp_gain} XP\n💪 Вот это дисциплина. Продолжаем!",
-                        f"✨ +{xp_gain} XP\n⚡ Каждый день приносит результат!",
-                        f"✨ +{xp_gain} XP\n🏆 Ты укрепляешь свои амбиции."
-                    ]
-                    text = random.choice(variants)
-                    await message.answer(text)
-
-                elif count_today == 4 and xp_gain == 0:
-                    await message.answer(
-                        "⚠️ Максимум 3 уникальных подтверждения в сутки!\n"
-                        "Подтверждение засчитано, но XP не начислено."
-                    )
-                else:
-                    variants_no_xp = [
-                        "✅ Подтверждено. Двигаемся дальше!",
-                        "🔥 День закрыт. Ты на пути к цели.",
-                        "⚡ Дисциплина соблюдена!",
-                        "🏆 Отлично. Поставил галочку — идём выше."
-                    ]
-                    await message.answer(random.choice(variants_no_xp))
-
-            # =============================
-            # 🔥 ОТПРАВКА МЕДИА В ЧАТ
-            # =============================
-            user_row = await conn.fetchrow("""
-                SELECT has_access, access_until, total_confirmed_days 
-                FROM users WHERE user_id=$1
-            """, user_id)
-
-            has_access = user_row["has_access"]
-            access_until = user_row["access_until"]
-
-            sub_active = bool(
-                has_access and 
-                access_until and 
-                access_until > datetime.now(timezone.utc)
-            )
-
-            target_chat = -1002392347850 if sub_active else -1002375148535
-
-            habit_info = await conn.fetchrow("""
-                SELECT name, days, done_days 
-                FROM habits WHERE id=$1
-            """, habit_id)
-
-            habit_name = habit_info["name"]
-            total_days = habit_info["days"]
-            current_day = habit_info["done_days"]
-            percent = round((current_day / total_days) * 100)
-
-            # Берём nickname строго из БД
-            user_profile = await conn.fetchrow(
-                "SELECT nickname FROM users WHERE user_id=$1",
-                user_id
-            )
-
-            nickname = user_profile["nickname"]
-
-            caption_text = (
-                f"💪 *{nickname}* подтвердил привычку *“{habit_name}”*\n"
-                f"📅 День {current_day} из {total_days} ({percent}%)"
-            )
-
-            if file_type == "photo":
-                await message.bot.send_photo(
-                    target_chat, file_id,
-                    caption=caption_text,
-                    parse_mode="Markdown"
-                )
-
-            elif file_type == "video":
-                await message.bot.send_video(
-                    target_chat, file_id,
-                    caption=caption_text,
-                    parse_mode="Markdown"
-                )
-
-            elif file_type == "circle":
-                await message.bot.send_video_note(target_chat, file_id)
+            if not share_allowed:
                 await message.bot.send_message(
                     target_chat,
                     caption_text,
                     parse_mode="Markdown"
                 )
+            else:
+                if file_type == "photo":
+                    await message.bot.send_photo(
+                        target_chat, file_id,
+                        caption=caption_text,
+                        parse_mode="Markdown"
+                    )
+
+                elif file_type == "video":
+                    await message.bot.send_video(
+                        target_chat, file_id,
+                        caption=caption_text,
+                        parse_mode="Markdown"
+                    )
+
+                elif file_type == "circle":
+                    await message.bot.send_video_note(target_chat, file_id)
+                    await message.bot.send_message(
+                        target_chat,
+                        caption_text,
+                        parse_mode="Markdown"
+                    )
 
             # ===========================================================
-            # 🔥 ШАГ 3: Реферал становится активным (твоя логика unchanged)
+            # 🔥 Автозавершение челленджа — текст пользователю
             # ===========================================================
-            total_days = await recalculate_total_confirmed_days(user_id)
-
-            if total_days >= 3:
-                affiliate_id = await get_affiliate_for_user(user_id)
-
-                if affiliate_id:
-                    await mark_referral_active(user_id)
-                    await add_payment_to_affiliate(affiliate_id, 1.0)
-
-                    nickname = message.from_user.username or message.from_user.first_name or user_id
-                    try:
-                        await message.bot.send_message(
-                            affiliate_id,
-                            f"🔥 Твой реферал @{nickname} стал активным!\n"
-                            f"💰 Начислено: 1$"
-                        )
-                    except Exception:
-                        pass
-
-            # ===========================================================
-            # 🔥 Шаг 4: автозавершение челленджа (твоя логика unchanged)
-            # ===========================================================
-            habit = await conn.fetchrow("""
-                SELECT user_id, name, days, done_days, is_challenge, challenge_id
-                FROM habits WHERE id=$1
-            """, habit_id)
-
-            if not habit:
-                return
-
-            if habit["is_challenge"] and habit["done_days"] >= habit["days"]:
-
-                existing = await conn.fetchrow("""
-                    SELECT repeat_count FROM completed_challenges
-                    WHERE user_id=$1 AND challenge_id=$2
-                """, habit["user_id"], habit["challenge_id"])
-
-                if existing:
-                    new_count = min(existing["repeat_count"] + 1, 3)
-                    await conn.execute("""
-                        UPDATE completed_challenges
-                        SET repeat_count=$1, completed_at=NOW()
-                        WHERE user_id=$2 AND challenge_id=$3
-                    """, new_count, habit["user_id"], habit["challenge_id"])
-                    stars = new_count
-                else:
-                    await conn.execute("""
-                        INSERT INTO completed_challenges (user_id, challenge_name, level_key, challenge_id, repeat_count)
-                        VALUES ($1, $2, 'auto', $3, 1)
-                    """, habit["user_id"], habit["name"], habit["challenge_id"])
-                    stars = 1
-
-                await conn.execute("""
-                    UPDATE users 
-                    SET finished_challenges = finished_challenges + 1,
-                        total_stars = total_stars + $1
-                    WHERE user_id=$2
-                """, 1 if not existing else stars - existing["repeat_count"], habit["user_id"])
-
-                cid = habit["challenge_id"]
-                stars_display = "⭐" * stars + "☆" * (3 - stars)
-                final_msg = FINAL_MESSAGES.get(cid, {}).get(stars, "")
-
-                text = (
-                    f"🔥 Челлендж *{habit['name']}* завершён!\n"
-                    f"🏆 Результат: {stars_display}\n\n"
-                )
-
-                if final_msg:
-                    text += final_msg + "\n\n"
-
-                text += "Продолжаем доминировать 💪"
-
-                await message.answer(text, parse_mode="Markdown")
+            if result.get("challenge_message"):
+                await message.answer(result["challenge_message"], parse_mode="Markdown")
 
         finally:
             # 🧹 ВСЕГДА сбрасываем FSM — и больше он не залипнет
@@ -396,7 +202,6 @@ async def ask_delete(callback: types.CallbackQuery):
     )
 
     await callback.answer()
-
 
 
 # ================================
@@ -451,7 +256,6 @@ async def delete_habit(callback: types.CallbackQuery):
         await callback.answer()
         return
 
-
     # ---------------------------------------------------
     # 🟧 Было 2 → стало 1 → показываем карточка удалена
     # ---------------------------------------------------
@@ -462,7 +266,6 @@ async def delete_habit(callback: types.CallbackQuery):
         await callback.answer()
         return
 
-
     # ---------------------------------------------------
     # 🟨 Было 3 → стало 2 → показываем 2 карточки
     # ---------------------------------------------------
@@ -472,7 +275,6 @@ async def delete_habit(callback: types.CallbackQuery):
             await send_habit_card(callback.message.chat, h, user_id)
         await callback.answer()
         return
-
 
     # ---------------------------------------------------
     # 🟩 Было 4+ → показываем список
@@ -497,6 +299,3 @@ async def dismiss_delete(callback: types.CallbackQuery):
     # Возвращаем обычное сообщение
     await callback.message.edit_text("Отменено ❎")
     await callback.answer()
-
-
-

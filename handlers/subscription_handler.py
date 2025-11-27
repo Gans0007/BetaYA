@@ -2,7 +2,12 @@ from aiogram import Router, types
 from database import get_pool
 from datetime import datetime, timedelta, timezone
 from config import PUBLIC_CHANNEL_ID
-from repositories.affiliate_repository import get_affiliate_for_user, add_payment_to_affiliate
+from repositories.affiliate_repository import (
+    get_affiliate_for_user,
+    add_payment_to_affiliate,
+    mark_referral_active,
+    mark_referral_inactive
+)
 
 router = Router()
 
@@ -38,6 +43,9 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         affiliate_id = await get_affiliate_for_user(user_id)
 
         if affiliate_id:
+ 
+            await mark_referral_active(user_id)
+
             await add_payment_to_affiliate(affiliate_id, 0.50)
 
             # уведомляем партнёра, но НЕ пользователя
@@ -60,7 +68,13 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         await callback.answer()
         return
 
+
     # 3️⃣ Если пользователь НЕ в канале → подписка не активна
+    try:
+        await mark_referral_inactive(user_id)
+    except:
+        pass
+
     await callback.message.answer(
         "⛔ Подписка не найдена.\n\n"
         "Чтобы продолжить пользоваться ботом — оплати подписку:",

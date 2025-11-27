@@ -40,13 +40,8 @@ class SubscriptionMiddleware(BaseMiddleware):
         # 🔥 ЕСЛИ ПОЛЬЗОВАТЕЛЯ НЕТ — АВТОЗАПУСК /start
         # ===========================================
         if not user:
-            await event.bot.send_message(
-                chat_id=event.from_user.id,
-                text="/start"
-            )
-            return
+             return await handler(event, data)
             
-
 
         total_days = user["total_confirmed_days"]
         has_access = user["has_access"]

@@ -177,3 +177,15 @@ async def get_payments_list(affiliate_id: int):
         """, affiliate_id)
 
 
+# ------------------------------------------
+# ПОМЕТКА РЕФЕРАЛА НЕАКТИВНЫМ
+# ------------------------------------------
+async def mark_referral_inactive(user_id: int) -> None:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE referrals
+            SET is_active = FALSE
+            WHERE user_id = $1
+        """, user_id)
+
