@@ -6,13 +6,7 @@ import pytz
 from database import get_pool
 from aiogram import Bot
 
-REMINDER_MESSAGES = [
-    "💪 Напоминаю о твоих привычках/челленджах! Сделай сегодня хотя бы одно действие!",
-    "🔥 Маленькое действие сегодня — большой результат завтра! Подтверди прогресс по привычке/челленджу.",
-    "🚀 Ещё есть время подтвердить выполнение. Поехали!",
-    "🏁 Не откладывай — сегодня отличный день для прогресса!",
-    "✨ Держи ритм! Подтверди хотя бы одну задачу сегодня!"
-]
+from handlers.tone.daily_reminder_tone import REMINDER_MESSAGES_TONE
 
 
 async def send_daily_reminders(bot: Bot):
@@ -58,18 +52,15 @@ async def send_daily_reminders(bot: Bot):
             next_run_utc = next_run_local.astimezone(pytz.utc)
             delay = (next_run_utc - now_utc).total_seconds()
 
-            # Лог планирования
             print(
                 f"📅 Пользователь {user_id} ({tz_str}) — "
                 f"напоминание запланировано на {next_run_local.strftime('%Y-%m-%d %H:%M:%S')}"
             )
 
-            # планируем индивидуальную отправку
             asyncio.create_task(
                 schedule_user_reminder(bot, user_id, delay, tz_str)
             )
 
-        # через сутки перепланируем новое случайное время
         await asyncio.sleep(24 * 60 * 60)
 
 
@@ -79,7 +70,6 @@ async def schedule_user_reminder(bot: Bot, user_id: int, delay: float, tz_str: s
     pool = await get_pool()
 
     async with pool.acquire() as conn:
-        # Есть ли ХОТЯ БЫ ОДНА активная задача (привычка или челлендж) без подтверждения СЕГОДНЯ в локальной TZ
         rows = await conn.fetch("""
             SELECT h.id
             FROM habits h
@@ -93,14 +83,22 @@ async def schedule_user_reminder(bot: Bot, user_id: int, delay: float, tz_str: s
         """, user_id, tz_str)
 
         if not rows:
-            # Всё уже подтверждено сегодня — молчим
             return
 
+        # Получаем тон
+        tone_row = await conn.fetchrow(
+            "SELECT notification_tone FROM users WHERE user_id = $1",
+            user_id
+        )
+
+    tone = tone_row["notification_tone"] if tone_row else "friend"
+    messages = REMINDER_MESSAGES_TONE.get(tone, REMINDER_MESSAGES_TONE["friend"])
+    text = random.choice(messages)
+
     try:
-        text = random.choice(REMINDER_MESSAGES)
         await bot.send_message(user_id, text)
         print(
-            f"📨 Отправлено напоминание пользователю {user_id} "
+            f"📨 Напоминание пользователю {user_id} [{tone}] "
             f"({tz_str}) в {datetime.now(pytz.timezone(tz_str)).strftime('%H:%M:%S')}"
         )
     except Exception as e:
