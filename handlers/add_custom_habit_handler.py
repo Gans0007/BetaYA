@@ -2,10 +2,16 @@ from aiogram import Router, types, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardRemove
+import logging
 
 from services.habit_create_service import create_custom_habit
 
 router = Router()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
 
 
 # -------------------------------
@@ -15,13 +21,10 @@ class AddHabit(StatesGroup):
     name = State()
     description = State()
     days = State()
-    difficulty = State()  # 🔥 новая стадия выбора сложности
+    difficulty = State()
     confirm = State()
 
 
-# -------------------------------
-# 🔹 Клавиатура отмены
-# -------------------------------
 def cancel_kb():
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_fsm")]]
@@ -29,47 +32,51 @@ def cancel_kb():
 
 
 # -------------------------------
-# 🔹 Обработка нажатия “Отмена”
+# 🔹 Отмена создания
 # -------------------------------
 @router.callback_query(F.data == "cancel_fsm")
 async def cancel_fsm(callback: types.CallbackQuery, state: FSMContext):
+    logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} отменил создание привычки")
     await state.clear()
     await callback.message.edit_text("❎ Создание привычки отменено.")
     await callback.answer()
 
 
 # -------------------------------
-# 🔹 Запуск процесса добавления
+# 🔹 Старт создания
 # -------------------------------
 @router.callback_query(F.data == "add_custom_habit")
 async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
+    logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} начал создание привычки")
     await state.set_state(AddHabit.name)
     await callback.message.edit_text("✏️ Введи название своей привычки:", reply_markup=cancel_kb())
     await callback.answer()
 
 
 # -------------------------------
-# 🔹 Шаг 1 — Название
+# 🔹 Шаг 1 — ввод имени
 # -------------------------------
 @router.message(AddHabit.name)
 async def set_name(message: types.Message, state: FSMContext):
+    logging.info(f"[ADD HABIT] Пользователь {message.from_user.id} ввёл название: {message.text}")
     await state.update_data(name=message.text)
     await state.set_state(AddHabit.description)
     await message.answer("💬 Опиши коротко свою привычку:", reply_markup=cancel_kb())
 
 
 # -------------------------------
-# 🔹 Шаг 2 — Описание
+# 🔹 Шаг 2 — описание
 # -------------------------------
 @router.message(AddHabit.description)
 async def set_description(message: types.Message, state: FSMContext):
+    logging.info(f"[ADD HABIT] Пользователь {message.from_user.id} ввёл описание привычки")
     await state.update_data(description=message.text)
     await state.set_state(AddHabit.days)
     await message.answer("📅 На сколько дней хочешь взять эту привычку? (минимум 7)", reply_markup=cancel_kb())
 
 
 # -------------------------------
-# 🔹 Шаг 3 — Длительность
+# 🔹 Шаг 3 — длительность
 # -------------------------------
 @router.message(AddHabit.days)
 async def set_days(message: types.Message, state: FSMContext):
@@ -78,8 +85,11 @@ async def set_days(message: types.Message, state: FSMContext):
         if days < 7 or days > 365:
             raise ValueError
     except ValueError:
+        logging.warning(f"[ADD HABIT] Пользователь {message.from_user.id} ввёл неправильное число дней")
         await message.answer("⚠️ Введи число от 7 до 365. Минимум — неделя 💪", reply_markup=cancel_kb())
         return
+
+    logging.info(f"[ADD HABIT] Пользователь {message.from_user.id} указал длительность: {days} дней")
 
     await state.update_data(days=days)
     await state.set_state(AddHabit.difficulty)
@@ -105,11 +115,13 @@ async def set_days(message: types.Message, state: FSMContext):
 
 
 # -------------------------------
-# 🔹 Шаг 4 — Выбор сложности
+# 🔹 Шаг 4 — уровень сложности
 # -------------------------------
 @router.callback_query(F.data.startswith("diff_"))
 async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
     diff = int(callback.data.split("_")[1])
+    logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} выбрал сложность: {diff}")
+
     await state.update_data(difficulty=diff)
 
     data = await state.get_data()
@@ -148,6 +160,9 @@ async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "save_habit")
 async def save_habit(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
+    name = data["name"]
+
+    logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} сохранил привычку: {name}")
 
     await create_custom_habit(
         user_id=callback.from_user.id,
@@ -155,9 +170,10 @@ async def save_habit(callback: types.CallbackQuery, state: FSMContext):
     )
 
     await callback.message.edit_text(
-        f"✅ Привычка *{data['name']}* успешно сохранена!\n"
+        f"✅ Привычка *{name}* успешно сохранена!\n"
         f"Теперь она появится в твоих 📋 *Активных заданиях*.",
         parse_mode="Markdown"
     )
+
     await state.clear()
     await callback.answer()

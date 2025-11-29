@@ -23,6 +23,8 @@ from handlers.subscription_handler import router as subscription_router
 
 from handlers.affiliate_menu_handler import router as affiliate_menu_router
 
+from honor_global_task import honor_global_rank_daily
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
@@ -45,6 +47,8 @@ async def main():
     # 3) Инициализация схемы БД
     await create_users_table()
     logging.info("✅ Database connected and schema ensured")
+
+    asyncio.create_task(honor_global_rank_daily(bot))
 
     # 4) Подключаем роутеры
     dp.include_router(start_router)
