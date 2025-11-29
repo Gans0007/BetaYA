@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from aiogram import types
 from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN
 from database import create_pool, close_pool
@@ -37,6 +38,10 @@ async def main():
     # 1) Бот и диспетчер
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
+
+    await bot.set_my_commands([
+        types.BotCommand(command="start", description="Запустить бота"),
+    ])
 
     dp.message.middleware(SubscriptionMiddleware())
     dp.callback_query.middleware(SubscriptionMiddleware())
