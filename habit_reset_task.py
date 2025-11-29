@@ -1,9 +1,12 @@
 # habit_reset_task.py
 
+import random
 import asyncio
 from datetime import datetime, timedelta
 import pytz
 from database import get_pool
+
+from handlers.tone.habit_reset_tone import HABIT_RESET_TONE
 
 
 async def check_habit_resets():
@@ -128,7 +131,7 @@ async def run_user_habit_reset(user_id: int, tz_str: str, delay: float):
 
 
 async def process_reset(pool, hb, reset_streak):
-    """Обрабатываем сброс с учётом Variant D"""
+    """Обрабатываем сброс — без деактивации привычки"""
 
     habit_id = hb["id"]
     user_id = hb["user_id"]
@@ -136,28 +139,14 @@ async def process_reset(pool, hb, reset_streak):
     reset_streak += 1
 
     async with pool.acquire() as conn:
-
-        # Если сброс произошёл < 3 раз — просто сбрасываем дни
-        if reset_streak < 3:
-            await conn.execute("""
-                UPDATE habits
-                SET done_days = 0, reset_streak = $2
-                WHERE id = $1
-            """, habit_id, reset_streak)
-
-            await send_reset_notification(user_id, hb["name"], reset_streak)
-            return
-
-        # Если 3 раза подряд — деактивируем привычку !
         await conn.execute("""
             UPDATE habits
-            SET is_active = FALSE,
-                done_days = 0,
-                reset_streak = 0
+            SET done_days = 0,
+                reset_streak = $2
             WHERE id = $1
-        """, habit_id)
+        """, habit_id, reset_streak)
 
-    await send_final_disable_notification(user_id, hb["name"])
+    await send_reset_notification(user_id, hb["name"], reset_streak)
 
 
 async def reset_streak_zero(pool, habit_id):
@@ -171,37 +160,47 @@ async def reset_streak_zero(pool, habit_id):
 
 
 async def send_reset_notification(user_id, name, streak):
-    """Уведомление о soft-reset (не деактивирован)"""
+    """Уведомление с учётом выбранного тона"""
     from aiogram import Bot
     from config import BOT_TOKEN
     bot = Bot(token=BOT_TOKEN)
 
-    try:
-        await bot.send_message(
-            user_id,
+    # 1. Берём тон пользователя
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        tone = await conn.fetchval("""
+            SELECT notification_tone FROM users WHERE user_id = $1
+        """, user_id)
+
+    # fallback — если по какой-то причине null
+    if tone not in HABIT_RESET_TONE:
+        tone = "friend"
+
+    # 2. Рандомная цитата
+    quote = random.choice(HABIT_RESET_TONE[tone])
+
+    # 3. Формируем текст
+    if tone == "friend":
+        text = (
             f"⚠️ Привычка *{name}* была сброшена.\n"
-            f"Причина: пропущенные дни\n"
-            f"Счётчик сбросов: {streak}/3\n\n"
-            f"Не сдаёмся, продолжаем 💪",
-            parse_mode="Markdown"
+            f"{quote}"
         )
-    finally:
-        await bot.session.close()
 
+    elif tone == "gamer":
+        text = (
+            f"🎮 Провал по привычке *{name}*.\n"
+            f"{quote}"
+        )
 
-async def send_final_disable_notification(user_id, name):
-    """Уведомление о полной деактивации после 3 сбросов"""
-    from aiogram import Bot
-    from config import BOT_TOKEN
-    bot = Bot(token=BOT_TOKEN)
+    elif tone == "spartan":
+        text = (
+            f"⚔️ Привычка *{name}* была сброшена.\n"
+            f"Пропущено подряд: *{streak}*\n\n"
+            f"{quote}"
+        )
 
     try:
-        await bot.send_message(
-            user_id,
-            f"❌ Привычка *{name}* была полностью аннулирована.\n"
-            f"Причина: 3 последовательных сброса\n\n"
-            f"Можешь создать её снова, когда будешь готов 🔥",
-            parse_mode="Markdown"
-        )
+        await bot.send_message(user_id, text, parse_mode="Markdown")
     finally:
         await bot.session.close()
+

@@ -25,6 +25,12 @@ from repositories.confirm_habit_repository import (
     update_user_challenge_counters,
 )
 
+from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
+import random
+import logging
+
+
+logger = logging.getLogger("habit_confirm")
 
 
 class HabitService:
@@ -33,17 +39,12 @@ class HabitService:
     Поведение 1-в-1 как в исходном confirm_habit_handler.
     """
 
-    # ================================
-    #  Старт подтверждения (callback confirm_)
-    # ================================
+    # ===========================================================
+    # 🔥 Шаг 1: пользователь инициирует подтверждение привычки
+    # ===========================================================
     async def start_confirmation(self, conn, user_id: int, habit_id: int):
-        """
-        Возвращает:
-        - error: None / "HABIT_NOT_FOUND"
-        - reverify: bool
-        - text: текст для сообщения
-        - parse_mode: "Markdown" или None
-        """
+
+        logger.info(f"[ПОЛЬЗОВАТЕЛЬ] user={user_id} начал подтверждение habit_id={habit_id}")
 
         user_row = await get_user_timezone(conn, user_id)
         user_tz = user_row["timezone"] if user_row else "Europe/Kyiv"
@@ -52,10 +53,13 @@ class HabitService:
 
         habit = await get_habit_for_start(conn, habit_id)
         if not habit:
+            logger.warning(f"[ОШИБКА] привычка habit_id={habit_id} не найдена у user={user_id}")
             return {"error": "HABIT_NOT_FOUND"}
 
         habit_name = habit["name"]
         is_challenge = habit["is_challenge"]
+
+        logger.info(f"[ПРИВЫЧКА] user={user_id} открыл: {habit_name} | челлендж={is_challenge}")
 
         title = f"челленджа *{habit_name}*" if is_challenge else f"привычки *{habit_name}*"
 
@@ -63,8 +67,10 @@ class HabitService:
 
         if last:
             last_dt = last["datetime"].astimezone(tz)
+            logger.info(f"[ПРОВЕРКА] Последнее подтверждение: {last_dt.date()}")
+
             if last_dt.date() == now.date():
-                # REVERIFY
+                logger.info(f"[REVERIFY] user={user_id} хочет переподтвердить сегодня")
                 text = (
                     "♻️ Уже есть подтверждение сегодня.\n"
                     f"Пришли новое медиа, чтобы *переподтвердить* {title}."
@@ -76,7 +82,8 @@ class HabitService:
                     "parse_mode": "Markdown",
                 }
 
-        # обычное подтверждение
+        logger.info(f"[НОВОЕ ДЕЙСТВИЕ] user={user_id} подтверждает впервые за сегодня")
+
         text = (
             f"📸 Пришли фото, видео или кружочек для подтверждения {title} 💪"
         )
@@ -87,9 +94,9 @@ class HabitService:
             "parse_mode": "Markdown",
         }
 
-    # ================================
-    #  Обработка медиа (message в FSM)
-    # ================================
+    # ===========================================================
+    # 🔥 Шаг 2: обработка медиа-подтверждения (новое или reverify)
+    # ===========================================================
     async def process_confirmation_media(
         self,
         conn,
@@ -99,85 +106,100 @@ class HabitService:
         file_type: str,
         reverify: bool,
     ):
-        """
-        Полностью повторяет поведение оригинального receive_media.
-        Возвращает словарь:
-        - error
-        - self_message
-        - target_chat
-        - share_allowed
-        - caption_text
-        - file_type
-        - file_id
-        - challenge_message (или None)
-        """
+
+        logger.info(f"[МЕДИА] user={user_id} отправил медиа для habit_id={habit_id}, reverify={reverify}")
 
         exists = await habit_exists(conn, habit_id)
         if not exists:
+            logger.warning(f"[ОШИБКА] привычка habit_id={habit_id} не существует")
             return {"error": "HABIT_NOT_FOUND"}
 
-        # =============================
-        # ♻️ REVERIFY
-        # =============================
+        # -----------------------------------------------------------
+        # 🧩 Блок: определяем — новое подтверждение или переподтверждение
+        # -----------------------------------------------------------
         if reverify:
+            logger.info(f"[ПЕРЕПОДТВЕРЖДЕНИЕ] user={user_id} обновил подтверждение")
             await update_last_confirmation_media(
                 conn, file_id, file_type, user_id, habit_id
             )
-
             await recalculate_total_confirmed_days(user_id)
             self_message = "♻️ Переподтверждение обновлено 💪"
 
-        # =============================
-        # ✔ Новое подтверждение
-        # =============================
         else:
+            logger.info(f"[НОВОЕ ПОДТВЕРЖДЕНИЕ] user={user_id} подтвердил впервые сегодня")
+
             await insert_confirmation(conn, user_id, habit_id, file_id, file_type)
 
             await update_user_streak(user_id)
+
+            habit_row = await get_challenge_habit(conn, habit_id)
+            if habit_row and habit_row["is_challenge"]:
+                logger.info(f"[СБРОС ПРОПУСКОВ] user={user_id} сброшен reset_streak (челлендж выполнен сегодня)")
+                await conn.execute("""
+                    UPDATE habits
+                    SET reset_streak = 0
+                    WHERE id = $1
+                """, habit_id)
+
             xp_gain = await add_xp_for_confirmation(user_id, habit_id)
+
+            logger.info(f"[XP] user={user_id} получил {xp_gain} XP за подтверждение")
 
             await increment_done_days(conn, habit_id)
             await recalculate_total_confirmed_days(user_id)
 
-            # АНТИ-ФАРМ XP — 1-в-1 как в исходнике
+            # -----------------------------------------------------------
+            # 🧩 Блок: начисление XP и анти-фарм проверка
+            # -----------------------------------------------------------
             count_today = await get_confirmations_count_today(conn, user_id)
 
-            if count_today <= 3 and xp_gain > 0:
-                variants = [
-                    f"✨ +{xp_gain} XP\n🔥 Мощно! Следующий шаг — ещё сильнее.",
-                    f"✨ +{xp_gain} XP\n💪 Вот это дисциплина. Продолжаем!",
-                    f"✨ +{xp_gain} XP\n⚡ Каждый день приносит результат!",
-                    f"✨ +{xp_gain} XP\n🏆 Ты укрепляешь свои амбиции."
-                ]
-                self_message = random.choice(variants)
+            # -----------------------------------------------------------
+            # 🧩 Блок: выбор пользовательского тона уведомлений
+            # -----------------------------------------------------------
+            tone = await conn.fetchval("""
+                SELECT notification_tone FROM users WHERE user_id = $1
+            """, user_id)
+
+            logger.info(f"[ТОН УВЕДОМЛЕНИЙ] user={user_id} tone={tone}")
+
+            if tone not in HABIT_CONFIRM_TONE:
+                tone = "friend"
+
+            # -----------------------------------------------------------
+            # 🧩 Блок: формируем текст feedback-ответа пользователю
+            # -----------------------------------------------------------
+            if xp_gain > 0 and count_today <= 3:
+                logger.info(f"[СООБЩЕНИЕ] user={user_id}: сообщение из with_xp")
+                self_message = random.choice(
+                    HABIT_CONFIRM_TONE[tone]["with_xp"]
+                ).format(xp=xp_gain)
 
             elif count_today == 4 and xp_gain == 0:
+                logger.info(f"[ЛИМИТ XP] user={user_id} достиг лимита XP за сегодня")
                 self_message = (
                     "⚠️ Максимум 3 уникальных подтверждения в сутки!\n"
                     "Подтверждение засчитано, но XP не начислено."
                 )
             else:
-                variants_no_xp = [
-                    "✅ Подтверждено. Двигаемся дальше!",
-                    "🔥 День закрыт. Ты на пути к цели.",
-                    "⚡ Дисциплина соблюдена!",
-                    "🏆 Отлично. Поставил галочку — идём выше."
-                ]
-                self_message = random.choice(variants_no_xp)
-
-        # =============================
-        # 🔥 ОТПРАВКА В ЧАТ (данные)
-        # =============================
+                logger.info(f"[СООБЩЕНИЕ] user={user_id}: сообщение из no_xp")
+                self_message = random.choice(
+                    HABIT_CONFIRM_TONE[tone]["no_xp"]
+                )
+        # ===========================================================
+        # 🔥 Шаг 3: отправка подтверждения в общий чат
+        # ===========================================================
         user_row = await get_user_notification_data(conn, user_id)
         target_chat = choose_target_chat(user_row)
-        share_allowed = user_row["share_confirmation_media"]
         nickname = user_row["nickname"]
+
+        logger.info(f"[ПУБЛИКАЦИЯ] user={user_id} -> чат={target_chat} ник={nickname}")
 
         habit_info = await get_habit_progress(conn, habit_id)
         habit_name = habit_info["name"]
-        total_days = habit_info["days"]
         current_day = habit_info["done_days"]
-        percent = round((current_day / total_days) * 100)
+        total_days = habit_info["days"]
+
+        logger.info(f"[ПРОГРЕСС] {habit_name}: {current_day}/{total_days} дней")
 
         if reverify:
             action_text = "♻️ переподтвердил"
@@ -186,7 +208,7 @@ class HabitService:
 
         caption_text = (
             f"{action_text} *{nickname}* привычку *“{habit_name}”*\n"
-            f"📅 День {current_day} из {total_days} ({percent}%)"
+            f"📅 День {current_day} из {total_days}"
         )
 
         # ===========================================================

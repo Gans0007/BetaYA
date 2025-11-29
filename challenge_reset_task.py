@@ -3,6 +3,10 @@ from datetime import datetime, timedelta
 import pytz
 from database import get_pool
 
+from handlers.tone.challenge_reset_tone import CHALLENGE_RESET_TONE
+import random
+
+
 
 async def check_challenge_resets():
     """
@@ -114,27 +118,67 @@ async def run_user_reset(user_id: int, tz_str: str, delay: float):
 
 
 async def reset_challenge_progress(pool, ch, reason: str):
-    """Сбрасывает прогресс челленджа без удаления."""
+    """Сбрасывает прогресс челленджа без удаления, с увеличением reset_streak."""
+    habit_id = ch["id"]
+    user_id = ch["user_id"]
+
+    # увеличиваем reset_streak + сбрасываем done_days
     async with pool.acquire() as conn:
         await conn.execute("""
             UPDATE habits
-            SET done_days = 0
+            SET done_days = 0,
+                reset_streak = reset_streak + 1
             WHERE id = $1
-        """, ch["id"])
+        """, habit_id)
 
+    # отправляем уведомление
     from aiogram import Bot
     from config import BOT_TOKEN
     bot = Bot(token=BOT_TOKEN)
 
     try:
-        await bot.send_message(
-            ch["user_id"],
-            f"⚠️ Прогресс по челленджу *{ch['name']}* был сброшен!\n"
-            f"Причина: {reason}\n\n"
-            f"Но это часть пути. Продолжай дальше 💪",
-            parse_mode="Markdown"
-        )
+        # истягиваем tone пользователя
+        async with pool.acquire() as conn:
+            tone = await conn.fetchval("""
+                SELECT notification_tone FROM users WHERE user_id = $1
+            """, user_id)
+
+        if tone not in CHALLENGE_RESET_TONE:
+            tone = "friend"
+
+        # достаём streak
+        async with pool.acquire() as conn:
+            streak = await conn.fetchval("""
+                SELECT reset_streak FROM habits WHERE id = $1
+            """, habit_id)
+
+        # рандомная цитата
+        quote = random.choice(CHALLENGE_RESET_TONE[tone])
+
+        # формируем сообщение
+        if tone == "friend":
+            text = (
+                f"⚠️ Прогресс по челленджу *{ch['name']}* был сброшен.\n\n"
+                f"{quote}"
+            )
+
+        elif tone == "gamer":
+            text = (
+                f"🎮 Провал в челлендже *{ch['name']}*.\n\n"
+                f"{quote}"
+            )
+
+        elif tone == "spartan":
+            text = (
+                f"⚔️ Челлендж *{ch['name']}* был сброшен.\n"
+                f"Пропущено подряд: *{streak}*\n\n"
+                f"{quote}"
+            )
+
+        await bot.send_message(user_id, text, parse_mode="Markdown")
+
     except Exception as e:
         print("Ошибка отправки уведомления:", e)
     finally:
         await bot.session.close()
+

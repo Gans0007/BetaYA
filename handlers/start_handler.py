@@ -1,4 +1,5 @@
 import pytz
+import logging
 from aiogram import F
 from datetime import datetime
 from aiogram import Router, types
@@ -15,41 +16,32 @@ from repositories.affiliate_repository import (
     user_exists_in_users_table,
 )
 
+# -------------------------------
+# 🔹 LOGGING
+# -------------------------------
+logging.basicConfig(level=logging.INFO)
+
+
 router = Router()
 
-# -------------------------------
-# 🔹 FSM для ввода никнейма
-# -------------------------------
+
 class NicknameFSM(StatesGroup):
     waiting_for_nickname = State()
 
 
-# -------------------------------
-# 🔹 Главное меню
-# -------------------------------
 def main_menu_kb() -> ReplyKeyboardMarkup:
-    rows = [
-        [KeyboardButton(text="📋 Активные задания")],
-        [KeyboardButton(text="🏆 Рейтинг"), KeyboardButton(text="👤 Профиль")],
-        [KeyboardButton(text="➕ Добавить привычку / челлендж")],
-    ]
     return ReplyKeyboardMarkup(
-        keyboard=rows,
+        keyboard=[
+            [KeyboardButton(text="📋 Активные задания")],
+            [KeyboardButton(text="🏆 Рейтинг"), KeyboardButton(text="👤 Профиль")],
+            [KeyboardButton(text="➕ Добавить привычку / челлендж")],
+        ],
         resize_keyboard=True,
         input_field_placeholder="Выбери действие…",
     )
 
 
-# -------------------------------
-# 🔹 Вытаскиваем реферальный код из /start
-# -------------------------------
 def extract_referral_code(message: types.Message) -> str | None:
-    """
-    Примеры:
-    /start
-    /start a3f9d1c2
-    /start@LiteVAmbitionBot a3f9d1c2
-    """
     if not message.text:
         return None
 
@@ -57,14 +49,15 @@ def extract_referral_code(message: types.Message) -> str | None:
     if len(parts) < 2:
         return None
 
-    return parts[1].strip() or None
+    ref = parts[1].strip() or None
+    logging.info(f"📎 Из сообщения извлечён реферальный код: {ref}")
+    return ref
 
 
-# -------------------------------
-# 🔹 Команда /start
-# -------------------------------
 @router.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
+    logging.info(f"🚀 /start от user_id={message.from_user.id}")
+
     user_timezone = "Europe/Kyiv"
     if message.from_user and message.from_user.language_code == "en":
         user_timezone = "Europe/London"
@@ -73,28 +66,18 @@ async def start_command(message: types.Message, state: FSMContext):
     elif message.from_user and message.from_user.language_code == "ru":
         user_timezone = "Europe/Moscow"
 
+    logging.info(f"🌍 Язык пользователя: {message.from_user.language_code}, timezone={user_timezone}")
+
     ref_code = extract_referral_code(message)
-
-    from repositories.affiliate_repository import (
-        get_affiliate_by_code,
-        create_referral,
-        user_already_has_affiliate,
-        user_exists_in_users_table,
-    )
-
     user_id = message.from_user.id
 
-    # ------------------------------------
-    # 🟩 1) Проверяем — существовал ли пользователь ДО вставки
-    # ------------------------------------
     existed_before = await user_exists_in_users_table(user_id)
+    logging.info(f"👤 existed_before={existed_before}")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
+        logging.info("💾 Открыто соединение с БД")
 
-        # ------------------------------------
-        # 🟩 2) Создаём или обновляем пользователя
-        # ------------------------------------
         await conn.execute(
             """
             INSERT INTO users (user_id, username, first_name, timezone)
@@ -109,53 +92,54 @@ async def start_command(message: types.Message, state: FSMContext):
             message.from_user.first_name,
             user_timezone,
         )
+        logging.info(f"💾 Пользователь сохранён/обновлён в БД: {user_id}")
 
-        # ------------------------------------
-        # 🟩 3) ЖЁСТКАЯ ЛОГИКА РЕФЕРАЛКИ
-        # ------------------------------------
         if ref_code:
+            logging.info(f"🔍 Проверяем аффилиейт-код: {ref_code}")
             affiliate_id = await get_affiliate_by_code(ref_code)
 
+            logging.info(f"👥 affiliate_id={affiliate_id}")
+
             if affiliate_id and affiliate_id != user_id:
-
-                # если пользователь существовал ДО старта → нельзя присвоить
                 if existed_before:
-                    pass  # ❌ старый пользователь → не даём рефералку
-
+                    logging.info("⛔ Пользователь не новый — рефералка НЕ присваивается")
+                    pass
                 else:
-                    # новый пользователь → можно присвоить
                     already = await user_already_has_affiliate(user_id)
+                    logging.info(f"🔍 Проверка: есть ли уже реферал? {already}")
 
                     if not already:
                         await create_referral(
                             affiliate_id=affiliate_id,
                             user_id=user_id
                         )
+                        logging.info(f"🎊 Реферал создан: {affiliate_id} ← {user_id}")
 
-                        # уведомляем партнёра
                         try:
                             await message.bot.send_message(
                                 affiliate_id,
                                 f"🎉 У тебя новый реферал: @{message.from_user.username or user_id}"
                             )
-                        except:
-                            pass
+                            logging.info(f"📨 Уведомление рефереру отправлено: {affiliate_id}")
+                        except Exception as e:
+                            logging.error(f"❗ Ошибка отправки уведомления рефереру: {e}")
 
         nickname = await conn.fetchval(
             "SELECT nickname FROM users WHERE user_id = $1", user_id
         )
+        logging.info(f"🔎 Nickname найден: {nickname}")
 
-
-    # Если никнейма нет — просим ввести и убираем все кнопки
     if not nickname:
+        logging.info("📝 Никнейма нет — просим пользователя ввести")
         await message.answer(
             "Привет! ✌️ Перед тем как начать, введи свой никнейм (имя, под которым тебя будут видеть другие):",
-            reply_markup=ReplyKeyboardRemove(),  # ❌ убираем все кнопки
+            reply_markup=ReplyKeyboardRemove(),
         )
         await state.set_state(NicknameFSM.waiting_for_nickname)
+        logging.info("⏳ FSM: waiting_for_nickname")
         return
 
-    # Если ник уже есть — показываем меню
+    logging.info("📲 Ник существует — показываем меню пользователю")
     await message.answer(
         "<b>Привет! ✌️ Я — Your Ambitions бот.</b>\n\n"
         "<b>Я могу быть кем тебе удобно:</b>\n"
@@ -172,47 +156,49 @@ async def start_command(message: types.Message, state: FSMContext):
         parse_mode="HTML"
     )
 
-# -------------------------------
-# 🔹 Обработка никнейма
-# -------------------------------
+
 @router.message(NicknameFSM.waiting_for_nickname)
 async def process_nickname(message: types.Message, state: FSMContext):
+    logging.info(f"🆕 Пользователь вводит ник: '{message.text}'")
+
     nickname = message.text.strip()
 
-    # Убираем @ если пользователь ввёл его
     if nickname.startswith("@"):
         nickname = nickname[1:]
 
-    # Проверяем длину и пустоту
     if not nickname:
+        logging.info("❗ Пустой никнейм")
         await message.answer("❗️Никнейм не может быть пустым. Попробуй снова:")
         return
     if len(nickname) > 20:
+        logging.info("❗ Никнейм слишком длинный")
         await message.answer("❗️Никнейм слишком длинный. Введи короче (до 20 символов):")
         return
 
     pool = await get_pool()
     async with pool.acquire() as conn:
-        # Проверяем, занят ли ник
         existing_user = await conn.fetchval(
             "SELECT user_id FROM users WHERE LOWER(nickname) = LOWER($1)",
             nickname
         )
+        logging.info(f"🔎 Проверяем занятость ника: {nickname} → exists={existing_user}")
+
         if existing_user and existing_user != message.from_user.id:
+            logging.info("⛔ Ник занят другим пользователем")
             await message.answer(
                 f"❗️Ник '{nickname}' уже используется другим пользователем.\n"
                 f"Попробуй другой вариант:"
             )
             return
 
-        # Если ник свободен — сохраняем
         await conn.execute(
             "UPDATE users SET nickname = $1 WHERE user_id = $2",
             nickname,
             message.from_user.id
         )
+        logging.info(f"💾 Ник сохранён: {message.from_user.id} → {nickname}")
 
-  
+    logging.info("🎉 Ник успешно установлен, показываем меню")
     await message.answer(
         f"<b>Отлично, {nickname}! ✌️ Я — Your Ambitions бот.</b>\n\n"
         "<b>Я могу быть кем тебе удобно:</b>\n"
@@ -228,6 +214,5 @@ async def process_nickname(message: types.Message, state: FSMContext):
         reply_markup=main_menu_kb(),
         parse_mode="HTML"
     )
+    logging.info("🧼 FSM cleared")
     await state.clear()
-
-
