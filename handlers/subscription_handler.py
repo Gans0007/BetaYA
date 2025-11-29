@@ -8,14 +8,20 @@ from repositories.affiliate_repository import (
     mark_referral_active,
     mark_referral_inactive
 )
+import logging
 
 router = Router()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
 
 # 🔄 Проверка подписки (кнопка "Проверить доступ")
 @router.callback_query(lambda c: c.data == "subscription_check")
 async def check_subscription_callback(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    logging.info(f"[NEED TO PAY] Пользователь {user_id} нажал 'Проверить доступ'")
 
     # 1️⃣ Проверяем вступление в приватную группу
     try:
@@ -31,6 +37,8 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         now = datetime.now(timezone.utc)
         new_until = now + timedelta(days=30)
 
+        logging.info(f"[NEED TO PAY] Подписка подтверждена — доступ до {new_until} для пользователя {user_id}")
+
         async with pool.acquire() as conn:
             await conn.execute("""
                 UPDATE users
@@ -43,21 +51,19 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         affiliate_id = await get_affiliate_for_user(user_id)
 
         if affiliate_id:
- 
-            await mark_referral_active(user_id)
+            logging.info(f"[NEED TO PAY] Реферал подтверждён. Партнёр {affiliate_id} получает +$0.50")
 
+            await mark_referral_active(user_id)
             await add_payment_to_affiliate(affiliate_id, 0.50)
 
-            # уведомляем партнёра, но НЕ пользователя
             try:
                 await callback.message.bot.send_message(
                     affiliate_id,
                     "🔥 Твой реферал продлил подписку!\n💰 Тебе начислено $0.50"
                 )
             except:
-                pass
+                logging.warning(f"[NEED TO PAY] Не удалось отправить уведомление партнёру {affiliate_id}")
 
-        # Сообщение пользователю
         await callback.message.edit_text(
             f"✅ Подписка подтверждена!\n"
             f"Доступ активен до: <b>{new_until.strftime('%d.%m.%Y')}</b>\n\n"
@@ -68,8 +74,9 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         await callback.answer()
         return
 
-
     # 3️⃣ Если пользователь НЕ в канале → подписка не активна
+    logging.info(f"[NEED TO PAY] Подписка НЕ найдена у пользователя {user_id} — требуется оплата")
+
     try:
         await mark_referral_inactive(user_id)
     except:

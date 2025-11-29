@@ -1,5 +1,6 @@
 from aiogram import Router, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import logging
 
 from services.challenge_service import (
     get_level_info,
@@ -14,6 +15,11 @@ from data.challenges_data import LEVEL_QUOTES
 
 router = Router()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
+
 
 # ============================================================
 #              ВЫВОД СПИСКА УРОВНЕЙ ЧЕЛЛЕНДЖЕЙ
@@ -21,6 +27,7 @@ router = Router()
 @router.callback_query(F.data == "choose_from_list")
 async def show_levels(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    logging.info(f"[CHALLENGE] Пользователь {user_id} открыл список уровней челленджей")
 
     stars, levels_dict = await get_level_info(user_id)
 
@@ -33,7 +40,6 @@ async def show_levels(callback: types.CallbackQuery):
             InlineKeyboardButton(text=name, callback_data=level_key)
         ])
 
-    # 🔥 ДОБАВЛЕНА КНОПКА НАЗАД
     keyboard.append([
         InlineKeyboardButton(text="⬅ Назад", callback_data="back_to_add_menu")
     ])
@@ -53,9 +59,12 @@ async def show_challenges(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     level_key = callback.data
 
+    logging.info(f"[CHALLENGE] Пользователь {user_id} открыл уровень {level_key}")
+
     stars, levels_dict = await get_level_info(user_id)
 
     if not is_level_unlocked(level_key, stars):
+        logging.info(f"[CHALLENGE] У пользователя {user_id} недостаточно звёзд для {level_key}")
         await callback.answer("Недостаточно ⭐ для доступа!", show_alert=True)
         return
 
@@ -68,7 +77,6 @@ async def show_challenges(callback: types.CallbackQuery):
     keyboard = []
     for index, (cid, title, desc_dict, ctype) in enumerate(challenges):
 
-        # Определяем статус челленджа
         if cid in active_ids:
             diff = active_diff.get(cid, 1)
             prefix = f"🔥 ⭐{diff}"
@@ -80,7 +88,6 @@ async def show_challenges(callback: types.CallbackQuery):
         else:
             prefix = ""
 
-        # КНОПКА ЧЕЛЛЕНДЖА
         keyboard.append([
             InlineKeyboardButton(
                 text=f"{prefix} {title}".strip(),
@@ -88,7 +95,6 @@ async def show_challenges(callback: types.CallbackQuery):
             )
         ])
 
-    # КНОПКА НАЗАД
     keyboard.append([
         InlineKeyboardButton(text="⬅ Назад", callback_data="choose_from_list")
     ])
@@ -109,8 +115,9 @@ async def show_challenges(callback: types.CallbackQuery):
 async def show_challenge_detail(callback: types.CallbackQuery):
     _, level_key, index_str = callback.data.split("|")
     index = int(index_str)
-
     user_id = callback.from_user.id
+
+    logging.info(f"[CHALLENGE] Пользователь {user_id} смотрит детали челленджа index={index} в {level_key}")
 
     challenges, active_ids, active_diff, completed = \
         await get_challenge_list(user_id, level_key)
@@ -150,12 +157,15 @@ async def accept_challenge_handler(callback: types.CallbackQuery):
     index = int(index_str)
     user_id = callback.from_user.id
 
+    logging.info(f"[CHALLENGE] Пользователь {user_id} пытается взять челлендж index={index} в {level_key}")
+
     challenges, active_ids, active_diff, completed = \
         await get_challenge_list(user_id, level_key)
 
     cid, title, desc_dict, ctype = challenges[index]
 
     if cid in active_ids:
+        logging.info(f"[CHALLENGE] Пользователь {user_id} уже имеет активный челлендж '{title}'")
         await callback.answer("Этот челлендж уже активен!", show_alert=True)
         return
 
@@ -163,6 +173,8 @@ async def accept_challenge_handler(callback: types.CallbackQuery):
     difficulty, days = await activate_challenge(
         user_id, cid, title, desc_dict, repeat, ctype
     )
+
+    logging.info(f"[CHALLENGE] Пользователь {user_id} начал челлендж '{title}', уровень={difficulty}, дней={days}")
 
     await callback.message.edit_text(
         f"🔥 Ты начал челлендж: *{title}*\n"

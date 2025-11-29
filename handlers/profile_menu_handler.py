@@ -1,9 +1,15 @@
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+import logging
 
 from services.profile_menu_service import profile_service
 
 router = Router()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
 
 
 # -------------------------------
@@ -12,8 +18,8 @@ router = Router()
 @router.message(lambda m: m.text == "👤 Профиль")
 async def show_profile_menu(message: types.Message):
     user_id = message.from_user.id
+    logging.info(f"[MENU PROFILE] Пользователь {user_id} открыл меню профиля")
 
-    # получаем статус партнёра через сервис
     is_affiliate = await profile_service.user_is_affiliate(user_id)
 
     row = [
@@ -22,6 +28,7 @@ async def show_profile_menu(message: types.Message):
     ]
 
     if is_affiliate:
+        logging.info(f"[MENU PROFILE] Показываю пункт партнёрка пользователю {user_id}")
         row.append(InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"))
 
     kb = InlineKeyboardMarkup(inline_keyboard=[row])
@@ -39,8 +46,8 @@ async def show_profile_menu(message: types.Message):
 @router.callback_query(lambda c: c.data == "back_to_profile_menu")
 async def back_to_profile_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    logging.info(f"[MENU PROFILE] Пользователь {user_id} вернулся в меню профиля")
 
-    # опять — только через сервис
     is_affiliate = await profile_service.user_is_affiliate(user_id)
 
     row = [
@@ -49,6 +56,7 @@ async def back_to_profile_menu(callback: types.CallbackQuery):
     ]
 
     if is_affiliate:
+        logging.info(f"[MENU PROFILE] Показываю пункт партнёрка пользователю {user_id}")
         row.append(InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"))
 
     kb = InlineKeyboardMarkup(inline_keyboard=[row])
@@ -58,4 +66,5 @@ async def back_to_profile_menu(callback: types.CallbackQuery):
         parse_mode="Markdown",
         reply_markup=kb
     )
+
     await callback.answer()

@@ -1,13 +1,13 @@
 from aiogram import Router, F, types
-import random  # может больше не нужен, но оставлю как в оригинале
+import random  
 from datetime import datetime, timezone
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime
-from data.challenges_data import FINAL_MESSAGES  # используется теперь в сервисе, но оставлю импорт
-
+from data.challenges_data import FINAL_MESSAGES  
 import pytz
+import logging
 
 from database import get_pool
 
@@ -28,17 +28,16 @@ from services.confirm_habit_service import habit_service
 
 router = Router()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+)
 
-# ================================
-# 🔹 FSM состояния
-# ================================
+
 class ConfirmHabitFSM(StatesGroup):
     waiting_for_media = State()
 
 
-# ================================
-# 🔹 Кнопка отмены
-# ================================
 def cancel_kb(habit_id: int):
     return InlineKeyboardMarkup(
         inline_keyboard=[
@@ -55,15 +54,19 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
 
+    logging.info(f"[CONFIRM] Пользователь {user_id} начал подтверждение привычки {habit_id}")
+
     pool = await get_pool()
     async with pool.acquire() as conn:
         result = await habit_service.start_confirmation(conn, user_id, habit_id)
 
         if result.get("error") == "HABIT_NOT_FOUND":
+            logging.warning(f"[CONFIRM] Привычка {habit_id} не найдена у пользователя {user_id}")
             await callback.answer("❌ Привычка не найдена.", show_alert=True)
             return
 
         reverify = result["reverify"]
+        logging.info(f"[CONFIRM] reverify = {reverify} для пользователя {user_id}")
 
         await state.update_data(habit_id=habit_id, reverify=reverify)
         await state.set_state(ConfirmHabitFSM.waiting_for_media)
@@ -82,6 +85,9 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
 # ================================
 @router.callback_query(F.data.startswith("cancel_media_"))
 async def cancel_media(callback: types.CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    logging.info(f"[CONFIRM] Пользователь {user_id} отменил подтверждение привычки")
+
     await state.clear()
     await callback.message.edit_text("❎ Подтверждение отменено.")
     await callback.answer()
@@ -97,7 +103,8 @@ async def receive_media(message: types.Message, state: FSMContext):
     reverify = data["reverify"]
     user_id = message.from_user.id
 
-    # Определяем тип медиа
+    logging.info(f"[CONFIRM] Пользователь {user_id} отправил медиа для привычки {habit_id}")
+
     if message.photo:
         file_id = message.photo[-1].file_id
         file_type = "photo"
@@ -108,8 +115,11 @@ async def receive_media(message: types.Message, state: FSMContext):
         file_id = message.video_note.file_id
         file_type = "circle"
     else:
+        logging.warning(f"[CONFIRM] Пользователь {user_id} отправил неподдерживаемый файл")
         await message.answer("⚠️ Нужно фото, видео или кружочек 🎥")
         return
+
+    logging.info(f"[CONFIRM] Получен файл типа: {file_type} от пользователя {user_id}")
 
     pool = await get_pool()
 
@@ -125,26 +135,26 @@ async def receive_media(message: types.Message, state: FSMContext):
             )
 
             if result.get("error") == "HABIT_NOT_FOUND":
+                logging.warning(f"[CONFIRM] Привычка {habit_id} уже завершена у {user_id}")
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
-            # Сообщение пользователю (XP / переподтверждение и т.п.)
+            logging.info(f"[CONFIRM] Сообщение пользователю: {result['self_message']}")
             await message.answer(result["self_message"])
 
-            # =============================
-            # 🔥 ОТПРАВКА В ЧАТ
-            # =============================
             caption_text = result["caption_text"]
             target_chat = result["target_chat"]
             share_allowed = result["share_allowed"]
 
             if not share_allowed:
+                logging.info(f"[CONFIRM] Публикую текст в чат для {user_id}")
                 await message.bot.send_message(
                     target_chat,
                     caption_text,
                     parse_mode="Markdown"
                 )
             else:
+                logging.info(f"[CONFIRM] Публикую медиа в чат для {user_id} [{file_type}]")
                 if file_type == "photo":
                     await message.bot.send_photo(
                         target_chat, file_id,
@@ -167,12 +177,10 @@ async def receive_media(message: types.Message, state: FSMContext):
                         parse_mode="Markdown"
                     )
 
-            # ===========================================================
-            # 🔥 Автозавершение челленджа — текст пользователю
-            # ===========================================================
             if result.get("challenge_message"):
+                logging.info(f"[CONFIRM] Челлендж завершён у пользователя {user_id}")
                 await message.answer(result["challenge_message"], parse_mode="Markdown")
 
         finally:
-            # 🧹 ВСЕГДА сбрасываем FSM — и больше он не залипнет
+            logging.info(f"[CONFIRM] Очищаю FSM состояние у пользователя {user_id}")
             await state.clear()
