@@ -6,6 +6,12 @@ from services.habit_view_service import send_habit_card, build_active_list
 
 router = Router()
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - ACTIVE_TASK - %(message)s",
+)
 
 # =====================================================
 # 🔹 Показ активных привычек (message)
@@ -13,6 +19,7 @@ router = Router()
 @router.message(lambda m: m.text == "📋 Активные задания")
 async def show_active_tasks(message: types.Message):
     user_id = message.from_user.id
+    logging.info(f"👤 Пользователь {user_id} открыл список активных привычек.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -52,6 +59,7 @@ async def show_active_tasks(message: types.Message):
 async def show_habit_card(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
+    logging.info(f"👤 Пользователь {user_id} открыл карточку привычки ID={habit_id}.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -89,6 +97,7 @@ async def show_habit_card(callback: types.CallbackQuery):
 @router.callback_query(F.data == "back_from_card")
 async def back_from_card(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    logging.info(f"👤 Пользователь {callback.from_user.id} вернулся из карточки назад.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -131,6 +140,7 @@ async def back_from_card(callback: types.CallbackQuery):
 @router.callback_query(F.data == "show_active_list")
 async def back_to_active_list(callback: types.CallbackQuery):
     user_id = callback.from_user.id
+    logging.info(f"👤 Пользователь {callback.from_user.id} запросил отображение списка активных привычек.")
 
     text, kb, rows = await build_active_list(user_id)
 
@@ -150,6 +160,7 @@ async def back_to_active_list(callback: types.CallbackQuery):
 async def ask_delete(callback: types.CallbackQuery):
     # Получаем id привычки
     habit_id = int(callback.data.split("_")[2])
+    logging.info(f"🗑 Пользователь {callback.from_user.id} запросил удаление привычки ID={habit_id}.")
 
     # Клавиатура: Да / Отмена
     kb = InlineKeyboardMarkup(
@@ -176,6 +187,7 @@ async def ask_delete(callback: types.CallbackQuery):
 async def delete_habit(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[2])
     user_id = callback.from_user.id
+    logging.info(f"❗ Пользователь {user_id} подтвердил удаление привычки ID={habit_id}.")
 
     pool = await get_pool()
 
@@ -260,6 +272,7 @@ async def delete_habit(callback: types.CallbackQuery):
 # ================================
 @router.callback_query(F.data == "dismiss_delete")
 async def dismiss_delete(callback: types.CallbackQuery):
+    logging.info(f"❌ Пользователь {callback.from_user.id} отменил удаление привычки.")
     # Возвращаем обычное сообщение
     await callback.message.edit_text("Отменено ❎")
     await callback.answer()
