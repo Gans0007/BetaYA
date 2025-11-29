@@ -86,9 +86,17 @@ async def get_confirmations_count_today(conn, user_id: int) -> int:
 
 async def get_user_notification_data(conn, user_id: int):
     return await conn.fetchrow("""
-        SELECT has_access, access_until, total_confirmed_days, share_confirmation_media, nickname
-        FROM users WHERE user_id=$1
+        SELECT 
+            has_access, 
+            access_until, 
+            total_confirmed_days, 
+            share_confirmation_media, 
+            nickname,
+            notification_tone
+        FROM users 
+        WHERE user_id=$1
     """, user_id)
+
 
 
 def choose_target_chat(user_row) -> int:

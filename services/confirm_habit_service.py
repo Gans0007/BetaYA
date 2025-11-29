@@ -1,6 +1,6 @@
-import random
 from datetime import datetime
 import pytz
+
 
 from data.challenges_data import FINAL_MESSAGES
 from services.user_service import recalculate_total_confirmed_days, update_user_streak
@@ -26,6 +26,7 @@ from repositories.confirm_habit_repository import (
 )
 
 from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
+from handlers.tone.confirm_caption_tone import HABIT_CAPTION_TONE
 import random
 
 class HabitService:
@@ -197,9 +198,16 @@ class HabitService:
         else:
             action_text = "💪 подтвердил"
 
-        caption_text = (
-            f"{action_text} *{nickname}* привычку *“{habit_name}”*\n"
-            f"📅 День {current_day} из {total_days} ({percent}%)"
+        tone = user_row.get("notification_tone") or "friend"
+        caption_raw = random.choice(HABIT_CAPTION_TONE[tone])
+
+        caption_text = caption_raw.format(
+            action=action_text,
+            nickname=nickname,
+            habit_name=habit_name,
+            current_day=current_day,
+            total_days=total_days,
+            percent=percent,
         )
 
         # ===========================================================
