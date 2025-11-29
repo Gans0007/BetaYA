@@ -38,11 +38,29 @@ def get_rank_message(rank: int, tone: str) -> str:
     return random.choice(group)
 
 
-async def safe_replace_message(msg: types.Message, text: str, kb=None):
+async def safe_replace_message(msg: types.Message | CallbackQuery, text: str, kb=None):
+    if isinstance(msg, CallbackQuery):
+        user_id = msg.from_user.id
+        target = msg.message
+        can_edit = True
+    else:
+        user_id = msg.from_user.id
+        target = msg
+        can_edit = False   # сообщение от пользователя — не редактируем!
+
+    if can_edit:
+        try:
+            await target.edit_text(text, reply_markup=kb, parse_mode="HTML")
+            return
+        except Exception as e:
+            logger.error(f"❗ Ошибка edit_text у пользователя {user_id}: {e}")
+
+    # если нельзя редактировать — отправляем новое
     try:
-        await msg.edit_text(text, reply_markup=kb, parse_mode="HTML")
-    except:
-        await msg.answer(text, reply_markup=kb, parse_mode="HTML")
+        await target.answer(text, reply_markup=kb, parse_mode="HTML")
+    except Exception as e2:
+        logger.error(f"❗ Ошибка answer у пользователя {user_id}: {e2}")
+
 
 
 def rating_keyboard(current: str):
@@ -79,6 +97,7 @@ def get_league_by_xp(xp: float):
 # 🌍 ТОП ПО МИРУ
 async def show_top10_world(msg):
     user_id = msg.from_user.id
+    logger.info(f"👤 Пользователь {user_id} открыл рейтинг по миру.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -118,7 +137,6 @@ async def show_top10_world(msg):
                 f"{medal}{nick:<8} {xp:>4} {days:>4} {streak:>4} {stars:>4}\n"
             )
 
-        # ВСЕГДА показываем позицию пользователя ниже
         pos = await conn.fetchrow("""
             SELECT r, nickname, xp, total_confirmed_days, current_streak, total_stars
             FROM (
@@ -132,6 +150,8 @@ async def show_top10_world(msg):
             nick = await get_display_name(pos["nickname"])
 
             rank = pos["r"]
+            logger.info(f"🔢 Пользователь {user_id} — место в мире: {rank}")
+
             tone = await conn.fetchval(
                 "SELECT notification_tone FROM users WHERE user_id=$1",
                 user_id
@@ -142,19 +162,15 @@ async def show_top10_world(msg):
             table.append("🔽 Твоя позиция:\n")
             table.append(
                 f"{rank}. {nick:<8}  "
-                f"{round(float(pos['xp']), 1):>6} {pos['total_confirmed_days']:>6} "
-                f"{pos['current_streak']:>6} {pos['total_stars']:>6}\n"
+                f"{round(float(pos['xp']), 1):>4} {pos['total_confirmed_days']:>4} "
+                f"{pos['current_streak']:>4} {pos['total_stars']:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 
         table.append("</pre>")
         text = header + "".join(table)
 
-    await safe_replace_message(
-        msg.message if isinstance(msg, CallbackQuery) else msg,
-        text,
-        kb=rating_keyboard("world")
-    )
+    await safe_replace_message(msg, text, kb=rating_keyboard("world"))
 
     if isinstance(msg, CallbackQuery):
         await msg.answer()
@@ -164,6 +180,7 @@ async def show_top10_world(msg):
 @router.callback_query(F.data == "honor_league")
 async def honor_league(callback: CallbackQuery):
     user_id = callback.from_user.id
+    logger.info(f"👤 Пользователь {user_id} открыл рейтинг своей лиги.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -206,13 +223,15 @@ async def honor_league(callback: CallbackQuery):
                 f"{medal}{nick:<8} {xp:>4} {days:>4} {streak:>4} {stars:>4}\n"
             )
 
-        # ВСЕГДА показываем позицию пользователя ниже (относительно своей лиги)
         rank = None
         pos_row = None
         for idx, row in enumerate(same, start=1):
             if row["user_id"] == user_id:
                 rank = idx
                 pos_row = row
+                logger.info(f"🔢 Пользователь {user_id} — место в лиге: {rank}")
+                if rank == 1:
+                    logger.info(f"👑 Пользователь {user_id} — ТОП-1 в своей лиге!")
                 break
 
         if rank is not None and pos_row is not None:
@@ -231,14 +250,14 @@ async def honor_league(callback: CallbackQuery):
             table.append(DIVIDER + "\n")
             table.append("🔽 Твоя позиция:\n")
             table.append(
-                f"{rank}. {nick:<8}  {xp:>6} {days:>6} {streak:>6} {stars:>6}\n"
+                f"{rank}. {nick:<8}  {xp:>4} {days:>4} {streak:>4} {stars:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 
         table.append("</pre>")
         text = header + "".join(table)
 
-    await safe_replace_message(callback.message, text, rating_keyboard("league"))
+    await safe_replace_message(callback, text, rating_keyboard("league"))
     await callback.answer()
 
 
@@ -246,6 +265,7 @@ async def honor_league(callback: CallbackQuery):
 @router.callback_query(F.data == "honor_stars")
 async def honor_stars(callback: CallbackQuery):
     user_id = callback.from_user.id
+    logger.info(f"👤 Пользователь {user_id} открыл рейтинг по звёздам.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -293,6 +313,10 @@ async def honor_stars(callback: CallbackQuery):
 
         if userpos:
             rank = userpos["r"]
+            logger.info(f"🔢 Пользователь {user_id} — место по звёздам: {rank}")
+            if rank == 1:
+                logger.info(f"👑 Пользователь {user_id} — ТОП-1 по звёздам!")
+
             nick = await get_display_name(userpos["nickname"])
             tone = await conn.fetchval(
                 "SELECT notification_tone FROM users WHERE user_id=$1",
@@ -304,15 +328,15 @@ async def honor_stars(callback: CallbackQuery):
             table.append("🔽 Твоя позиция:\n")
             table.append(
                 f"{rank}. {nick:<8}  "
-                f"{userpos['total_stars']:>6} {round(float(userpos['xp']), 1):>6} "
-                f"{userpos['total_confirmed_days']:>6} {userpos['current_streak']:>6}\n"
+                f"{userpos['total_stars']:>4} {round(float(userpos['xp']), 1):>4} "
+                f"{userpos['total_confirmed_days']:>4} {userpos['current_streak']:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 
         table.append("</pre>")
         text = header + "".join(table)
 
-    await safe_replace_message(callback.message, text, rating_keyboard("stars"))
+    await safe_replace_message(callback, text, rating_keyboard("stars"))
     await callback.answer()
 
 
