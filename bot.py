@@ -73,6 +73,11 @@ async def main():
     from daily_reminder_task import send_daily_reminders
     asyncio.create_task(send_daily_reminders(bot))
 
+    # 6) очередь отправки
+    from services.message_queue import queue_consumer
+    from handlers.confirm_habit_handler import process_task_from_queue
+    asyncio.create_task(queue_consumer(process_task_from_queue))
+
     # 🆕 Проверка подписки
     from subscriprion_check_task import subscription_checker
     asyncio.create_task(subscription_checker())

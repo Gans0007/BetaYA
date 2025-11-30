@@ -8,6 +8,9 @@ from repositories.affiliate_repository import (
     mark_referral_active,
     mark_referral_inactive
 )
+
+from services.affiliate_service import affiliate_service
+
 import logging
 
 router = Router()
@@ -53,8 +56,7 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         if affiliate_id:
             logging.info(f"[NEED TO PAY] Реферал подтверждён. Партнёр {affiliate_id} получает +$0.50")
 
-            await mark_referral_active(user_id)
-            await add_payment_to_affiliate(affiliate_id, 0.50)
+            await affiliate_service.activate_referral(user_id, 0.50)
 
             try:
                 await callback.message.bot.send_message(

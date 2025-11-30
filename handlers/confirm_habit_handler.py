@@ -24,6 +24,7 @@ from repositories.affiliate_repository import (
 )
 
 from services.confirm_habit_service import habit_service
+from services.message_queue import QUEUE_CONFIRM
 
 
 router = Router()
@@ -105,6 +106,7 @@ async def receive_media(message: types.Message, state: FSMContext):
 
     logging.info(f"[CONFIRM] Пользователь {user_id} отправил медиа для привычки {habit_id}")
 
+    # Получаем file_id
     if message.photo:
         file_id = message.photo[-1].file_id
         file_type = "photo"
@@ -121,8 +123,33 @@ async def receive_media(message: types.Message, state: FSMContext):
 
     logging.info(f"[CONFIRM] Получен файл типа: {file_type} от пользователя {user_id}")
 
-    pool = await get_pool()
+    # 📌 ставим задачу в очередь
+    await QUEUE_CONFIRM.put({
+        "user_id": user_id,
+        "habit_id": habit_id,
+        "reverify": reverify,
+        "file_id": file_id,
+        "file_type": file_type,
+        "message": message
+    })
 
+    await message.answer("⏳ Подтверждение принято в обработку...")
+
+    await state.clear()
+
+
+# ================================
+# 🔥 Обработчик очереди
+# ================================
+async def process_task_from_queue(task):
+    message = task["message"]
+    user_id = task["user_id"]
+    habit_id = task["habit_id"]
+    reverify = task["reverify"]
+    file_id = task["file_id"]
+    file_type = task["file_type"]
+
+    pool = await get_pool()
     async with pool.acquire() as conn:
         try:
             result = await habit_service.process_confirmation_media(
@@ -135,11 +162,9 @@ async def receive_media(message: types.Message, state: FSMContext):
             )
 
             if result.get("error") == "HABIT_NOT_FOUND":
-                logging.warning(f"[CONFIRM] Привычка {habit_id} уже завершена у {user_id}")
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
-            logging.info(f"[CONFIRM] Сообщение пользователю: {result['self_message']}")
             await message.answer(result["self_message"])
 
             caption_text = result["caption_text"]
@@ -147,28 +172,24 @@ async def receive_media(message: types.Message, state: FSMContext):
             share_allowed = result["share_allowed"]
 
             if not share_allowed:
-                logging.info(f"[CONFIRM] Публикую текст в чат для {user_id}")
                 await message.bot.send_message(
                     target_chat,
                     caption_text,
                     parse_mode="Markdown"
                 )
             else:
-                logging.info(f"[CONFIRM] Публикую медиа в чат для {user_id} [{file_type}]")
                 if file_type == "photo":
                     await message.bot.send_photo(
                         target_chat, file_id,
                         caption=caption_text,
                         parse_mode="Markdown"
                     )
-
                 elif file_type == "video":
                     await message.bot.send_video(
                         target_chat, file_id,
                         caption=caption_text,
                         parse_mode="Markdown"
                     )
-
                 elif file_type == "circle":
                     await message.bot.send_video_note(target_chat, file_id)
                     await message.bot.send_message(
@@ -178,9 +199,9 @@ async def receive_media(message: types.Message, state: FSMContext):
                     )
 
             if result.get("challenge_message"):
-                logging.info(f"[CONFIRM] Челлендж завершён у пользователя {user_id}")
                 await message.answer(result["challenge_message"], parse_mode="Markdown")
 
-        finally:
-            logging.info(f"[CONFIRM] Очищаю FSM состояние у пользователя {user_id}")
-            await state.clear()
+        except Exception as e:
+            logging.error(f"[QUEUE PROCESSING ERROR] {e}")
+            await message.answer("⚠️ Ошибка обработки подтверждения. Мы исправим это.")
+

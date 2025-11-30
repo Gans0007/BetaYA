@@ -103,5 +103,22 @@ class SubscriptionMiddleware(BaseMiddleware):
                 await event.answer()
                 return
 
-        # Если нет блокировки — пропускаем дальше
+        # Если нет блокировки — значит подписка активна
+        # это случается и при автоматическом продлении
+        try:
+            # Проверяем — является ли пользователь чьим-то рефералом
+            from repositories.affiliate_repository import get_affiliate_for_user
+            from services.affiliate_service import affiliate_service
+
+            affiliate_id = await get_affiliate_for_user(user_id)
+
+            if affiliate_id and has_access and access_until >= now:
+                # Пробуем активировать реферальную подписку
+                await affiliate_service.activate_referral(user_id, 0.50)
+
+        except Exception as e:
+            print(f"[AUTO_SUBSCRIPTION ERROR] {e}")
+
+        # Пропускаем дальше
         return await handler(event, data)
+

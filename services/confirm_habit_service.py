@@ -191,6 +191,10 @@ class HabitService:
         habit_name = habit_info["name"]
         total_days = habit_info["days"]
         current_day = habit_info["done_days"]
+
+        if not total_days or total_days <= 0:
+            total_days = 1  # защита от деления на 0
+
         percent = round((current_day / total_days) * 100)
 
         if reverify:
@@ -199,16 +203,26 @@ class HabitService:
             action_text = "💪 подтвердил"
 
         tone = user_row.get("notification_tone") or "friend"
+        if tone not in HABIT_CAPTION_TONE:
+            tone = "friend"
+
         caption_raw = random.choice(HABIT_CAPTION_TONE[tone])
 
-        caption_text = caption_raw.format(
-            action=action_text,
-            nickname=nickname,
-            habit_name=habit_name,
-            current_day=current_day,
-            total_days=total_days,
-            percent=percent,
-        )
+        try:
+            caption_text = caption_raw.format(
+                action=action_text,
+                nickname=nickname,
+                habit_name=habit_name,
+                current_day=current_day,
+                total_days=total_days,
+                percent=percent,
+            )
+        except Exception:
+            # защитный fallback, если вдруг шаблон кривой
+            caption_text = (
+                f"{action_text} *{nickname}* привычку *“{habit_name}”*\n"
+                f"📅 День {current_day} из {total_days} ({percent}%)"
+            )
 
         # ===========================================================
         # 🔥 Шаг 4: автозавершение челленджа (1-в-1 как в исходнике)

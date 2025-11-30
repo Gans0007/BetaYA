@@ -52,8 +52,9 @@ async def process_user_rank(bot, user, now_utc):
     today = local_time.date()
 
     # Не время — выходим
-    if not (local_time.hour == 0 and local_time.minute == 5):
-        return
+#    if not (local_time.hour == 0 and local_time.minute == 5):
+ #       return
+
 
     # Уже проверяли сегодня — выходим
     if last_date == today:
@@ -64,7 +65,79 @@ async def process_user_rank(bot, user, now_utc):
     if rank is None:
         return
 
-    # Обновляем в БД
+    # ======= 1) ПЕРВЫЙ РАЗ =======
+    if last_rank is None:
+        try:
+            await bot.send_message(
+                chat_id=user_id,
+                text=(
+                    f"🏁 Твоё стартовое место в глобальном рейтинге: {rank}\n"
+                    f"Теперь каждый день ты будешь видеть свой прогресс 💪"
+                ),
+                disable_notification=True,
+                parse_mode="HTML"
+            )
+        except Exception as e:
+            logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
+
+        # записываем метку в БД
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute("""
+                UPDATE users
+                SET last_global_rank = $2,
+                    last_rank_update = $3
+                WHERE user_id = $1
+            """, user_id, rank, today)
+
+        logger.info(f"[GLOBAL] стартовое место отправлено юзеру {user_id}")
+        return
+
+    # ======= 2) СРАВНИВАЕМ =======
+    delta = last_rank - rank
+
+    # ======= 3) СНАЧАЛА отправляем УВЕДОМЛЕНИЕ =======
+    if delta > 0:
+        # улучшение
+        msg = (
+            f"📈 Ты поднялся в глобальном рейтинге!\n"
+            f"Было место: {last_rank}\n"
+            f"Стало: {rank}\n"
+            f"Ты улучшил позицию на {delta}! 🔥"
+        )
+    elif delta < 0:
+        # ухудшение
+        msg = (
+            f"📉 Ты немного просел в глобальном рейтинге.\n"
+            f"Было место: {last_rank}\n"
+            f"Стало: {rank}\n"
+            f"Ты потерял {abs(delta)} позиций."
+        )
+    else:
+        # то же место
+        msg = (
+            f"➡ Ты сохранил своё место в рейтинге: {rank}\n"
+            f"Стабильность — уже результат 💪"
+        )
+
+    try:
+        await bot.send_message(
+            chat_id=user_id,
+            text=msg,
+            disable_notification=True,
+            parse_mode="HTML"
+        )
+        logger.info(f"[GLOBAL] уведомление отправлено юзеру {user_id}")
+
+        # маленькая задержка, чтобы Telegram не резал по лимитам
+        await asyncio.sleep(0.1)
+
+    except Exception as e:
+        logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
+
+
+
+    # ======= 4) ПОСЛЕ — обновляем в БД =======
     pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.execute("""
@@ -73,37 +146,3 @@ async def process_user_rank(bot, user, now_utc):
                 last_rank_update = $3
             WHERE user_id = $1
         """, user_id, rank, today)
-
-    # Если первый раз — не уведомляем
-    if last_rank is None:
-        logger.info(f"[GLOBAL] Пользователь {user_id}: первое вычисление места {rank}")
-        return
-
-    # Сравниваем разницу
-    delta = last_rank - rank
-
-    # Улучшение (место выросло)
-    if delta > 0:
-        await bot.send_message(
-            user_id,
-            f"📈 Ты поднялся в глобальном рейтинге!\n"
-            f"Было место: {last_rank}\n"
-            f"Стало: {rank}\n"
-            f"Ты улучшил позицию на {delta}!"
-        )
-        logger.info(f"[GLOBAL] {user_id} улучшил место {last_rank} → {rank} (+{delta})")
-
-    # Ухудшение
-    elif delta < 0:
-        delta = abs(delta)
-        await bot.send_message(
-            user_id,
-            f"📉 Ты немного просел в глобальном рейтинге.\n"
-            f"Было место: {last_rank}\n"
-            f"Стало: {rank}\n"
-            f"Потерял {delta} позиций."
-        )
-        logger.info(f"[GLOBAL] {user_id} упал {last_rank} → {rank} (-{delta})")
-
-    else:
-        logger.info(f"[GLOBAL] {user_id} место не изменилось: {rank}")
