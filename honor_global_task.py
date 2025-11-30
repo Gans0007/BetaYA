@@ -51,9 +51,9 @@ async def process_user_rank(bot, user, now_utc):
     local_time = now_utc.astimezone(tz)
     today = local_time.date()
 
-    # Не время — выходим
-#    if not (local_time.hour == 0 and local_time.minute == 5):
- #       return
+    Не время — выходим
+    if not (local_time.hour == 0 and local_time.minute == 5):
+        return
 
 
     # Уже проверяли сегодня — выходим
