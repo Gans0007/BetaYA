@@ -3,17 +3,13 @@ from datetime import datetime, timezone, timedelta
 from aiogram import Bot, types
 from config import BOT_TOKEN, PUBLIC_CHANNEL_ID
 from database import get_pool
-from repositories.affiliate_repository import get_affiliate_for_user, add_payment_to_affiliate
+from repositories.affiliate_repository import get_affiliate_for_user
+from services.affiliate_service import affiliate_service
 
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 async def subscription_checker():
-    """
-    Каждые 10 минут:
-    - Проверяет срок подписки пользователя
-    - Если он в платной группе → продлевает подписку на 30 дней
-    - Если нет → отключает и отправляет уведомление
-    - При каждом продлении начисляет партнёру $0.50
-    """
 
     bot = Bot(token=BOT_TOKEN)
 
@@ -27,27 +23,23 @@ async def subscription_checker():
                 FROM users
             """)
 
-        for u in users:
-            user_id = u["user_id"]
-            has_access = u["has_access"]
-            access_until = u["access_until"]
+            for u in users:
+                user_id = u["user_id"]
+                has_access = u["has_access"]
+                access_until = u["access_until"]
 
-            # подписка ещё действует
-            if has_access and access_until and access_until > now:
-                continue
+                if has_access and access_until and access_until > now:
+                    continue
 
-            # проверяем участие в канале
-            try:
-                member = await bot.get_chat_member(PUBLIC_CHANNEL_ID, user_id)
-                in_group = member.status in ("member", "administrator", "creator")
-            except Exception:
-                in_group = False
+                try:
+                    member = await bot.get_chat_member(PUBLIC_CHANNEL_ID, user_id)
+                    in_group = member.status in ("member", "administrator", "creator")
+                except Exception:
+                    in_group = False
 
-            # 1️⃣ Если пользователь в канале → продлеваем подписку на 30 дней
-            if in_group:
-                new_until = now + timedelta(days=30)
+                if in_group:
+                    new_until = now + timedelta(days=30)
 
-                async with pool.acquire() as conn:
                     await conn.execute("""
                         UPDATE users
                         SET has_access = TRUE,
@@ -55,58 +47,61 @@ async def subscription_checker():
                         WHERE user_id = $1
                     """, user_id, new_until)
 
-                # 💸 Начисление партнёру $0.50
-                affiliate_id = await get_affiliate_for_user(user_id)
+                    affiliate_id = await get_affiliate_for_user(user_id)
 
-                if affiliate_id:
-                    await add_payment_to_affiliate(affiliate_id, 0.50)
+                    if affiliate_id:
+                        logging.info(f"[REF-ACTIVATE] Пользователь {user_id} → активирован системой авто-подписки → affiliate {affiliate_id}")
+                        await affiliate_service.activate_referral(user_id, 0.50)
 
-                    try:
-                        await bot.send_message(
-                            affiliate_id,
-                            "🔥 Твой реферал продлил подписку (автоматически)!\n💰 Тебе начислено $0.50"
-                        )
-                    except:
-                        pass
+                        try:
+                            await bot.send_message(
+                                affiliate_id,
+                                "🔥 Твой реферал продлил подписку (автоматически)!\n💰 Тебе начислено $0.50"
+                            )
+                        except Exception as e:
+                            logging.warning(f"[REF-NOTIFY-FAILED] Не удалось отправить сообщение партнёру {affiliate_id} — {e}")
 
-                continue  # очень важно!
+                    continue
 
-            # 2️⃣ Если пользователь НЕ в канале → отключаем доступ
-            if not has_access or (access_until and access_until <= now):
-
-                async with pool.acquire() as conn:
+                if not has_access or (access_until and access_until <= now):
                     await conn.execute("""
                         UPDATE users
                         SET has_access = FALSE
                         WHERE user_id = $1
                     """, user_id)
 
-                # уведомление пользователю
-                try:
-                    await bot.send_message(
-                        user_id,
-                        "⛔ *Подписка закончилась!*\n\n"
-                        "Чтобы продолжить пользоваться ботом — оплати доступ.\n\n"
-                        "Выбери действие ниже:",
-                        parse_mode="Markdown",
-                        reply_markup=types.InlineKeyboardMarkup(
-                            inline_keyboard=[
-                                [
-                                    types.InlineKeyboardButton(
-                                        text="💳 Оплатить подписку",
-                                        url="https://t.me/tribute/app?startapp=ssdz"
-                                    )
-                                ],
-                                [
-                                    types.InlineKeyboardButton(
-                                        text="🔎 Проверить доступ",
-                                        callback_data="subscription_check"
-                                    )
+                    try:
+                        await affiliate_service.deactivate_referral(user_id)
+                        logging.info(f"[REF-DEACTIVATE] Пользователь {user_id} → не продлил подписку")
+                    except Exception as e:
+                        logging.error(f"[REF-DEACTIVATE-ERROR] Пользователь {user_id} — {e}")
+
+                    try:
+                        await bot.send_message(
+                            user_id,
+                            "⛔ *Подписка закончилась!*\n\n"
+                            "Чтобы продолжить пользоваться ботом — оплати доступ.\n\n"
+                            "Выбери действие ниже:",
+                            parse_mode="Markdown",
+                            reply_markup=types.InlineKeyboardMarkup(
+                                inline_keyboard=[
+                                    [
+                                        types.InlineKeyboardButton(
+                                            text="💳 Оплатить подписку",
+                                            url="https://t.me/tribute/app?startapp=ssdz"
+                                        )
+                                    ],
+                                    [
+                                        types.InlineKeyboardButton(
+                                            text="🔎 Проверить доступ",
+                                            callback_data="subscription_check"
+                                        )
+                                    ]
                                 ]
-                            ]
+                            )
                         )
-                    )
-                except:
-                    pass
+                    except Exception as e:
+                        logging.warning(f"[USER-NOTIFY-FAILED] Не удалось отправить сообщение пользователю {user_id} — {e}")
 
         await asyncio.sleep(600)
+
