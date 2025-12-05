@@ -149,9 +149,16 @@ async def process_task_from_queue(task):
     file_id = task["file_id"]
     file_type = task["file_type"]
 
+    # 🔥 Чаты
+    FREE_MAIN_CHAT = -1002375148535       # бесплатный основной
+    FREE_EXTRA_CHAT = -1002435430482      # бесплатный дополнительный (дублирование)
+
     pool = await get_pool()
     async with pool.acquire() as conn:
         try:
+            # =============================
+            # ЛОГИКА ОБРАБОТКИ HABIT
+            # =============================
             result = await habit_service.process_confirmation_media(
                 conn=conn,
                 user_id=user_id,
@@ -165,43 +172,70 @@ async def process_task_from_queue(task):
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
+            # Сообщение пользователю
             await message.answer(result["self_message"])
 
             caption_text = result["caption_text"]
-            target_chat = result["target_chat"]
+            target_chat = result["target_chat"]    # уже рассчитан choose_target_chat()
             share_allowed = result["share_allowed"]
 
-            if not share_allowed:
-                await message.bot.send_message(
-                    target_chat,
-                    caption_text,
-                    parse_mode="Markdown"
-                )
-            else:
-                if file_type == "photo":
-                    await message.bot.send_photo(
-                        target_chat, file_id,
-                        caption=caption_text,
-                        parse_mode="Markdown"
-                    )
-                elif file_type == "video":
-                    await message.bot.send_video(
-                        target_chat, file_id,
-                        caption=caption_text,
-                        parse_mode="Markdown"
-                    )
-                elif file_type == "circle":
-                    await message.bot.send_video_note(target_chat, file_id)
-                    await message.bot.send_message(
-                        target_chat,
-                        caption_text,
-                        parse_mode="Markdown"
-                    )
+            # =============================
+            # ЛОГИКА ОТПРАВКИ В ЧАТЫ
+            # =============================
+            async def send_to_two_chats(send_action):
+                """
+                Хелпер: отправляет одновременно в бесплатный основной и дополнительный.
+                send_action — функция отправки.
+                """
+                await send_action(target_chat)
+                await send_action(FREE_EXTRA_CHAT)
 
+            # ======= Платные пользователи =======
+            if target_chat != FREE_MAIN_CHAT:
+                # Платник → только в один чат
+                if not share_allowed:
+                    await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+                else:
+                    if file_type == "photo":
+                        await message.bot.send_photo(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
+                    elif file_type == "video":
+                        await message.bot.send_video(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
+                    elif file_type == "circle":
+                        await message.bot.send_video_note(target_chat, file_id)
+                        await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+
+            # ======= БЕСПЛАТНЫЕ → отправляем в 2 чата =======
+            else:
+                if not share_allowed:
+                    # ====== ТЕКСТ ======
+                    await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+                    await message.bot.send_message(FREE_EXTRA_CHAT, caption_text, parse_mode="Markdown")
+
+                else:
+                    # ====== MEDIA: PHOTO ======
+                    if file_type == "photo":
+                        await message.bot.send_photo(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
+                        await message.bot.send_photo(FREE_EXTRA_CHAT, file_id, caption=caption_text, parse_mode="Markdown")
+
+                    # ====== MEDIA: VIDEO ======
+                    elif file_type == "video":
+                        await message.bot.send_video(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
+                        await message.bot.send_video(FREE_EXTRA_CHAT, file_id, caption=caption_text, parse_mode="Markdown")
+
+                    # ====== MEDIA: CIRCLE ======
+                    elif file_type == "circle":
+                        await message.bot.send_video_note(target_chat, file_id)
+                        await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+
+                        await message.bot.send_video_note(FREE_EXTRA_CHAT, file_id)
+                        await message.bot.send_message(FREE_EXTRA_CHAT, caption_text, parse_mode="Markdown")
+
+            # =============================
+            # Челлендж-сообщение
+            # =============================
             if result.get("challenge_message"):
                 await message.answer(result["challenge_message"], parse_mode="Markdown")
 
         except Exception as e:
             logging.error(f"[QUEUE PROCESSING ERROR] {e}")
             await message.answer("⚠️ Ошибка обработки подтверждения. Мы исправим это.")
-

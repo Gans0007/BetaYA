@@ -56,12 +56,12 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         if affiliate_id:
             logging.info(f"[NEED TO PAY] Реферал подтверждён. Партнёр {affiliate_id} получает +$0.50")
 
-            await affiliate_service.activate_referral(user_id, 0.50)
+            await affiliate_service.activate_referral(user_id, 1)
 
             try:
                 await callback.message.bot.send_message(
                     affiliate_id,
-                    "🔥 Твой реферал продлил подписку!\n💰 Тебе начислено $0.50"
+                    "🔥 Твой реферал продлил подписку!\n💰 Тебе начислено $1"
                 )
             except:
                 logging.warning(f"[NEED TO PAY] Не удалось отправить уведомление партнёру {affiliate_id}")

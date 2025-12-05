@@ -77,12 +77,14 @@ class AffiliateService:
         stats = await repo.get_affiliate_stats(user_id)
         code = await repo.get_referral_code(user_id)
         payments = await repo.get_payments(user_id)
+        paid_out = await repo.get_paid_out(user_id)
 
         return {
             "code": code,
             "invited": stats["invited"],
             "active": stats["active"],
             "payments": payments,
+            "paid_out": paid_out,
         }
 
 

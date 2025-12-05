@@ -189,3 +189,15 @@ async def mark_referral_inactive(user_id: int) -> None:
             WHERE user_id = $1
         """, user_id)
 
+# ------------------------------------------
+# КОЛОНКА ВЫПЛАТ
+# ------------------------------------------
+async def get_paid_out(user_id: int) -> float:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval("""
+            SELECT paid_out
+            FROM users
+            WHERE user_id = $1
+        """, user_id) or 0
+

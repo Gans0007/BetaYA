@@ -3,11 +3,12 @@
 # ================================
 
 import asyncio
-from database import get_pool
+from database import get_pool, close_pool, create_pool
 from services.honor_global_service import get_global_rank
 from datetime import datetime, timezone
 import pytz
 import logging
+import asyncpg
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,26 @@ async def honor_global_rank_daily(bot):
     В 00:05 вызывает перерасчёт рейтинга.
     """
     while True:
-        await process_all_users(bot)
+        try:
+            await process_all_users(bot)
+
+        except (asyncpg.exceptions.ConnectionDoesNotExistError,
+                ConnectionResetError,
+                OSError) as e:
+            logger.error(f"[HONOR GLOBAL ERROR] Потеряно соединение с БД: {e}")
+            logger.info("🔄 Пересоздаю пул соединений...")
+
+            try:
+                await close_pool()
+                await create_pool()
+                logger.info("✅ Пул успешно пересоздан")
+
+            except Exception as e2:
+                logger.error(f"❌ Ошибка пересоздания пула: {e2}")
+
+        except Exception as e:
+            logger.error(f"[HONOR GLOBAL UNEXPECTED ERROR] {e}")
+
         await asyncio.sleep(60)
 
 
@@ -51,21 +71,20 @@ async def process_user_rank(bot, user, now_utc):
     local_time = now_utc.astimezone(tz)
     today = local_time.date()
 
-    #Не время — выходим
     if not (local_time.hour == 0 and local_time.minute == 5):
         return
 
+    logger.info(f"[GLOBAL] Запуск расчёта рейтинга для user_id={user_id}")
 
-    # Уже проверяли сегодня — выходим
+
     if last_date == today:
         return
 
-    # Считаем глобальное место
     rank = await get_global_rank(user_id)
     if rank is None:
         return
 
-    # ======= 1) ПЕРВЫЙ РАЗ =======
+    # ======= 1) Первая отправка =======
     if last_rank is None:
         try:
             await bot.send_message(
@@ -80,7 +99,6 @@ async def process_user_rank(bot, user, now_utc):
         except Exception as e:
             logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
 
-        # записываем метку в БД
         pool = await get_pool()
         async with pool.acquire() as conn:
             await conn.execute("""
@@ -90,15 +108,12 @@ async def process_user_rank(bot, user, now_utc):
                 WHERE user_id = $1
             """, user_id, rank, today)
 
-        logger.info(f"[GLOBAL] стартовое место отправлено юзеру {user_id}")
         return
 
-    # ======= 2) СРАВНИВАЕМ =======
+    # ======= 2) Сравниваем =======
     delta = last_rank - rank
 
-    # ======= 3) СНАЧАЛА отправляем УВЕДОМЛЕНИЕ =======
     if delta > 0:
-        # улучшение
         msg = (
             f"📈 Ты поднялся в глобальном рейтинге!\n"
             f"Было место: {last_rank}\n"
@@ -106,7 +121,6 @@ async def process_user_rank(bot, user, now_utc):
             f"Ты улучшил позицию на {delta}! 🔥"
         )
     elif delta < 0:
-        # ухудшение
         msg = (
             f"📉 Ты немного просел в глобальном рейтинге.\n"
             f"Было место: {last_rank}\n"
@@ -114,7 +128,6 @@ async def process_user_rank(bot, user, now_utc):
             f"Ты потерял {abs(delta)} позиций."
         )
     else:
-        # то же место
         msg = (
             f"➡ Ты сохранил своё место в рейтинге: {rank}\n"
             f"Стабильность — уже результат 💪"
@@ -129,15 +142,12 @@ async def process_user_rank(bot, user, now_utc):
         )
         logger.info(f"[GLOBAL] уведомление отправлено юзеру {user_id}")
 
-        # маленькая задержка, чтобы Telegram не резал по лимитам
         await asyncio.sleep(0.1)
 
     except Exception as e:
         logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
 
-
-
-    # ======= 4) ПОСЛЕ — обновляем в БД =======
+    # ======= 3) Обновляем БД =======
     pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.execute("""

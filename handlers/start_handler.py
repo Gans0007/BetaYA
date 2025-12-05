@@ -56,7 +56,18 @@ def extract_referral_code(message: types.Message) -> str | None:
 
 @router.message(CommandStart())
 async def start_command(message: types.Message, state: FSMContext):
-    logging.info(f"🚀 /start от user_id={message.from_user.id}")
+    logging.info(f"🚀 /start от user_id={message.from_user.id} (chat_type={message.chat.type})")
+
+    # 🔥 Блокируем /start в группах и каналах
+    if message.chat.type != "private":
+        logging.warning(
+            f"⛔ /start заблокирован! user_id={message.from_user.id}, "
+            f"username=@{message.from_user.username}, chat_id={message.chat.id}, "
+            f"chat_type={message.chat.type}"
+        )
+        await message.answer("⚠️ Команду /start можно использовать только в личном чате с ботом.")
+        return
+
 
     user_timezone = "Europe/Kyiv"
     if message.from_user and message.from_user.language_code == "en":
