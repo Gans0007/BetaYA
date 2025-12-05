@@ -28,6 +28,7 @@ async def create_users_table():
                 referral_code TEXT,
                 is_affiliate BOOLEAN DEFAULT FALSE,
                 payments DOUBLE PRECISION DEFAULT 0,
+                paid_out DOUBLE PRECISION DEFAULT 0,    
                 has_access BOOLEAN DEFAULT TRUE,
                 access_until TIMESTAMPTZ,
                 last_global_rank INTEGER,
