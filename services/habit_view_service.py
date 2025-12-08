@@ -173,7 +173,7 @@ async def build_active_list(user_id: int):
             SELECT id, name, is_challenge
             FROM habits
             WHERE user_id=$1 AND is_active=TRUE
-            ORDER BY is_challenge DESC, created_at DESC
+            ORDER BY created_at ASC
         """, user_id)
 
     if not rows:

@@ -33,7 +33,7 @@ async def show_active_tasks(message: types.Message):
             FROM habits h
             JOIN users u ON u.user_id = h.user_id
             WHERE h.user_id = $1 AND h.is_active = TRUE
-            ORDER BY h.is_challenge DESC, h.created_at DESC
+            ORDER BY h.created_at ASC
         """, user_id)
 
     # Нет активных привычек
@@ -111,7 +111,7 @@ async def back_from_card(callback: types.CallbackQuery):
             FROM habits h
             JOIN users u ON u.user_id=h.user_id
             WHERE h.user_id=$1 AND h.is_active=TRUE
-            ORDER BY h.is_challenge DESC, h.created_at DESC
+            ORDER BY h.created_at ASC
         """, user_id)
 
     # 🔹 0 привычек
@@ -219,7 +219,7 @@ async def delete_habit(callback: types.CallbackQuery):
             FROM habits h
             JOIN users u ON u.user_id=h.user_id
             WHERE h.user_id=$1 AND h.is_active=TRUE
-            ORDER BY h.is_challenge DESC, h.created_at DESC
+            ORDER BY h.created_at ASC
         """, user_id)
 
     # ---------------------------------------------------
