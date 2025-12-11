@@ -31,7 +31,7 @@ router = Router()
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
 
@@ -104,26 +104,43 @@ async def receive_media(message: types.Message, state: FSMContext):
     reverify = data["reverify"]
     user_id = message.from_user.id
 
-    logging.info(f"[CONFIRM] Пользователь {user_id} отправил медиа для привычки {habit_id}")
+    logging.info(f"[MEDIA] Пользователь {user_id} отправил медиа для привычки {habit_id}")
 
-    # Получаем file_id
+    # PHOTO
     if message.photo:
         file_id = message.photo[-1].file_id
         file_type = "photo"
+        logging.info(f"[MEDIA] Фото получено. file_id={file_id}")
+
+    # VIDEO + SIZE CHECK
     elif message.video:
+        max_video_size = 25 * 1024 * 1024  # 25 MB
+        video_size = message.video.file_size or 0
+
+        logging.info(f"[MEDIA] Видео получено. file_id={message.video.file_id}, size={video_size} bytes")
+
+        if video_size > max_video_size:
+            logging.warning(f"[MEDIA] Видео отклонено! Размер {video_size} > {max_video_size}")
+            await message.answer("⚠️ Видео слишком большое. Максимум — 25 МБ.")
+            return
+
         file_id = message.video.file_id
         file_type = "video"
+
+    # CIRCLE VIDEO
     elif message.video_note:
         file_id = message.video_note.file_id
         file_type = "circle"
+        logging.info(f"[MEDIA] Кружочек получен. file_id={file_id}")
+
     else:
-        logging.warning(f"[CONFIRM] Пользователь {user_id} отправил неподдерживаемый файл")
+        logging.warning(f"[MEDIA] Пользователь {user_id} прислал неподдерживаемый тип")
         await message.answer("⚠️ Нужно фото, видео или кружочек 🎥")
         return
 
-    logging.info(f"[CONFIRM] Получен файл типа: {file_type} от пользователя {user_id}")
+    # Добавляем задачу в очередь
+    logging.info(f"[QUEUE] Добавляем задачу в очередь: user={user_id}, habit={habit_id}, type={file_type}")
 
-    # 📌 ставим задачу в очередь
     await QUEUE_CONFIRM.put({
         "user_id": user_id,
         "habit_id": habit_id,
@@ -134,12 +151,11 @@ async def receive_media(message: types.Message, state: FSMContext):
     })
 
     await message.answer("⏳ Подтверждение принято в обработку...")
-
     await state.clear()
 
 
 # ================================
-# 🔥 Обработчик очереди
+# 🔥 Обработчик очереди (НОВАЯ ЛОГИКА)
 # ================================
 async def process_task_from_queue(task):
     message = task["message"]
@@ -149,16 +165,14 @@ async def process_task_from_queue(task):
     file_id = task["file_id"]
     file_type = task["file_type"]
 
-    # 🔥 Чаты
-    FREE_MAIN_CHAT = -1002375148535       # бесплатный основной
-    FREE_EXTRA_CHAT = -1002435430482      # бесплатный дополнительный (дублирование)
+    FREE_MAIN_CHAT = -1002375148535
+    # FREE_EXTRA_CHAT = -1002435430482 
+
+    logging.info(f"[QUEUE] Начата обработка задачи: user={user_id}, habit={habit_id}, type={file_type}")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
         try:
-            # =============================
-            # ЛОГИКА ОБРАБОТКИ HABIT
-            # =============================
             result = await habit_service.process_confirmation_media(
                 conn=conn,
                 user_id=user_id,
@@ -168,74 +182,44 @@ async def process_task_from_queue(task):
                 reverify=reverify,
             )
 
-            if result.get("error") == "HABIT_NOT_FOUND":
+            if result.get("error"):
+                logging.warning(f"[QUEUE] Ошибка: привычка {habit_id} не найдена")
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
-            # Сообщение пользователю
-            await message.answer(result["self_message"])
+            logging.info(f"[QUEUE] Сообщение пользователю отправлено.")
 
             caption_text = result["caption_text"]
-            target_chat = result["target_chat"]    # уже рассчитан choose_target_chat()
             share_allowed = result["share_allowed"]
 
-            # =============================
-            # ЛОГИКА ОТПРАВКИ В ЧАТЫ
-            # =============================
-            async def send_to_two_chats(send_action):
-                """
-                Хелпер: отправляет одновременно в бесплатный основной и дополнительный.
-                send_action — функция отправки.
-                """
-                await send_action(target_chat)
-                await send_action(FREE_EXTRA_CHAT)
+            async def send_to_chat(chat_id):
+                logging.info(f"[SEND] Отправка в чат {chat_id} (type={file_type})")
 
-            # ======= Платные пользователи =======
-            if target_chat != FREE_MAIN_CHAT:
-                # Платник → только в один чат
                 if not share_allowed:
-                    await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
-                else:
-                    if file_type == "photo":
-                        await message.bot.send_photo(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
-                    elif file_type == "video":
-                        await message.bot.send_video(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
-                    elif file_type == "circle":
-                        await message.bot.send_video_note(target_chat, file_id)
-                        await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
+                    logging.info(f"[SEND] Текст отправлен в чат {chat_id}")
+                    return
 
-            # ======= БЕСПЛАТНЫЕ → отправляем в 2 чата =======
-            else:
-                if not share_allowed:
-                    # ====== ТЕКСТ ======
-                    await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
-                    await message.bot.send_message(FREE_EXTRA_CHAT, caption_text, parse_mode="Markdown")
+                if file_type == "photo":
+                    await message.bot.send_photo(chat_id, file_id, caption=caption_text, parse_mode="Markdown")
+                elif file_type == "video":
+                    await message.bot.send_video(chat_id, file_id, caption=caption_text, parse_mode="Markdown")
+                elif file_type == "circle":
+                    await message.bot.send_video_note(chat_id, file_id)
+                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
 
-                else:
-                    # ====== MEDIA: PHOTO ======
-                    if file_type == "photo":
-                        await message.bot.send_photo(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
-                        await message.bot.send_photo(FREE_EXTRA_CHAT, file_id, caption=caption_text, parse_mode="Markdown")
+                logging.info(f"[SEND] Медиа отправлено в чат {chat_id}")
 
-                    # ====== MEDIA: VIDEO ======
-                    elif file_type == "video":
-                        await message.bot.send_video(target_chat, file_id, caption=caption_text, parse_mode="Markdown")
-                        await message.bot.send_video(FREE_EXTRA_CHAT, file_id, caption=caption_text, parse_mode="Markdown")
+            await send_to_chat(FREE_MAIN_CHAT)
 
-                    # ====== MEDIA: CIRCLE ======
-                    elif file_type == "circle":
-                        await message.bot.send_video_note(target_chat, file_id)
-                        await message.bot.send_message(target_chat, caption_text, parse_mode="Markdown")
+            # 🔥 И автоматически дублируем в дополнительный чат
+            #logging.info(f"[SEND] Дублирование медиа в дополнительный чат {FREE_EXTRA_CHAT}")
+            #await send_to_chat(FREE_EXTRA_CHAT)
 
-                        await message.bot.send_video_note(FREE_EXTRA_CHAT, file_id)
-                        await message.bot.send_message(FREE_EXTRA_CHAT, caption_text, parse_mode="Markdown")
-
-            # =============================
-            # Челлендж-сообщение
-            # =============================
             if result.get("challenge_message"):
+                logging.info(f"[CHALLENGE] Челлендж завершен, отправляем уведомление.")
                 await message.answer(result["challenge_message"], parse_mode="Markdown")
 
         except Exception as e:
-            logging.error(f"[QUEUE PROCESSING ERROR] {e}")
+            logging.error(f"[QUEUE PROCESSING ERROR] {e}", exc_info=True)
             await message.answer("⚠️ Ошибка обработки подтверждения. Мы исправим это.")

@@ -98,21 +98,6 @@ async def get_user_notification_data(conn, user_id: int):
     """, user_id)
 
 
-
-def choose_target_chat(user_row) -> int:
-    has_access = user_row["has_access"]
-    access_until = user_row["access_until"]
-
-    sub_active = bool(
-        has_access and
-        access_until and
-        access_until > datetime.now(timezone.utc)
-    )
-
-    # те же самые chat_id, что и в исходнике
-    return -1002392347850 if sub_active else -1002375148535
-
-
 async def get_habit_progress(conn, habit_id: int):
     return await conn.fetchrow("""
         SELECT name, days, done_days 

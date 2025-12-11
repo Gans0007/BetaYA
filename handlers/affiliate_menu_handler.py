@@ -11,51 +11,44 @@ logging.basicConfig(
     format="%(asctime)s - %(message)s",
 )
 
+# -------------------------------------------------
+# 🧩 Утилита — красиво показывать имя пользователя
+# -------------------------------------------------
+def format_user(row):
+    username = row.get("username")
+    nickname = row.get("nickname")
+    user_id = row.get("user_id")
 
-# -------------------------------
+    if username:
+        return f"@{username}"
+    if nickname:
+        return f"{nickname}"
+    return f"ID:{user_id}"
+
+
+# -------------------------------------------------
 # 💼 Меню партнёрки
-# -------------------------------
+# -------------------------------------------------
 @router.callback_query(lambda c: c.data == "affiliate_menu")
 async def show_affiliate_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     logging.info(f"[AFFILIATE] Пользователь {user_id} открыл меню партнёрки")
 
     dashboard = await affiliate_service.get_affiliate_dashboard(user_id)
-
     code = dashboard["code"]
-
-    if not code:
-        logging.info(f"[AFFILIATE] У пользователя {user_id} нет реферального кода — партнёрка не активирована")
-        text = (
-            "💼 *Партнёрка*\n\n"
-            "Пока у тебя не задан реферальный код.\n"
-            "Напиши админу, чтобы он выдал тебе партнёрку."
-        )
-        kb = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_profile_menu")]
-            ]
-        )
-        await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
-        await callback.answer()
-        return
-
-    logging.info(f"[AFFILIATE] Код пользователя {user_id}: {code} — партнёрка активна")
 
     bot_username = (await callback.message.bot.get_me()).username
     ref_link = f"https://t.me/{bot_username}?start={code}"
 
     text = (
-        "💼 *Партнёрка*\n\n"
-        f"🔗 Твой реферальный код:\n`{code}`\n\n"
-        f"👥 Приглашено всего: *{dashboard['invited']}*\n"
-        f"🔥 Активных пользователей: *{dashboard['active']}*\n\n"
-        f"💰 Заработано: *{dashboard['payments']}$*\n"
-        f"🏦 Выплачено: *{dashboard['paid_out']}$*\n\n"
-        "Твоя реферальная ссылка:\n"
-        f"{ref_link}\n\n"
-        "Когда твои люди становятся *активными*,\n"
-        "ты *зарабатываешь 20%* от стоимости подписки.💰"
+        "💼 Партнёрская программа\n\n"
+        f"🔗 Твой реферальный код: {code}\n"
+        f"🌐 Реферальная ссылка:\n{ref_link}\n\n"
+        f"👥 Всего приглашено: {dashboard['invited']}\n"
+        f"🔥 Активных: {dashboard['active']}\n\n"
+        f"💰 Заработано: {dashboard['payments']}$\n"
+        f"🏦 Выплачено: {dashboard['paid_out']}$\n\n"
+        "Ты получаешь 20% от стоимости подписки за каждого активного реферала."
     )
 
     kb = InlineKeyboardMarkup(
@@ -66,13 +59,13 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
         ]
     )
 
-    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 
 
-# -------------------------------
+# -------------------------------------------------
 # 👥 Список рефералов
-# -------------------------------
+# -------------------------------------------------
 @router.callback_query(lambda c: c.data == "affiliate_referrals_list")
 async def show_affiliate_referrals(callback: types.CallbackQuery):
     user_id = callback.from_user.id
@@ -81,14 +74,13 @@ async def show_affiliate_referrals(callback: types.CallbackQuery):
     referrals = await affiliate_service.get_my_referrals(user_id)
 
     if not referrals:
-        logging.info(f"[AFFILIATE] У пользователя {user_id} нет рефералов")
-        text = "У тебя пока нет рефералов 😔"
+        text = "😔 У тебя пока нет рефералов."
     else:
-        logging.info(f"[AFFILIATE] У пользователя {user_id} найдено {len(referrals)} рефералов")
-        text = "👥 *Твои рефералы:*\n\n"
+        text = "👥 Твои рефералы:\n\n"
         for r in referrals:
+            name = format_user(r)
             status = "🟢 активен" if r["is_active"] else "🔴 не активен"
-            text += f"@{r['username']} — {status}\n"
+            text += f"{name} — {status}\n"
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -96,28 +88,32 @@ async def show_affiliate_referrals(callback: types.CallbackQuery):
         ]
     )
 
-    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 
 
-# -------------------------------
+# -------------------------------------------------
 # 💰 История выплат
-# -------------------------------
+# -------------------------------------------------
 @router.callback_query(lambda c: c.data == "affiliate_payments_list")
 async def show_affiliate_payments(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    logging.info(f"[AFFILIATE] Пользователь {user_id} смотрит историю выплат")
+    logging.info(f"[AFFILIATE] Пользователь {user_id} смотрит выплаты")
 
     payments = await affiliate_service.get_affiliate_payments_list(user_id)
 
     if not payments:
-        logging.info(f"[AFFILIATE] У пользователя {user_id} не было выплат")
-        text = "Пока ещё не было активных рефералов 💸"
+        text = "💸 Пока ещё не было активных рефералов."
     else:
-        logging.info(f"[AFFILIATE] У пользователя {user_id} найдено {len(payments)} выплат(ы)")
-        text = "💰 *Зачисления:*\n\n"
+        text = "💰 Выплаты:\n\n"
         for p in payments:
-            text += f"@{p['username']} активировался — ты получил выплату\n"
+            name = format_user(p)
+            amount = p.get("amount", "?")
+            created_at = p.get("created_at")
+
+            date_text = created_at.strftime("%d.%m.%Y") if created_at else ""
+
+            text += f"• {name} → +{amount}$ ({date_text})\n"
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -125,5 +121,5 @@ async def show_affiliate_payments(callback: types.CallbackQuery):
         ]
     )
 
-    await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
+    await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()

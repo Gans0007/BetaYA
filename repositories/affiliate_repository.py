@@ -201,3 +201,23 @@ async def get_paid_out(user_id: int) -> float:
             WHERE user_id = $1
         """, user_id) or 0
 
+
+# ------------------------------------------
+# Генерация реферального кода (user_id)
+# ------------------------------------------
+async def generate_referral_code(user_id: int):
+    return str(user_id)
+
+# ------------------------------------------
+# Присвоить пользователю реферальный код
+# ------------------------------------------
+async def assign_referral_code(user_id: int, code: str):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE users
+            SET referral_code = $1
+            WHERE user_id = $2
+        """, code, user_id)
+
+

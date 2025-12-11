@@ -2,8 +2,6 @@ from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
-from services.profile_menu_service import profile_service
-
 router = Router()
 
 logging.basicConfig(
@@ -20,18 +18,15 @@ async def show_profile_menu(message: types.Message):
     user_id = message.from_user.id
     logging.info(f"[MENU PROFILE] Пользователь {user_id} открыл меню профиля")
 
-    is_affiliate = await profile_service.user_is_affiliate(user_id)
-
-    row = [
-        InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
-        InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
-    ]
-
-    if is_affiliate:
-        logging.info(f"[MENU PROFILE] Показываю пункт партнёрка пользователю {user_id}")
-        row.append(InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"))
-
-    kb = InlineKeyboardMarkup(inline_keyboard=[row])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
+                InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
+                InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"),
+            ]
+        ]
+    )
 
     await message.answer(
         "👤 *Профиль*\n\nВыбери нужный раздел:",
@@ -48,18 +43,15 @@ async def back_to_profile_menu(callback: types.CallbackQuery):
     user_id = callback.from_user.id
     logging.info(f"[MENU PROFILE] Пользователь {user_id} вернулся в меню профиля")
 
-    is_affiliate = await profile_service.user_is_affiliate(user_id)
-
-    row = [
-        InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
-        InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
-    ]
-
-    if is_affiliate:
-        logging.info(f"[MENU PROFILE] Показываю пункт партнёрка пользователю {user_id}")
-        row.append(InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"))
-
-    kb = InlineKeyboardMarkup(inline_keyboard=[row])
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
+                InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
+                InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"),
+            ]
+        ]
+    )
 
     await callback.message.edit_text(
         "👤 *Профиль*\n\nВыбери нужный раздел:",

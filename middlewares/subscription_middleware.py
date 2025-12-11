@@ -112,7 +112,7 @@ class SubscriptionMiddleware(BaseMiddleware):
 
             affiliate_id = await get_affiliate_for_user(user_id)
 
-            if affiliate_id and has_access and access_until >= now:
+            if affiliate_id and has_access and access_until and access_until >= now:
                 # Пробуем активировать реферальную подписку
                 await affiliate_service.activate_referral(user_id, 0.50)
 

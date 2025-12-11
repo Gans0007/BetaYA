@@ -26,7 +26,6 @@ async def create_users_table():
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW(),
                 referral_code TEXT,
-                is_affiliate BOOLEAN DEFAULT FALSE,
                 payments DOUBLE PRECISION DEFAULT 0,
                 paid_out DOUBLE PRECISION DEFAULT 0,    
                 has_access BOOLEAN DEFAULT TRUE,

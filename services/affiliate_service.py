@@ -10,72 +10,60 @@ class AffiliateService:
         """
         Возвращает:
         True — реферал успешно присвоен
-        False — не присваиваем (код не найден, или уже есть реферал)
+        False — код не найден, или уже есть реферал, или код свой
         """
 
-        # найти владельца реф-кода
         affiliate_id = await repo.get_affiliate_by_code(referral_code)
         if not affiliate_id:
             return False
 
-        # нельзя быть рефералом самого себя
         if affiliate_id == user_id:
             return False
 
-        # проверяем — уже являешься чьим-то рефералом?
         if await repo.user_already_has_affiliate(user_id):
             return False
 
-        # записываем
         await repo.create_referral(affiliate_id, user_id)
         return True
-
 
     # -----------------------------------------
     # 🟢 Сделать реферала активным
     # -----------------------------------------
     async def activate_referral(self, user_id: int, bonus_amount: float = 0):
-        """
-        Активирует реферала.
-        По желанию начисляет бонус партнёру.
-        """
-
         affiliate_id = await repo.get_affiliate_for_user(user_id)
         if not affiliate_id:
             return False
 
-        # обновляем статус
         await repo.mark_referral_active(user_id)
 
-        # начисление денег партнёру
         if bonus_amount > 0:
             await repo.add_payment_to_affiliate(affiliate_id, bonus_amount)
 
         return True
 
-
     # -----------------------------------------
     # 🔴 Сделать реферала неактивным
     # -----------------------------------------
     async def deactivate_referral(self, user_id: int):
-        """
-        Убирает активный статус у реферала.
-        """
-
         await repo.mark_referral_inactive(user_id)
         return True
-
 
     # -----------------------------------------
     # 📊 Получить отображаемую инфу для меню
     # -----------------------------------------
     async def get_affiliate_dashboard(self, user_id: int):
-        """
-        Возвращает словарь с данными для UI.
-        """
 
-        stats = await repo.get_affiliate_stats(user_id)
+        # 1️⃣ Получаем текущий реферальный код
         code = await repo.get_referral_code(user_id)
+
+        # 2️⃣ Если нет — создаём на основе user_id
+        if not code:
+            new_code = await repo.generate_referral_code(user_id)
+            await repo.assign_referral_code(user_id, new_code)
+            code = new_code
+
+        # 3️⃣ Статистика
+        stats = await repo.get_affiliate_stats(user_id)
         payments = await repo.get_payments(user_id)
         paid_out = await repo.get_paid_out(user_id)
 
@@ -87,34 +75,17 @@ class AffiliateService:
             "paid_out": paid_out,
         }
 
-
     # -----------------------------------------
-    # 📜 Получить список рефералов (для UI)
+    # 📜 Получить список рефералов
     # -----------------------------------------
     async def get_my_referrals(self, user_id: int):
-        """
-        Возвращает список словарей:
-        {
-            "user_id":,
-            "registered_at":,
-            "is_active":,
-            "active_at":,
-            "username":
-        }
-        """
-
         rows = await repo.get_referrals_list(user_id)
         return [dict(row) for row in rows]
 
-
     # -----------------------------------------
-    # 💰 Получить историю выплат (для UI)
+    # 💰 Получить историю выплат
     # -----------------------------------------
     async def get_affiliate_payments_list(self, user_id: int):
-        """
-        Возвращает историю выплат.
-        """
-
         rows = await repo.get_payments_list(user_id)
         return [dict(row) for row in rows]
 

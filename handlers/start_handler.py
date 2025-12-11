@@ -14,6 +14,8 @@ from repositories.affiliate_repository import (
     create_referral,
     user_already_has_affiliate,
     user_exists_in_users_table,
+    generate_referral_code,  
+    assign_referral_code 
 )
 
 # -------------------------------
@@ -68,23 +70,23 @@ async def start_command(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Команду /start можно использовать только в личном чате с ботом.")
         return
 
-
+    # Определяем timezone
     user_timezone = "Europe/Kyiv"
-    if message.from_user and message.from_user.language_code == "en":
+    if message.from_user.language_code == "en":
         user_timezone = "Europe/London"
-    elif message.from_user and message.from_user.language_code == "uk":
-        user_timezone = "Europe/Kyiv"
-    elif message.from_user and message.from_user.language_code == "ru":
+    elif message.from_user.language_code == "ru":
         user_timezone = "Europe/Moscow"
-
-    logging.info(f"🌍 Язык пользователя: {message.from_user.language_code}, timezone={user_timezone}")
 
     ref_code = extract_referral_code(message)
     user_id = message.from_user.id
 
+        # Есть ли этот пользователь в БД?
     existed_before = await user_exists_in_users_table(user_id)
     logging.info(f"👤 existed_before={existed_before}")
 
+    # -----------------------------
+    # 1. СОЗДАЕМ ПОЛЬЗОВАТЕЛЯ
+    # -----------------------------
     pool = await get_pool()
     async with pool.acquire() as conn:
         logging.info("💾 Открыто соединение с БД")
@@ -103,42 +105,53 @@ async def start_command(message: types.Message, state: FSMContext):
             message.from_user.first_name,
             user_timezone,
         )
-        logging.info(f"💾 Пользователь сохранён/обновлён в БД: {user_id}")
 
-        if ref_code:
-            logging.info(f"🔍 Проверяем аффилиейт-код: {ref_code}")
-            affiliate_id = await get_affiliate_by_code(ref_code)
+    logging.info(f"💾 Пользователь сохранён/обновлён в БД: {user_id}")
 
-            logging.info(f"👥 affiliate_id={affiliate_id}")
+    # -----------------------------
+    # 2. ОБРАБОТКА РЕФЕРАЛКИ (ПОСЛЕ СОЗДАНИЯ!)
+    # -----------------------------
+    if ref_code and not existed_before:
+        logging.info(f"🔍 Проверяем аффилиейт-код: {ref_code}")
+        affiliate_id = await get_affiliate_by_code(ref_code)
+        logging.info(f"👥 affiliate_id={affiliate_id}")
 
-            if affiliate_id and affiliate_id != user_id:
-                if existed_before:
-                    logging.info("⛔ Пользователь не новый — рефералка НЕ присваивается")
-                    pass
-                else:
-                    already = await user_already_has_affiliate(user_id)
-                    logging.info(f"🔍 Проверка: есть ли уже реферал? {already}")
+        if affiliate_id and affiliate_id != user_id:
+            already = await user_already_has_affiliate(user_id)
 
-                    if not already:
-                        await create_referral(
-                            affiliate_id=affiliate_id,
-                            user_id=user_id
-                        )
-                        logging.info(f"🎊 Реферал создан: {affiliate_id} ← {user_id}")
+            if not already:
+                await create_referral(affiliate_id, user_id)
+                logging.info(f"🎊 Реферал создан: {affiliate_id} ← {user_id}")
 
-                        try:
-                            await message.bot.send_message(
-                                affiliate_id,
-                                f"🎉 У тебя новый реферал: @{message.from_user.username or user_id}"
-                            )
-                            logging.info(f"📨 Уведомление рефереру отправлено: {affiliate_id}")
-                        except Exception as e:
-                            logging.error(f"❗ Ошибка отправки уведомления рефереру: {e}")
+                try:
+                    await message.bot.send_message(
+                        affiliate_id,
+                        f"🎉 У тебя новый реферал: @{message.from_user.username or user_id}"
+                    )
+                except Exception as e:
+                    logging.error(f"❗ Ошибка отправки уведомления рефереру: {e}")
+
+    # -----------------------------
+    # 3. ГЕНЕРАЦИЯ РЕФЕРАЛЬНОГО КОДА
+    # -----------------------------
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        current_code = await conn.fetchval(
+            "SELECT referral_code FROM users WHERE user_id = $1",
+            user_id
+        )
+
+        if not current_code:
+            new_code = await generate_referral_code(user_id)
+            await assign_referral_code(user_id, new_code)
+            logging.info(f"🎯 Пользователю {user_id} присвоен рефкод: {new_code}")
 
         nickname = await conn.fetchval(
-            "SELECT nickname FROM users WHERE user_id = $1", user_id
+            "SELECT nickname FROM users WHERE user_id = $1",
+            user_id
         )
         logging.info(f"🔎 Nickname найден: {nickname}")
+
 
     if not nickname:
         logging.info("📝 Никнейма нет — просим пользователя ввести")
