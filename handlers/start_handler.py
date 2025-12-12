@@ -1,6 +1,7 @@
 import pytz
 import logging
 from aiogram import F
+from html import escape
 from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import CommandStart
@@ -17,6 +18,10 @@ from repositories.affiliate_repository import (
     generate_referral_code,  
     assign_referral_code 
 )
+
+
+
+
 
 # -------------------------------
 # 🔹 LOGGING
@@ -80,7 +85,7 @@ async def start_command(message: types.Message, state: FSMContext):
     ref_code = extract_referral_code(message)
     user_id = message.from_user.id
 
-        # Есть ли этот пользователь в БД?
+    # Есть ли этот пользователь в БД?
     existed_before = await user_exists_in_users_table(user_id)
     logging.info(f"👤 existed_before={existed_before}")
 
@@ -165,21 +170,11 @@ async def start_command(message: types.Message, state: FSMContext):
 
     logging.info("📲 Ник существует — показываем меню пользователю")
     await message.answer(
-        "<b>Привет! ✌️ Я — Your Ambitions бот.</b>\n\n"
-        "<b>Первый в своем роде трекер привычек онлайн. Ты видишь всех - все видят тебя. Развиваемся вместе!</b>\n\n"
-        "<b>Я могу быть кем тебе удобно:</b>\n"
-        "🤝 <b>другом</b>, который поддержит и не осудит,\n"
-        "🎮 <b>игрой</b>, в которой ты прокачиваешь себя,\n"
-        "⚔️ <b>спартанцем</b>, который заставит не сдаваться,\n"
-        "🧠 <b>наставником</b>, который помогает расти,\n"
-        "📓 или даже <b>личной зачёткой</b>, где записаны твои победы.\n\n"
-        "<b>Я буду напоминать о привычках, вести твой прогресс и помогать держать дисциплину каждый день.</b>\n"
-        "Давай топить вместе, братуха. Ты не один — я рядом. 💪🔥\n\n"
-        "<b>Начни с добавления привычки или челленджа.</b>\n"
-        "Настроить мой стиль поведения и тон уведомлений можешь в «Профиль → Настройки».",
+        welcome_text(nickname),
         reply_markup=main_menu_kb(),
         parse_mode="HTML"
     )
+
 
 
 @router.message(NicknameFSM.waiting_for_nickname)
@@ -190,6 +185,9 @@ async def process_nickname(message: types.Message, state: FSMContext):
 
     if nickname.startswith("@"):
         nickname = nickname[1:]
+
+    # 🔐 Защита от HTML (<b>boss</b> и т.п.)
+    nickname = escape(nickname)
 
     if not nickname:
         logging.info("❗ Пустой никнейм")
@@ -225,7 +223,19 @@ async def process_nickname(message: types.Message, state: FSMContext):
 
     logging.info("🎉 Ник успешно установлен, показываем меню")
     await message.answer(
-        f"<b>Отлично, {nickname}! ✌️ Я — Your Ambitions бот.</b>\n\n"
+        welcome_text(nickname),
+        reply_markup=main_menu_kb(),
+        parse_mode="HTML"
+    )
+
+    logging.info("🧼 FSM cleared")
+    await state.clear()
+
+
+def welcome_text(nickname: str | None = None) -> str:
+    name = f"{nickname}! " if nickname else ""
+    return (
+        f"<b>Отлично, {name}✌️ Я — Your Ambitions бот.</b>\n\n"
         "<b>Я могу быть кем тебе удобно:</b>\n"
         "🤝 <b>другом</b>, который поддержит и не осудит,\n"
         "🎮 <b>игрой</b>, в которой ты прокачиваешь себя,\n"
@@ -235,9 +245,7 @@ async def process_nickname(message: types.Message, state: FSMContext):
         "<b>Я буду напоминать о привычках, вести твой прогресс и помогать держать дисциплину каждый день.</b>\n"
         "Давай топить вместе, братуха. Ты не один — я рядом. 💪🔥\n\n"
         "<b>Начни с добавления привычки или челленджа.</b>\n"
-        "Настроить мой стиль поведения и тон уведомлений можешь в «Профиль → Настройки».",
-        reply_markup=main_menu_kb(),
-        parse_mode="HTML"
+        "Настроить мой стиль поведения и тон уведомлений можешь в «Профиль → Настройки».\n\n"
+        "💬 <b>Общий чат комьюнити:</b>\n"
+        "👉 <a href=\"https://t.me/yourambitions_chat\">Your Ambitions Chat</a>"
     )
-    logging.info("🧼 FSM cleared")
-    await state.clear()
