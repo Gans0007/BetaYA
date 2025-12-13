@@ -187,6 +187,14 @@ async def process_task_from_queue(task):
                 await message.answer("⚠️ Эта привычка уже завершена.")
                 return
 
+            if result.get("self_message"):
+                await message.answer(result["self_message"], parse_mode="Markdown")
+                logging.info(
+                    f"[XP][USER_NOTIFY] user={user_id} habit={habit_id} "
+                    f"message_sent=True reverify={reverify}"
+                )
+
+
             logging.info(f"[QUEUE] Сообщение пользователю отправлено.")
 
             caption_text = result["caption_text"]
