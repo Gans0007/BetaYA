@@ -210,6 +210,12 @@ class HabitService:
             text += "Продолжаем доминировать 💪"
             challenge_message = text
 
+            # ❌ УДАЛЯЕМ ЧЕЛЛЕНДЖ НАВСЕГДА
+            await conn.execute("""
+                DELETE FROM habits
+                WHERE id = $1
+            """, habit_id)
+
         return {
             "error": None,
             "self_message": self_message,
