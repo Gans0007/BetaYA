@@ -7,11 +7,7 @@ from services.habit_view_service import send_habit_card, build_active_list
 router = Router()
 
 import logging
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - ACTIVE_TASK - %(message)s",
-)
+logger = logging.getLogger(__name__)
 
 # =====================================================
 # 🔹 Показ активных привычек (message)
@@ -19,7 +15,7 @@ logging.basicConfig(
 @router.message(lambda m: m.text == "📋 Активные задания")
 async def show_active_tasks(message: types.Message):
     user_id = message.from_user.id
-    logging.info(f"👤 Пользователь {user_id} открыл список активных привычек.")
+    logger.info(f"👤 Пользователь {user_id} открыл список активных привычек.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -59,7 +55,7 @@ async def show_active_tasks(message: types.Message):
 async def show_habit_card(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
-    logging.info(f"👤 Пользователь {user_id} открыл карточку привычки ID={habit_id}.")
+    logger.info(f"👤 Пользователь {user_id} открыл карточку привычки ID={habit_id}.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -97,7 +93,7 @@ async def show_habit_card(callback: types.CallbackQuery):
 @router.callback_query(F.data == "back_from_card")
 async def back_from_card(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    logging.info(f"👤 Пользователь {callback.from_user.id} вернулся из карточки назад.")
+    logger.info(f"👤 Пользователь {callback.from_user.id} вернулся из карточки назад.")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
@@ -140,7 +136,7 @@ async def back_from_card(callback: types.CallbackQuery):
 @router.callback_query(F.data == "show_active_list")
 async def back_to_active_list(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    logging.info(f"👤 Пользователь {callback.from_user.id} запросил отображение списка активных привычек.")
+    logger.info(f"👤 Пользователь {callback.from_user.id} запросил отображение списка активных привычек.")
 
     text, kb, rows = await build_active_list(user_id)
 
@@ -160,7 +156,7 @@ async def back_to_active_list(callback: types.CallbackQuery):
 async def ask_delete(callback: types.CallbackQuery):
     # Получаем id привычки
     habit_id = int(callback.data.split("_")[2])
-    logging.info(f"🗑 Пользователь {callback.from_user.id} запросил удаление привычки ID={habit_id}.")
+    logger.info(f"🗑 Пользователь {callback.from_user.id} запросил удаление привычки ID={habit_id}.")
 
     # Клавиатура: Да / Отмена
     kb = InlineKeyboardMarkup(
@@ -187,7 +183,7 @@ async def ask_delete(callback: types.CallbackQuery):
 async def delete_habit(callback: types.CallbackQuery):
     habit_id = int(callback.data.split("_")[2])
     user_id = callback.from_user.id
-    logging.info(f"❗ Пользователь {user_id} подтвердил удаление привычки ID={habit_id}.")
+    logger.info(f"❗ Пользователь {user_id} подтвердил удаление привычки ID={habit_id}.")
 
     pool = await get_pool()
 
@@ -272,7 +268,272 @@ async def delete_habit(callback: types.CallbackQuery):
 # ================================
 @router.callback_query(F.data == "dismiss_delete")
 async def dismiss_delete(callback: types.CallbackQuery):
-    logging.info(f"❌ Пользователь {callback.from_user.id} отменил удаление привычки.")
+    logger.info(f"❌ Пользователь {callback.from_user.id} отменил удаление привычки.")
     # Возвращаем обычное сообщение
     await callback.message.edit_text("Отменено ❎")
+    await callback.answer()
+
+
+# ================================
+# 🔁 Запрос подтверждения продления
+# ================================
+
+@router.callback_query(
+    F.data.startswith("extend_")
+    & ~F.data.startswith("extend_confirm_")
+    & ~F.data.startswith("extend_cancel_")
+)
+async def ask_extend_habit(callback: types.CallbackQuery):
+
+    habit_id = int(callback.data.split("_")[1])
+    user_id = callback.from_user.id
+
+    logger.info(f"[EXTEND_ASK] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit = await conn.fetchrow("""
+            SELECT name
+            FROM habits
+            WHERE id=$1 AND user_id=$2
+        """, habit_id, user_id)
+
+    if not habit:
+        await callback.answer("❌ Привычка не найдена.", show_alert=True)
+        return
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(
+                text="✅ Да, продлить на 7 дней",
+                callback_data=f"extend_confirm_{habit_id}"
+            )],
+            [InlineKeyboardButton(
+                text="❌ Нет",
+                callback_data=f"extend_cancel_{habit_id}"
+            )]
+        ]
+    )
+
+    await callback.message.edit_text(
+        f"🔁 *Продлить привычку «{habit['name']}» на 7 дней?*",
+        parse_mode="Markdown",
+        reply_markup=kb
+    )
+
+    await callback.answer()
+
+
+# ================================
+# ✅ Подтверждение продления
+# ================================
+@router.callback_query(F.data.startswith("extend_confirm_"))
+async def confirm_extend_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
+
+    logger.info(f"[EXTEND_CONFIRM] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE habits
+            SET days = days + 7
+            WHERE id=$1 AND user_id=$2
+        """, habit_id, user_id)
+
+        habit = await conn.fetchrow("""
+            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge,
+                   h.difficulty,
+                   (SELECT datetime FROM confirmations
+                        WHERE habit_id=h.id
+                        ORDER BY datetime DESC LIMIT 1) AS last_date,
+                   u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id=h.user_id
+            WHERE h.id=$1 AND h.user_id=$2
+        """, habit_id, user_id)
+
+    await callback.answer("🔁 Привычка продлена на 7 дней", show_alert=True)
+
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
+    await send_habit_card(callback.message.chat, habit, user_id)
+
+
+# ================================
+# ❌ Отмена продления
+# ================================
+@router.callback_query(F.data.startswith("extend_cancel_"))
+async def cancel_extend_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
+
+    logger.info(f"[EXTEND_CANCEL] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit = await conn.fetchrow("""
+            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge,
+                   h.difficulty,
+                   (SELECT datetime FROM confirmations
+                        WHERE habit_id=h.id
+                        ORDER BY datetime DESC LIMIT 1) AS last_date,
+                   u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id=h.user_id
+            WHERE h.id=$1 AND h.user_id=$2
+        """, habit_id, user_id)
+
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
+    await send_habit_card(callback.message.chat, habit, user_id)
+    await callback.answer()
+
+
+
+# ================================
+# ✅ Вопрос о завершении привычки
+# ================================
+@router.callback_query(
+    F.data.startswith("finish_")
+    & ~F.data.startswith("finish_confirm_")
+    & ~F.data.startswith("finish_cancel_")
+)
+async def ask_finish_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[1])
+    user_id = callback.from_user.id
+
+    logger.info(f"[FINISH_ASK] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit = await conn.fetchrow("""
+            SELECT name
+            FROM habits
+            WHERE id=$1 AND user_id=$2
+        """, habit_id, user_id)
+
+    if not habit:
+        await callback.answer("❌ Привычка не найдена.", show_alert=True)
+        return
+
+    kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(
+                text="✅ Да, завершить",
+                callback_data=f"finish_confirm_{habit_id}"
+            )],
+            [InlineKeyboardButton(
+                text="❌ Нет",
+                callback_data=f"finish_cancel_{habit_id}"
+            )]
+        ]
+    )
+
+    await callback.message.edit_text(
+        f"🏁 *Завершить привычку «{habit['name']}»?*",
+        parse_mode="Markdown",
+        reply_markup=kb
+    )
+
+    await callback.answer()
+
+# ================================
+# ✅ Завершить привычку
+# ================================
+@router.callback_query(F.data.startswith("finish_confirm_"))
+async def confirm_finish_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
+
+    logger.info(f"[FINISH_CONFIRM] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit = await conn.fetchrow("""
+            SELECT name
+            FROM habits
+            WHERE id=$1 AND user_id=$2
+        """, habit_id, user_id)
+
+        if not habit:
+            await callback.answer("❌ Привычка уже завершена.", show_alert=True)
+            return
+
+        habit_name = habit["name"]
+
+        await conn.execute("""
+            UPDATE users
+            SET finished_habits = finished_habits + 1
+            WHERE user_id = $1
+        """, user_id)
+
+        await conn.execute("DELETE FROM confirmations WHERE habit_id=$1", habit_id)
+        await conn.execute("DELETE FROM habits WHERE id=$1 AND user_id=$2", habit_id, user_id)
+
+    await callback.answer(
+        f"🎉 Привычка «{habit_name}» завершена!",
+        show_alert=True
+    )
+
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
+    text, kb, rows = await build_active_list(user_id)
+
+    if not rows:
+        await callback.message.answer(
+            "🏁 *Привычка завершена!*\n\n😴 Активных привычек больше нет.",
+            parse_mode="Markdown"
+        )
+    else:
+        await callback.message.answer(
+            "🏁 *Привычка завершена!*\n\nПродолжаем движение дальше 💪",
+            parse_mode="Markdown",
+            reply_markup=kb
+        )
+
+
+
+# ================================
+# ✅ Отмена завершения привычки
+# ================================
+@router.callback_query(F.data.startswith("finish_cancel_"))
+async def cancel_finish_habit(callback: types.CallbackQuery):
+    habit_id = int(callback.data.split("_")[2])
+    user_id = callback.from_user.id
+
+    logger.info(f"[FINISH_CANCEL] user={user_id} habit_id={habit_id}")
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit = await conn.fetchrow("""
+            SELECT h.id, h.name, h.description, h.days, h.done_days, h.is_challenge,
+                   h.difficulty,
+                   (SELECT datetime FROM confirmations
+                        WHERE habit_id=h.id
+                        ORDER BY datetime DESC LIMIT 1) AS last_date,
+                   u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id=h.user_id
+            WHERE h.id=$1 AND h.user_id=$2
+        """, habit_id, user_id)
+
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
+    if habit:
+        await send_habit_card(callback.message.chat, habit, user_id)
+
     await callback.answer()
