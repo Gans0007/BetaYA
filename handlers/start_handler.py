@@ -247,5 +247,5 @@ def welcome_text(nickname: str | None = None) -> str:
         "<b>Начни с добавления привычки или челленджа.</b>\n"
         "Настроить мой стиль поведения и тон уведомлений можешь в «Профиль → Настройки».\n\n"
         "💬 <b>Общий чат комьюнити:</b>\n"
-        "👉 <a href=\"https://t.me/yourambitions_chat\">Your Ambitions Chat</a>"
+        "👉 <a href=\"https://t.me/yourambitions_chat\">заглянуть в чат</a>"
     )

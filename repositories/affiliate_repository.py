@@ -163,18 +163,24 @@ async def get_referrals_list(affiliate_id: int):
 
 
 # ------------------------------------------
-# ДАТЬ СПИСОК ВЫПЛАТ КНОПКА
+# 💰 Записать выплату партнёру (СОБЫТИЕ)
 # ------------------------------------------
-async def get_payments_list(affiliate_id: int):
+async def add_affiliate_payment(
+    affiliate_id: int,
+    referral_user_id: int,
+    amount: float
+):
     pool = await get_pool()
     async with pool.acquire() as conn:
-        return await conn.fetch("""
-            SELECT r.user_id, r.active_at, u.username
-            FROM referrals r
-            LEFT JOIN users u ON u.user_id = r.user_id
-            WHERE r.affiliate_id = $1 AND r.is_active = TRUE
-            ORDER BY r.active_at
-        """, affiliate_id)
+        await conn.execute("""
+            INSERT INTO affiliate_payments (
+                affiliate_id,
+                referral_user_id,
+                amount
+            )
+            VALUES ($1, $2, $3)
+        """, affiliate_id, referral_user_id, amount)
+
 
 
 # ------------------------------------------
@@ -220,4 +226,68 @@ async def assign_referral_code(user_id: int, code: str):
             WHERE user_id = $2
         """, code, user_id)
 
+
+# ------------------------------------------
+# 🔢 Количество рефералов (для пагинации)
+# ------------------------------------------
+async def get_referrals_count(affiliate_id: int) -> int:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval("""
+            SELECT COUNT(*)
+            FROM referrals
+            WHERE affiliate_id = $1
+        """, affiliate_id)
+
+
+# ------------------------------------------
+# 📄 Список рефералов с пагинацией
+# ------------------------------------------
+async def get_referrals_list_paginated(
+    affiliate_id: int,
+    limit: int,
+    offset: int
+):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetch("""
+            SELECT r.user_id, r.registered_at, r.is_active, r.active_at,
+                   u.username
+            FROM referrals r
+            LEFT JOIN users u ON u.user_id = r.user_id
+            WHERE r.affiliate_id = $1
+            ORDER BY r.is_active DESC, r.registered_at
+            LIMIT $2 OFFSET $3
+        """, affiliate_id, limit, offset)
+
+# ------------------------------------------
+# 📄 История выплат партнёра
+# ------------------------------------------
+async def get_affiliate_payments_history(affiliate_id: int):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetch("""
+            SELECT
+                p.referral_user_id,
+                p.amount,
+                p.created_at,
+                u.username
+            FROM affiliate_payments p
+            LEFT JOIN users u ON u.user_id = p.referral_user_id
+            WHERE p.affiliate_id = $1
+            ORDER BY p.created_at DESC
+        """, affiliate_id)
+
+
+# ------------------------------------------
+# 🔍 Проверить — активен ли реферал
+# ------------------------------------------
+async def is_referral_active(user_id: int) -> bool:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        return await conn.fetchval("""
+            SELECT is_active
+            FROM referrals
+            WHERE user_id = $1
+        """, user_id) is True
 

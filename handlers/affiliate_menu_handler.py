@@ -66,29 +66,117 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
 # -------------------------------------------------
 # 👥 Список рефералов
 # -------------------------------------------------
-@router.callback_query(lambda c: c.data == "affiliate_referrals_list")
+@router.callback_query(lambda c: c.data.startswith("affiliate_referrals"))
 async def show_affiliate_referrals(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    logging.info(f"[AFFILIATE] Пользователь {user_id} смотрит список рефералов")
+    raw_data = callback.data
 
-    referrals = await affiliate_service.get_my_referrals(user_id)
+    logging.info(
+        f"👥 [ПАРТНЁРКА] Пользователь {user_id} открыл список рефералов "
+        f"(callback_data='{raw_data}')"
+    )
 
-    if not referrals:
+    # -------------------------------
+    # 📄 Определяем страницу
+    # -------------------------------
+    parts = raw_data.split(":")
+    try:
+        page = int(parts[1]) if len(parts) > 1 else 1
+    except ValueError:
+        logging.warning(
+            f"⚠️ [ПАРТНЁРКА] Некорректный номер страницы у пользователя {user_id}: "
+            f"{parts}"
+        )
+        page = 1
+
+    PER_PAGE = 10
+
+    logging.info(
+        f"📄 [ПАРТНЁРКА] Загружаем страницу {page} "
+        f"(по {PER_PAGE} рефералов на страницу) для пользователя {user_id}"
+    )
+
+    # -------------------------------
+    # 📦 Получаем данные
+    # -------------------------------
+    data = await affiliate_service.get_my_referrals_paginated(
+        user_id=user_id,
+        page=page,
+        per_page=PER_PAGE
+    )
+
+    total = data["total"]
+    referrals = data["items"]
+
+    logging.info(
+        f"📊 [ПАРТНЁРКА] Найдено рефералов всего: {total}. "
+        f"Показано на странице {page}: {len(referrals)}"
+    )
+
+    # -------------------------------
+    # 📝 Формируем текст
+    # -------------------------------
+    if total == 0:
         text = "😔 У тебя пока нет рефералов."
+        logging.info(
+            f"ℹ️ [ПАРТНЁРКА] У пользователя {user_id} нет рефералов"
+        )
     else:
-        text = "👥 Твои рефералы:\n\n"
+        pages = (total + PER_PAGE - 1) // PER_PAGE
+        text = f"👥 Твои рефералы (стр. {page}/{pages}):\n\n"
+
         for r in referrals:
             name = format_user(r)
             status = "🟢 активен" if r["is_active"] else "🔴 не активен"
             text += f"{name} — {status}\n"
 
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="affiliate_menu")]
-        ]
+    # -------------------------------
+    # 🔘 Кнопки навигации
+    # -------------------------------
+    nav_buttons = []
+
+    if page > 1:
+        nav_buttons.append(
+            InlineKeyboardButton(
+                text="⬅️",
+                callback_data=f"affiliate_referrals:{page - 1}"
+            )
+        )
+
+    if page * PER_PAGE < total:
+        nav_buttons.append(
+            InlineKeyboardButton(
+                text="➡️",
+                callback_data=f"affiliate_referrals:{page + 1}"
+            )
+        )
+
+    keyboard = []
+    if nav_buttons:
+        keyboard.append(nav_buttons)
+
+        logging.info(
+            f"🔁 [ПАРТНЁРКА] Навигация: "
+            f"{'назад ' if page > 1 else ''}"
+            f"{'вперёд' if page * PER_PAGE < total else ''}"
+        )
+
+    keyboard.append(
+        [InlineKeyboardButton(text="⬅️ Назад", callback_data="affiliate_menu")]
     )
 
-    await callback.message.edit_text(text, reply_markup=kb)
+    # -------------------------------
+    # ✉️ Отправляем сообщение
+    # -------------------------------
+    await callback.message.edit_text(
+        text,
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard)
+    )
+
+    logging.info(
+        f"✅ [ПАРТНЁРКА] Страница {page} успешно показана пользователю {user_id}"
+    )
+
     await callback.answer()
 
 

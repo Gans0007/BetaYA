@@ -26,6 +26,9 @@ from handlers.affiliate_menu_handler import router as affiliate_menu_router
 
 from honor_global_task import honor_global_rank_daily
 
+#from services.startup_broadcast_service import send_startup_message
+
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
@@ -85,6 +88,10 @@ async def main():
     # 🔥 Запускаем автоматическую проверку аннулирований (челленджи + привычки)
     asyncio.create_task(check_challenge_resets())
     asyncio.create_task(check_habit_resets())
+
+
+    # 🔔 Рассылка при старте
+#    asyncio.create_task(send_startup_message(bot))
 
     logging.info("🤖 Bot started...")
     try:

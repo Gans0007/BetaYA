@@ -1,6 +1,9 @@
 from aiogram import BaseMiddleware, types
 from datetime import datetime, timezone
 from database import get_pool
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SubscriptionMiddleware(BaseMiddleware):
@@ -51,7 +54,7 @@ class SubscriptionMiddleware(BaseMiddleware):
 
         # Условия блокировки
         need_block = (
-            total_days >= 7 and (
+            total_days >= 10 and (
                 not has_access or
                 not access_until or
                 access_until < now
