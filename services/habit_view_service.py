@@ -2,6 +2,7 @@ from aiogram import Bot, types
 from datetime import datetime
 import pytz
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from services.profile_settings_service import profile_settings_service
 
 from database import get_pool
 
@@ -167,6 +168,10 @@ async def send_habit_card(source, habit, user_id: int):
 # =====================================================
 async def build_active_list(user_id: int):
 
+    # 🔹 Берём настройки пользователя
+    settings = await profile_settings_service.get_settings_for_user(user_id)
+    share_on = settings["share_on"]
+
     pool = await get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch("""
@@ -188,6 +193,8 @@ async def build_active_list(user_id: int):
 
     text = (
         "📋 *Твои активные привычки:*\n\n"
+        f"📢 Публикация медиа: "
+        f"{'🟢 Вкл' if share_on else '⚪ Выкл'}\n\n"
         "Нажми на любую, чтобы открыть карточку 👇"
     )
 
