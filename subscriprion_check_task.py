@@ -1,16 +1,18 @@
 import asyncio
 from datetime import datetime, timezone, timedelta
+
 from aiogram import Bot, types
 from config import BOT_TOKEN, PUBLIC_CHANNEL_ID
 from database import get_pool
+
 from repositories.affiliate_repository import get_affiliate_for_user
 from services.affiliate_service import affiliate_service
 
 import logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+logger = logging.getLogger(__name__)
+
 
 async def subscription_checker():
-
     bot = Bot(token=BOT_TOKEN)
 
     while True:
@@ -19,7 +21,10 @@ async def subscription_checker():
 
         async with pool.acquire() as conn:
             users = await conn.fetch("""
-                SELECT user_id, has_access, access_until
+                SELECT user_id,
+                       has_access,
+                       access_until,
+                       subscription_notified
                 FROM users
             """)
 
@@ -27,55 +32,80 @@ async def subscription_checker():
                 user_id = u["user_id"]
                 has_access = u["has_access"]
                 access_until = u["access_until"]
+                notified = u["subscription_notified"]
 
+                # -------------------------------------------------
+                # ✅ 1. Подписка активна — ничего не делаем
+                # -------------------------------------------------
                 if has_access and access_until and access_until > now:
                     continue
 
+                # -------------------------------------------------
+                # 🔍 2. Проверяем, состоит ли пользователь в канале
+                # -------------------------------------------------
                 try:
                     member = await bot.get_chat_member(PUBLIC_CHANNEL_ID, user_id)
-                    in_group = member.status in ("member", "administrator", "creator")
+                    in_channel = member.status in ("member", "administrator", "creator")
                 except Exception:
-                    in_group = False
+                    in_channel = False
 
-                if in_group:
+                # -------------------------------------------------
+                # 🟢 3. Пользователь В КАНАЛЕ → авто-продление
+                # -------------------------------------------------
+                if in_channel:
                     new_until = now + timedelta(days=30)
 
                     await conn.execute("""
                         UPDATE users
                         SET has_access = TRUE,
-                            access_until = $2
+                            access_until = $2,
+                            subscription_notified = FALSE
                         WHERE user_id = $1
                     """, user_id, new_until)
 
                     affiliate_id = await get_affiliate_for_user(user_id)
-
                     if affiliate_id:
-                        logging.info(f"[REF-ACTIVATE] Пользователь {user_id} → активирован системой авто-подписки → affiliate {affiliate_id}")
+                        logger.info(
+                            f"[REF-ACTIVATE] Пользователь {user_id} → автоподписка → affiliate {affiliate_id}"
+                        )
                         await affiliate_service.activate_referral(user_id, 0.50)
 
                         try:
                             await bot.send_message(
                                 affiliate_id,
-                                "🔥 Твой реферал продлил подписку (автоматически)!\n💰 Тебе начислено $0.50"
+                                "🔥 Твой реферал продлил подписку автоматически!\n💰 Начислено $0.50"
                             )
                         except Exception as e:
-                            logging.warning(f"[REF-NOTIFY-FAILED] Не удалось отправить сообщение партнёру {affiliate_id} — {e}")
+                            logger.warning(
+                                f"[REF-NOTIFY-FAILED] Affiliate {affiliate_id}: {e}"
+                            )
 
                     continue
 
-                if not has_access or (access_until and access_until <= now):
+                # -------------------------------------------------
+                # 🔴 4. Подписка закончилась И пользователь НЕ в канале
+                # -------------------------------------------------
+                if not notified:
+                    # 🔒 Отключаем доступ ОДИН РАЗ
                     await conn.execute("""
                         UPDATE users
-                        SET has_access = FALSE
+                        SET has_access = FALSE,
+                            subscription_notified = TRUE
                         WHERE user_id = $1
                     """, user_id)
 
+                    # ❌ Деактивируем реферала ОДИН РАЗ
                     try:
                         await affiliate_service.deactivate_referral(user_id)
-                        logging.info(f"[REF-DEACTIVATE] Пользователь {user_id} → не продлил подписку")
+                        logger.info(
+                            f"[REF-DEACTIVATE] Пользователь {user_id} → подписка закончилась"
+                        )
                     except Exception as e:
-                        logging.error(f"[REF-DEACTIVATE-ERROR] Пользователь {user_id} — {e}")
+                        logger.error(
+                            f"[REF-DEACTIVATE-ERROR] Пользователь {user_id}: {e}"
+                        )
 
+                    # 📩 Уведомляем пользователя ОДИН РАЗ
                     try:
                         await bot.send_message(
                             user_id,
@@ -101,7 +131,15 @@ async def subscription_checker():
                             )
                         )
                     except Exception as e:
-                        logging.warning(f"[USER-NOTIFY-FAILED] Не удалось отправить сообщение пользователю {user_id} — {e}")
+                        logger.warning(
+                            f"[USER-NOTIFY-FAILED] Пользователь {user_id}: {e}"
+                        )
+
+                # -------------------------------------------------
+                # 🟡 5. Уже уведомлён → НИЧЕГО НЕ ДЕЛАЕМ
+                # -------------------------------------------------
+                # никаких логов
+                # никаких сообщений
+                # никаких деактиваций
 
         await asyncio.sleep(600)
-

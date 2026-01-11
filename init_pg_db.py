@@ -31,7 +31,8 @@ async def create_users_table():
                 has_access BOOLEAN DEFAULT TRUE,
                 access_until TIMESTAMPTZ,
                 last_global_rank INTEGER,
-                last_rank_update DATE
+                last_rank_update DATE,
+                subscription_notified BOOLEAN DEFAULT FALSE
             )
         """)
 
