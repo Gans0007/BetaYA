@@ -168,12 +168,21 @@ async def send_habit_card(source, habit, user_id: int):
 # =====================================================
 async def build_active_list(user_id: int):
 
-    # 🔹 Берём настройки пользователя
+    # 🔹 Настройки пользователя
     settings = await profile_settings_service.get_settings_for_user(user_id)
     share_on = settings["share_on"]
 
     pool = await get_pool()
     async with pool.acquire() as conn:
+
+        # 🔹 Таймзона пользователя
+        user_row = await conn.fetchrow(
+            "SELECT timezone FROM users WHERE user_id=$1", user_id
+        )
+        user_tz = user_row["timezone"] if user_row and user_row["timezone"] else "Europe/Kyiv"
+        tz = pytz.timezone(user_tz)
+        today = datetime.now(tz).date()
+
         rows = await conn.fetch("""
             SELECT id, name, is_challenge
             FROM habits
@@ -181,13 +190,42 @@ async def build_active_list(user_id: int):
             ORDER BY created_at ASC
         """, user_id)
 
-    if not rows:
-        return None, None, []
+        if not rows:
+            return None, None, []
 
-    buttons = []
-    for row in rows:
-        title = f"🔥 {row['name']}" if row["is_challenge"] else row["name"]
-        buttons.append([InlineKeyboardButton(text=title, callback_data=f"habit_{row['id']}")])
+        buttons = []
+
+        for row in rows:
+            habit_id = row["id"]
+            title = row["name"]
+
+            # 🔹 Проверяем подтверждение за сегодня
+            last = await conn.fetchrow("""
+                SELECT datetime
+                FROM confirmations
+                WHERE user_id=$1 AND habit_id=$2
+                ORDER BY datetime DESC
+                LIMIT 1
+            """, user_id, habit_id)
+
+            confirmed_today = False
+            if last:
+                last_dt = last["datetime"].astimezone(tz)
+                confirmed_today = last_dt.date() == today
+
+            # 🔹 Формируем текст кнопки
+            if row["is_challenge"]:
+                title = f"🔥 {title}"
+
+            if confirmed_today:
+                title = f"{title} 😎"
+
+            buttons.append([
+                InlineKeyboardButton(
+                    text=title,
+                    callback_data=f"habit_{habit_id}"
+                )
+            ])
 
     kb = InlineKeyboardMarkup(inline_keyboard=buttons)
 
@@ -199,3 +237,4 @@ async def build_active_list(user_id: int):
     )
 
     return text, kb, rows
+
