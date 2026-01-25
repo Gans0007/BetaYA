@@ -72,6 +72,7 @@ class HabitService:
             "reverify": False,
             "text": f"📸 Пришли фото, видео или кружочек для подтверждения {title} 💪",
             "parse_mode": "Markdown",
+            "allow_no_media": True,  # 🔥 ВОТ ЭТО
         }
 
     # ================================
@@ -82,8 +83,8 @@ class HabitService:
         conn,
         user_id: int,
         habit_id: int,
-        file_id: str,
-        file_type: str,
+        file_id: str | None,
+        file_type: str | None,
         reverify: bool,
     ):
 

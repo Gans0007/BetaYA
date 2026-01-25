@@ -22,7 +22,6 @@ async def create_users_table():
                 league TEXT DEFAULT 'Безответственный',
                 league_emoji TEXT DEFAULT '🕳️',
                 share_confirmation_media BOOLEAN DEFAULT TRUE,
-                language TEXT DEFAULT 'ru',
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW(),
                 referral_code TEXT,

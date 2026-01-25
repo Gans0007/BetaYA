@@ -50,8 +50,11 @@ def cancel_kb(habit_id: int):
 # ================================
 # 🔹 Старт подтверждения
 # ================================
-@router.callback_query(F.data.startswith("confirm_"))
+@router.callback_query(
+    F.data.startswith("confirm_") & ~F.data.startswith("confirm_no_media_")
+)
 async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
+
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
 
@@ -72,13 +75,29 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
         await state.update_data(habit_id=habit_id, reverify=reverify)
         await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
+        keyboard = InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="✅ Подтвердить без фото",
+                        callback_data=f"confirm_no_media_{habit_id}"
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text="❌ Отмена",
+                        callback_data=f"cancel_media_{habit_id}"
+                    )
+                ]
+            ]
+        )
+
         await callback.message.answer(
             result["text"],
             parse_mode=result.get("parse_mode"),
-            reply_markup=cancel_kb(habit_id)
+            reply_markup=keyboard
         )
 
-    await callback.answer()
 
 
 # ================================
@@ -152,6 +171,53 @@ async def receive_media(message: types.Message, state: FSMContext):
 
     await message.answer("⏳ Подтверждение принято в обработку...")
     await state.clear()
+
+@router.callback_query(F.data.startswith("confirm_no_media_"))
+async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
+    habit_id = int(callback.data.split("_")[-1])
+    user_id = callback.from_user.id
+
+    logging.info(f"[CONFIRM_NO_MEDIA] user={user_id}, habit={habit_id}")
+
+    # FSM больше не нужен
+    await state.clear()
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+
+        # 🔥 1. ОБЯЗАТЕЛЬНО проходим start_confirmation
+        start = await habit_service.start_confirmation(conn, user_id, habit_id)
+
+        if start.get("error") == "HABIT_NOT_FOUND":
+            await callback.answer("❌ Привычка не найдена.", show_alert=True)
+            return
+
+        reverify = start["reverify"]
+        logging.info(f"[CONFIRM_NO_MEDIA] reverify={reverify}")
+
+        # 🔥 2. Подтверждаем ТОЙ ЖЕ логикой, что и с фото
+        result = await habit_service.process_confirmation_media(
+            conn=conn,
+            user_id=user_id,
+            habit_id=habit_id,
+            file_id=None,
+            file_type=None,
+            reverify=reverify
+        )
+
+    await callback.answer()
+
+    # 🔥 Сообщение пользователю (как при фото)
+    if result.get("self_message"):
+        await callback.message.answer(result["self_message"], parse_mode="Markdown")
+
+    # 🔥 Если челлендж завершён — тоже уведомляем
+    if result.get("challenge_message"):
+        await callback.message.answer(result["challenge_message"], parse_mode="Markdown")
+
+    logging.info(
+        f"[CONFIRM_NO_MEDIA][DONE] user={user_id}, habit={habit_id}, reverify={reverify}"
+    )
 
 
 # ================================

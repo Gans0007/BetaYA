@@ -6,7 +6,7 @@ async def get_user_settings(user_id: int):
     pool = await get_pool()
     async with pool.acquire() as conn:
         return await conn.fetchrow("""
-            SELECT notification_tone, share_confirmation_media, language
+            SELECT notification_tone, share_confirmation_media
             FROM users
             WHERE user_id = $1
         """, user_id)
@@ -20,17 +20,6 @@ async def update_notification_tone(user_id: int, tone_code: str):
             SET notification_tone = $1
             WHERE user_id = $2
         """, tone_code, user_id)
-
-
-async def update_language(user_id: int, language_code: str):
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        await conn.execute("""
-            UPDATE users
-            SET language = $1
-            WHERE user_id = $2
-        """, language_code, user_id)
-
 
 async def toggle_share_media(user_id: int):
     pool = await get_pool()
