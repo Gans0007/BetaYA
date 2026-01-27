@@ -92,11 +92,13 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
             ]
         )
 
-        await callback.message.answer(
+        sent = await callback.message.answer(
             result["text"],
             parse_mode=result.get("parse_mode"),
             reply_markup=keyboard
         )
+
+        await state.update_data(confirm_message_id=sent.message_id)
 
 
 
@@ -157,8 +159,16 @@ async def receive_media(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Нужно фото, видео или кружочек 🎥")
         return
 
+
     # Добавляем задачу в очередь
     logging.info(f"[QUEUE] Добавляем задачу в очередь: user={user_id}, habit={habit_id}, type={file_type}")
+
+    # 🔥 УБИРАЕМ КНОПКИ
+    await clear_confirm_buttons(
+        state=state,
+        bot=message.bot,
+        chat_id=message.chat.id
+    )
 
     await QUEUE_CONFIRM.put({
         "user_id": user_id,
@@ -177,6 +187,13 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
     habit_id = int(callback.data.split("_")[-1])
     user_id = callback.from_user.id
 
+    # 🔥 УБИРАЕМ КНОПКИ
+    await clear_confirm_buttons(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
+
     logging.info(f"[CONFIRM_NO_MEDIA] user={user_id}, habit={habit_id}")
 
     # FSM больше не нужен
@@ -185,7 +202,7 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
     pool = await get_pool()
     async with pool.acquire() as conn:
 
-        # 🔥 1. ОБЯЗАТЕЛЬНО проходим start_confirmation
+        # 🔥 1. Проверка и reverify
         start = await habit_service.start_confirmation(conn, user_id, habit_id)
 
         if start.get("error") == "HABIT_NOT_FOUND":
@@ -193,31 +210,18 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
             return
 
         reverify = start["reverify"]
-        logging.info(f"[CONFIRM_NO_MEDIA] reverify={reverify}")
 
-        # 🔥 2. Подтверждаем ТОЙ ЖЕ логикой, что и с фото
-        result = await habit_service.process_confirmation_media(
-            conn=conn,
-            user_id=user_id,
-            habit_id=habit_id,
-            file_id=None,
-            file_type=None,
-            reverify=reverify
-        )
+    # 🔥 2. КЛАДЁМ В ОЧЕРЕДЬ (КАК БУДТО ЭТО МЕДИА)
+    await QUEUE_CONFIRM.put({
+        "user_id": user_id,
+        "habit_id": habit_id,
+        "reverify": reverify,
+        "file_id": None,        # 👈 нет файла
+        "file_type": None,      # 👈 нет типа → значит ТОЛЬКО ТЕКСТ
+        "message": callback.message
+    })
 
-    await callback.answer()
-
-    # 🔥 Сообщение пользователю (как при фото)
-    if result.get("self_message"):
-        await callback.message.answer(result["self_message"], parse_mode="Markdown")
-
-    # 🔥 Если челлендж завершён — тоже уведомляем
-    if result.get("challenge_message"):
-        await callback.message.answer(result["challenge_message"], parse_mode="Markdown")
-
-    logging.info(
-        f"[CONFIRM_NO_MEDIA][DONE] user={user_id}, habit={habit_id}, reverify={reverify}"
-    )
+    await callback.answer("⏳ Подтверждение принято")
 
 
 # ================================
@@ -269,9 +273,16 @@ async def process_task_from_queue(task):
             async def send_to_chat(chat_id):
                 logging.info(f"[SEND] Отправка в чат {chat_id} (type={file_type})")
 
+                # 🔥 ПОДТВЕРЖДЕНИЕ БЕЗ ФОТО — ТЕКСТ ВСЕГДА
+                if file_type is None:
+                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
+                    logging.info("[SEND] Текст опубликован (подтверждение без фото)")
+                    return
+
+                # ⬇️ всё остальное — БЕЗ ИЗМЕНЕНИЙ
                 if not share_allowed:
                     await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
-                    logging.info(f"[SEND] Текст отправлен в чат {chat_id}")
+                    logging.info("[SEND] Медиа запрещено, опубликован только текст")
                     return
 
                 if file_type == "photo":
@@ -297,3 +308,18 @@ async def process_task_from_queue(task):
         except Exception as e:
             logging.error(f"[QUEUE PROCESSING ERROR] {e}", exc_info=True)
             await message.answer("⚠️ Ошибка обработки подтверждения. Мы исправим это.")
+
+# 🔥 ОЧИЩЕНИЕ КЛАВИАТУРЫ ПОСЛЕ ВЫПОЛНЕНИЯ ДЕЙСТВИЯ
+async def clear_confirm_buttons(state: FSMContext, bot, chat_id: int):
+    data = await state.get_data()
+    msg_id = data.get("confirm_message_id")
+
+    if msg_id:
+        try:
+            await bot.edit_message_reply_markup(
+                chat_id=chat_id,
+                message_id=msg_id,
+                reply_markup=None
+            )
+        except Exception:
+            pass

@@ -96,7 +96,15 @@ class HabitService:
         # ♻️ REVERIFY
         # =============================
         if reverify:
-            await update_last_confirmation_media(conn, file_id, file_type, user_id, habit_id)
+            if file_id and file_type:
+                await update_last_confirmation_media(
+                    conn,
+                    file_id,
+                    file_type,
+                    user_id,
+                    habit_id
+                )
+
             await recalculate_total_confirmed_days(user_id)
             self_message = "♻️ Переподтверждение обновлено 💪"
 
