@@ -79,7 +79,10 @@ async def main():
     # 6) очередь отправки
     from services.message_queue import queue_consumer
     from handlers.confirm_habit_handler import process_task_from_queue
-    asyncio.create_task(queue_consumer(process_task_from_queue))
+
+    asyncio.create_task(
+        queue_consumer(process_task_from_queue, bot)
+    )
 
     # 🆕 Проверка подписки
     from subscriprion_check_task import subscription_checker

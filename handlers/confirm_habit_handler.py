@@ -1,12 +1,8 @@
 from aiogram import Router, F, types
-import random  
-from datetime import datetime, timezone
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime
-from data.challenges_data import FINAL_MESSAGES  
-import pytz
 import logging
 
 from database import get_pool
@@ -176,7 +172,8 @@ async def receive_media(message: types.Message, state: FSMContext):
         "reverify": reverify,
         "file_id": file_id,
         "file_type": file_type,
-        "message": message
+        "chat_id": message.chat.id,
+        "reply_to": message.message_id
     })
 
     await message.answer("⏳ Подтверждение принято в обработку...")
@@ -216,33 +213,31 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
         "user_id": user_id,
         "habit_id": habit_id,
         "reverify": reverify,
-        "file_id": None,        # 👈 нет файла
-        "file_type": None,      # 👈 нет типа → значит ТОЛЬКО ТЕКСТ
-        "message": callback.message
+        "file_id": None,
+        "file_type": None,
+        "chat_id": callback.message.chat.id,
+        "reply_to": callback.message.message_id
     })
-
     await callback.answer("⏳ Подтверждение принято")
 
 
 # ================================
-# 🔥 Обработчик очереди (НОВАЯ ЛОГИКА)
+# 🔥 Обработчик очереди (SAFE VERSION)
 # ================================
-async def process_task_from_queue(task):
-    message = task["message"]
-    user_id = task["user_id"]
-    habit_id = task["habit_id"]
-    reverify = task["reverify"]
-    file_id = task["file_id"]
-    file_type = task["file_type"]
+async def process_task_from_queue(task, bot):
+    try:
+        user_id = task["user_id"]
+        habit_id = task["habit_id"]
+        reverify = task["reverify"]
+        file_id = task["file_id"]
+        file_type = task["file_type"]
+        chat_id = task["chat_id"]
+        reply_to = task["reply_to"]
 
-    FREE_MAIN_CHAT = -1002375148535
-    # FREE_EXTRA_CHAT = -1002435430482 
+        FREE_MAIN_CHAT = -1002375148535
 
-    logging.info(f"[QUEUE] Начата обработка задачи: user={user_id}, habit={habit_id}, type={file_type}")
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        try:
+        pool = await get_pool()
+        async with pool.acquire() as conn:
             result = await habit_service.process_confirmation_media(
                 conn=conn,
                 user_id=user_id,
@@ -252,62 +247,93 @@ async def process_task_from_queue(task):
                 reverify=reverify,
             )
 
-            if result.get("error"):
-                logging.warning(f"[QUEUE] Ошибка: привычка {habit_id} не найдена")
-                await message.answer("⚠️ Эта привычка уже завершена.")
-                return
+        # ❌ привычка не найдена / уже завершена
+        if result.get("error"):
+            await bot.send_message(
+                chat_id=chat_id,
+                text="⚠️ Эта привычка уже завершена.",
+                reply_to_message_id=reply_to
+            )
+            return
 
-            if result.get("self_message"):
-                await message.answer(result["self_message"], parse_mode="Markdown")
-                logging.info(
-                    f"[XP][USER_NOTIFY] user={user_id} habit={habit_id} "
-                    f"message_sent=True reverify={reverify}"
-                )
+        # 👤 сообщение пользователю
+        if result.get("self_message"):
+            await bot.send_message(
+                chat_id=chat_id,
+                text=result["self_message"],
+                parse_mode="Markdown",
+                reply_to_message_id=reply_to
+            )
 
+        caption_text = result["caption_text"]
+        share_allowed = result["share_allowed"]
 
-            logging.info(f"[QUEUE] Сообщение пользователю отправлено.")
+        # 🔥 подтверждение без фото
+        if file_type is None:
+            await bot.send_message(
+                FREE_MAIN_CHAT,
+                caption_text,
+                parse_mode="Markdown"
+            )
+            return
 
-            caption_text = result["caption_text"]
-            share_allowed = result["share_allowed"]
+        # 🚫 медиа запрещено
+        if not share_allowed:
+            await bot.send_message(
+                FREE_MAIN_CHAT,
+                caption_text,
+                parse_mode="Markdown"
+            )
+            return
 
-            async def send_to_chat(chat_id):
-                logging.info(f"[SEND] Отправка в чат {chat_id} (type={file_type})")
+        # 📸 фото
+        if file_type == "photo":
+            await bot.send_photo(
+                FREE_MAIN_CHAT,
+                file_id,
+                caption=caption_text,
+                parse_mode="Markdown"
+            )
 
-                # 🔥 ПОДТВЕРЖДЕНИЕ БЕЗ ФОТО — ТЕКСТ ВСЕГДА
-                if file_type is None:
-                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
-                    logging.info("[SEND] Текст опубликован (подтверждение без фото)")
-                    return
+        # 🎥 видео
+        elif file_type == "video":
+            await bot.send_video(
+                FREE_MAIN_CHAT,
+                file_id,
+                caption=caption_text,
+                parse_mode="Markdown"
+            )
 
-                # ⬇️ всё остальное — БЕЗ ИЗМЕНЕНИЙ
-                if not share_allowed:
-                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
-                    logging.info("[SEND] Медиа запрещено, опубликован только текст")
-                    return
+        # ⭕ кружок
+        elif file_type == "circle":
+            await bot.send_video_note(FREE_MAIN_CHAT, file_id)
+            await bot.send_message(
+                FREE_MAIN_CHAT,
+                caption_text,
+                parse_mode="Markdown"
+            )
 
-                if file_type == "photo":
-                    await message.bot.send_photo(chat_id, file_id, caption=caption_text, parse_mode="Markdown")
-                elif file_type == "video":
-                    await message.bot.send_video(chat_id, file_id, caption=caption_text, parse_mode="Markdown")
-                elif file_type == "circle":
-                    await message.bot.send_video_note(chat_id, file_id)
-                    await message.bot.send_message(chat_id, caption_text, parse_mode="Markdown")
+        logging.info(f"[SEND] Медиа отправлено в чат {FREE_MAIN_CHAT}")
 
-                logging.info(f"[SEND] Медиа отправлено в чат {chat_id}")
+        # 🎯 сообщение о завершении челленджа
+        if result.get("challenge_message"):
+            await bot.send_message(
+                chat_id=chat_id,
+                text=result["challenge_message"],
+                parse_mode="Markdown",
+                reply_to_message_id=reply_to
+            )
 
-            await send_to_chat(FREE_MAIN_CHAT)
+    except Exception as e:
+        logging.error(f"[QUEUE PROCESSING ERROR] {e}", exc_info=True)
+        try:
+            await bot.send_message(
+                chat_id=task["chat_id"],
+                text="⚠️ Ошибка обработки подтверждения. Мы уже исправляем это."
+            )
+        except Exception:
+            pass
 
-            # 🔥 И автоматически дублируем в дополнительный чат
-            #logging.info(f"[SEND] Дублирование медиа в дополнительный чат {FREE_EXTRA_CHAT}")
-            #await send_to_chat(FREE_EXTRA_CHAT)
-
-            if result.get("challenge_message"):
-                logging.info(f"[CHALLENGE] Челлендж завершен, отправляем уведомление.")
-                await message.answer(result["challenge_message"], parse_mode="Markdown")
-
-        except Exception as e:
-            logging.error(f"[QUEUE PROCESSING ERROR] {e}", exc_info=True)
-            await message.answer("⚠️ Ошибка обработки подтверждения. Мы исправим это.")
 
 # 🔥 ОЧИЩЕНИЕ КЛАВИАТУРЫ ПОСЛЕ ВЫПОЛНЕНИЯ ДЕЙСТВИЯ
 async def clear_confirm_buttons(state: FSMContext, bot, chat_id: int):
