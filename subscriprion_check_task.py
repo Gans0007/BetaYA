@@ -1,22 +1,24 @@
 import asyncio
 from datetime import datetime, timezone, timedelta
 
-from aiogram import Bot, types
-from config import BOT_TOKEN, PUBLIC_CHANNEL_ID
+from aiogram import types
+from config import PUBLIC_CHANNEL_ID
 from database import get_pool
 
 from repositories.affiliate_repository import get_affiliate_for_user
 from services.affiliate_service import affiliate_service
 
+from core.shutdown import shutdown_event
+
 import logging
 logger = logging.getLogger(__name__)
 
 
-async def subscription_checker():
-    bot = Bot(token=BOT_TOKEN)
+async def subscription_checker(bot):
 
-    while True:
-        pool = await get_pool()
+    pool = await get_pool()
+
+    while not shutdown_event.is_set():
         now = datetime.now(timezone.utc)
 
         async with pool.acquire() as conn:
@@ -142,4 +144,7 @@ async def subscription_checker():
                 # никаких сообщений
                 # никаких деактиваций
 
-        await asyncio.sleep(600)
+        try:
+            await asyncio.wait_for(shutdown_event.wait(), timeout=600)
+        except asyncio.TimeoutError:
+            pass

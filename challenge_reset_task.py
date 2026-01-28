@@ -8,7 +8,7 @@ import random
 
 
 
-async def check_challenge_resets():
+async def check_challenge_resets(bot):
     """
     Раз в сутки (в 00:00 по локальному времени пользователя)
     проверяет пропуски челленджей и сбрасывает сделанные дни (done_days = 0)
@@ -54,13 +54,14 @@ async def check_challenge_resets():
             next_reset_utc = next_reset_local.astimezone(pytz.utc)
             delay = (next_reset_utc - now_utc).total_seconds()
 
-            asyncio.create_task(run_user_reset(user_id, tz_str, delay))
+            asyncio.create_task(run_user_reset(user_id, tz_str, delay, bot))
 
         # обновлять список юзеров раз в день
         await asyncio.sleep(24 * 60 * 60)
 
 
-async def run_user_reset(user_id: int, tz_str: str, delay: float):
+async def run_user_reset(user_id: int, tz_str: str, delay: float, bot):
+
     """Дождаться локальной полуночи пользователя и выполнить сброс."""
     await asyncio.sleep(delay)
 
@@ -108,16 +109,17 @@ async def run_user_reset(user_id: int, tz_str: str, delay: float):
         # ⭐⭐ — сброс, если прошло >= 3 дней с последнего подтверждения
         # (то есть было минимум 2 полных дня без подтверждений)
         if repeat == 2 and days_since >= 3:
-            await reset_challenge_progress(pool, ch, "2 дня без подтверждения")
+            await reset_challenge_progress(pool, ch, "2 дня без подтверждения", bot)
 
         # ⭐⭐⭐ — сброс, если вчера не было подтверждения
         elif repeat == 3:
             yesterday = user_now.date() - timedelta(days=1)
             if last_local.date() != yesterday:
-                await reset_challenge_progress(pool, ch, "1 день пропуска")
+                await reset_challenge_progress(pool, ch, "1 день пропуска", bot)
 
 
-async def reset_challenge_progress(pool, ch, reason: str):
+
+async def reset_challenge_progress(pool, ch, reason: str, bot):
     """Сбрасывает прогресс челленджа без удаления, с увеличением reset_streak."""
     habit_id = ch["id"]
     user_id = ch["user_id"]
@@ -130,11 +132,6 @@ async def reset_challenge_progress(pool, ch, reason: str):
                 reset_streak = reset_streak + 1
             WHERE id = $1
         """, habit_id)
-
-    # отправляем уведомление
-    from aiogram import Bot
-    from config import BOT_TOKEN
-    bot = Bot(token=BOT_TOKEN)
 
     try:
         # истягиваем tone пользователя
@@ -179,6 +176,4 @@ async def reset_challenge_progress(pool, ch, reason: str):
 
     except Exception as e:
         print("Ошибка отправки уведомления:", e)
-    finally:
-        await bot.session.close()
 

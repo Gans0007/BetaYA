@@ -79,8 +79,8 @@ async def main():
 
     # Background tasks
     asyncio.create_task(honor_global_rank_daily(bot))
-    asyncio.create_task(check_challenge_resets())
-    asyncio.create_task(check_habit_resets())
+    asyncio.create_task(check_challenge_resets(bot))
+    asyncio.create_task(check_habit_resets(bot))
 
     from daily_reminder_task import send_daily_reminders
     asyncio.create_task(send_daily_reminders(bot))
@@ -89,7 +89,7 @@ async def main():
     asyncio.create_task(queue_consumer(process_task_from_queue, bot))
 
     from subscriprion_check_task import subscription_checker
-    asyncio.create_task(subscription_checker())
+    asyncio.create_task(subscription_checker(bot))
 
     logging.info("🤖 Bot started")
 

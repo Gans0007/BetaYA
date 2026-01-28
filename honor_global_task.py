@@ -3,12 +3,14 @@
 # ================================
 
 import asyncio
-from database import get_pool, close_pool, create_pool
-from services.honor_global_service import get_global_rank
 from datetime import datetime, timezone
 import pytz
 import logging
 import asyncpg
+
+from database import get_pool
+from services.honor_global_service import get_global_rank
+from core.shutdown import shutdown_event
 
 logger = logging.getLogger(__name__)
 
@@ -18,32 +20,28 @@ async def honor_global_rank_daily(bot):
     Запускается в фоне, проверяет каждую минуту локальное время пользователя.
     В 00:05 вызывает перерасчёт рейтинга.
     """
-    while True:
+
+    pool = await get_pool()
+
+    while not shutdown_event.is_set():
         try:
-            await process_all_users(bot)
+            await process_all_users(bot, pool)
 
         except (asyncpg.exceptions.ConnectionDoesNotExistError,
                 ConnectionResetError,
                 OSError) as e:
             logger.error(f"[HONOR GLOBAL ERROR] Потеряно соединение с БД: {e}")
-            logger.info("🔄 Пересоздаю пул соединений...")
-
-            try:
-                await close_pool()
-                await create_pool()
-                logger.info("✅ Пул успешно пересоздан")
-
-            except Exception as e2:
-                logger.error(f"❌ Ошибка пересоздания пула: {e2}")
 
         except Exception as e:
             logger.error(f"[HONOR GLOBAL UNEXPECTED ERROR] {e}")
 
-        await asyncio.sleep(60)
+        try:
+            await asyncio.wait_for(shutdown_event.wait(), timeout=60)
+        except asyncio.TimeoutError:
+            pass
 
 
-async def process_all_users(bot):
-    pool = await get_pool()
+async def process_all_users(bot, pool):
     now_utc = datetime.now(timezone.utc)
 
     async with pool.acquire() as conn:
@@ -54,10 +52,10 @@ async def process_all_users(bot):
         """)
 
     for u in users:
-        await process_user_rank(bot, u, now_utc)
+        await process_user_rank(bot, u, now_utc, pool)
 
 
-async def process_user_rank(bot, user, now_utc):
+async def process_user_rank(bot, user, now_utc, pool):
     user_id = user["user_id"]
     tz_name = user["timezone"] or "Europe/Kyiv"
     last_rank = user["last_global_rank"]
@@ -65,7 +63,7 @@ async def process_user_rank(bot, user, now_utc):
 
     try:
         tz = pytz.timezone(tz_name)
-    except:
+    except Exception:
         tz = pytz.timezone("Europe/Kyiv")
 
     local_time = now_utc.astimezone(tz)
@@ -74,11 +72,10 @@ async def process_user_rank(bot, user, now_utc):
     if not (local_time.hour == 0 and local_time.minute == 5):
         return
 
-    logger.info(f"[GLOBAL] Запуск расчёта рейтинга для user_id={user_id}")
-
-
     if last_date == today:
         return
+
+    logger.info(f"[GLOBAL] Запуск расчёта рейтинга для user_id={user_id}")
 
     rank = await get_global_rank(user_id)
     if rank is None:
@@ -99,7 +96,6 @@ async def process_user_rank(bot, user, now_utc):
         except Exception as e:
             logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
 
-        pool = await get_pool()
         async with pool.acquire() as conn:
             await conn.execute("""
                 UPDATE users
@@ -141,14 +137,12 @@ async def process_user_rank(bot, user, now_utc):
             parse_mode="HTML"
         )
         logger.info(f"[GLOBAL] уведомление отправлено юзеру {user_id}")
-
         await asyncio.sleep(0.1)
 
     except Exception as e:
         logger.error(f"[GLOBAL SEND ERROR] юзеру {user_id}: {e}")
 
     # ======= 3) Обновляем БД =======
-    pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.execute("""
             UPDATE users

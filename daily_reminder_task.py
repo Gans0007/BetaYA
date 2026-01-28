@@ -14,10 +14,10 @@ async def send_daily_reminders(bot: Bot):
     Раз в сутки планирует ОДНО случайное напоминание для каждого пользователя
     (между 12:00 и 20:00 по его таймзоне), если у него есть активные привычки/челленджи.
     """
-    pool = await get_pool()
 
     while True:
-        # Берём пользователей, у кого есть активные записи (и привычки, и челленджи)
+        pool = await get_pool()
+
         async with pool.acquire() as conn:
             users = await conn.fetch("""
                 SELECT DISTINCT u.user_id, u.timezone
@@ -39,16 +39,19 @@ async def send_daily_reminders(bot: Bot):
 
             user_now = now_utc.astimezone(user_tz)
 
-            # 🎲 случайное локальное время 12:00–20:59
             random_hour = random.randint(12, 20)
             random_minute = random.randint(0, 59)
+
             next_run_local = user_now.replace(
-                hour=random_hour, minute=random_minute, second=0, microsecond=0
+                hour=random_hour,
+                minute=random_minute,
+                second=0,
+                microsecond=0
             )
+
             if next_run_local < user_now:
                 next_run_local += timedelta(days=1)
 
-            # в UTC для sleep
             next_run_utc = next_run_local.astimezone(pytz.utc)
             delay = (next_run_utc - now_utc).total_seconds()
 

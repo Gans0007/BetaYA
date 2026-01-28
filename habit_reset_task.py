@@ -9,7 +9,7 @@ from database import get_pool
 from handlers.tone.habit_reset_tone import HABIT_RESET_TONE
 
 
-async def check_habit_resets():
+async def check_habit_resets(bot):
     """
     Ежедневный сброс привычек:
       ⭐ Легко — без сбросов
@@ -56,12 +56,12 @@ async def check_habit_resets():
             next_reset_utc = next_reset_local.astimezone(pytz.utc)
             delay = (next_reset_utc - now_utc).total_seconds()
 
-            asyncio.create_task(run_user_habit_reset(user_id, tz_str, delay))
+            asyncio.create_task(run_user_habit_reset(user_id, tz_str, delay, bot))
 
         await asyncio.sleep(24 * 60 * 60)
 
 
-async def run_user_habit_reset(user_id: int, tz_str: str, delay: float):
+async def run_user_habit_reset(user_id: int, tz_str: str, delay: float, bot):
     """Сбрасывает привычки пользователя в его локальную полуночь."""
     await asyncio.sleep(delay)
 
@@ -124,13 +124,13 @@ async def run_user_habit_reset(user_id: int, tz_str: str, delay: float):
                 need_reset = True
 
         if need_reset:
-            await process_reset(pool, hb, reset_streak)
+            await process_reset(pool, hb, reset_streak, bot)
         else:
             # если пользователь подтвердил → streak обнуляем
             await reset_streak_zero(pool, hb["id"])
 
 
-async def process_reset(pool, hb, reset_streak):
+async def process_reset(pool, hb, reset_streak, bot):
     """Обрабатываем сброс — без деактивации привычки"""
 
     habit_id = hb["id"]
@@ -146,7 +146,7 @@ async def process_reset(pool, hb, reset_streak):
             WHERE id = $1
         """, habit_id, reset_streak)
 
-    await send_reset_notification(user_id, hb["name"], reset_streak)
+    await send_reset_notification(user_id, hb["name"], reset_streak, bot)
 
 
 async def reset_streak_zero(pool, habit_id):
@@ -159,11 +159,7 @@ async def reset_streak_zero(pool, habit_id):
         """, habit_id)
 
 
-async def send_reset_notification(user_id, name, streak):
-    """Уведомление с учётом выбранного тона"""
-    from aiogram import Bot
-    from config import BOT_TOKEN
-    bot = Bot(token=BOT_TOKEN)
+async def send_reset_notification(user_id, name, streak, bot):
 
     # 1. Берём тон пользователя
     pool = await get_pool()
@@ -201,6 +197,8 @@ async def send_reset_notification(user_id, name, streak):
 
     try:
         await bot.send_message(user_id, text, parse_mode="Markdown")
-    finally:
-        await bot.session.close()
+    except Exception as e:
+        print(f"⚠️ Ошибка отправки уведомления о сбросе привычки {habit_id}: {e}")
+
+
 
