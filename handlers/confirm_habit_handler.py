@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime
 import logging
+from core.shutdown import shutdown_event
 
 from database import get_pool
 
