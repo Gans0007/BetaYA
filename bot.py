@@ -22,6 +22,9 @@ from handlers.profile_stats_handler import router as profile_stats_router
 from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
 from handlers.affiliate_menu_handler import router as affiliate_menu_router
+from handlers.habit_reminder_handler import router as habit_reminder_router
+from tasks.habit_reminder_tasks import habit_reminder_task
+
 
 from middlewares.subscription_middleware import SubscriptionMiddleware
 from habit_reset_task import check_habit_resets
@@ -76,11 +79,14 @@ async def main():
     dp.include_router(honor_router)
     dp.include_router(affiliate_menu_router)
     dp.include_router(subscription_router)
+    dp.include_router(habit_reminder_router)
 
     # Background tasks
     asyncio.create_task(honor_global_rank_daily(bot))
     asyncio.create_task(check_challenge_resets(bot))
     asyncio.create_task(check_habit_resets(bot))
+    asyncio.create_task(habit_reminder_task(bot))
+
 
     from daily_reminder_task import send_daily_reminders
     asyncio.create_task(send_daily_reminders(bot))
