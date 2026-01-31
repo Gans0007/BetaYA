@@ -17,11 +17,8 @@ from handlers.add_custom_habit_handler import router as add_custom_habit_router
 from handlers import confirm_habit_handler
 from handlers import active_tasks_handler
 
-from handlers.profile.menu import router as profile_menu_router
-from handlers.profile.settings import router as profile_settings_router
-from handlers.profile.stats import router as profile_stats_router
-from handlers.profile.achievements import router as achievements_router
-from handlers.profile.affiliate import router as affiliate_menu_router
+#----__init.py PROFILE ----
+from handlers.profile import setup as setup_profile
 
 from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
@@ -79,12 +76,8 @@ async def main():
     dp.include_router(add_custom_habit_router)
     dp.include_router(confirm_habit_handler.router)
     dp.include_router(active_tasks_handler.router)
-    dp.include_router(profile_menu_router)
-    dp.include_router(achievements_router)
-    dp.include_router(profile_settings_router)
-    dp.include_router(profile_stats_router)
+    setup_profile(dp)
     dp.include_router(honor_router)
-    dp.include_router(affiliate_menu_router)
     dp.include_router(subscription_router)
     dp.include_router(habit_reminder_router)
 
