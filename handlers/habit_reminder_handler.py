@@ -32,12 +32,15 @@ async def set_reminder_start(callback: types.CallbackQuery, state: FSMContext):
     # 🔹 Получаем таймзону пользователя
     pool = await get_pool()
     async with pool.acquire() as conn:
-        tz_row = await conn.fetchrow(
-            "SELECT timezone FROM users WHERE user_id = $1",
-            user_id
-        )
+        habit_row = await conn.fetchrow("""
+            SELECT h.reminder_time, u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id = h.user_id
+            WHERE h.id = $1
+        """, habit_id)
 
-    tz_name = tz_row["timezone"] if tz_row and tz_row["timezone"] else "Europe/Kyiv"
+    tz_name = habit_row["timezone"] if habit_row and habit_row["timezone"] else "Europe/Kyiv"
+    reminder_time_exists = habit_row and habit_row["reminder_time"] is not None
 
     try:
         tz = pytz.timezone(tz_name)
@@ -46,16 +49,25 @@ async def set_reminder_start(callback: types.CallbackQuery, state: FSMContext):
 
     now_local = datetime.now(tz).strftime("%H:%M")
 
-    # 🔴 КНОПКА ОТМЕНЫ
-    cancel_kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="❌ Отмена",
-                    callback_data="cancel_reminder_setup"
-                )
-            ]
-        ]
+    # 🔴 КНОПКИ: Отмена + Удалить напоминание
+    buttons = [
+        InlineKeyboardButton(
+            text="❌ Отмена",
+            callback_data="cancel_reminder_setup"
+        )
+    ]
+
+    # 🧠 Кнопка "Удалить" — только если напоминание есть
+    if reminder_time_exists:
+        buttons.append(
+            InlineKeyboardButton(
+                text="🗑 Удалить напоминание",
+                callback_data="reminder_delete"
+            )
+        )
+
+    action_kb = InlineKeyboardMarkup(
+        inline_keyboard=[buttons]
     )
 
     await callback.message.answer(
@@ -63,7 +75,7 @@ async def set_reminder_start(callback: types.CallbackQuery, state: FSMContext):
         "Пример: 07:30 или 21:45\n\n"
         f"🕒 Текущее время: *{now_local}* ({tz.zone})",
         parse_mode="Markdown",
-        reply_markup=cancel_kb
+        reply_markup=action_kb
     )
 
     await state.set_state(HabitReminderFSM.waiting_for_time)
@@ -137,4 +149,56 @@ async def cancel_reminder_setup(callback: types.CallbackQuery, state: FSMContext
     )
 
     await callback.answer()
+
+# ================================
+# 🗑 Удалить напоминание
+# ================================
+@router.callback_query(F.data == "reminder_delete")
+async def delete_habit_reminder(callback: types.CallbackQuery, state: FSMContext):
+    data = await state.get_data()
+    habit_id = data.get("habit_id")
+    user_id = callback.from_user.id
+
+    if not habit_id:
+        await callback.answer("Не удалось определить привычку", show_alert=True)
+        return
+
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        habit_row = await conn.fetchrow("""
+            SELECT h.name, u.timezone
+            FROM habits h
+            JOIN users u ON u.user_id = h.user_id
+            WHERE h.id = $1
+        """, habit_id)
+
+        if not habit_row:
+            await state.clear()
+            await callback.message.edit_text("⚠️ Привычка не найдена")
+            await callback.answer()
+            return
+
+        await conn.execute("""
+            UPDATE habits
+            SET reminder_time = NULL
+            WHERE id = $1
+        """, habit_id)
+
+    habit_name = habit_row["name"]
+    tz_name = habit_row["timezone"] or "Europe/Kyiv"
+
+    # 🪵 ЛОГ УДАЛЕНИЯ
+    logger.info(
+        f"[REMINDER DELETED] Напоминание пользователю {user_id} "
+        f'на привычку "{habit_name}" удалено ({tz_name})'
+    )
+
+    await state.clear()
+
+    await callback.message.edit_text(
+        "🗑 Напоминание удалено"
+    )
+
+    await callback.answer()
+
 
