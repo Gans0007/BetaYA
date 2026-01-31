@@ -2,27 +2,12 @@ from aiogram import Router, F, types
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from datetime import datetime
 import logging
-from core.shutdown import shutdown_event
 
 from database import get_pool
-
-from services.user_service import recalculate_total_confirmed_days
-from services.user_service import update_user_streak
-from services.xp_service import add_xp_for_confirmation
-
-from services.habit_view_service import send_habit_card, build_active_list
-
-from repositories.affiliate_repository import (
-    get_affiliate_for_user,
-    mark_referral_active,
-    add_payment_to_affiliate
-)
-
 from services.confirm_habit_service import habit_service
 from services.message_queue import QUEUE_CONFIRM
-
+from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
 
 router = Router()
 
@@ -32,16 +17,11 @@ logging.basicConfig(
 )
 
 
+# ================================
+# 🔹 FSM
+# ================================
 class ConfirmHabitFSM(StatesGroup):
     waiting_for_media = State()
-
-
-def cancel_kb(habit_id: int):
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="❌ Отмена", callback_data=f"cancel_media_{habit_id}")]
-        ]
-    )
 
 
 # ================================
@@ -51,52 +31,50 @@ def cancel_kb(habit_id: int):
     F.data.startswith("confirm_") & ~F.data.startswith("confirm_no_media_")
 )
 async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
-
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
 
-    logging.info(f"[CONFIRM] Пользователь {user_id} начал подтверждение привычки {habit_id}")
+    logging.info(f"[CONFIRM] user={user_id} habit={habit_id}")
 
     pool = await get_pool()
     async with pool.acquire() as conn:
         result = await habit_service.start_confirmation(conn, user_id, habit_id)
 
         if result.get("error") == "HABIT_NOT_FOUND":
-            logging.warning(f"[CONFIRM] Привычка {habit_id} не найдена у пользователя {user_id}")
             await callback.answer("❌ Привычка не найдена.", show_alert=True)
             return
 
-        reverify = result["reverify"]
-        logging.info(f"[CONFIRM] reverify = {reverify} для пользователя {user_id}")
+    await state.update_data(
+        habit_id=habit_id,
+        reverify=result["reverify"]
+    )
+    await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
-        await state.update_data(habit_id=habit_id, reverify=reverify)
-        await state.set_state(ConfirmHabitFSM.waiting_for_media)
-
-        keyboard = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text="✅ Подтвердить без фото",
-                        callback_data=f"confirm_no_media_{habit_id}"
-                    )
-                ],
-                [
-                    InlineKeyboardButton(
-                        text="❌ Отмена",
-                        callback_data=f"cancel_media_{habit_id}"
-                    )
-                ]
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="✅ Подтвердить без фото",
+                    callback_data=f"confirm_no_media_{habit_id}"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="❌ Отмена",
+                    callback_data=f"cancel_media_{habit_id}"
+                )
             ]
-        )
+        ]
+    )
 
-        sent = await callback.message.answer(
-            result["text"],
-            parse_mode=result.get("parse_mode"),
-            reply_markup=keyboard
-        )
+    sent = await callback.message.answer(
+        result["text"],
+        parse_mode=result.get("parse_mode"),
+        reply_markup=keyboard
+    )
 
-        await state.update_data(confirm_message_id=sent.message_id)
-
+    await save_fsm_ui_message(state, sent.message_id)
+    await callback.answer()
 
 
 # ================================
@@ -104,16 +82,21 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
 # ================================
 @router.callback_query(F.data.startswith("cancel_media_"))
 async def cancel_media(callback: types.CallbackQuery, state: FSMContext):
-    user_id = callback.from_user.id
-    logging.info(f"[CONFIRM] Пользователь {user_id} отменил подтверждение привычки")
+    logging.info(f"[CONFIRM CANCEL] user={callback.from_user.id}")
+
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
 
     await state.clear()
-    await callback.message.edit_text("❎ Подтверждение отменено.")
     await callback.answer()
+    await callback.message.answer("❎ Подтверждение отменено.")
 
 
 # ================================
-# 🔹 Получаем медиафайл
+# 🔹 Получаем медиа
 # ================================
 @router.message(ConfirmHabitFSM.waiting_for_media)
 async def receive_media(message: types.Message, state: FSMContext):
@@ -122,46 +105,28 @@ async def receive_media(message: types.Message, state: FSMContext):
     reverify = data["reverify"]
     user_id = message.from_user.id
 
-    logging.info(f"[MEDIA] Пользователь {user_id} отправил медиа для привычки {habit_id}")
-
-    # PHOTO
+    # ---- тип медиа ----
     if message.photo:
         file_id = message.photo[-1].file_id
         file_type = "photo"
-        logging.info(f"[MEDIA] Фото получено. file_id={file_id}")
 
-    # VIDEO + SIZE CHECK
     elif message.video:
-        max_video_size = 25 * 1024 * 1024  # 25 MB
-        video_size = message.video.file_size or 0
-
-        logging.info(f"[MEDIA] Видео получено. file_id={message.video.file_id}, size={video_size} bytes")
-
-        if video_size > max_video_size:
-            logging.warning(f"[MEDIA] Видео отклонено! Размер {video_size} > {max_video_size}")
-            await message.answer("⚠️ Видео слишком большое. Максимум — 25 МБ.")
+        if (message.video.file_size or 0) > 25 * 1024 * 1024:
+            await message.answer("⚠️ Видео слишком большое (макс 25 МБ)")
             return
-
         file_id = message.video.file_id
         file_type = "video"
 
-    # CIRCLE VIDEO
     elif message.video_note:
         file_id = message.video_note.file_id
         file_type = "circle"
-        logging.info(f"[MEDIA] Кружочек получен. file_id={file_id}")
 
     else:
-        logging.warning(f"[MEDIA] Пользователь {user_id} прислал неподдерживаемый тип")
-        await message.answer("⚠️ Нужно фото, видео или кружочек 🎥")
+        await message.answer("⚠️ Нужно фото, видео или кружочек")
         return
 
-
-    # Добавляем задачу в очередь
-    logging.info(f"[QUEUE] Добавляем задачу в очередь: user={user_id}, habit={habit_id}, type={file_type}")
-
-    # 🔥 УБИРАЕМ КНОПКИ
-    await clear_confirm_buttons(
+    # 🔥 закрываем FSM UI
+    await clear_fsm_ui(
         state=state,
         bot=message.bot,
         chat_id=message.chat.id
@@ -180,50 +145,45 @@ async def receive_media(message: types.Message, state: FSMContext):
     await message.answer("⏳ Подтверждение принято в обработку...")
     await state.clear()
 
+
+# ================================
+# 🔹 Подтверждение без фото
+# ================================
 @router.callback_query(F.data.startswith("confirm_no_media_"))
 async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
     habit_id = int(callback.data.split("_")[-1])
     user_id = callback.from_user.id
 
-    # 🔥 УБИРАЕМ КНОПКИ
-    await clear_confirm_buttons(
+    await clear_fsm_ui(
         state=state,
         bot=callback.bot,
         chat_id=callback.message.chat.id
     )
-
-    logging.info(f"[CONFIRM_NO_MEDIA] user={user_id}, habit={habit_id}")
-
-    # FSM больше не нужен
     await state.clear()
 
     pool = await get_pool()
     async with pool.acquire() as conn:
-
-        # 🔥 1. Проверка и reverify
         start = await habit_service.start_confirmation(conn, user_id, habit_id)
 
         if start.get("error") == "HABIT_NOT_FOUND":
             await callback.answer("❌ Привычка не найдена.", show_alert=True)
             return
 
-        reverify = start["reverify"]
-
-    # 🔥 2. КЛАДЁМ В ОЧЕРЕДЬ (КАК БУДТО ЭТО МЕДИА)
     await QUEUE_CONFIRM.put({
         "user_id": user_id,
         "habit_id": habit_id,
-        "reverify": reverify,
+        "reverify": start["reverify"],
         "file_id": None,
         "file_type": None,
         "chat_id": callback.message.chat.id,
         "reply_to": callback.message.message_id
     })
+
     await callback.answer("⏳ Подтверждение принято")
 
 
 # ================================
-# 🔥 Обработчик очереди (SAFE VERSION)
+# 🔥 Обработчик очереди
 # ================================
 async def process_task_from_queue(task, bot):
     try:
@@ -248,7 +208,6 @@ async def process_task_from_queue(task, bot):
                 reverify=reverify,
             )
 
-        # ❌ привычка не найдена / уже завершена
         if result.get("error"):
             await bot.send_message(
                 chat_id=chat_id,
@@ -257,7 +216,6 @@ async def process_task_from_queue(task, bot):
             )
             return
 
-        # 👤 сообщение пользователю
         if result.get("self_message"):
             await bot.send_message(
                 chat_id=chat_id,
@@ -269,8 +227,7 @@ async def process_task_from_queue(task, bot):
         caption_text = result["caption_text"]
         share_allowed = result["share_allowed"]
 
-        # 🔥 подтверждение без фото
-        if file_type is None:
+        if file_type is None or not share_allowed:
             await bot.send_message(
                 FREE_MAIN_CHAT,
                 caption_text,
@@ -278,16 +235,6 @@ async def process_task_from_queue(task, bot):
             )
             return
 
-        # 🚫 медиа запрещено
-        if not share_allowed:
-            await bot.send_message(
-                FREE_MAIN_CHAT,
-                caption_text,
-                parse_mode="Markdown"
-            )
-            return
-
-        # 📸 фото
         if file_type == "photo":
             await bot.send_photo(
                 FREE_MAIN_CHAT,
@@ -296,7 +243,6 @@ async def process_task_from_queue(task, bot):
                 parse_mode="Markdown"
             )
 
-        # 🎥 видео
         elif file_type == "video":
             await bot.send_video(
                 FREE_MAIN_CHAT,
@@ -305,7 +251,6 @@ async def process_task_from_queue(task, bot):
                 parse_mode="Markdown"
             )
 
-        # ⭕ кружок
         elif file_type == "circle":
             await bot.send_video_note(FREE_MAIN_CHAT, file_id)
             await bot.send_message(
@@ -314,9 +259,6 @@ async def process_task_from_queue(task, bot):
                 parse_mode="Markdown"
             )
 
-        logging.info(f"[SEND] Медиа отправлено в чат {FREE_MAIN_CHAT}")
-
-        # 🎯 сообщение о завершении челленджа
         if result.get("challenge_message"):
             await bot.send_message(
                 chat_id=chat_id,
@@ -326,27 +268,11 @@ async def process_task_from_queue(task, bot):
             )
 
     except Exception as e:
-        logging.error(f"[QUEUE PROCESSING ERROR] {e}", exc_info=True)
+        logging.error(f"[QUEUE PROCESS ERROR] {e}", exc_info=True)
         try:
             await bot.send_message(
                 chat_id=task["chat_id"],
-                text="⚠️ Ошибка обработки подтверждения. Мы уже исправляем это."
-            )
-        except Exception:
-            pass
-
-
-# 🔥 ОЧИЩЕНИЕ КЛАВИАТУРЫ ПОСЛЕ ВЫПОЛНЕНИЯ ДЕЙСТВИЯ
-async def clear_confirm_buttons(state: FSMContext, bot, chat_id: int):
-    data = await state.get_data()
-    msg_id = data.get("confirm_message_id")
-
-    if msg_id:
-        try:
-            await bot.edit_message_reply_markup(
-                chat_id=chat_id,
-                message_id=msg_id,
-                reply_markup=None
+                text="⚠️ Ошибка обработки подтверждения."
             )
         except Exception:
             pass
