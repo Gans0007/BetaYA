@@ -1,3 +1,4 @@
+#handlers/profile/menu
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging

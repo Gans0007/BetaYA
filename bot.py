@@ -16,14 +16,17 @@ from handlers.challenges_handler import router as challenges_router
 from handlers.add_custom_habit_handler import router as add_custom_habit_router
 from handlers import confirm_habit_handler
 from handlers import active_tasks_handler
-from handlers.profile_menu_handler import router as profile_menu_router
-from handlers.profile_settings_handler import router as profile_settings_router
-from handlers.profile_stats_handler import router as profile_stats_router
+
+from handlers.profile.menu import router as profile_menu_router
+from handlers.profile.settings import router as profile_settings_router
+from handlers.profile.stats import router as profile_stats_router
+from handlers.profile.achievements import router as achievements_router
+from handlers.profile.affiliate import router as affiliate_menu_router
+
 from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
-from handlers.affiliate_menu_handler import router as affiliate_menu_router
 from handlers.habit_reminder_handler import router as habit_reminder_router
-from handlers.profile.achievements_view import router as achievements_router
+
 
 
 from tasks.habit_reminder_tasks import habit_reminder_task
