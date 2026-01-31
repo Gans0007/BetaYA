@@ -5,6 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import logging
 
 from services.habit_create_service import create_custom_habit
+from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
 
 router = Router()
 
@@ -30,22 +31,6 @@ def cancel_kb():
         inline_keyboard=[[InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_fsm")]]
     )
 
-
-async def clear_previous_prompt(state: FSMContext, bot, chat_id: int):
-    data = await state.get_data()
-    last_msg_id = data.get("last_prompt_message_id")
-
-    if last_msg_id:
-        try:
-            await bot.edit_message_reply_markup(
-                chat_id=chat_id,
-                message_id=last_msg_id,
-                reply_markup=None
-            )
-        except Exception:
-            pass
-
-
 # -------------------------------
 # ❌ Отмена
 # -------------------------------
@@ -53,7 +38,12 @@ async def clear_previous_prompt(state: FSMContext, bot, chat_id: int):
 async def cancel_fsm(callback: types.CallbackQuery, state: FSMContext):
     logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} отменил создание привычки")
 
-    await clear_previous_prompt(state, callback.bot, callback.message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
+
     await state.clear()
     await callback.answer()
 
@@ -67,6 +57,12 @@ async def cancel_fsm(callback: types.CallbackQuery, state: FSMContext):
 async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
     logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} начал создание привычки")
 
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
+
     await callback.answer()
     await state.set_state(AddHabit.name)
 
@@ -75,15 +71,18 @@ async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=cancel_kb()
     )
 
-    await state.update_data(last_prompt_message_id=sent.message_id)
-
+    await save_fsm_ui_message(state, sent.message_id)
 
 # -------------------------------
 # ✍️ Имя
 # -------------------------------
 @router.message(AddHabit.name)
 async def set_name(message: types.Message, state: FSMContext):
-    await clear_previous_prompt(state, message.bot, message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=message.bot,
+        chat_id=message.chat.id
+    )
 
     await state.update_data(name=message.text)
     await state.set_state(AddHabit.description)
@@ -93,7 +92,7 @@ async def set_name(message: types.Message, state: FSMContext):
         reply_markup=cancel_kb()
     )
 
-    await state.update_data(last_prompt_message_id=sent.message_id)
+    await save_fsm_ui_message(state, sent.message_id)
 
 
 # -------------------------------
@@ -101,7 +100,11 @@ async def set_name(message: types.Message, state: FSMContext):
 # -------------------------------
 @router.message(AddHabit.description)
 async def set_description(message: types.Message, state: FSMContext):
-    await clear_previous_prompt(state, message.bot, message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=message.bot,
+        chat_id=message.chat.id
+    )
 
     await state.update_data(description=message.text)
     await state.set_state(AddHabit.days)
@@ -111,7 +114,7 @@ async def set_description(message: types.Message, state: FSMContext):
         reply_markup=cancel_kb()
     )
 
-    await state.update_data(last_prompt_message_id=sent.message_id)
+    await save_fsm_ui_message(state, sent.message_id)
 
 
 # -------------------------------
@@ -128,10 +131,14 @@ async def set_days(message: types.Message, state: FSMContext):
             "⚠️ Введи число от 7 до 365. Минимум — неделя 💪",
             reply_markup=cancel_kb()
         )
-        await state.update_data(last_prompt_message_id=sent.message_id)
+        await save_fsm_ui_message(state, sent.message_id)
         return
 
-    await clear_previous_prompt(state, message.bot, message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=message.bot,
+        chat_id=message.chat.id
+    )
 
     await state.update_data(days=days)
     await state.set_state(AddHabit.difficulty)
@@ -152,7 +159,7 @@ async def set_days(message: types.Message, state: FSMContext):
         reply_markup=keyboard
     )
 
-    await state.update_data(last_prompt_message_id=sent.message_id)
+    await save_fsm_ui_message(state, sent.message_id)
 
 
 # -------------------------------
@@ -160,7 +167,11 @@ async def set_days(message: types.Message, state: FSMContext):
 # -------------------------------
 @router.callback_query(F.data.startswith("diff_"))
 async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
-    await clear_previous_prompt(state, callback.bot, callback.message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
 
     diff = int(callback.data.split("_")[1])
     await state.update_data(difficulty=diff)
@@ -194,7 +205,7 @@ async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(AddHabit.confirm)
-    await state.update_data(last_prompt_message_id=sent.message_id)
+    await save_fsm_ui_message(state, sent.message_id)
     await callback.answer()
 
 
@@ -203,7 +214,11 @@ async def set_difficulty(callback: types.CallbackQuery, state: FSMContext):
 # -------------------------------
 @router.callback_query(F.data == "save_habit")
 async def save_habit(callback: types.CallbackQuery, state: FSMContext):
-    await clear_previous_prompt(state, callback.bot, callback.message.chat.id)
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
 
     data = await state.get_data()
     name = data["name"]
@@ -221,3 +236,4 @@ async def save_habit(callback: types.CallbackQuery, state: FSMContext):
     )
 
     await state.clear()
+

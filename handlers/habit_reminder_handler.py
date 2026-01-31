@@ -3,6 +3,9 @@ from aiogram import Router, F, types
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from datetime import time, datetime
+
+from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
+
 import pytz
 import re
 import logging
@@ -70,13 +73,17 @@ async def set_reminder_start(callback: types.CallbackQuery, state: FSMContext):
         inline_keyboard=[buttons]
     )
 
-    await callback.message.answer(
+    sent = await callback.message.answer(
         "⏰ Введите время напоминания в формате HH:MM\n"
         "Пример: 07:30 или 21:45\n\n"
         f"🕒 Текущее время: *{now_local}* ({tz.zone})",
         parse_mode="Markdown",
         reply_markup=action_kb
     )
+
+    # 🧠 сохраняем UI-сообщение в FSM
+    await save_fsm_ui_message(state, sent.message_id)
+
 
     await state.set_state(HabitReminderFSM.waiting_for_time)
     await callback.answer()
@@ -130,6 +137,13 @@ async def set_reminder_time(message: types.Message, state: FSMContext):
         f"установлено на {text} ({tz_name})"
     )
 
+    # 🧹 убираем кнопки FSM
+    await clear_fsm_ui(
+        state=state,
+        bot=message.bot,
+        chat_id=message.chat.id
+    )
+
     await message.answer(
         f"🔔 Напоминание установлено ежедневно в {text}"
     )
@@ -173,6 +187,13 @@ async def delete_habit_reminder(callback: types.CallbackQuery, state: FSMContext
         """, habit_id)
 
         if not habit_row:
+
+            await clear_fsm_ui(
+                state=state,
+                bot=callback.bot,
+                chat_id=callback.message.chat.id
+            )
+
             await state.clear()
             await callback.message.edit_text("⚠️ Привычка не найдена")
             await callback.answer()
