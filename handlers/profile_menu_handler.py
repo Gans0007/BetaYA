@@ -24,9 +24,13 @@ async def show_profile_menu(message: types.Message):
                 InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
                 InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
                 InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"),
+            ],
+            [
+                InlineKeyboardButton(text="🏆 Достижения", callback_data="profile:achievements"),
             ]
         ]
     )
+
 
     await message.answer(
         "👤 *Профиль*\n\nВыбери нужный раздел:",
@@ -49,9 +53,13 @@ async def back_to_profile_menu(callback: types.CallbackQuery):
                 InlineKeyboardButton(text="⚙️ Настройки", callback_data="profile_settings"),
                 InlineKeyboardButton(text="📊 Статистика", callback_data="profile_stats"),
                 InlineKeyboardButton(text="💼 Партнёрка", callback_data="affiliate_menu"),
-            ]
+            ],
+            [
+                InlineKeyboardButton(text="🏆 Достижения", callback_data="profile:achievements"),
+            ] 
         ]
-    )
+)
+
 
     await callback.message.edit_text(
         "👤 *Профиль*\n\nВыбери нужный раздел:",

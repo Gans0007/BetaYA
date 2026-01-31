@@ -23,6 +23,9 @@ from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
 from handlers.affiliate_menu_handler import router as affiliate_menu_router
 from handlers.habit_reminder_handler import router as habit_reminder_router
+from handlers.profile.achievements_view import router as achievements_router
+
+
 from tasks.habit_reminder_tasks import habit_reminder_task
 
 
@@ -74,6 +77,7 @@ async def main():
     dp.include_router(confirm_habit_handler.router)
     dp.include_router(active_tasks_handler.router)
     dp.include_router(profile_menu_router)
+    dp.include_router(achievements_router)
     dp.include_router(profile_settings_router)
     dp.include_router(profile_stats_router)
     dp.include_router(honor_router)
