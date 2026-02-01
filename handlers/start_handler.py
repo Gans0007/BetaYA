@@ -77,10 +77,6 @@ async def start_command(message: types.Message, state: FSMContext):
 
     # Определяем timezone
     user_timezone = "Europe/Kyiv"
-    if message.from_user.language_code == "en":
-        user_timezone = "Europe/London"
-    elif message.from_user.language_code == "ru":
-        user_timezone = "Europe/Moscow"
 
     ref_code = extract_referral_code(message)
     user_id = message.from_user.id
@@ -103,7 +99,7 @@ async def start_command(message: types.Message, state: FSMContext):
             ON CONFLICT (user_id) DO UPDATE
               SET username = EXCLUDED.username,
                   first_name = EXCLUDED.first_name,
-                  timezone = EXCLUDED.timezone
+                  timezone = COALESCE(users.timezone, EXCLUDED.timezone)
             """,
             user_id,
             message.from_user.username,

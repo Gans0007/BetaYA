@@ -6,10 +6,14 @@ async def get_user_settings(user_id: int):
     pool = await get_pool()
     async with pool.acquire() as conn:
         return await conn.fetchrow("""
-            SELECT notification_tone, share_confirmation_media
+            SELECT
+                notification_tone,
+                share_confirmation_media,
+                timezone
             FROM users
             WHERE user_id = $1
         """, user_id)
+
 
 
 async def update_notification_tone(user_id: int, tone_code: str):

@@ -25,10 +25,13 @@ class ProfileSettingsService:
             else True
         )
 
+        timezone = user.get("timezone")  # 🔥 ВОТ ЭТО КЛЮЧЕВО
+
         return {
             "tone_code": tone_code,
             "tone_label": NOTIFICATION_TONES.get(tone_code),
             "share_on": share_on,
+            "timezone": timezone,     
         }
 
     async def set_tone(self, user_id: int, tone_code: str):

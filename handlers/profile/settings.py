@@ -2,6 +2,12 @@
 from aiogram import Router, F, types
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.exceptions import TelegramBadRequest
+
+from handlers.profile.settings_timezone import (
+    timezone_keyboard,
+    get_timezone_display
+)
+
 import logging
 
 from config import PUBLIC_CHAT_ID, CHAT_USERNAME
@@ -34,21 +40,19 @@ async def show_profile_settings(callback: CallbackQuery):
 
     settings = await profile_settings_service.get_settings_for_user(user_id)
 
-    logger.info(
-        f"[SETTINGS] Текущие настройки пользователя {user_id}: "
-        f"тон={settings['tone_label']}, share_on={settings['share_on']}"
-    )
-
     # --- Проверяем участие в чате ---
     in_chat = await is_user_in_public_chat(bot, user_id)
 
-    # --- Клавиатура ---
+    tz = settings.get("timezone")
+    timezone_label = get_timezone_display(tz)
+
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
             InlineKeyboardButton(text="Друг 🤝", callback_data="tone_friend"),
             InlineKeyboardButton(text="Игровой 🎮", callback_data="tone_gamer"),
             InlineKeyboardButton(text="Спартанец ⚔️", callback_data="tone_spartan"),
         ],
+        timezone_keyboard(tz).inline_keyboard[0],
         [
             InlineKeyboardButton(
                 text=f"Публикация медиа: {'🟢 Вкл' if settings['share_on'] else '⚪ Выкл'}",
@@ -60,19 +64,9 @@ async def show_profile_settings(callback: CallbackQuery):
         ]
     ])
 
-    # --- Текст ---
-    text = (
-        f"⚙️ <b>Настройки</b>\n\n"
-        f"🔔 Тон уведомлений: <b>{settings['tone_label']}</b>\n"
-        f"📢 Публикация медиа: <b>{'🟢 Вкл' if settings['share_on'] else '⚪ Выкл'}</b>\n\n"
-    )
-
-       # 🔒 Если пользователь НЕ в чате — добавляем кнопку В КЛАВИАТУРУ
     if not in_chat:
-        logger.info(f"[SETTINGS] Пользователь {user_id} не в чате — добавляем кнопку входа")
-
         keyboard.inline_keyboard.insert(
-            -1,  # вставляем перед кнопкой «Назад»
+            -1,
             [
                 InlineKeyboardButton(
                     text="💬 Вступить в общий чат",
@@ -81,10 +75,10 @@ async def show_profile_settings(callback: CallbackQuery):
             ]
         )
 
-    # --- Текст ---
     text = (
         f"⚙️ <b>Настройки</b>\n\n"
         f"🔔 Тон уведомлений: <b>{settings['tone_label']}</b>\n"
+        f"🕒 Регион: <b>{timezone_label}</b>\n"
         f"📢 Публикация медиа: <b>{'🟢 Вкл' if settings['share_on'] else '⚪ Выкл'}</b>\n\n"
         f"Выбери нужные параметры 👇"
     )
@@ -103,6 +97,7 @@ async def show_profile_settings(callback: CallbackQuery):
             raise
 
     await callback.answer()
+
 
 
 # =====================================================
