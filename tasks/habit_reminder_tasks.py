@@ -46,7 +46,14 @@ async def habit_reminder_task(bot: Bot):
 
 
 async def process_all_reminders(bot: Bot, pool):
+    # Берём текущее UTC-время ОДИН РАЗ за проход
     now_utc = datetime.now(timezone.utc)
+
+    # 🧹 Очистка LAST_SENT от прошлых дней
+    today = now_utc.date()
+    LAST_SENT.difference_update(
+        {key for key in LAST_SENT if key[2] != today}
+    )
 
     async with pool.acquire() as conn:
         rows = await conn.fetch("""
@@ -80,13 +87,14 @@ async def process_single_reminder(bot: Bot, row, now_utc):
         tz = pytz.timezone("Europe/Kyiv")
 
     local_time = now_utc.astimezone(tz)
-
-    # 🔥 Допуск ±1 минута
-    target_minutes = reminder_time.hour * 60 + reminder_time.minute
-    current_minutes = local_time.hour * 60 + local_time.minute
-
-    if abs(current_minutes - target_minutes) > 1:
+    
+    # 🔥 Сравнение ТОЛЬКО по локальному часу и минуте
+    if (
+        local_time.hour != reminder_time.hour
+        or local_time.minute != reminder_time.minute
+    ):
         return
+
 
     # 🔒 Защита от повторной отправки в день
     key = (user_id, habit_id, local_time.date())
