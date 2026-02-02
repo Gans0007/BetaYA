@@ -65,17 +65,28 @@ async def subscription_checker(bot):
                         WHERE user_id = $1
                     """, user_id, new_until)
 
-                    affiliate_id = await get_affiliate_for_user(user_id)
-                    if affiliate_id:
+                    # 💸 Начисление партнёру по УРОВНЮ (автопродление)
+                    SUBSCRIPTION_PRICE = 10.0
+
+                    ok, amount, level = await affiliate_service.reward_for_subscription_payment(
+                        referral_user_id=user_id,
+                        subscription_price=SUBSCRIPTION_PRICE
+                    )
+
+                    if ok and amount > 0 and level:
+                        affiliate_id = await get_affiliate_for_user(user_id)
+
                         logger.info(
-                            f"[REF-ACTIVATE] Пользователь {user_id} → автоподписка → affiliate {affiliate_id}"
+                            f"[REF-RENEW] Пользователь {user_id} → affiliate {affiliate_id}: "
+                            f"{level['title']} ({level['percent']}%) → ${amount}"
                         )
-                        await affiliate_service.activate_referral(user_id, 0.50)
 
                         try:
                             await bot.send_message(
                                 affiliate_id,
-                                "🔥 Твой реферал продлил подписку автоматически!\n💰 Начислено $0.50"
+                                f"🔥 Реферал продлил подписку автоматически!\n"
+                                f"🏅 Уровень партнёра: {level['emoji']} {level['title']} ({level['percent']}%)\n"
+                                f"💰 Начислено: ${amount}"
                             )
                         except Exception as e:
                             logger.warning(

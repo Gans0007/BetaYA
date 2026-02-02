@@ -1,5 +1,6 @@
 import logging
 from repositories import affiliate_repository as repo
+from core.affiliate_levels import AFFILIATE_LEVELS
 
 class AffiliateService:
 
@@ -140,6 +141,70 @@ class AffiliateService:
         )
 
         return True
+
+    # =========================================================
+    # 🏅 УРОВНИ ПАРТНЁРА / ПРОГРЕСС / ДИНАМИЧЕСКИЙ %
+    # =========================================================
+
+    def _get_level_and_next(self, active_referrals: int):
+        """
+        Внутренний метод:
+        определяет текущий и следующий уровень по активным рефералам
+        """
+        current = AFFILIATE_LEVELS[0]
+        next_level = None
+
+        for lvl in AFFILIATE_LEVELS:
+            if active_referrals >= lvl["min_active"]:
+                current = lvl
+            elif next_level is None:
+                next_level = lvl
+
+        return current, next_level
+
+    async def get_affiliate_level_info(self, affiliate_id: int):
+        """
+        Возвращает:
+        current_level, next_level, need_to_next (int | None)
+        """
+        stats = await repo.get_affiliate_stats(affiliate_id)
+        active = stats["active"]
+
+        current, next_level = self._get_level_and_next(active)
+
+        need = None
+        if next_level:
+            need = max(0, next_level["min_active"] - active)
+
+        return current, next_level, need
+
+    async def reward_for_subscription_payment(
+        self,
+        referral_user_id: int,
+        subscription_price: float
+    ):
+        """
+        Универсальный метод начисления:
+        - первый платёж
+        - автопродление
+        """
+        affiliate_id = await repo.get_affiliate_for_user(referral_user_id)
+        if not affiliate_id:
+            return False, 0.0, None
+
+        current_level, _, _ = await self.get_affiliate_level_info(affiliate_id)
+
+        percent = current_level["percent"]
+        amount = round(subscription_price * percent / 100, 2)
+
+        # продление
+        if await repo.is_referral_active(referral_user_id):
+            await self.pay_for_subscription_renewal(referral_user_id, amount)
+            return True, amount, current_level
+
+        # первый платёж
+        ok = await self.activate_referral(referral_user_id, amount)
+        return ok, amount, current_level
 
 
 

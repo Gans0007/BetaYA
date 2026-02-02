@@ -35,31 +35,77 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
     logging.info(f"[AFFILIATE] Пользователь {user_id} открыл меню партнёрки")
 
     dashboard = await affiliate_service.get_affiliate_dashboard(user_id)
-    code = dashboard["code"]
+
+    current_level, next_level, need = await affiliate_service.get_affiliate_level_info(
+        user_id
+    )
 
     bot_username = (await callback.message.bot.get_me()).username
-    ref_link = f"https://t.me/{bot_username}?start={code}"
+    ref_link = f"https://t.me/{bot_username}?start={dashboard['code']}"
 
     text = (
-        "💼 Партнёрская программа\n\n"
-        f"🔗 Твой реферальный код: {code}\n"
-        f"🌐 Реферальная ссылка:\n{ref_link}\n\n"
-        f"👥 Всего приглашено: {dashboard['invited']}\n"
-        f"🔥 Активных: {dashboard['active']}\n\n"
-        f"💰 Заработано: {dashboard['payments']}$\n"
-        f"🏦 Выплачено: {dashboard['paid_out']}$\n\n"
-        "Ты получаешь 20% от стоимости подписки за каждого активного реферала."
+        "🏅 ПАРТНЁРСКИЙ СТАТУС\n\n"
+        f"Уровень: {current_level['emoji']} {current_level['title']}\n"
+        f"💰 Доход: {dashboard['payments']} $\n"
+        f"👥 Активных: {dashboard['active']}\n\n"
+        f"📈 {current_level['percent']}% с платежей\n"
+    )
+
+    if next_level:
+        text += (
+            f"\n📊 До уровня {next_level['emoji']} {next_level['title']}:\n"
+            f"ещё {need} активных рефералов\n"
+            f"➡️ будет {next_level['percent']}%\n"
+        )
+    else:
+        text += "\n🔥 Максимальный уровень\n"
+
+    text += (
+        "\nℹ️ Как зарабатывать больше:\n"
+        "• Пригласи друга → он оплачивает подписку\n"
+        "• Ты получаешь % с каждого его платежа\n"
+        "• Увеличивай команду — повышай пассивный доход\n"
+        "• Вся статистика отслеживается здесь.\n"
+    )
+
+    text += (
+        "\n━━━━━━━━━━━━━━\n"
+        "🔗 Твоя партнёрская ссылка ниже:\n"
+
     )
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="👥 Мои рефералы", callback_data="affiliate_referrals_list")],
-            [InlineKeyboardButton(text="💰 Выплаты", callback_data="affiliate_payments_list")],
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back_to_profile_menu")]
+            [
+                InlineKeyboardButton(
+                    text="📤 Поделиться ссылкой",
+                    switch_inline_query=ref_link
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="👥 Рефералы",
+                    callback_data="affiliate_referrals_list"
+                ),
+                InlineKeyboardButton(
+                    text="💰 Выплаты",
+                    callback_data="affiliate_payments_list"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="⬅️ Назад",
+                    callback_data="back_to_profile_menu"
+                )
+            ]
         ]
     )
 
-    await callback.message.edit_text(text, reply_markup=kb)
+    await callback.message.edit_text(
+        text,
+        reply_markup=kb,
+        disable_web_page_preview=True
+    )
     await callback.answer()
 
 

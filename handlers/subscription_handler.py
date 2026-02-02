@@ -4,8 +4,6 @@ from datetime import datetime, timedelta, timezone
 from config import PUBLIC_CHANNEL_ID
 from repositories.affiliate_repository import (
     get_affiliate_for_user,
-    add_payment_to_affiliate,
-    mark_referral_active,
     mark_referral_inactive
 )
 
@@ -38,9 +36,36 @@ async def check_subscription_callback(callback: types.CallbackQuery):
     # 2️⃣ Если пользователь в канале → активируем подписку на 30 дней
     if in_group:
         now = datetime.now(timezone.utc)
+
+        # 🛡 Защита от двойного нажатия / повторного начисления
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow("""
+                SELECT access_until
+                FROM users
+                WHERE user_id = $1
+            """, user_id)
+
+        if row and row["access_until"] and row["access_until"] > now:
+            logging.info(
+                f"[NEED TO PAY] Повторное нажатие 'Проверить доступ' "
+                f"для пользователя {user_id} — подписка уже активна"
+            )
+
+            await callback.message.edit_text(
+                f"✅ Подписка уже активна!\n"
+                f"Доступ до: <b>{row['access_until'].strftime('%d.%m.%Y')}</b>",
+                parse_mode="HTML"
+            )
+            await callback.answer()
+            return
+
+        # ⏳ Подписка истекла → продлеваем
         new_until = now + timedelta(days=30)
 
-        logging.info(f"[NEED TO PAY] Подписка подтверждена — доступ до {new_until} для пользователя {user_id}")
+        logging.info(
+            f"[NEED TO PAY] Подписка подтверждена — доступ до {new_until} "
+            f"для пользователя {user_id}"
+        )
 
         async with pool.acquire() as conn:
             await conn.execute("""
@@ -50,21 +75,33 @@ async def check_subscription_callback(callback: types.CallbackQuery):
                 WHERE user_id = $1
             """, user_id, new_until)
 
-        # 💸 Начисление партнёру (10% от 5$ = $0.50)
-        affiliate_id = await get_affiliate_for_user(user_id)
+        # 💸 Начисление партнёру по УРОВНЮ (первый платёж / продление)
+        SUBSCRIPTION_PRICE = 10.0
 
-        if affiliate_id:
-            logging.info(f"[NEED TO PAY] Реферал подтверждён. Партнёр {affiliate_id} получает +$0.50")
+        ok, amount, level = await affiliate_service.reward_for_subscription_payment(
+            referral_user_id=user_id,
+            subscription_price=SUBSCRIPTION_PRICE
+        )
 
-            await affiliate_service.activate_referral(user_id, 1)
+        if ok and amount > 0 and level:
+            affiliate_id = await get_affiliate_for_user(user_id)
+
+            logging.info(
+                f"[NEED TO PAY] Начисление партнёру {affiliate_id}: "
+                f"{level['title']} ({level['percent']}%) → ${amount}"
+            )
 
             try:
                 await callback.message.bot.send_message(
                     affiliate_id,
-                    "🔥 Твой реферал продлил подписку!\n💰 Тебе начислено $1"
+                    f"🔥 Реферал оплатил подписку!\n"
+                    f"🏅 Уровень партнёра: {level['emoji']} {level['title']} ({level['percent']}%)\n"
+                    f"💰 Начислено: ${amount}"
                 )
-            except:
-                logging.warning(f"[NEED TO PAY] Не удалось отправить уведомление партнёру {affiliate_id}")
+            except Exception as e:
+                logging.warning(
+                    f"[NEED TO PAY] Не удалось отправить уведомление партнёру {affiliate_id}: {e}"
+                )
 
         await callback.message.edit_text(
             f"✅ Подписка подтверждена!\n"
@@ -75,6 +112,7 @@ async def check_subscription_callback(callback: types.CallbackQuery):
 
         await callback.answer()
         return
+
 
     # 3️⃣ Если пользователь НЕ в канале → подписка не активна
     logging.info(f"[NEED TO PAY] Подписка НЕ найдена у пользователя {user_id} — требуется оплата")

@@ -94,7 +94,7 @@ async def main():
     from handlers.confirm_habit_handler import process_task_from_queue
     asyncio.create_task(queue_consumer(process_task_from_queue, bot))
 
-    from subscriprion_check_task import subscription_checker
+    from subscription_check_task import subscription_checker
     asyncio.create_task(subscription_checker(bot))
 
     logging.info("🤖 Bot started")
