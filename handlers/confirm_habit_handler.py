@@ -218,7 +218,7 @@ async def process_task_from_queue(task, bot):
 
 
         # 🏆 Achievements: habit confirmed
-        achievement_service = bot.state.achievement_service
+        achievement_service = getattr(bot, "achievement_service", None)
         if achievement_service and result.get("total_confirmed") is not None:
             await achievement_service.check(
                 user_id=user_id,
