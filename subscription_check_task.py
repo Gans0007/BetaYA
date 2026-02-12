@@ -96,9 +96,11 @@ async def subscription_checker(bot):
                     continue
 
                 # -------------------------------------------------
-                # 🔴 4. Подписка закончилась И пользователь НЕ в канале
+                # 🔴 4. Подписка реально истекла (по access_until)
                 # -------------------------------------------------
-                if not notified:
+                subscription_expired = not access_until or access_until <= now
+
+                if subscription_expired and not notified:
                     # 🔒 Отключаем доступ ОДИН РАЗ
                     await conn.execute("""
                         UPDATE users
@@ -106,6 +108,24 @@ async def subscription_checker(bot):
                             subscription_notified = TRUE
                         WHERE user_id = $1
                     """, user_id)
+                    # 🚪 Удаляем пользователя из закрытого чата
+                    try:
+                        await bot.ban_chat_member(
+                            chat_id=-1002392347850,
+                            user_id=user_id
+                        )
+                        await bot.unban_chat_member(
+                            chat_id=-1002392347850,
+                            user_id=user_id
+                        )
+                        logger.info(
+                            f"[CHAT-REMOVE] Пользователь {user_id} удалён из закрытого чата"
+                        )
+                    except Exception as e:
+                        logger.warning(
+                            f"[CHAT-REMOVE-ERROR] Пользователь {user_id}: {e}"
+                        )
+
 
                     # ❌ Деактивируем реферала ОДИН РАЗ
                     try:
@@ -123,7 +143,7 @@ async def subscription_checker(bot):
                         await bot.send_message(
                             user_id,
                             "⛔ *Подписка закончилась!*\n\n"
-                            "Чтобы продолжить пользоваться ботом — оплати доступ.\n\n"
+                            "Чтобы продолжить пользоваться преймуществами PRO версии — оплати доступ.\n\n"
                             "Выбери действие ниже:",
                             parse_mode="Markdown",
                             reply_markup=types.InlineKeyboardMarkup(
