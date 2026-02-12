@@ -72,6 +72,7 @@ async def main():
     # 🏆 Achievements system
     achievement_service = await setup_achievements()
     dp.workflow_data["achievement_service"] = achievement_service
+    bot.achievement_service = achievement_service
 
     # Routers
     dp.include_router(start_router)
