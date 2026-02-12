@@ -111,6 +111,20 @@ async def create_users_table():
         """)
 
         # -------------------------------
+        # 🏆 Таблица достижений пользователя (user_achievements)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_achievements (
+                user_id BIGINT NOT NULL,
+                achievement_id TEXT NOT NULL,
+                unlocked_at TIMESTAMPTZ DEFAULT NOW(),
+
+                PRIMARY KEY (user_id, achievement_id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
         # 🔹 Индексы для ускорения запросов
         # -------------------------------
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id)")

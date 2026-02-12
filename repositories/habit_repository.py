@@ -39,3 +39,15 @@ async def insert_habit(user_id: int, name: str, desc: str, days: int, diff: int)
             """,
             user_id, name, desc, days, diff
         )
+
+
+async def count_active_habits(user_id: int) -> int:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        result = await conn.fetchval("""
+            SELECT COUNT(*) 
+            FROM habits
+            WHERE user_id = $1
+              AND is_active = TRUE
+        """, user_id)
+    return result or 0

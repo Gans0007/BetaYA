@@ -124,7 +124,7 @@ async def check_subscription_callback(callback: types.CallbackQuery):
 
     await callback.message.answer(
         "⛔ Подписка не найдена.\n\n"
-        "Чтобы продолжить пользоваться ботом — оплати подписку:",
+        "Чтобы открыть безлимит — вступай в закрытое сообщество. Ты не один:",
         reply_markup=types.InlineKeyboardMarkup(
             inline_keyboard=[
                 [

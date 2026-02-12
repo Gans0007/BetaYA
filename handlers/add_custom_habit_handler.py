@@ -6,6 +6,8 @@ import logging
 
 from services.habit_create_service import create_custom_habit
 from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
+from services.access_service import can_add_habit
+from services.subscription_message_service import show_subscription_limit_message
 
 router = Router()
 
@@ -55,7 +57,15 @@ async def cancel_fsm(callback: types.CallbackQuery, state: FSMContext):
 # -------------------------------
 @router.callback_query(F.data == "add_custom_habit")
 async def start_add_habit(callback: types.CallbackQuery, state: FSMContext):
-    logging.info(f"[ADD HABIT] Пользователь {callback.from_user.id} начал создание привычки")
+    user_id = callback.from_user.id
+    logging.info(f"[ADD HABIT] Пользователь {user_id} начал создание привычки")
+
+    # ✅ NEW: проверка лимита (триггер именно на попытку добавить)
+    allowed, active_count = await can_add_habit(user_id)
+    if not allowed:
+        await callback.answer()
+        await show_subscription_limit_message(callback.message, active_count)
+        return
 
     await clear_fsm_ui(
         state=state,

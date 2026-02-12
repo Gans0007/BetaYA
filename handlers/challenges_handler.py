@@ -13,6 +13,9 @@ from services.challenge_service import (
 
 from data.challenges_data import LEVEL_QUOTES
 
+from services.access_service import can_add_habit
+from services.subscription_message_service import show_subscription_limit_message
+
 router = Router()
 
 logging.basicConfig(
@@ -158,6 +161,13 @@ async def accept_challenge_handler(callback: types.CallbackQuery):
     user_id = callback.from_user.id
 
     logging.info(f"[CHALLENGE] Пользователь {user_id} пытается взять челлендж index={index} в {level_key}")
+
+    # ✅ NEW: лимит проверяем именно при попытке взять (создать) челлендж
+    allowed, active_count = await can_add_habit(user_id)
+    if not allowed:
+        await callback.answer()
+        await show_subscription_limit_message(callback.message, active_count)
+        return
 
     challenges, active_ids, active_diff, completed = \
         await get_challenge_list(user_id, level_key)
