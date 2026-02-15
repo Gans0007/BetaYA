@@ -24,8 +24,6 @@ from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
 from handlers.habit_reminder_handler import router as habit_reminder_router
 
-from achievements import setup_achievements
-
 from tasks.habit_reminder_tasks import habit_reminder_task
 
 
@@ -68,10 +66,6 @@ async def main():
     await create_pool()
     await create_users_table()
     logging.info("✅ Database connected")
-
-    # 🏆 Achievements system
-    achievement_service = await setup_achievements()
-    dp.workflow_data["achievement_service"] = achievement_service
 
     # Routers
     dp.include_router(start_router)

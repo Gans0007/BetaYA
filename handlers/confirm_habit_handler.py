@@ -217,17 +217,6 @@ async def process_task_from_queue(task, bot):
             return
 
 
-        # 🏆 Achievements: habit confirmed
-        achievement_service = bot.state.achievement_service
-        if achievement_service and result.get("total_confirmed") is not None:
-            await achievement_service.check(
-                user_id=user_id,
-                event="habit_confirmed",
-                context={
-                    "total_confirmed": result["total_confirmed"]
-                }
-            )
-
         if result.get("self_message"):
             await bot.send_message(
                 chat_id=chat_id,
