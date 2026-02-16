@@ -4,10 +4,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 
-from database import get_pool
 from services.confirm_habit_service import habit_service
 from services.message_queue import QUEUE_CONFIRM
 from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
+from config import PUBLIC_CHAT_ID
 
 router = Router()
 
@@ -36,13 +36,11 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
 
     logging.info(f"[CONFIRM] user={user_id} habit={habit_id}")
 
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        result = await habit_service.start_confirmation(conn, user_id, habit_id)
+    result = await habit_service.start_confirmation(user_id, habit_id)
 
-        if result.get("error") == "HABIT_NOT_FOUND":
-            await callback.answer("❌ Привычка не найдена.", show_alert=True)
-            return
+    if result.get("error") == "HABIT_NOT_FOUND":
+        await callback.answer("❌ Привычка не найдена.", show_alert=True)
+        return
 
     await state.update_data(
         habit_id=habit_id,
@@ -161,13 +159,11 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
     )
     await state.clear()
 
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        start = await habit_service.start_confirmation(conn, user_id, habit_id)
+    start = await habit_service.start_confirmation(user_id, habit_id)
 
-        if start.get("error") == "HABIT_NOT_FOUND":
-            await callback.answer("❌ Привычка не найдена.", show_alert=True)
-            return
+    if start.get("error") == "HABIT_NOT_FOUND":
+        await callback.answer("❌ Привычка не найдена.", show_alert=True)
+        return
 
     await QUEUE_CONFIRM.put({
         "user_id": user_id,
@@ -195,18 +191,15 @@ async def process_task_from_queue(task, bot):
         chat_id = task["chat_id"]
         reply_to = task["reply_to"]
 
-        FREE_MAIN_CHAT = -1002375148535
+        PUBLIC_CHAT_ID
 
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-            result = await habit_service.process_confirmation_media(
-                conn=conn,
-                user_id=user_id,
-                habit_id=habit_id,
-                file_id=file_id,
-                file_type=file_type,
-                reverify=reverify,
-            )
+        result = await habit_service.process_confirmation_media(
+            user_id=user_id,
+            habit_id=habit_id,
+            file_id=file_id,
+            file_type=file_type,
+            reverify=reverify,
+        )
 
         if result.get("error"):
             await bot.send_message(
@@ -216,17 +209,7 @@ async def process_task_from_queue(task, bot):
             )
             return
 
-
-        # 🏆 Achievements: habit confirmed
-        achievement_service = getattr(bot, "achievement_service", None)
-        if achievement_service and result.get("total_confirmed") is not None:
-            await achievement_service.check(
-                user_id=user_id,
-                event="habit_confirmed",
-                context={
-                    "total_confirmed": result["total_confirmed"]
-                }
-            )
+#--------
 
         if result.get("self_message"):
             await bot.send_message(
@@ -241,7 +224,7 @@ async def process_task_from_queue(task, bot):
 
         if file_type is None or not share_allowed:
             await bot.send_message(
-                FREE_MAIN_CHAT,
+                PUBLIC_CHAT_ID,
                 caption_text,
                 parse_mode="Markdown"
             )
@@ -249,7 +232,7 @@ async def process_task_from_queue(task, bot):
 
         if file_type == "photo":
             await bot.send_photo(
-                FREE_MAIN_CHAT,
+                PUBLIC_CHAT_ID,
                 file_id,
                 caption=caption_text,
                 parse_mode="Markdown"
@@ -257,16 +240,16 @@ async def process_task_from_queue(task, bot):
 
         elif file_type == "video":
             await bot.send_video(
-                FREE_MAIN_CHAT,
+                PUBLIC_CHAT_ID,
                 file_id,
                 caption=caption_text,
                 parse_mode="Markdown"
             )
 
         elif file_type == "circle":
-            await bot.send_video_note(FREE_MAIN_CHAT, file_id)
+            await bot.send_video_note(PUBLIC_CHAT_ID, file_id)
             await bot.send_message(
-                FREE_MAIN_CHAT,
+                PUBLIC_CHAT_ID,
                 caption_text,
                 parse_mode="Markdown"
             )

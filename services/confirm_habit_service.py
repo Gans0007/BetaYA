@@ -1,6 +1,8 @@
 from datetime import datetime
 import pytz
+import random
 
+from core.database import get_pool
 from data.challenges_data import FINAL_MESSAGES
 from services.user_service import recalculate_total_confirmed_days, update_user_streak
 from services.xp_service import add_xp_for_confirmation
@@ -25,22 +27,20 @@ from repositories.confirm_habit_repository import (
 
 from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
 from handlers.tone.confirm_caption_tone import HABIT_CAPTION_TONE
-import random
 
 
 class HabitService:
-    """
-    Логика подтверждения привычки.
-    Полностью обновлена под новую систему публикаций:
-    - Больше НЕТ выбора чата
-    - Нет choose_target_chat
-    - Чаты выбираются в handler-е, а не тут
-    """
 
     # ================================
-    #  Старт подтверждения
+    # START CONFIRMATION (обёртка)
     # ================================
-    async def start_confirmation(self, conn, user_id: int, habit_id: int):
+    async def start_confirmation(self, user_id: int, habit_id: int):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                return await self._start_confirmation_logic(conn, user_id, habit_id)
+
+    async def _start_confirmation_logic(self, conn, user_id, habit_id):
         user_row = await get_user_timezone(conn, user_id)
         user_tz = user_row["timezone"] if user_row else "Europe/Kyiv"
         tz = pytz.timezone(user_tz)
@@ -56,7 +56,6 @@ class HabitService:
 
         last = await get_last_confirmation_for_habit(conn, user_id, habit_id)
 
-        # проверяем reverify
         if last:
             last_dt = last["datetime"].astimezone(tz)
             if last_dt.date() == now.date():
@@ -72,25 +71,49 @@ class HabitService:
             "reverify": False,
             "text": f"📸 Пришли фото, видео или кружочек для подтверждения {title} 💪",
             "parse_mode": "Markdown",
-            "allow_no_media": True,  # 🔥 ВОТ ЭТО
+            "allow_no_media": True,
         }
 
     # ================================
-    #  ОБРАБОТКА МЕДИА
+    # PROCESS MEDIA (обёртка)
     # ================================
     async def process_confirmation_media(
         self,
-        conn,
         user_id: int,
         habit_id: int,
         file_id: str | None,
         file_type: str | None,
         reverify: bool,
     ):
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                return await self._process_confirmation_logic(
+                    conn,
+                    user_id,
+                    habit_id,
+                    file_id,
+                    file_type,
+                    reverify,
+                )
+
+    async def _process_confirmation_logic(
+        self,
+        conn,
+        user_id,
+        habit_id,
+        file_id,
+        file_type,
+        reverify,
+    ):
 
         exists = await habit_exists(conn, habit_id)
         if not exists:
             return {"error": "HABIT_NOT_FOUND"}
+
+        # === дальше оставляешь весь свой старый код ===
+        # НИЧЕГО ВНУТРИ ЛОГИКИ МЕНЯТЬ НЕ НУЖНО
+
 
         # =============================
         # ♻️ REVERIFY

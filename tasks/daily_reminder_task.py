@@ -3,7 +3,7 @@ import asyncio
 import random
 from datetime import datetime, timedelta
 import pytz
-from database import get_pool
+from core.database import get_pool
 from aiogram import Bot
 
 from handlers.tone.daily_reminder_tone import REMINDER_MESSAGES_TONE

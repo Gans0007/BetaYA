@@ -1,4 +1,4 @@
-from database import get_pool
+from core.database import get_pool
 from aiogram import Bot
 from config import BOT_TOKEN  # если токен у тебя в другом месте — укажи путь
 bot = Bot(token=BOT_TOKEN)

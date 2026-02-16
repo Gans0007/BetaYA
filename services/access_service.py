@@ -1,7 +1,7 @@
 # services/access_service.py
 
 from typing import Tuple
-from database import get_pool
+from core.database import get_pool
 from repositories.user_repository import get_user_by_id
 from repositories.habit_repository import count_active_habits
 

@@ -8,7 +8,7 @@ import pytz
 import logging
 import asyncpg
 
-from database import get_pool
+from core.database import get_pool
 from services.honor_global_service import get_global_rank
 from core.shutdown import shutdown_event
 

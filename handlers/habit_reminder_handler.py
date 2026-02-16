@@ -10,7 +10,7 @@ import pytz
 import re
 import logging
 
-from database import get_pool
+from core.database import get_pool
 
 router = Router()
 logger = logging.getLogger(__name__)

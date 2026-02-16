@@ -3,7 +3,7 @@ from aiogram import Router, types, F
 from aiogram.types import CallbackQuery, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from database import get_pool
+from core.database import get_pool
 from services.xp_service import LEAGUES
 from handlers.tone.honor_board_tone import HONOR_TONE
 import random

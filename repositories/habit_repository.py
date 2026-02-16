@@ -1,6 +1,6 @@
 # repositories/habit_repository.py
 
-from database import get_pool
+from core.database import get_pool
 
 # =====================================================
 # 🔹 Репозиторий: добавление пользовательской привычки

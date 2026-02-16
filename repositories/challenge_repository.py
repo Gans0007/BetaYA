@@ -1,4 +1,4 @@
-from database import get_pool
+from core.database import get_pool
 
 
 # =====================================================

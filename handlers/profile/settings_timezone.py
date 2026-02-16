@@ -5,7 +5,7 @@ import logging
 import pytz
 
 
-from database import get_pool
+from core.database import get_pool
 
 router = Router()
 logger = logging.getLogger(__name__)

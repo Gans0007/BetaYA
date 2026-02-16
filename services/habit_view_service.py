@@ -4,7 +4,7 @@ import pytz
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from services.profile_settings_service import profile_settings_service
 
-from database import get_pool
+from core.database import get_pool
 
 
 # =====================================================

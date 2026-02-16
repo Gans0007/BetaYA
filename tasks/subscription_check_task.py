@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 
 from aiogram import types
 from config import PUBLIC_CHANNEL_ID
-from database import get_pool
+from core.database import get_pool
 
 from repositories.affiliate_repository import get_affiliate_for_user
 from services.affiliate_service import affiliate_service

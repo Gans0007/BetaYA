@@ -1,5 +1,5 @@
 # repositories/profile_stats_repository.py
-from database import get_pool
+from core.database import get_pool
 
 
 async def get_user_stats(user_id: int):

@@ -3,12 +3,14 @@ import logging
 import signal
 from contextlib import suppress
 
-from core.shutdown import shutdown_event
-
 from aiogram import Bot, Dispatcher, types
 from config import BOT_TOKEN
-from database import create_pool, close_pool
-from init_pg_db import create_users_table
+
+from core import (
+    shutdown_event,
+    startup,
+    shutdown,
+)
 
 from handlers.start_handler import router as start_router
 from handlers.add_habit_handler import router as add_habit_router
@@ -16,25 +18,19 @@ from handlers.challenges_handler import router as challenges_router
 from handlers.add_custom_habit_handler import router as add_custom_habit_router
 from handlers import confirm_habit_handler
 from handlers import active_tasks_handler
-
-#----__init.py PROFILE ----
 from handlers.profile import setup as setup_profile
-
 from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
 from handlers.habit_reminder_handler import router as habit_reminder_router
 
-from achievements import setup_achievements
-
 from tasks.habit_reminder_tasks import habit_reminder_task
-
+from tasks.habit_reset_task import check_habit_resets
+from tasks.challenge_reset_task import check_challenge_resets
+from tasks.honor_global_task import honor_global_rank_daily
 
 from middlewares.subscription_middleware import SubscriptionMiddleware
-from habit_reset_task import check_habit_resets
-from challenge_reset_task import check_challenge_resets
-from honor_global_task import honor_global_rank_daily
-
 from services.message_queue import queue_consumer, QUEUE_CONFIRM
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -42,12 +38,39 @@ logging.basicConfig(
 )
 
 
+# -------------------------------------------------
+# 🔹 Graceful shutdown handler
+# -------------------------------------------------
 def setup_signal_handlers(loop):
     for sig in (signal.SIGTERM, signal.SIGINT):
         with suppress(NotImplementedError):
             loop.add_signal_handler(sig, shutdown_event.set)
 
 
+# -------------------------------------------------
+# 🔹 Background tasks launcher
+# -------------------------------------------------
+async def start_background_tasks(bot):
+    from tasks.daily_reminder_task import send_daily_reminders
+    from handlers.confirm_habit_handler import process_task_from_queue
+    from tasks.subscription_check_task import subscription_checker
+
+    tasks = []
+
+    tasks.append(asyncio.create_task(honor_global_rank_daily(bot)))
+    tasks.append(asyncio.create_task(check_challenge_resets(bot)))
+    tasks.append(asyncio.create_task(check_habit_resets(bot)))
+    tasks.append(asyncio.create_task(habit_reminder_task(bot)))
+    tasks.append(asyncio.create_task(send_daily_reminders(bot)))
+    tasks.append(asyncio.create_task(queue_consumer(process_task_from_queue, bot)))
+    tasks.append(asyncio.create_task(subscription_checker(bot)))
+
+    return tasks
+
+
+# -------------------------------------------------
+# 🔹 Main
+# -------------------------------------------------
 async def main():
     if not BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN не задан")
@@ -65,15 +88,6 @@ async def main():
     dp.message.middleware(SubscriptionMiddleware())
     dp.callback_query.middleware(SubscriptionMiddleware())
 
-    await create_pool()
-    await create_users_table()
-    logging.info("✅ Database connected")
-
-    # 🏆 Achievements system
-    achievement_service = await setup_achievements()
-    dp.workflow_data["achievement_service"] = achievement_service
-    bot.achievement_service = achievement_service
-
     # Routers
     dp.include_router(start_router)
     dp.include_router(add_habit_router)
@@ -86,39 +100,15 @@ async def main():
     dp.include_router(subscription_router)
     dp.include_router(habit_reminder_router)
 
-    # Background tasks
-    asyncio.create_task(honor_global_rank_daily(bot))
-    asyncio.create_task(check_challenge_resets(bot))
-    asyncio.create_task(check_habit_resets(bot))
-    asyncio.create_task(habit_reminder_task(bot))
-
-
-    from daily_reminder_task import send_daily_reminders
-    asyncio.create_task(send_daily_reminders(bot))
-
-    from handlers.confirm_habit_handler import process_task_from_queue
-    asyncio.create_task(queue_consumer(process_task_from_queue, bot))
-
-    from subscription_check_task import subscription_checker
-    asyncio.create_task(subscription_checker(bot))
+    # --- STARTUP ---
+    background_tasks = await startup(bot, start_background_tasks)
 
     logging.info("🤖 Bot started")
 
     try:
         await dp.start_polling(bot)
     finally:
-        logging.warning("🛑 Shutdown initiated")
-
-        shutdown_event.set()
-
-        logging.warning("⏳ Waiting for queue to finish...")
-        await QUEUE_CONFIRM.join()
-
-        await close_pool()
-        await bot.session.close()
-
-        logging.warning("✅ Bot shutdown completed")
-
+        await shutdown(bot, background_tasks, QUEUE_CONFIRM)
 
 if __name__ == "__main__":
     asyncio.run(main())

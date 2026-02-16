@@ -4,7 +4,7 @@ import random
 import asyncio
 from datetime import datetime, timedelta
 import pytz
-from database import get_pool
+from core.database import get_pool
 
 from handlers.tone.habit_reset_tone import HABIT_RESET_TONE
 

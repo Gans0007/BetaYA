@@ -2,7 +2,7 @@
 #  honor_global_service.py
 # ================================
 
-from database import get_pool
+from core.database import get_pool
 
 
 async def get_global_rank(user_id: int) -> int | None:

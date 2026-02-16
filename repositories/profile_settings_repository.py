@@ -1,5 +1,5 @@
 # repositories/profile_settings_repository.py
-from database import get_pool
+from core.database import get_pool
 
 
 async def get_user_settings(user_id: int):

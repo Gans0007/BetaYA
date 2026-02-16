@@ -6,7 +6,7 @@ from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from database import get_pool
+from core.database import get_pool
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 

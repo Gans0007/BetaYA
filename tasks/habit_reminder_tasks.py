@@ -9,7 +9,7 @@ import logging
 import asyncpg
 
 from aiogram import Bot
-from database import get_pool
+from core.database import get_pool
 from core.shutdown import shutdown_event
 
 logger = logging.getLogger(__name__)

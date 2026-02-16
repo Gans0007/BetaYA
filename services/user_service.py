@@ -1,4 +1,6 @@
 # services/user_service.py
+from datetime import date, timedelta
+from core.database import get_pool
 
 # -------------------------------
 # 🔗 Связка репозиториев для пересчёта дней
@@ -23,9 +25,6 @@ async def recalculate_total_confirmed_days(user_id: int) -> int:
 # -------------------------------
 # 🔥 Стрик: подсчёт текущего и максимального
 # -------------------------------
-from datetime import date, timedelta
-from database import get_pool
-
 async def update_user_streak(user_id: int):
     pool = await get_pool()
 

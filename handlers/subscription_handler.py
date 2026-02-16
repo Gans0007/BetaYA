@@ -1,5 +1,5 @@
 from aiogram import Router, types
-from database import get_pool
+from core.database import get_pool
 from datetime import datetime, timedelta, timezone
 from config import PUBLIC_CHANNEL_ID
 from repositories.affiliate_repository import (

@@ -1,6 +1,6 @@
 from aiogram import Router, types, F
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from database import get_pool
+from core.database import get_pool
 
 from services.habit_view_service import send_habit_card, build_active_list
 
