@@ -3,6 +3,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from core.database import get_pool
 
 from services.habit_view_service import send_habit_card, build_active_list
+from services.user_stats_service import increment_finished_habits
 
 router = Router()
 
@@ -469,11 +470,7 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
 
         habit_name = habit["name"]
 
-        await conn.execute("""
-            UPDATE users
-            SET finished_habits = finished_habits + 1
-            WHERE user_id = $1
-        """, user_id)
+        await increment_finished_habits(conn, user_id)
 
         await conn.execute("DELETE FROM confirmations WHERE habit_id=$1", habit_id)
         await conn.execute("DELETE FROM habits WHERE id=$1 AND user_id=$2", habit_id, user_id)

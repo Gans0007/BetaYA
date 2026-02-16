@@ -11,7 +11,7 @@ async def get_user_total_stars(user_id: int) -> int:
     pool = await get_pool()
     async with pool.acquire() as conn:
         return await conn.fetchval(
-            "SELECT total_stars FROM users WHERE user_id=$1",
+            "SELECT total_stars FROM user_stats WHERE user_id=$1",
             user_id
         )
 

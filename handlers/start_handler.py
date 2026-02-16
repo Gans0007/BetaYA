@@ -107,6 +107,13 @@ async def start_command(message: types.Message, state: FSMContext):
             user_timezone,
         )
 
+        # 🔹 создаём запись статистики (если нет)
+        await conn.execute("""
+            INSERT INTO user_stats (user_id)
+            VALUES ($1)
+            ON CONFLICT (user_id) DO NOTHING
+        """, user_id)
+
     logging.info(f"💾 Пользователь сохранён/обновлён в БД: {user_id}")
 
     # -----------------------------

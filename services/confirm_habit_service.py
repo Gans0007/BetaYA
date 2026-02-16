@@ -25,6 +25,12 @@ from repositories.confirm_habit_repository import (
     update_user_challenge_counters,
 )
 
+from services.user_stats_service import (
+    increment_finished_challenges,
+    increment_total_stars,
+)
+
+
 from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
 from handlers.tone.confirm_caption_tone import HABIT_CAPTION_TONE
 
@@ -225,7 +231,14 @@ class HabitService:
                 stars = 1
 
             stars_delta = 1 if not existing else stars - existing["repeat_count"]
-            await update_user_challenge_counters(conn, stars_delta, habit_row["user_id"])
+
+            # 🔹 +1 к завершённым челленджам
+            await increment_finished_challenges(conn, habit_row["user_id"])
+
+            # 🔹 начисляем звёзды только если они есть
+            if stars_delta > 0:
+                await increment_total_stars(conn, habit_row["user_id"], stars_delta)
+
 
             cid = habit_row["challenge_id"]
             stars_display = "⭐" * stars + "☆" * (3 - stars)

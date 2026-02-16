@@ -13,7 +13,6 @@ async def create_users_table():
                 nickname TEXT,
                 username TEXT,
                 first_name TEXT,
-                finished_habits INTEGER DEFAULT 0,
                 finished_challenges INTEGER DEFAULT 0,
                 total_stars INTEGER DEFAULT 0,
                 total_confirmed_days INTEGER DEFAULT 0,
@@ -34,6 +33,19 @@ async def create_users_table():
                 subscription_notified BOOLEAN DEFAULT FALSE
             )
         """)
+
+        # -------------------------------
+        # 🔹 Таблица статистики пользователей
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_stats (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                finished_habits INTEGER DEFAULT 0,
+                finished_challenges INTEGER DEFAULT 0
+            )
+        """)
+
 
         # -------------------------------
         # 🔹 Таблица привычек (habits)
