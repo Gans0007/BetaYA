@@ -47,3 +47,14 @@ async def set_total_confirmed_days(conn, user_id: int, total_days: int):
         SET total_confirmed_days = EXCLUDED.total_confirmed_days
     """, user_id, total_days)
 
+#стрик
+async def update_current_streak(user_id: int, streak: int):
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            UPDATE user_stats
+            SET current_streak = $1
+            WHERE user_id = $2
+        """, streak, user_id)
+
+

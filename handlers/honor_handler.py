@@ -203,8 +203,14 @@ async def honor_league(callback: CallbackQuery):
     pool = await get_pool()
     async with pool.acquire() as conn:
 
-        xp_user = await conn.fetchval("SELECT xp FROM users WHERE user_id=$1", user_id)
-        league_index = get_league_by_xp(xp_user)
+        xp_user = await conn.fetchval("""
+            SELECT COALESCE(s.xp, 0)
+            FROM users u
+            LEFT JOIN user_stats s ON u.user_id = s.user_id
+            WHERE u.user_id=$1
+        """, user_id)
+
+        league_index = get_league_by_xp(float(xp_user))
         league = LEAGUES[league_index]
 
         users = await conn.fetch("""
@@ -220,7 +226,10 @@ async def honor_league(callback: CallbackQuery):
             ORDER BY s.xp DESC NULLS LAST
         """)
 
-        same = [u for u in users if get_league_by_xp(float(u["xp"])) == league_index]
+        same = [
+            u for u in users
+            if get_league_by_xp(float(u["xp"])) == league_index
+        ]
 
         top10 = same[:10]
         medals = ["👑", "🥈", "🥉"] + [f"{i}." for i in range(4, 11)]
@@ -238,9 +247,9 @@ async def honor_league(callback: CallbackQuery):
 
         for i, row in enumerate(top10):
             xp = round(float(row["xp"]), 1)
-            days = row["total_confirmed_days"] or 0
-            streak = row["current_streak"] or 0
-            stars = row["total_stars"] or 0
+            days = row["total_confirmed_days"]
+            streak = row["current_streak"]
+            stars = row["total_stars"]
 
             nick = await get_display_name(row["nickname"])
             medal = medals[i].ljust(4)
@@ -251,6 +260,7 @@ async def honor_league(callback: CallbackQuery):
 
         rank = None
         pos_row = None
+
         for idx, row in enumerate(same, start=1):
             if row["user_id"] == user_id:
                 rank = idx
@@ -262,10 +272,6 @@ async def honor_league(callback: CallbackQuery):
 
         if rank is not None and pos_row is not None:
             nick = await get_display_name(pos_row["nickname"])
-            xp = round(float(pos_row["xp"]), 1)
-            days = pos_row["total_confirmed_days"] or 0
-            streak = pos_row["current_streak"] or 0
-            stars = pos_row["total_stars"] or 0
 
             tone = await conn.fetchval(
                 "SELECT notification_tone FROM users WHERE user_id=$1",

@@ -1,11 +1,13 @@
 # services/user_stats_service.py
 
 import logging
+
 from repositories.user_stats_repository import (
     increment_finished_habits as repo_inc_habits,
     increment_finished_challenges as repo_inc_challenges,
     increment_total_stars as repo_inc_stars,
-    set_total_confirmed_days as repo_set_days
+    set_total_confirmed_days as repo_set_days,
+    update_current_streak
 )
 
 logger = logging.getLogger(__name__)
@@ -31,3 +33,7 @@ async def increment_total_stars(conn, user_id: int, stars: int):
 async def set_total_confirmed_days(conn, user_id: int, total_days: int):
     await repo_set_days(conn, user_id, total_days)
     logger.info(f"[STATS] total_confirmed_days updated → {total_days} user={user_id}")
+
+async def set_current_streak(user_id: int, streak: int):
+    await update_current_streak(user_id, streak)
+

@@ -41,7 +41,9 @@ async def create_users_table():
                 finished_habits INTEGER DEFAULT 0,
                 finished_challenges INTEGER DEFAULT 0,
                 total_stars INTEGER DEFAULT 0,
-                xp DOUBLE PRECISION DEFAULT 0
+                xp DOUBLE PRECISION DEFAULT 0,
+                total_confirmed_days INTEGER DEFAULT 0,
+                current_streak INTEGER DEFAULT 0
             )
         """)
 
