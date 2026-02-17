@@ -1,7 +1,6 @@
 from core.database import get_pool
-from aiogram import Bot
-from config import BOT_TOKEN  # если токен у тебя в другом месте — укажи путь
-bot = Bot(token=BOT_TOKEN)
+
+from repositories.user_stats_repository import increment_xp
 
 # XP за уровни челленджей
 XP_LEVELS = {
@@ -149,11 +148,7 @@ async def add_xp_for_confirmation(user_id: int, habit_id: int):
         # ------------------------------------------
         # 5) Начисляем XP пользователю
         # ------------------------------------------
-        await conn.execute("""
-            UPDATE users
-            SET xp = xp + $1
-            WHERE user_id = $2
-        """, xp_gain, user_id)
+        await increment_xp(conn, user_id, xp_gain)
 
         return xp_gain
 
@@ -177,10 +172,14 @@ async def check_next_league(user_id: int):
     pool = await get_pool()
     async with pool.acquire() as conn:
         user = await conn.fetchrow("""
-            SELECT xp, total_stars, league
-            FROM users
-            WHERE user_id = $1
-        """, user_id)
+            SELECT 
+                COALESCE(s.xp, 0) as xp,
+                COALESCE(s.total_stars, 0) as total_stars,
+                u.league
+            FROM users u
+            LEFT JOIN user_stats s ON s.user_id = u.user_id
+        WHERE u.user_id = $1
+    """, user_id)
 
     if not user:
         return {"can_level_up": False, "next_league": None}

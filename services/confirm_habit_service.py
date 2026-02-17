@@ -22,7 +22,6 @@ from repositories.confirm_habit_repository import (
     get_completed_challenge,
     update_completed_challenge,
     insert_completed_challenge,
-    update_user_challenge_counters,
 )
 
 from services.user_stats_service import (

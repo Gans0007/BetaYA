@@ -13,11 +13,8 @@ async def create_users_table():
                 nickname TEXT,
                 username TEXT,
                 first_name TEXT,
-                finished_challenges INTEGER DEFAULT 0,
-                total_stars INTEGER DEFAULT 0,
                 total_confirmed_days INTEGER DEFAULT 0,
                 notification_tone TEXT DEFAULT 'friend',
-                xp DOUBLE PRECISION DEFAULT 0,
                 league TEXT DEFAULT 'Безответственный',
                 league_emoji TEXT DEFAULT '🕳️',
                 share_confirmation_media BOOLEAN DEFAULT TRUE,
@@ -42,7 +39,9 @@ async def create_users_table():
                 id SERIAL PRIMARY KEY,
                 user_id BIGINT UNIQUE NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
                 finished_habits INTEGER DEFAULT 0,
-                finished_challenges INTEGER DEFAULT 0
+                finished_challenges INTEGER DEFAULT 0,
+                total_stars INTEGER DEFAULT 0,
+                xp DOUBLE PRECISION DEFAULT 0
             )
         """)
 

@@ -143,15 +143,3 @@ async def insert_completed_challenge(
         VALUES ($1, $2, 'auto', $3, 1)
     """, user_id, challenge_name, challenge_id)
 
-
-async def update_user_challenge_counters(
-    conn,
-    stars_delta: int,
-    user_id: int
-):
-    return await conn.execute("""
-        UPDATE users 
-        SET finished_challenges = finished_challenges + 1,
-            total_stars = total_stars + $1
-        WHERE user_id=$2
-    """, stars_delta, user_id)

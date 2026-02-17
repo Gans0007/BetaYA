@@ -18,7 +18,7 @@ async def get_user_stats(user_id: int):
                 u.joined_at,
                 u.current_streak,
                 u.max_streak,
-                u.xp,
+                COALESCE(s.xp, 0) AS xp,
                 u.league,
                 u.league_emoji
 

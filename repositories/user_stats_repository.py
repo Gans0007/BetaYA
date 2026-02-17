@@ -29,3 +29,13 @@ async def increment_total_stars(conn, user_id: int, stars: int):
         SET total_stars = user_stats.total_stars + $2
     """, user_id, stars)
 
+# +XP
+async def increment_xp(conn, user_id: int, xp: float):
+    return await conn.execute("""
+        INSERT INTO user_stats (user_id, xp)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE
+        SET xp = user_stats.xp + $2
+    """, user_id, xp)
+
+
