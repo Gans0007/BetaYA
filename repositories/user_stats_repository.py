@@ -38,4 +38,12 @@ async def increment_xp(conn, user_id: int, xp: float):
         SET xp = user_stats.xp + $2
     """, user_id, xp)
 
+# +всего дней
+async def set_total_confirmed_days(conn, user_id: int, total_days: int):
+    return await conn.execute("""
+        INSERT INTO user_stats (user_id, total_confirmed_days)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE
+        SET total_confirmed_days = EXCLUDED.total_confirmed_days
+    """, user_id, total_days)
 

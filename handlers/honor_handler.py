@@ -105,9 +105,16 @@ async def show_top10_world(msg):
         total = await conn.fetchval("SELECT COUNT(*) FROM users")
 
         rows = await conn.fetch("""
-            SELECT user_id, nickname, xp, total_confirmed_days, current_streak, total_stars
-            FROM users
-            ORDER BY xp DESC
+            SELECT 
+                u.user_id,
+                u.nickname,
+                COALESCE(s.xp, 0) AS xp,
+                COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+                COALESCE(u.current_streak, 0) AS current_streak,
+                COALESCE(s.total_stars, 0) AS total_stars
+            FROM users u
+            LEFT JOIN user_stats s ON u.user_id = s.user_id
+            ORDER BY s.xp DESC NULLS LAST
             LIMIT 10
         """)
 
@@ -138,12 +145,20 @@ async def show_top10_world(msg):
             )
 
         pos = await conn.fetchrow("""
-            SELECT r, nickname, xp, total_confirmed_days, current_streak, total_stars
+            SELECT *
             FROM (
-                SELECT user_id, nickname, xp, total_confirmed_days, current_streak, total_stars,
-                       ROW_NUMBER() OVER (ORDER BY xp DESC) AS r
-                FROM users
-            ) t WHERE user_id=$1
+                SELECT 
+                    u.user_id,
+                    u.nickname,
+                    COALESCE(s.xp, 0) AS xp,
+                    COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+                    COALESCE(u.current_streak, 0) AS current_streak,
+                    COALESCE(s.total_stars, 0) AS total_stars,
+                    ROW_NUMBER() OVER (ORDER BY s.xp DESC NULLS LAST) AS r
+                FROM users u
+                LEFT JOIN user_stats s ON u.user_id = s.user_id
+            ) t
+            WHERE user_id=$1
         """, user_id)
 
         if pos:
@@ -156,14 +171,17 @@ async def show_top10_world(msg):
                 "SELECT notification_tone FROM users WHERE user_id=$1",
                 user_id
             )
+
             msg_mot = get_rank_message(rank, tone)
 
             table.append(DIVIDER + "\n")
             table.append("🔽 Твоя позиция:\n")
             table.append(
-                f"{rank}. {nick:<8}  "
-                f"{round(float(pos['xp']), 1):>4} {pos['total_confirmed_days']:>4} "
-                f"{pos['current_streak']:>4} {pos['total_stars']:>4}\n"
+                f"{rank}. {nick:<8} "
+                f"{round(float(pos['xp']), 1):>4} "
+                f"{pos['total_confirmed_days']:>4} "
+                f"{pos['current_streak']:>4} "
+                f"{pos['total_stars']:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 
@@ -190,8 +208,16 @@ async def honor_league(callback: CallbackQuery):
         league = LEAGUES[league_index]
 
         users = await conn.fetch("""
-            SELECT user_id, nickname, xp, total_confirmed_days, current_streak, total_stars
-            FROM users ORDER BY xp DESC
+            SELECT 
+                u.user_id,
+                u.nickname,
+                COALESCE(s.xp, 0) AS xp,
+                COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+                COALESCE(u.current_streak, 0) AS current_streak,
+                COALESCE(s.total_stars, 0) AS total_stars
+            FROM users u
+            LEFT JOIN user_stats s ON u.user_id = s.user_id
+            ORDER BY s.xp DESC NULLS LAST
         """)
 
         same = [u for u in users if get_league_by_xp(float(u["xp"])) == league_index]
@@ -245,12 +271,17 @@ async def honor_league(callback: CallbackQuery):
                 "SELECT notification_tone FROM users WHERE user_id=$1",
                 user_id
             )
+
             msg_mot = get_rank_message(rank, tone)
 
             table.append(DIVIDER + "\n")
             table.append("🔽 Твоя позиция:\n")
             table.append(
-                f"{rank}. {nick:<8}  {xp:>4} {days:>4} {streak:>4} {stars:>4}\n"
+                f"{rank}. {nick:<8} "
+                f"{round(float(pos_row['xp']), 1):>4} "
+                f"{pos_row['total_confirmed_days']:>4} "
+                f"{pos_row['current_streak']:>4} "
+                f"{pos_row['total_stars']:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 
@@ -273,8 +304,17 @@ async def honor_stars(callback: CallbackQuery):
         total = await conn.fetchval("SELECT COUNT(*) FROM users")
 
         rows = await conn.fetch("""
-            SELECT user_id, nickname, total_stars, xp, total_confirmed_days, current_streak
-            FROM users ORDER BY total_stars DESC LIMIT 10
+            SELECT 
+                u.user_id,
+                u.nickname,
+                COALESCE(s.total_stars, 0) AS total_stars,
+                COALESCE(s.xp, 0) AS xp,
+                COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+                COALESCE(u.current_streak, 0) AS current_streak
+            FROM users u
+            LEFT JOIN user_stats s ON u.user_id = s.user_id
+            ORDER BY s.total_stars DESC NULLS LAST
+            LIMIT 10
         """)
 
         medals = ["👑", "🥈", "🥉"] + [f"{i}." for i in range(4, 11)]
@@ -304,11 +344,20 @@ async def honor_stars(callback: CallbackQuery):
             )
 
         userpos = await conn.fetchrow("""
-            SELECT r, nickname, total_stars, xp, total_confirmed_days, current_streak FROM (
-                SELECT user_id, nickname, total_stars, xp, total_confirmed_days, current_streak,
-                       ROW_NUMBER() OVER (ORDER BY total_stars DESC) AS r
-                FROM users
-            ) tt WHERE user_id=$1
+            SELECT r, nickname, total_stars, xp, total_confirmed_days, current_streak
+            FROM (
+                SELECT 
+                    u.user_id,
+                    u.nickname,
+                    COALESCE(s.total_stars, 0) AS total_stars,
+                    COALESCE(s.xp, 0) AS xp,
+                    COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+                    COALESCE(u.current_streak, 0) AS current_streak,
+                    ROW_NUMBER() OVER (ORDER BY s.total_stars DESC NULLS LAST) AS r
+                FROM users u
+                LEFT JOIN user_stats s ON u.user_id = s.user_id
+            ) tt
+            WHERE user_id=$1
         """, user_id)
 
         if userpos:
@@ -322,14 +371,17 @@ async def honor_stars(callback: CallbackQuery):
                 "SELECT notification_tone FROM users WHERE user_id=$1",
                 user_id
             )
+
             msg_mot = get_rank_message(rank, tone)
 
             table.append(DIVIDER + "\n")
             table.append("🔽 Твоя позиция:\n")
             table.append(
                 f"{rank}. {nick:<8}  "
-                f"{userpos['total_stars']:>4} {round(float(userpos['xp']), 1):>4} "
-                f"{userpos['total_confirmed_days']:>4} {userpos['current_streak']:>4}\n"
+                f"{userpos['total_stars']:>4} "
+                f"{round(float(userpos['xp']), 1):>4} "
+                f"{userpos['total_confirmed_days']:>4} "
+                f"{userpos['current_streak']:>4}\n"
             )
             table.append(f"{msg_mot}\n")
 

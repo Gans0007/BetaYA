@@ -13,8 +13,7 @@ async def get_user_stats(user_id: int):
                 COALESCE(s.finished_habits, 0) AS finished_habits,
                 COALESCE(s.finished_challenges, 0) AS finished_challenges,
                 COALESCE(s.total_stars, 0) AS total_stars,
-
-                u.total_confirmed_days,
+                COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
                 u.joined_at,
                 u.current_streak,
                 u.max_streak,

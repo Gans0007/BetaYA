@@ -133,7 +133,7 @@ class HabitService:
                     habit_id
                 )
 
-            await recalculate_total_confirmed_days(user_id)
+            await recalculate_total_confirmed_days(conn, user_id)
             self_message = "♻️ Переподтверждение обновлено 💪"
 
         else:
@@ -153,7 +153,7 @@ class HabitService:
             xp_gain = await add_xp_for_confirmation(user_id, habit_id)
 
             await increment_done_days(conn, habit_id)
-            await recalculate_total_confirmed_days(user_id)
+            await recalculate_total_confirmed_days(conn, user_id)
 
             count_today = await get_confirmations_count_today(conn, user_id)
 
