@@ -18,8 +18,8 @@ async def get_user_stats(user_id: int):
                 COALESCE(s.current_streak, 0) AS current_streak,
                 COALESCE(s.max_streak, 0) AS max_streak,
                 COALESCE(s.xp, 0) AS xp,
-                u.league,
-                u.league_emoji
+                COALESCE(s.league, 'Безответственный') AS league,
+                COALESCE(s.league_emoji, '🕳️') AS league_emoji
 
             FROM users u
             LEFT JOIN user_stats s 
@@ -33,11 +33,12 @@ async def update_league(user_id: int, league_name: str, league_emoji: str):
     pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.execute("""
-            UPDATE users
-            SET league = $1,
-                league_emoji = $2
-            WHERE user_id = $3
-        """, league_name, league_emoji, user_id)
+            INSERT INTO user_stats (user_id, league, league_emoji)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (user_id) DO UPDATE
+            SET league = EXCLUDED.league,
+                league_emoji = EXCLUDED.league_emoji
+        """, user_id, league_name, league_emoji)
 
 
 async def get_last_confirmations_for_week(user_id: int):

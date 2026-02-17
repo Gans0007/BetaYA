@@ -14,8 +14,6 @@ async def create_users_table():
                 username TEXT,
                 first_name TEXT,
                 notification_tone TEXT DEFAULT 'friend',
-                league TEXT DEFAULT 'Безответственный',
-                league_emoji TEXT DEFAULT '🕳️',
                 share_confirmation_media BOOLEAN DEFAULT TRUE,
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW(),
@@ -44,7 +42,9 @@ async def create_users_table():
                 total_confirmed_days INTEGER DEFAULT 0,
                 current_streak INTEGER DEFAULT 0,
                 max_streak INTEGER DEFAULT 0,
-                last_streak_date DATE
+                last_streak_date DATE,
+                league TEXT DEFAULT 'Безответственный',
+                league_emoji TEXT DEFAULT '🕳️'
             )
         """)
 
