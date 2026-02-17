@@ -13,7 +13,6 @@ async def create_users_table():
                 nickname TEXT,
                 username TEXT,
                 first_name TEXT,
-                total_confirmed_days INTEGER DEFAULT 0,
                 notification_tone TEXT DEFAULT 'friend',
                 league TEXT DEFAULT 'Безответственный',
                 league_emoji TEXT DEFAULT '🕳️',
@@ -43,7 +42,9 @@ async def create_users_table():
                 total_stars INTEGER DEFAULT 0,
                 xp DOUBLE PRECISION DEFAULT 0,
                 total_confirmed_days INTEGER DEFAULT 0,
-                current_streak INTEGER DEFAULT 0
+                current_streak INTEGER DEFAULT 0,
+                max_streak INTEGER DEFAULT 0,
+                last_streak_date DATE
             )
         """)
 

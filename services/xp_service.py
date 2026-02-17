@@ -95,62 +95,54 @@ LEAGUES = [
     },
 ]
 
-async def add_xp_for_confirmation(user_id: int, habit_id: int):
-    """Начисляет XP за уникальное подтверждение привычки/челленджа с ограничением:
-       — не более 3 уникальных подтверждений в сутки дают XP.
+async def add_xp_for_confirmation(conn, user_id: int, habit_id: int):
+    """
+    Начисляет XP за уникальное подтверждение.
+    Работает внутри существующей транзакции.
     """
 
-    pool = await get_pool()
+    # ------------------------------------------
+    # 🔒 1) Проверка анти-фарма XP
+    # ------------------------------------------
+    count_today = await conn.fetchval("""
+        SELECT COUNT(DISTINCT habit_id)
+        FROM confirmations
+        WHERE user_id = $1
+          AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
+    """, user_id)
 
-    async with pool.acquire() as conn:
+    if count_today >= 3:
+        return 0
 
-        # ------------------------------------------
-        # 🔒 1) Проверка анти-фарма XP
-        #     Сколько уникальных привычек подтверждено сегодня?
-        # ------------------------------------------
-        count_today = await conn.fetchval("""
-            SELECT COUNT(DISTINCT habit_id)
-            FROM confirmations
-            WHERE user_id = $1
-              AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
-        """, user_id)
+    # ------------------------------------------
+    # 2) Получаем данные привычки
+    # ------------------------------------------
+    habit = await conn.fetchrow("""
+        SELECT is_challenge, challenge_id, difficulty
+        FROM habits
+        WHERE id = $1
+    """, habit_id)
 
-        # Если уже 3 уникальных → XP не начисляем
-        if count_today >= 3:
-            return 0
+    if not habit:
+        return 0
 
-        # ------------------------------------------
-        # 2) Получаем данные привычки
-        # ------------------------------------------
-        habit = await conn.fetchrow("""
-            SELECT is_challenge, challenge_id, difficulty
-            FROM habits
-            WHERE id = $1
-        """, habit_id)
+    # ------------------------------------------
+    # 3) Определяем XP
+    # ------------------------------------------
+    if habit["is_challenge"]:
+        level_key = habit["challenge_id"][0]
+        xp_gain = XP_LEVELS.get(level_key, 1.0)
+    else:
+        diff = habit["difficulty"] or 1
+        xp_gain = XP_DIFFICULTY.get(diff, 1.0)
 
-        if not habit:
-            return 0  # Привычки нет → XP не даём
+    # ------------------------------------------
+    # 4) Начисляем XP
+    # ------------------------------------------
+    await increment_xp(conn, user_id, xp_gain)
 
-        # ------------------------------------------
-        # 3) Челлендж → XP по уровню
-        # ------------------------------------------
-        if habit["is_challenge"]:
-            level_key = habit["challenge_id"][0]
-            xp_gain = XP_LEVELS.get(level_key, 1.0)
+    return xp_gain
 
-        # ------------------------------------------
-        # 4) Привычка → XP по сложности
-        # ------------------------------------------
-        else:
-            diff = habit["difficulty"] or 1
-            xp_gain = XP_DIFFICULTY.get(diff, 1.0)
-
-        # ------------------------------------------
-        # 5) Начисляем XP пользователю
-        # ------------------------------------------
-        await increment_xp(conn, user_id, xp_gain)
-
-        return xp_gain
 
 
 # ------------------------------------------

@@ -4,7 +4,7 @@ import random
 
 from core.database import get_pool
 from data.challenges_data import FINAL_MESSAGES
-from services.user_service import recalculate_total_confirmed_days, update_user_streak
+from services.user_service import recalculate_total_confirmed_days
 from services.xp_service import add_xp_for_confirmation
 
 from repositories.confirm_habit_repository import (
@@ -139,7 +139,10 @@ class HabitService:
         else:
             # новое подтверждение
             await insert_confirmation(conn, user_id, habit_id, file_id, file_type)
-            await update_user_streak(user_id)
+
+            from services.user_stats_service import update_user_streak
+
+            await update_user_streak(conn, user_id)
 
             # сброс streak для челленджа
             habit_row = await get_challenge_habit(conn, habit_id)
@@ -150,7 +153,7 @@ class HabitService:
                     WHERE id = $1
                 """, habit_id)
 
-            xp_gain = await add_xp_for_confirmation(user_id, habit_id)
+            xp_gain = await add_xp_for_confirmation(conn, user_id, habit_id)
 
             await increment_done_days(conn, habit_id)
             await recalculate_total_confirmed_days(conn, user_id)

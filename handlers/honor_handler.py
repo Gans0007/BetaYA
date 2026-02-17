@@ -110,7 +110,7 @@ async def show_top10_world(msg):
                 u.nickname,
                 COALESCE(s.xp, 0) AS xp,
                 COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
-                COALESCE(u.current_streak, 0) AS current_streak,
+                COALESCE(s.current_streak, 0) AS current_streak,
                 COALESCE(s.total_stars, 0) AS total_stars
             FROM users u
             LEFT JOIN user_stats s ON u.user_id = s.user_id
@@ -152,7 +152,7 @@ async def show_top10_world(msg):
                     u.nickname,
                     COALESCE(s.xp, 0) AS xp,
                     COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
-                    COALESCE(u.current_streak, 0) AS current_streak,
+                    COALESCE(s.current_streak, 0) AS current_streak,
                     COALESCE(s.total_stars, 0) AS total_stars,
                     ROW_NUMBER() OVER (ORDER BY s.xp DESC NULLS LAST) AS r
                 FROM users u
@@ -219,7 +219,7 @@ async def honor_league(callback: CallbackQuery):
                 u.nickname,
                 COALESCE(s.xp, 0) AS xp,
                 COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
-                COALESCE(u.current_streak, 0) AS current_streak,
+                COALESCE(s.current_streak, 0) AS current_streak,
                 COALESCE(s.total_stars, 0) AS total_stars
             FROM users u
             LEFT JOIN user_stats s ON u.user_id = s.user_id
@@ -316,7 +316,7 @@ async def honor_stars(callback: CallbackQuery):
                 COALESCE(s.total_stars, 0) AS total_stars,
                 COALESCE(s.xp, 0) AS xp,
                 COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
-                COALESCE(u.current_streak, 0) AS current_streak
+                COALESCE(s.current_streak, 0) AS current_streak
             FROM users u
             LEFT JOIN user_stats s ON u.user_id = s.user_id
             ORDER BY s.total_stars DESC NULLS LAST
@@ -358,7 +358,7 @@ async def honor_stars(callback: CallbackQuery):
                     COALESCE(s.total_stars, 0) AS total_stars,
                     COALESCE(s.xp, 0) AS xp,
                     COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
-                    COALESCE(u.current_streak, 0) AS current_streak,
+                    COALESCE(s.current_streak, 0) AS current_streak,
                     ROW_NUMBER() OVER (ORDER BY s.total_stars DESC NULLS LAST) AS r
                 FROM users u
                 LEFT JOIN user_stats s ON u.user_id = s.user_id
