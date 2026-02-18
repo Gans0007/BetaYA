@@ -12,22 +12,15 @@ FREE_HABIT_LIMIT = 2
 
 
 async def can_add_habit(user_id: int) -> Tuple[bool, int]:
-    """
-    Проверяет, может ли пользователь добавить новую привычку.
-    Возвращает:
-        (True, count)  если можно
-        (False, count) если нельзя
-    """
 
     pool = await get_pool()
     user = await get_user_by_id(pool, user_id)
 
     now = datetime.now(timezone.utc)
 
-    # Проверка реальной активности подписки
+    # ✅ Проверяем только дату
     if (
         user
-        and user["has_access"]
         and user["access_until"]
         and user["access_until"] > now
     ):

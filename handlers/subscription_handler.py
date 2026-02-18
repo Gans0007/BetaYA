@@ -70,8 +70,7 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         async with pool.acquire() as conn:
             await conn.execute("""
                 UPDATE users
-                SET has_access = TRUE,
-                    access_until = $2
+                SET access_until = $2
                 WHERE user_id = $1
             """, user_id, new_until)
 
