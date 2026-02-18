@@ -87,7 +87,6 @@ async def get_confirmations_count_today(conn, user_id: int) -> int:
 async def get_user_notification_data(conn, user_id: int):
     return await conn.fetchrow("""
         SELECT 
-            u.has_access, 
             u.access_until, 
             COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
             u.share_confirmation_media, 
