@@ -5,9 +5,12 @@ from repositories.user_stats_repository import (
     increment_finished_habits as repo_inc_habits,
     increment_finished_challenges as repo_inc_challenges,
     increment_total_stars as repo_inc_stars,
+    increment_usdt_payments as repo_inc_usdt,
     set_total_confirmed_days as repo_set_days,
     update_user_streak as repo_update_streak
 )
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -69,3 +72,16 @@ async def update_user_streak(conn, user_id: int):
     )
 
     return new_streak
+
+# ===============================
+# 💰 +USDT выплаты
+# ===============================
+async def increment_usdt_payments(conn, user_id: int, amount: float):
+    if amount <= 0:
+        logger.warning(
+            f"[СТАТИСТИКА] Попытка начислить некорректную сумму USDT: {amount} user={user_id}"
+        )
+        return
+
+    await repo_inc_usdt(conn, user_id, amount)
+    logger.info(f"[СТАТИСТИКА] Пользователю {user_id} начислено {amount} USDT.")

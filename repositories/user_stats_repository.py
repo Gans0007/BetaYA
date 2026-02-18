@@ -106,3 +106,13 @@ async def update_user_streak(conn, user_id: int):
     return 1
 
 
+# +USDT выплаты
+async def increment_usdt_payments(conn, user_id: int, amount: float):
+    return await conn.execute("""
+        INSERT INTO user_stats (user_id, usdt_payments)
+        VALUES ($1, $2)
+        ON CONFLICT (user_id) DO UPDATE
+        SET usdt_payments = user_stats.usdt_payments + $2
+    """, user_id, amount)
+
+

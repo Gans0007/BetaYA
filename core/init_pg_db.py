@@ -18,7 +18,6 @@ async def create_users_table():
                 timezone TEXT DEFAULT 'Europe/Kyiv',
                 joined_at TIMESTAMP DEFAULT NOW(),
                 referral_code TEXT,
-                payments DOUBLE PRECISION DEFAULT 0,
                 paid_out DOUBLE PRECISION DEFAULT 0,    
                 has_access BOOLEAN DEFAULT TRUE,
                 access_until TIMESTAMPTZ,
@@ -44,7 +43,8 @@ async def create_users_table():
                 max_streak INTEGER DEFAULT 0,
                 last_streak_date DATE,
                 league TEXT DEFAULT 'Безответственный',
-                league_emoji TEXT DEFAULT '🕳️'
+                league_emoji TEXT DEFAULT '🕳️',
+                payments NUMERIC(18,6) DEFAULT 0
             )
         """)
 

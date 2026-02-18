@@ -2,6 +2,8 @@
 
 from core.database import get_pool
 
+from services.user_stats_service import increment_usdt_payments
+
 
 # ------------------------------------------
 # Найти аффилиата по реферальному коду
@@ -83,11 +85,7 @@ async def mark_referral_active(user_id: int) -> None:
 async def add_payment_to_affiliate(affiliate_id: int, amount: float):
     pool = await get_pool()
     async with pool.acquire() as conn:
-        await conn.execute("""
-            UPDATE users
-            SET payments = payments + $1
-            WHERE user_id = $2
-        """, amount, affiliate_id)
+        await increment_usdt_payments(conn, affiliate_id, amount)
 
 # ------------------------------------------
 # Функция получения баланса
@@ -96,10 +94,11 @@ async def get_payments(user_id: int) -> float:
     pool = await get_pool()
     async with pool.acquire() as conn:
         return await conn.fetchval("""
-            SELECT payments
-            FROM users
+            SELECT usdt_payments
+            FROM user_stats
             WHERE user_id = $1
         """, user_id) or 0
+
 
 
 # ------------------------------------------

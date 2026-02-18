@@ -1,5 +1,6 @@
 # services/access_service.py
 
+from datetime import datetime, timezone
 from typing import Tuple
 from core.database import get_pool
 from repositories.user_repository import get_user_by_id
@@ -21,8 +22,15 @@ async def can_add_habit(user_id: int) -> Tuple[bool, int]:
     pool = await get_pool()
     user = await get_user_by_id(pool, user_id)
 
-    # Если есть активная подписка → безлимит
-    if user and user["has_access"]:
+    now = datetime.now(timezone.utc)
+
+    # Проверка реальной активности подписки
+    if (
+        user
+        and user["has_access"]
+        and user["access_until"]
+        and user["access_until"] > now
+    ):
         return True, 0
 
     active_count = await count_active_habits(user_id)
