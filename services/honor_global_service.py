@@ -13,8 +13,9 @@ async def get_global_rank(user_id: int) -> int | None:
     pool = await get_pool()
     async with pool.acquire() as conn:
         users = await conn.fetch("""
-            SELECT user_id, xp
-            FROM users
+            SELECT u.user_id, COALESCE(s.xp, 0) AS xp
+            FROM users u
+            LEFT JOIN user_stats s ON s.user_id = u.user_id
             ORDER BY xp DESC
         """)
 
@@ -23,3 +24,4 @@ async def get_global_rank(user_id: int) -> int | None:
             return idx
 
     return None
+
