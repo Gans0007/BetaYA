@@ -44,7 +44,7 @@ async def create_users_table():
                 last_streak_date DATE,
                 league TEXT DEFAULT 'Безответственный',
                 league_emoji TEXT DEFAULT '🕳️',
-                payments NUMERIC(18,6) DEFAULT 0
+                usdt_payments NUMERIC(18,6) DEFAULT 0
             )
         """)
 
@@ -89,6 +89,21 @@ async def create_users_table():
         """)
 
         # -------------------------------
+        # 🔹 Таблица достижений пользователя (user_achievements)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_achievements (
+                user_id BIGINT NOT NULL,
+                achievement_code TEXT NOT NULL,
+                earned_at TIMESTAMPTZ DEFAULT NOW(),
+
+                PRIMARY KEY (user_id, achievement_code),
+
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
         # 🔹 Таблица завершённых челленджей (completed_challenges)
         # -------------------------------
         await conn.execute("""
@@ -121,20 +136,6 @@ async def create_users_table():
 
                 FOREIGN KEY(affiliate_id) REFERENCES users(user_id) ON DELETE CASCADE,
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
-            )
-        """)
-
-        # -------------------------------
-        # 🏆 Таблица достижений пользователя (user_achievements)
-        # -------------------------------
-        await conn.execute("""
-            CREATE TABLE IF NOT EXISTS user_achievements (
-                user_id BIGINT NOT NULL,
-                achievement_id TEXT NOT NULL,
-                unlocked_at TIMESTAMPTZ DEFAULT NOW(),
-
-                PRIMARY KEY (user_id, achievement_id),
-                FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)
 

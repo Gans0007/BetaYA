@@ -33,6 +33,8 @@ from services.user_stats_service import (
 from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
 from handlers.tone.confirm_caption_tone import HABIT_CAPTION_TONE
 
+from services.achievements.achievements_service import check_and_grant_achievements
+
 
 class HabitService:
 
@@ -116,6 +118,9 @@ class HabitService:
         if not exists:
             return {"error": "HABIT_NOT_FOUND"}
 
+        # 🏆 Список новых достижений
+        new_achievements = []
+
         # === дальше оставляешь весь свой старый код ===
         # НИЧЕГО ВНУТРИ ЛОГИКИ МЕНЯТЬ НЕ НУЖНО
 
@@ -157,6 +162,11 @@ class HabitService:
 
             await increment_done_days(conn, habit_id)
             await recalculate_total_confirmed_days(conn, user_id)
+
+            # =============================
+            # 🏆 ПРОВЕРКА ДОСТИЖЕНИЙ
+            # =============================
+            new_achievements = await check_and_grant_achievements(conn, user_id)
 
             count_today = await get_confirmations_count_today(conn, user_id)
 
@@ -271,6 +281,7 @@ class HabitService:
             "file_type": file_type,
             "file_id": file_id,
             "challenge_message": challenge_message,
+            "new_achievements": new_achievements,
         }
 
 

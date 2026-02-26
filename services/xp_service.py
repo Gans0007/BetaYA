@@ -167,7 +167,7 @@ async def check_next_league(user_id: int):
             SELECT 
                 COALESCE(s.xp, 0) as xp,
                 COALESCE(s.total_stars, 0) as total_stars,
-                u.league
+                COALESCE(s.league, 'Безответственный') as league
             FROM users u
             LEFT JOIN user_stats s ON s.user_id = u.user_id
         WHERE u.user_id = $1
@@ -207,4 +207,18 @@ async def check_next_league(user_id: int):
         "need_stars": need_stars,
         "need_xp": need_xp,
     }
+
+# ------------------------------------------
+# 🏆 Начисление XP за достижения
+# ------------------------------------------
+async def add_xp_for_achievements(user_id: int, amount: float):
+    """
+    Начисляет XP за достижения.
+    Отдельно от XP за подтверждение привычек.
+    """
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        await increment_xp(conn, user_id, amount)
 

@@ -228,36 +228,68 @@ async def process_task_from_queue(task, bot):
                 caption_text,
                 parse_mode="Markdown"
             )
-            return
+        else:
+            if file_type == "photo":
+                await bot.send_photo(
+                    PUBLIC_CHAT_ID,
+                    file_id,
+                    caption=caption_text,
+                    parse_mode="Markdown"
+                )
 
-        if file_type == "photo":
-            await bot.send_photo(
-                PUBLIC_CHAT_ID,
-                file_id,
-                caption=caption_text,
-                parse_mode="Markdown"
-            )
+            elif file_type == "video":
+                await bot.send_video(
+                    PUBLIC_CHAT_ID,
+                    file_id,
+                    caption=caption_text,
+                    parse_mode="Markdown"
+                )
 
-        elif file_type == "video":
-            await bot.send_video(
-                PUBLIC_CHAT_ID,
-                file_id,
-                caption=caption_text,
-                parse_mode="Markdown"
-            )
-
-        elif file_type == "circle":
-            await bot.send_video_note(PUBLIC_CHAT_ID, file_id)
-            await bot.send_message(
-                PUBLIC_CHAT_ID,
-                caption_text,
-                parse_mode="Markdown"
-            )
+            elif file_type == "circle":
+                await bot.send_video_note(PUBLIC_CHAT_ID, file_id)
+                await bot.send_message(
+                    PUBLIC_CHAT_ID,
+                    caption_text,
+                    parse_mode="Markdown"
+                )
 
         if result.get("challenge_message"):
             await bot.send_message(
                 chat_id=chat_id,
                 text=result["challenge_message"],
+                parse_mode="Markdown",
+                reply_to_message_id=reply_to
+            )
+
+        # ================================
+        # 🏆 УВЕДОМЛЕНИЕ О ДОСТИЖЕНИЯХ
+        # ================================
+        new_achievements = result.get("new_achievements", [])
+
+        for ach in new_achievements:
+
+            logging.info(
+                f"📩 Уведомление отправляется | Пользователь: {chat_id} | "
+                f"Достижение: {ach.get('title')} | "
+                f"XP: {ach.get('xp_reward', 0)} | "
+                f"USDT: {ach.get('usdt_reward', 0)}"
+            )
+
+            icon = ach.get("icon", "🏆")
+
+            text = (
+                "🏆 *Новое достижение!*\n\n"
+                f"{icon} *{ach.get('title', '')}*\n"
+                f"{ach.get('description', '')}\n\n"
+                f"✨ +{ach.get('xp_reward', 0)} XP"
+            )
+
+            if ach.get("usdt_reward", 0) > 0:
+                text += f"\n💰 +{ach['usdt_reward']} USDT"
+
+            await bot.send_message(
+                chat_id=chat_id,
+                text=text,
                 parse_mode="Markdown",
                 reply_to_message_id=reply_to
             )
