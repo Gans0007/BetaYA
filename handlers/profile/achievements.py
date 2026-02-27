@@ -4,6 +4,7 @@ import logging
 
 from data.achievements_data import ALL_ACHIEVEMENTS
 from core.database import get_pool
+from services.achievements.achievements_service import get_category_progress
 
 router = Router()
 
@@ -104,6 +105,13 @@ async def show_category_achievements(callback: types.CallbackQuery):
 
         earned_codes = {row["achievement_code"] for row in rows}
 
+        # 📊 Получаем общий прогресс по категории
+        progress = await get_category_progress(
+            conn,
+            user_id,
+            category
+        )
+
     achievements_list = ALL_ACHIEVEMENTS[category]
 
     # Заголовок красивый
@@ -116,7 +124,11 @@ async def show_category_achievements(callback: types.CallbackQuery):
     }
 
     header = category_titles.get(category, category.capitalize())
-    text = f"{header}\n\n"
+
+    text = (
+        f"{header}\n\n"
+        f"🏆 Выполнено: {progress['completed']} / {progress['total']}\n\n"
+    )
 
     for achievement in achievements_list:
 

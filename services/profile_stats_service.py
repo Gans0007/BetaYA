@@ -25,6 +25,7 @@ class ProfileStatsService:
         stars = user["total_stars"] or 0
         confirmed_days = user["total_confirmed_days"] or 0
         xp = round(user["xp"] or 0, 1)
+        usdt = user["usdt_payments"] or 0
         joined_at = user["joined_at"].strftime("%d.%m.%Y") if user["joined_at"] else "—"
 
         league_name = user["league"]
@@ -51,7 +52,7 @@ class ProfileStatsService:
             f"🏆 Лига: {league_emoji} {league_name} {next_req_text}\n"
             "--------------------------------------\n"
             f"🌟 Звёзды   | XP      | $\n"
-            f"{stars:<10} {xp:<8}  {0}\n"
+            f"{stars:<10} {xp:<8}  {usdt}\n"
             "--------------------------------------\n"
             f"🔥 Текущий стрик:          {current}\n"
             f"🏆 Максимальный стрик:      {maximum}\n"

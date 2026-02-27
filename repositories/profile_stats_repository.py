@@ -18,6 +18,7 @@ async def get_user_stats(user_id: int):
                 COALESCE(s.current_streak, 0) AS current_streak,
                 COALESCE(s.max_streak, 0) AS max_streak,
                 COALESCE(s.xp, 0) AS xp,
+                COALESCE(s.usdt_payments, 0) AS usdt_payments,
                 COALESCE(s.league, 'Безответственный') AS league,
                 COALESCE(s.league_emoji, '🕳️') AS league_emoji
 

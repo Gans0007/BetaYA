@@ -34,6 +34,40 @@ def check_condition(stats, condition_type: str, condition_value: int) -> bool:
     return False
 
 
+async def get_category_progress(conn, user_id: int, category: str):
+    """
+    Возвращает прогресс пользователя по категории достижений.
+    {
+        "completed": int,
+        "total": int
+    }
+    """
+
+    from data.achievements_data import ALL_ACHIEVEMENTS
+    from repositories.achievements.achievements_repository import get_user_achievements_codes
+
+    # Все достижения категории
+    category_achievements = ALL_ACHIEVEMENTS.get(category, [])
+    total = len(category_achievements)
+
+    if total == 0:
+        return {"completed": 0, "total": 0}
+
+    # Получаем коды достижений пользователя
+    user_codes = await get_user_achievements_codes(conn, user_id)
+
+    # Считаем выполненные
+    completed = sum(
+        1 for ach in category_achievements
+        if ach["code"] in user_codes
+    )
+
+    return {
+        "completed": completed,
+        "total": total
+    }
+
+
 async def check_and_grant_achievements(conn, user_id: int):
     stats = await get_user_stats(conn, user_id)
     if not stats:
