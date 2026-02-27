@@ -267,6 +267,14 @@ class HabitService:
             text += "Продолжаем доминировать 💪"
             challenge_message = text
 
+            # =============================
+            # 🏆 ПРОВЕРКА ДОСТИЖЕНИЙ ПОСЛЕ ЗАВЕРШЕНИЯ ЧЕЛЛЕНДЖА
+            # =============================
+            more_achievements = await check_and_grant_achievements(conn, user_id)
+
+            if more_achievements:
+                new_achievements.extend(more_achievements) 
+
             # ❌ УДАЛЯЕМ ЧЕЛЛЕНДЖ НАВСЕГДА
             await conn.execute("""
                 DELETE FROM habits

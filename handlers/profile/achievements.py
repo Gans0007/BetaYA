@@ -1,6 +1,7 @@
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
+import html
 
 from data.achievements_data import ALL_ACHIEVEMENTS
 from core.database import get_pool
@@ -153,10 +154,14 @@ async def show_category_achievements(callback: types.CallbackQuery):
             status_icon = "🔒"
             progress_text = f"{progress_value} / {condition_value}"
 
+        safe_title = html.escape(str(title))
+        safe_desc = html.escape(str(description))
+        safe_progress = html.escape(str(progress_text))
+
         text += (
-            f"{status_icon} {icon} *{title}*\n"
-            f"{description}\n"
-            f"Прогресс: {progress_text}\n\n"
+            f"{status_icon} {icon} <b>{safe_title}</b>\n"
+            f"{safe_desc}\n"
+            f"Прогресс: {safe_progress}\n\n"
         )
 
     kb = InlineKeyboardMarkup(
@@ -172,7 +177,7 @@ async def show_category_achievements(callback: types.CallbackQuery):
 
     await callback.message.edit_text(
         text,
-        parse_mode="Markdown",
+        parse_mode="HTML",
         reply_markup=kb
     )
 

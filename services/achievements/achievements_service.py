@@ -26,12 +26,34 @@ async def get_user_stats(conn, user_id: int):
     """, user_id)
 
 
-def check_condition(stats, condition_type: str, condition_value: int) -> bool:
+
+
+async def check_condition(conn, user_id, stats, condition_type, condition_value):
+
+    # 🔥 Стрик
     if condition_type == "streak":
         return stats["current_streak"] >= condition_value
+
+    # 🔥 Общее количество подтверждений
     if condition_type == "total_confirms":
         return stats["total_confirmed_days"] >= condition_value
+
+    # 🔥 Завершение конкретного челленджа
+    if condition_type == "challenge_complete":
+
+        result = await conn.fetchrow("""
+            SELECT 1
+            FROM completed_challenges
+            WHERE user_id = $1
+              AND challenge_id = $2
+        """, user_id, condition_value)
+
+        return result is not None
+
     return False
+
+
+
 
 
 async def get_category_progress(conn, user_id: int, category: str):
@@ -78,7 +100,13 @@ async def check_and_grant_achievements(conn, user_id: int):
     for category_achievements in ALL_ACHIEVEMENTS.values():
         for achievement in category_achievements:
 
-            if not check_condition(stats, achievement["condition_type"], achievement["condition_value"]):
+            if not await check_condition(
+                conn,
+                user_id,
+                stats,
+                achievement["condition_type"],
+                achievement["condition_value"]
+            ):
                 continue
 
             if await has_user_achievement(conn, user_id, achievement["code"]):
