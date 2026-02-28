@@ -82,9 +82,22 @@ async def check_condition(conn, user_id, stats, condition_type, condition_value)
 
         return (result or 0) >= condition_value
 
+
+    # 🏅 Уровень партнёра
+    if condition_type == "referral_level":
+
+        from services.affiliate_service import affiliate_service
+
+        current_level, _, _ = await affiliate_service.get_affiliate_level_info(user_id)
+
+        logger.info(
+            f"🏅 Проверка referral_level | user={user_id} | "
+            f"current={current_level['key']} | нужно={condition_value}"
+        )
+
+        return current_level["key"] == condition_value
+
     return False
-
-
 
 
 
