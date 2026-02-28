@@ -273,7 +273,8 @@ async def process_task_from_queue(task, bot):
             await process_achievements_and_notify(
                 bot,
                 conn,
-                user_id
+                user_id,
+                trigger_types=["streak", "total_confirms", "challenge_complete"]
             )
 
     except Exception as e:

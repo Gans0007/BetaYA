@@ -120,6 +120,13 @@ async def show_category_achievements(callback: types.CallbackQuery):
             WHERE affiliate_id = $1
         """, user_id) or 0
 
+        active_referrals = await conn.fetchval("""
+            SELECT COUNT(*)
+            FROM referrals
+            WHERE affiliate_id = $1
+              AND is_active = TRUE
+        """, user_id) or 0
+
     achievements_list = ALL_ACHIEVEMENTS[category]
 
     # Заголовок красивый
@@ -153,6 +160,8 @@ async def show_category_achievements(callback: types.CallbackQuery):
             progress_value = total_confirmed
         elif condition_type == "referrals_count":
             progress_value = referrals_count
+        elif condition_type == "active_referrals":
+            progress_value = active_referrals
 
         else:
             progress_value = 0

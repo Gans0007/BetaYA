@@ -65,6 +65,23 @@ async def check_condition(conn, user_id, stats, condition_type, condition_value)
 
         return (result or 0) >= condition_value
 
+    # 🟢 Количество активных рефералов
+    if condition_type == "active_referrals":
+
+        result = await conn.fetchval("""
+            SELECT COUNT(*)
+            FROM referrals
+            WHERE affiliate_id = $1
+              AND is_active = TRUE
+        """, user_id)
+
+        logger.info(
+            f"🟢 Проверка active_referrals | user={user_id} | "
+            f"active={result} | нужно={condition_value}"
+        )
+
+        return (result or 0) >= condition_value
+
     return False
 
 
@@ -105,8 +122,16 @@ async def get_category_progress(conn, user_id: int, category: str):
     }
 
 
-async def check_and_grant_achievements(conn, user_id: int):
-    logger.info(f"🔍 Проверка достижений для пользователя {user_id}")
+async def check_and_grant_achievements(
+    conn,
+    user_id: int,
+    trigger_types: list[str] | None = None
+):
+    logger.info(
+        f"🔍 Проверка достижений для пользователя {user_id} | "
+        f"trigger={trigger_types}"
+    )
+
     stats = await get_user_stats(conn, user_id)
     if not stats:
         return []
@@ -116,11 +141,17 @@ async def check_and_grant_achievements(conn, user_id: int):
     for category_achievements in ALL_ACHIEVEMENTS.values():
         for achievement in category_achievements:
 
+            condition_type = achievement["condition_type"]
+
+            # 🎯 Если передан trigger — фильтруем
+            if trigger_types and condition_type not in trigger_types:
+                continue
+
             if not await check_condition(
                 conn,
                 user_id,
                 stats,
-                achievement["condition_type"],
+                condition_type,
                 achievement["condition_value"]
             ):
                 continue
@@ -128,33 +159,21 @@ async def check_and_grant_achievements(conn, user_id: int):
             if await has_user_achievement(conn, user_id, achievement["code"]):
                 continue
 
-            # Присвоение достижения
             await grant_achievement(conn, user_id, achievement["code"])
 
             logger.info(
                 f"🏆 Достижение выдано | Пользователь: {user_id} | "
-                f"Код: {achievement['code']} | "
-                f"Название: {achievement['title']}"
+                f"Код: {achievement['code']}"
             )
 
-            # Начисление XP
             if achievement.get("xp_reward", 0) > 0:
                 await increment_xp(conn, user_id, achievement["xp_reward"])
 
-                logger.info(
-                    f"⭐ Начислен XP | Пользователь: {user_id} | "
-                    f"+{achievement['xp_reward']} XP за достижение "
-                    f"'{achievement['title']}'"
-                )
-
-            # Начисление USDT
             if achievement.get("usdt_reward", 0) > 0:
-                await add_usdt_reward(conn, user_id, achievement["usdt_reward"])
-
-                logger.info(
-                    f"💰 Начислен USDT | Пользователь: {user_id} | "
-                    f"+{achievement['usdt_reward']} USDT за достижение "
-                    f"'{achievement['title']}'"
+                await add_usdt_reward(
+                    conn,
+                    user_id,
+                    achievement["usdt_reward"]
                 )
 
             newly_earned.append(achievement)
@@ -164,13 +183,18 @@ async def check_and_grant_achievements(conn, user_id: int):
 async def process_achievements_and_notify(
     bot,
     conn,
-    user_id: int
+    user_id: int,
+    trigger_types: list[str] | None = None
 ):
-    logger.info(f"📢 Отправка уведомлений о достижениях | user={user_id}")
+    logger.info(
+        f"📢 Отправка уведомлений | user={user_id} | "
+        f"trigger={trigger_types}"
+    )
 
     new_achievements = await check_and_grant_achievements(
         conn,
-        user_id
+        user_id,
+        trigger_types=trigger_types
     )
 
     for ach in new_achievements:
@@ -188,8 +212,6 @@ async def process_achievements_and_notify(
         try:
             await bot.send_message(user_id, text)
         except Exception as e:
-            logger.error(
-                f"❗ Ошибка отправки уведомления: {e}"
-            )
+            logger.error(f"❗ Ошибка отправки уведомления: {e}")
 
     return new_achievements

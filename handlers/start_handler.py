@@ -150,7 +150,8 @@ async def start_command(message: types.Message, state: FSMContext):
                     await process_achievements_and_notify(
                         message.bot,
                         conn,
-                        affiliate_id
+                        affiliate_id,
+                        trigger_types=["referrals_count"]
                     )
 
     # -----------------------------

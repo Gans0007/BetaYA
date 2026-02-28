@@ -78,6 +78,7 @@ async def check_subscription_callback(callback: types.CallbackQuery):
         SUBSCRIPTION_PRICE = 10.0
 
         ok, amount, level = await affiliate_service.reward_for_subscription_payment(
+            callback.bot,
             referral_user_id=user_id,
             subscription_price=SUBSCRIPTION_PRICE
         )

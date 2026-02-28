@@ -2,6 +2,9 @@ import logging
 from repositories import affiliate_repository as repo
 from core.affiliate_levels import AFFILIATE_LEVELS
 
+from core.database import get_pool
+from services.achievements.achievements_service import process_achievements_and_notify
+
 class AffiliateService:
 
     # -----------------------------------------
@@ -31,7 +34,12 @@ class AffiliateService:
     # -----------------------------------------
     # 🟢 Сделать реферала активным (ПЕРВАЯ АКТИВАЦИЯ)
     # -----------------------------------------
-    async def activate_referral(self, user_id: int, bonus_amount: float = 0):
+    async def activate_referral(
+        self,
+        bot,
+        user_id: int,
+        bonus_amount: float = 0
+    ):
         affiliate_id = await repo.get_affiliate_for_user(user_id)
 
         if not affiliate_id:
@@ -93,6 +101,17 @@ class AffiliateService:
             f"🏁 [REF-ACTIVATE] Завершена активация реферала {user_id} "
             f"→ affiliate {affiliate_id}"
         )
+
+        #--------Проверка достижений
+        pool = await get_pool()
+
+        async with pool.acquire() as conn:
+            await process_achievements_and_notify(
+                bot,
+                conn,
+                affiliate_id,
+                trigger_types=["active_referrals"]
+            )
 
         return True
 
@@ -180,6 +199,7 @@ class AffiliateService:
 
     async def reward_for_subscription_payment(
         self,
+        bot,
         referral_user_id: int,
         subscription_price: float
     ):
@@ -203,7 +223,7 @@ class AffiliateService:
             return True, amount, current_level
 
         # первый платёж
-        ok = await self.activate_referral(referral_user_id, amount)
+        ok = await self.activate_referral(bot, referral_user_id, amount)
         return ok, amount, current_level
 
 

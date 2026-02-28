@@ -460,6 +460,41 @@ MONEY_ACHIEVEMENTS = [
         "xp_reward": 70,
         "usdt_reward": 2,
     },
+    # 🟢 АКТИВНЫЕ РЕФЕРАЛЫ
+    {
+        "code": "money_active_referrals_3",
+        "category": "money",
+        "title": "Ядро команды",
+        "description": "3 активных реферала. Ты умеешь удерживать людей.",
+        "icon": "🟢",
+        "condition_type": "active_referrals",
+        "condition_value": 3,
+        "xp_reward": 50,
+        "usdt_reward": 2,
+    },
+    {
+        "code": "money_active_referrals_10",
+        "category": "money",
+        "title": "Команда из 10",
+        "description": "10 активных рефералов. Ты лидер, а не просто пригласил.",
+        "icon": "🟢",
+        "condition_type": "active_referrals",
+        "condition_value": 10,
+        "xp_reward": 120,
+        "usdt_reward": 5,
+    },
+    {
+        "code": "money_active_referrals_25",
+        "category": "money",
+        "title": "Стабильная сеть",
+        "description": "25 активных рефералов. Ты построил работающую систему.",
+        "icon": "🟢",
+        "condition_type": "active_referrals",
+        "condition_value": 25,
+        "xp_reward": 220,
+        "usdt_reward": 10,
+    },
+
 ]
 
 # -------------------------------
