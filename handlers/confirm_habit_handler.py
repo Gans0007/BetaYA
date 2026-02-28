@@ -9,6 +9,10 @@ from services.message_queue import QUEUE_CONFIRM
 from services.fsm_ui import save_fsm_ui_message, clear_fsm_ui
 from config import PUBLIC_CHAT_ID
 
+from core.database import get_pool
+from services.achievements.achievements_service import process_achievements_and_notify
+
+
 router = Router()
 
 logging.basicConfig(
@@ -262,36 +266,14 @@ async def process_task_from_queue(task, bot):
             )
 
         # ================================
-        # 🏆 УВЕДОМЛЕНИЕ О ДОСТИЖЕНИЯХ
+        # 🏆 Централизованная проверка достижений
         # ================================
-        new_achievements = result.get("new_achievements", [])
-
-        for ach in new_achievements:
-
-            logging.info(
-                f"📩 Уведомление отправляется | Пользователь: {chat_id} | "
-                f"Достижение: {ach.get('title')} | "
-                f"XP: {ach.get('xp_reward', 0)} | "
-                f"USDT: {ach.get('usdt_reward', 0)}"
-            )
-
-            icon = ach.get("icon", "🏆")
-
-            text = (
-                "🏆 *Новое достижение!*\n\n"
-                f"{icon} *{ach.get('title', '')}*\n"
-                f"{ach.get('description', '')}\n\n"
-                f"✨ +{ach.get('xp_reward', 0)} XP"
-            )
-
-            if ach.get("usdt_reward", 0) > 0:
-                text += f"\n💰 +{ach['usdt_reward']} USDT"
-
-            await bot.send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode="Markdown",
-                reply_to_message_id=reply_to
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            await process_achievements_and_notify(
+                bot,
+                conn,
+                user_id
             )
 
     except Exception as e:

@@ -30,15 +30,15 @@ async def get_user_stats(conn, user_id: int):
 
 async def check_condition(conn, user_id, stats, condition_type, condition_value):
 
-    # 🔥 Стрик
+    # 🔥 Стрик  confirm_habit_handler
     if condition_type == "streak":
         return stats["current_streak"] >= condition_value
 
-    # 🔥 Общее количество подтверждений
+    # 🔥 Общее количество подтверждений confirm_habit_handler
     if condition_type == "total_confirms":
         return stats["total_confirmed_days"] >= condition_value
 
-    # 🔥 Завершение конкретного челленджа
+    # 🔥 Завершение конкретного челленджа confirm_habit_handler
     if condition_type == "challenge_complete":
 
         result = await conn.fetchrow("""
@@ -49,6 +49,21 @@ async def check_condition(conn, user_id, stats, condition_type, condition_value)
         """, user_id, condition_value)
 
         return result is not None
+
+    # 💰 Количество приглашённых рефералов  start.py
+    if condition_type == "referrals_count":
+        result = await conn.fetchval("""
+            SELECT COUNT(*)
+            FROM referrals
+            WHERE affiliate_id = $1
+        """, user_id)
+
+        logger.info(
+            f"💰 Проверка referrals_count | user={user_id} | "
+            f"count={result} | нужно={condition_value}"
+        )
+
+        return (result or 0) >= condition_value
 
     return False
 
@@ -91,6 +106,7 @@ async def get_category_progress(conn, user_id: int, category: str):
 
 
 async def check_and_grant_achievements(conn, user_id: int):
+    logger.info(f"🔍 Проверка достижений для пользователя {user_id}")
     stats = await get_user_stats(conn, user_id)
     if not stats:
         return []
@@ -144,3 +160,36 @@ async def check_and_grant_achievements(conn, user_id: int):
             newly_earned.append(achievement)
 
     return newly_earned
+
+async def process_achievements_and_notify(
+    bot,
+    conn,
+    user_id: int
+):
+    logger.info(f"📢 Отправка уведомлений о достижениях | user={user_id}")
+
+    new_achievements = await check_and_grant_achievements(
+        conn,
+        user_id
+    )
+
+    for ach in new_achievements:
+
+        text = (
+            "🏆 Новое достижение!\n\n"
+            f"{ach.get('icon', '🏆')} {ach['title']}\n"
+            f"{ach['description']}\n\n"
+            f"+{ach.get('xp_reward', 0)} XP"
+        )
+
+        if ach.get("usdt_reward", 0) > 0:
+            text += f"\n+{ach['usdt_reward']} USDT"
+
+        try:
+            await bot.send_message(user_id, text)
+        except Exception as e:
+            logger.error(
+                f"❗ Ошибка отправки уведомления: {e}"
+            )
+
+    return new_achievements

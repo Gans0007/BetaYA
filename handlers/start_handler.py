@@ -19,6 +19,8 @@ from repositories.affiliate_repository import (
     assign_referral_code 
 )
 
+from services.achievements.achievements_service import process_achievements_and_notify
+
 
 
 
@@ -131,13 +133,25 @@ async def start_command(message: types.Message, state: FSMContext):
                 await create_referral(affiliate_id, user_id)
                 logging.info(f"🎊 Реферал создан: {affiliate_id} ← {user_id}")
 
+                # 📩 Сначала уведомляем партнёра
                 try:
                     await message.bot.send_message(
                         affiliate_id,
                         f"🎉 У тебя новый реферал: @{message.from_user.username or user_id}"
                     )
                 except Exception as e:
-                    logging.error(f"❗ Ошибка отправки уведомления рефереру: {e}")
+                    logging.error(
+                        f"❗ Ошибка отправки уведомления рефереру: {e}"
+                    )
+
+                # 🏆 Затем проверяем и выдаём достижения
+                pool = await get_pool()
+                async with pool.acquire() as conn:
+                    await process_achievements_and_notify(
+                        message.bot,
+                        conn,
+                        affiliate_id
+                    )
 
     # -----------------------------
     # 3. ГЕНЕРАЦИЯ РЕФЕРАЛЬНОГО КОДА

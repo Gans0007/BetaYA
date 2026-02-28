@@ -421,6 +421,48 @@ STATUS_ACHIEVEMENTS = [
 
 
 # -------------------------------
+# 💰 Money Achievements
+# -------------------------------
+
+MONEY_ACHIEVEMENTS = [
+
+    # 👥 РЕФЕРАЛЫ (всего приглашённых)
+    {
+        "code": "money_referrals_1",
+        "category": "money",
+        "title": "Первый партнёр",
+        "description": "Ты пригласил первого участника. Влияние начинается.",
+        "icon": "🤝",
+        "condition_type": "referrals_count",
+        "condition_value": 1,
+        "xp_reward": 20,
+        "usdt_reward": 0,
+    },
+    {
+        "code": "money_referrals_5",
+        "category": "money",
+        "title": "Пятёрка в системе",
+        "description": "Ты пригласил 5 участников. У тебя появляется команда.",
+        "icon": "🤝",
+        "condition_type": "referrals_count",
+        "condition_value": 5,
+        "xp_reward": 40,
+        "usdt_reward": 1,
+    },
+    {
+        "code": "money_referrals_10",
+        "category": "money",
+        "title": "Десятка влияния",
+        "description": "10 приглашённых. Ты начинаешь масштабироваться.",
+        "icon": "🤝",
+        "condition_type": "referrals_count",
+        "condition_value": 10,
+        "xp_reward": 70,
+        "usdt_reward": 2,
+    },
+]
+
+# -------------------------------
 # 📦 Универсальный список всех достижений
 # -------------------------------
 ALL_ACHIEVEMENTS = {
@@ -428,5 +470,5 @@ ALL_ACHIEVEMENTS = {
     "body": BODY_ACHIEVEMENTS,
     "mind": MIND_ACHIEVEMENTS,
     "status": STATUS_ACHIEVEMENTS,
-    # "money": MONEY_ACHIEVEMENTS,
+    "money": MONEY_ACHIEVEMENTS,
 }
