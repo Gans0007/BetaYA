@@ -5,6 +5,11 @@ from repositories.profile_stats_repository import (
     get_last_confirmations_for_week
 )
 from services.xp_service import LEAGUES, check_next_league
+from services.achievements.achievements_service import (
+    get_total_achievement_progress,
+    build_progress_bar
+)
+from core.database import get_pool
 
 
 class ProfileStatsService:
@@ -62,11 +67,25 @@ class ProfileStatsService:
             "</pre>"
         )
 
+        # --- ОБЩИЙ ПРОГРЕСС ДОСТИЖЕНИЙ ---
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            progress = await get_total_achievement_progress(conn, user_id)
+
+        bar = build_progress_bar(progress["percent"])
+
+        achievements_block = (
+            "🔥 Процент выполнения: "
+            f"{progress['completed']} / {progress['total']} достижений\n"
+            f"📊 {bar}\n"
+        )
+
+
         final_text = (
             f"📊 <b>Твоя статистика</b>\n\n"
             f"{table}\n"
+            f"{achievements_block}\n"
             f"💬 <i>{league_quote}</i>\n\n"
-            f"Продолжай в том же духе! 💥"
         )
 
         return final_text

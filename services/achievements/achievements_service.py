@@ -220,6 +220,7 @@ async def check_and_grant_achievements(
 
     return newly_earned
 
+
 async def process_achievements_and_notify(
     bot,
     conn,
@@ -255,3 +256,37 @@ async def process_achievements_and_notify(
             logger.error(f"❗ Ошибка отправки уведомления: {e}")
 
     return new_achievements
+
+
+
+async def get_total_achievement_progress(conn, user_id: int):
+    from repositories.achievements.achievements_repository import get_user_achievements_codes
+
+    total = sum(len(v) for v in ALL_ACHIEVEMENTS.values())
+    user_codes = await get_user_achievements_codes(conn, user_id)
+
+    completed = sum(
+        1
+        for category in ALL_ACHIEVEMENTS.values()
+        for ach in category
+        if ach["code"] in user_codes
+    )
+
+    percent = round((completed / total) * 100) if total > 0 else 0
+
+    return {
+        "completed": completed,
+        "total": total,
+        "percent": percent
+    }
+
+
+def build_progress_bar(percent: int, length: int = 10) -> str:
+    percent = max(0, min(100, percent))
+
+    filled = round(length * percent / 100)
+    empty = length - filled
+
+    bar = "🟩" * filled + "⬜" * empty
+
+    return f"{bar}{percent}%"
