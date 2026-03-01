@@ -1,8 +1,10 @@
 from data.achievements_data import ALL_ACHIEVEMENTS
+
 from repositories.achievements.achievements_repository import (
-    has_user_achievement,
     grant_achievement,
+    get_user_achievements_codes,
 )
+
 from repositories.user_stats_repository import increment_xp
 
 import logging
@@ -20,7 +22,10 @@ async def add_usdt_reward(conn, user_id: int, amount: float):
 
 async def get_user_stats(conn, user_id: int):
     return await conn.fetchrow("""
-        SELECT current_streak, total_confirmed_days
+        SELECT
+            current_streak,
+            total_confirmed_days,
+            usdt_payments
         FROM user_stats
         WHERE user_id = $1
     """, user_id)
@@ -97,6 +102,18 @@ async def check_condition(conn, user_id, stats, condition_type, condition_value)
 
         return current_level["key"] == condition_value
 
+
+    # 💵 Баланс USDT (берём из user_stats.usdt_payments)
+    if condition_type == "usdt_balance":
+        balance = stats.get("usdt_payments") or 0
+
+        logger.info(
+            f"💵 Проверка usdt_balance | user={user_id} | "
+            f"balance={balance} | нужно={condition_value}"
+        )
+
+        return float(balance) >= float(condition_value)
+
     return False
 
 
@@ -149,6 +166,9 @@ async def check_and_grant_achievements(
     if not stats:
         return []
 
+    # ✅ 1 запрос в БД: получаем все ачивки пользователя
+    user_codes = await get_user_achievements_codes(conn, user_id)
+
     newly_earned = []
 
     for category_achievements in ALL_ACHIEVEMENTS.values():
@@ -156,10 +176,17 @@ async def check_and_grant_achievements(
 
             condition_type = achievement["condition_type"]
 
-            # 🎯 Если передан trigger — фильтруем
+            # 🎯 Если передан trigger — фильтруем по типу условия
             if trigger_types and condition_type not in trigger_types:
                 continue
 
+            code = achievement["code"]
+
+            # ✅ Уже есть — вообще ничего не проверяем (и не логируем лишнее)
+            if code in user_codes:
+                continue
+
+            # ✅ Проверяем условие только если ачивки ещё нет
             if not await check_condition(
                 conn,
                 user_id,
@@ -169,14 +196,14 @@ async def check_and_grant_achievements(
             ):
                 continue
 
-            if await has_user_achievement(conn, user_id, achievement["code"]):
-                continue
+            await grant_achievement(conn, user_id, code)
 
-            await grant_achievement(conn, user_id, achievement["code"])
+            # ✅ Обновляем кэш, чтобы в этом же прогоне не выдать повторно
+            user_codes.add(code)
 
             logger.info(
                 f"🏆 Достижение выдано | Пользователь: {user_id} | "
-                f"Код: {achievement['code']}"
+                f"Код: {code}"
             )
 
             if achievement.get("xp_reward", 0) > 0:

@@ -110,7 +110,7 @@ class AffiliateService:
                 bot,
                 conn,
                 affiliate_id,
-                trigger_types=["active_referrals", "referral_level"]
+                trigger_types=["active_referrals", "referral_level", "usdt_balance"]
             )
 
         return True

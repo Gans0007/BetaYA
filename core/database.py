@@ -8,7 +8,12 @@ async def create_pool():
     if pool is None:
         if not DATABASE_URL:
             raise RuntimeError("DATABASE_URL не задан. Проверь .env")
-        pool = await asyncpg.create_pool(DATABASE_URL)
+        pool = await asyncpg.create_pool(
+            DATABASE_URL,
+            min_size=5,
+            max_size=25,
+            command_timeout=60
+        )
         print("✅ Database pool created")
 
 async def close_pool():
