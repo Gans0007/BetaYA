@@ -90,13 +90,16 @@ async def show_category_achievements(callback: types.CallbackQuery):
     async with pool.acquire() as conn:
 
         stats = await conn.fetchrow("""
-            SELECT current_streak, total_confirmed_days
+            SELECT current_streak,
+                   total_confirmed_days,
+                   usdt_payments
             FROM user_stats
             WHERE user_id = $1
         """, user_id)
 
         current_streak = stats["current_streak"] if stats else 0
         total_confirmed = stats["total_confirmed_days"] if stats else 0
+        usdt_balance = stats["usdt_payments"] if stats else 0
 
         rows = await conn.fetch("""
             SELECT achievement_code
@@ -162,6 +165,8 @@ async def show_category_achievements(callback: types.CallbackQuery):
             progress_value = referrals_count
         elif condition_type == "active_referrals":
             progress_value = active_referrals
+        elif condition_type == "usdt_balance":
+            progress_value = round(usdt_balance, 2)
 
         else:
             progress_value = 0
