@@ -228,7 +228,7 @@ async def build_active_list(user_id: int):
                 title = f"🔥 {title}"
 
             if confirmed_today:
-                title = f"{title} 😎"
+                title = f"{title} ✔"
 
             buttons.append([
                 InlineKeyboardButton(

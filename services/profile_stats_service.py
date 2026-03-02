@@ -44,7 +44,7 @@ class ProfileStatsService:
         if current_index < len(LEAGUES) - 1:
             next_league = LEAGUES[current_index + 1]
             stars_needed = max(0, next_league["stars"] - stars)
-            xp_needed = max(0, next_league["xp"] - xp)
+            xp_needed = int(round(max(0, next_league["xp"] - xp)))
             next_req_text = f"(до следующей — {stars_needed}⭐ и {xp_needed} XP)"
         else:
             next_req_text = "(максимальная лига)"
@@ -60,11 +60,11 @@ class ProfileStatsService:
             f"{stars:<10} {xp:<8}  {usdt}\n"
             "--------------------------------------\n"
             f"🔥 Текущий стрик:          {current}\n"
-            f"🏆 Максимальный стрик:      {maximum}\n"
+            f"⚡️ Максимальный стрик:      {maximum}\n"
             f"💪 Завершённых привычек:    {habits}\n"
-            f"🏆 Завершённых челленджей:  {challenges}\n"
+            f"🦾 Завершённых челленджей:  {challenges}\n"
             f"📅 Подтверждённых дней:     {confirmed_days}\n"
-            "</pre>"
+
         )
 
         # --- ОБЩИЙ ПРОГРЕСС ДОСТИЖЕНИЙ ---
@@ -75,9 +75,10 @@ class ProfileStatsService:
         bar = build_progress_bar(progress["percent"])
 
         achievements_block = (
-            "🔥 Процент выполнения: "
-            f"{progress['completed']} / {progress['total']} достижений\n"
+            "🔥 Достижений: "
+            f"{progress['completed']} / {progress['total']}\n"
             f"📊 {bar}\n"
+            "</pre>"
         )
 
 
@@ -95,6 +96,28 @@ class ProfileStatsService:
         result = await check_next_league(user_id)
 
         return result
+
+    #-----------------------------------------
+    #Уведомление о переходе на следующую лигу
+    #-----------------------------------------
+    async def notify_if_can_level_up(self, bot, user_id: int):
+        result = await check_next_league(user_id)
+
+        if not result.get("next_league"):
+            return
+
+        if not result.get("can_level_up"):
+            return
+
+        next_l = result["next_league"]
+
+        await bot.send_message(
+            user_id,
+            f"🚀 Условия выполнены!\n\n"
+            f"Ты можешь повысить лигу:\n"
+            f"Профиль → Статистика → 🚀 Level Up"
+
+        )
 
     async def apply_level_up(self, user_id: int, league_name: str, emoji: str):
         await update_league(user_id, league_name, emoji)

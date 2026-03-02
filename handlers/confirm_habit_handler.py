@@ -11,6 +11,7 @@ from config import PUBLIC_CHAT_ID
 
 from core.database import get_pool
 from services.achievements.achievements_service import process_achievements_and_notify
+from services.profile_stats_service import profile_stats_service
 
 
 router = Router()
@@ -276,6 +277,9 @@ async def process_task_from_queue(task, bot):
                 user_id,
                 trigger_types=["streak", "total_confirms", "challenge_complete"]
             )
+
+        # 🔥 Проверка возможности повышения лиги
+        await profile_stats_service.notify_if_can_level_up(bot, user_id)
 
     except Exception as e:
         logging.error(f"[QUEUE PROCESS ERROR] {e}", exc_info=True)

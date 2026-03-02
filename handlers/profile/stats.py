@@ -39,54 +39,35 @@ async def show_stats(callback: types.CallbackQuery):
 @router.callback_query(lambda c: c.data == "next_league")
 async def process_level_up(callback: types.CallbackQuery):
     user_id = callback.from_user.id
-    logging.info(f"[STATISTIC] Пользователь {user_id} нажал Level Up")
     await callback.answer()
 
     result = await profile_stats_service.process_level_up_request(user_id)
 
-    if not result["next_league"]:
-        logging.info(f"[STATISTIC] Пользователь {user_id} уже достиг максимальной лиги")
-        await callback.message.edit_text("🔥 Ты уже достиг максимальной лиги!")
+    # Максимальная лига
+    if not result.get("next_league"):
+        await callback.message.answer("🔥 Ты уже достиг максимальной лиги.")
         return
 
-    if not result["can_level_up"]:
-        need_stars = result["need_stars"]
-        need_xp = result["need_xp"]
-
-        logging.info(f"[STATISTIC] Пользователю {user_id} не хватает {need_stars}⭐ и {need_xp} XP до повышения")
-
-        conf_count = await profile_stats_service.get_weekly_confirmation_rate(user_id)
-
-        if not conf_count:
-            estimate = "Сделай хотя бы одно подтверждение 💪"
-        else:
-            avg_xp = float((conf_count * 1.4) / 7)
-            days = float(need_xp) / avg_xp if avg_xp > 0 else 999
-            low = max(1, int(days * 0.85))
-            high = max(1, int(days * 1.15))
-            estimate = f"~ {low}–{high} дней 🔥"
-
+    # Условия НЕ выполнены → просто пишем сколько не хватает
+    if not result.get("can_level_up"):
         await callback.message.answer(
-            f"⏳ До новой лиги:\n"
-            f"{estimate}\n\n"
-            f"⭐ Ост осталось: {need_stars}⭐\n"
-            f"✨ Осталось: {need_xp} XP",
-            parse_mode="HTML",
-            reply_markup=InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text="⬅️ Назад", callback_data="profile_stats")]]
-            )
+            f"❌ Для повышения уровня не хватает:\n\n"
+            f"⭐ {result['need_stars']} звёзд\n"
+            f"✨ {result['need_xp']} XP"
         )
         return
 
-    # МОЖНО ПОВЫСИТЬ ЛИГУ
+    # Условия выполнены → переносим
     next_l = result["next_league"]
-    logging.info(f"[STATISTIC] Пользователь {user_id} повышен до: {next_l['emoji']} {next_l['name']}")
 
-    await profile_stats_service.apply_level_up(user_id, next_l["name"], next_l["emoji"])
+    await profile_stats_service.apply_level_up(
+        user_id,
+        next_l["name"],
+        next_l["emoji"]
+    )
 
     await callback.message.answer(
-        f"🏆 Новая лига!\n"
-        f"Ты поднялся до уровня: {next_l['emoji']} {next_l['name']}\n\n"
-        f"«{next_l['quote']}»\n"
-        f"Продолжай в том же духе 🚀"
+        f"🏆 Повышение!\n\n"
+        f"Ты перешёл в лигу {next_l['emoji']} {next_l['name']}!\n\n"
+        f"«{next_l['quote']}»"
     )

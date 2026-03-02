@@ -79,9 +79,10 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
         f"🟢 Активных:            {active}\n"
         f"{progress_block}"
         "--------------------------------------\n"
+        "</pre>"
         f"🔗 Твоя ссылка:\n"
         f"{ref_link}\n"
-        "</pre>"
+
     )
 
 
