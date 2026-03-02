@@ -54,7 +54,7 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
         bar = build_progress_bar(active, next_level["min_active"])
         progress_block = (
             "--------------------------------------\n"
-            f"🚀 До {next_level['title']} ({next_level['min_active']} активных)\n"
+            f"{next_level['emoji']} Следующий уровень: {next_level['title']} ({next_level['min_active']} активных)\n"
             f"{bar:<20} {active} / {next_level['min_active']}\n"
             f"Ещё активных:        {need}\n"
             f"Будет доход:         {next_level['percent']}%\n"
