@@ -170,13 +170,6 @@ class HabitService:
 
             if xp_gain > 0 and count_today <= 3:
                 self_message = random.choice(HABIT_CONFIRM_TONE[tone]["with_xp"]).format(xp=xp_gain)
-
-            elif count_today == 4:
-                self_message = (
-                    "⚠️ Максимум 3 уникальных подтверждения в сутки!\n"
-                    "Подтверждение засчитано, но XP не начислено."
-                )
-
             else:
                 self_message = random.choice(HABIT_CONFIRM_TONE[tone]["no_xp"])
 
