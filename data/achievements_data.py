@@ -18,8 +18,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 1,
-        "xp_reward": 2,
-        "usdt_reward": 0.3,
+        "xp_reward": 10,
+        "usdt_reward": 0,
     },
 
     {
@@ -30,22 +30,9 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 3,
-        "xp_reward": 5,
-        "usdt_reward": 0.3,
+        "xp_reward": 25,
+        "usdt_reward": 0,
     },
-
-    {
-        "code": "discipline_complete_0_goodmorning",
-        "category": "body",
-        "title": "Прокачал сердце",
-        "description": "Ты завершил челлендж «Прокачать сердце». Твоё тело стало сильнее.",
-        "icon": "🌞",
-        "condition_type": "challenge_complete",
-        "condition_value": "0_goodmorning", 
-        "xp_reward": 15,
-        "usdt_reward": 1,
-    },
-
     {
         "code": "discipline_streak_7",
         "category": "discipline",
@@ -54,8 +41,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 7,
-        "xp_reward": 10,
-        "usdt_reward": 0.6,
+        "xp_reward": 50,
+        "usdt_reward": 0.5,
     },
 
     {
@@ -66,8 +53,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 14,
-        "xp_reward": 15,
-        "usdt_reward": 1,
+        "xp_reward": 60,
+        "usdt_reward": 0,
     },
 
     {
@@ -78,8 +65,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 21,
-        "xp_reward": 20,
-        "usdt_reward": 1,
+        "xp_reward": 75,
+        "usdt_reward": 0,
     },
 
     {
@@ -90,7 +77,7 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 30,
-        "xp_reward": 25,
+        "xp_reward": 100,
         "usdt_reward": 1,
     },
 
@@ -102,8 +89,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 45,
-        "xp_reward": 30,
-        "usdt_reward": 2,
+        "xp_reward": 120,
+        "usdt_reward": 0,
     },
 
     {
@@ -114,22 +101,9 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 60,
-        "xp_reward": 35,
+        "xp_reward": 150,
         "usdt_reward": 2,
     },
-
-    {
-        "code": "discipline_streak_75",
-        "category": "discipline",
-        "title": "75 дней дисциплины",
-        "description": "Система становится образом жизни.",
-        "icon": "🔥",
-        "condition_type": "streak",
-        "condition_value": 75,
-        "xp_reward": 40,
-        "usdt_reward": 3,
-    },
-
     {
         "code": "discipline_streak_90",
         "category": "discipline",
@@ -138,7 +112,7 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 90,
-        "xp_reward": 45,
+        "xp_reward": 200,
         "usdt_reward": 3,
     },
 
@@ -150,8 +124,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 120,
-        "xp_reward": 50,
-        "usdt_reward": 4,
+        "xp_reward": 250,
+        "usdt_reward": 0,
     },
 
     {
@@ -162,7 +136,7 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 180,
-        "xp_reward": 55,
+        "xp_reward": 300,
         "usdt_reward": 4,
     },
 
@@ -174,8 +148,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 240,
-        "xp_reward": 60,
-        "usdt_reward": 5,
+        "xp_reward": 350,
+        "usdt_reward": 0,
     },
 
     {
@@ -186,7 +160,7 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "🔥",
         "condition_type": "streak",
         "condition_value": 300,
-        "xp_reward": 65,
+        "xp_reward": 400,
         "usdt_reward": 5,
     },
 
@@ -198,8 +172,8 @@ DISCIPLINE_ACHIEVEMENTS = [
         "icon": "👑",
         "condition_type": "streak",
         "condition_value": 365,
-        "xp_reward": 70,
-        "usdt_reward": 6,
+        "xp_reward": 500,
+        "usdt_reward": 10,
     },
 
 ]
@@ -214,8 +188,8 @@ BODY_ACHIEVEMENTS = [
         "icon": "❤️",
         "condition_type": "challenge_complete",
         "condition_value": "0_running",   # 🔥 ключ челленджа
-        "xp_reward": 15,
-        "usdt_reward": 1,
+        "xp_reward": 50,
+        "usdt_reward": 0,
     },
 
     {
@@ -226,8 +200,8 @@ BODY_ACHIEVEMENTS = [
         "icon": "🚿",
         "condition_type": "challenge_complete",
         "condition_value": "0_warmshower",   # 🔥 ключ челленджа
-        "xp_reward": 15,
-        "usdt_reward": 1,
+        "xp_reward": 50,
+        "usdt_reward": 0,
     },
 
     {
@@ -238,7 +212,7 @@ BODY_ACHIEVEMENTS = [
         "icon": "⚡",
         "condition_type": "challenge_complete",
         "condition_value": "1_warmup_5",   # 🔥 ключ челленджа
-        "xp_reward": 20,
+        "xp_reward": 60,
         "usdt_reward": 1,
     },
 
@@ -250,8 +224,8 @@ BODY_ACHIEVEMENTS = [
         "icon": "💧",
         "condition_type": "challenge_complete",
         "condition_value": "1_water_morning",   # 🔥 ключ челленджа
-        "xp_reward": 15,
-        "usdt_reward": 1,
+        "xp_reward": 60,
+        "usdt_reward": 0,
     },
 
     {
@@ -262,7 +236,7 @@ BODY_ACHIEVEMENTS = [
         "icon": "🥗",
         "condition_type": "challenge_complete",
         "condition_value": "3_no_junk_food",   # 🔥 ключ челленджа
-        "xp_reward": 25,
+        "xp_reward": 90,
         "usdt_reward": 1,
     },
 
@@ -274,8 +248,8 @@ BODY_ACHIEVEMENTS = [
         "icon": "🏃‍♂️",
         "condition_type": "challenge_complete",
         "condition_value": "4_run_2km",   # 🔥 ключ челленджа
-        "xp_reward": 30,
-        "usdt_reward": 2,
+        "xp_reward": 120,
+        "usdt_reward": 1,
     },
 
 ]
@@ -296,8 +270,8 @@ MIND_ACHIEVEMENTS = [
         "icon": "📵",
         "condition_type": "challenge_complete",
         "condition_value": "0_nosocial",
-        "xp_reward": 20,
-        "usdt_reward": 1,
+        "xp_reward": 60,
+        "usdt_reward": 0,
     },
 
     {
@@ -308,8 +282,8 @@ MIND_ACHIEVEMENTS = [
         "icon": "🧘",
         "condition_type": "challenge_complete",
         "condition_value": "0_meditation",
-        "xp_reward": 25,
-        "usdt_reward": 1,
+        "xp_reward": 60,
+        "usdt_reward": 0,
     },
 
     {
@@ -320,7 +294,7 @@ MIND_ACHIEVEMENTS = [
         "icon": "📖",
         "condition_type": "challenge_complete",
         "condition_value": "2_read_10",
-        "xp_reward": 25,
+        "xp_reward": 75,
         "usdt_reward": 1,
     },
 
@@ -332,8 +306,8 @@ MIND_ACHIEVEMENTS = [
         "icon": "🍬",
         "condition_type": "challenge_complete",
         "condition_value": "3_no_sugar_5",
-        "xp_reward": 30,
-        "usdt_reward": 2,
+        "xp_reward": 100,
+        "usdt_reward": 0,
     },
 
     {
@@ -344,8 +318,8 @@ MIND_ACHIEVEMENTS = [
         "icon": "🤐",
         "condition_type": "challenge_complete",
         "condition_value": "4_no_swear",
-        "xp_reward": 30,
-        "usdt_reward": 2,
+        "xp_reward": 120,
+        "usdt_reward": 0,
     },
 
     {
@@ -356,8 +330,8 @@ MIND_ACHIEVEMENTS = [
         "icon": "🗓️",
         "condition_type": "challenge_complete",
         "condition_value": "5_planning",
-        "xp_reward": 35,
-        "usdt_reward": 2,
+        "xp_reward": 150,
+        "usdt_reward": 0,
     },
 
 ]
@@ -377,8 +351,8 @@ STATUS_ACHIEVEMENTS = [
         "icon": "📓",
         "condition_type": "challenge_complete",
         "condition_value": "5_journal",
-        "xp_reward": 25,
-        "usdt_reward": 1,
+        "xp_reward": 120,
+        "usdt_reward": 0,
     },
 
     {
@@ -389,8 +363,8 @@ STATUS_ACHIEVEMENTS = [
         "icon": "🚫",
         "condition_type": "challenge_complete",
         "condition_value": "5_no_porn",
-        "xp_reward": 40,
-        "usdt_reward": 2,
+        "xp_reward": 120,
+        "usdt_reward": 0,
     },
 
     {
@@ -401,10 +375,9 @@ STATUS_ACHIEVEMENTS = [
         "icon": "🌍",
         "condition_type": "challenge_complete",
         "condition_value": "5_english",
-        "xp_reward": 30,
-        "usdt_reward": 2,
+        "xp_reward": 120,
+        "usdt_reward": 0,
     },
-
     {
         "code": "status_complete_0_friends",
         "category": "status",
@@ -413,8 +386,8 @@ STATUS_ACHIEVEMENTS = [
         "icon": "🤝",
         "condition_type": "challenge_complete",
         "condition_value": "0_friends",
-        "xp_reward": 20,
-        "usdt_reward": 1,
+        "xp_reward": 60,
+        "usdt_reward": 0,
     },
 
 ]
@@ -435,7 +408,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🤝",
         "condition_type": "referrals_count",
         "condition_value": 1,
-        "xp_reward": 20,
+        "xp_reward": 40,
         "usdt_reward": 0,
     },
     {
@@ -446,7 +419,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🤝",
         "condition_type": "referrals_count",
         "condition_value": 5,
-        "xp_reward": 40,
+        "xp_reward": 80,
         "usdt_reward": 1,
     },
     {
@@ -457,7 +430,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🤝",
         "condition_type": "referrals_count",
         "condition_value": 10,
-        "xp_reward": 70,
+        "xp_reward": 120,
         "usdt_reward": 2,
     },
     # 🟢 АКТИВНЫЕ РЕФЕРАЛЫ
@@ -469,8 +442,8 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🟢",
         "condition_type": "active_referrals",
         "condition_value": 3,
-        "xp_reward": 50,
-        "usdt_reward": 2,
+        "xp_reward": 100,
+        "usdt_reward": 0,
     },
     {
         "code": "money_active_referrals_10",
@@ -480,8 +453,8 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🟢",
         "condition_type": "active_referrals",
         "condition_value": 10,
-        "xp_reward": 120,
-        "usdt_reward": 5,
+        "xp_reward": 200,
+        "usdt_reward": 0,
     },
     {
         "code": "money_active_referrals_25",
@@ -491,8 +464,8 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🟢",
         "condition_type": "active_referrals",
         "condition_value": 25,
-        "xp_reward": 220,
-        "usdt_reward": 10,
+        "xp_reward": 300,
+        "usdt_reward": 0,
     },
     # 🏅 РЕФЕРАЛЬНЫЕ УРОВНИ (значение должно совпадать с current_level['title'])
     {
@@ -503,7 +476,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "🥇",
         "condition_type": "referral_level",
         "condition_value": "gold",
-        "xp_reward": 220,
+        "xp_reward": 250,
         "usdt_reward": 12,
     },
     {
@@ -514,7 +487,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "💠",
         "condition_type": "referral_level",
         "condition_value": "platinum",
-        "xp_reward": 350,
+        "xp_reward": 400,
         "usdt_reward": 20,
     },
     {
@@ -525,7 +498,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "💎",
         "condition_type": "referral_level",
         "condition_value": "diamond",
-        "xp_reward": 550,
+        "xp_reward": 600,
         "usdt_reward": 35,
     },
     {
@@ -549,7 +522,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "💵",
         "condition_type": "usdt_balance",
         "condition_value": 10,
-        "xp_reward": 60,
+        "xp_reward": 80,
         "usdt_reward": 0,
     },
     {
@@ -560,7 +533,7 @@ MONEY_ACHIEVEMENTS = [
         "icon": "💵",
         "condition_type": "usdt_balance",
         "condition_value": 50,
-        "xp_reward": 120,
+        "xp_reward": 150,
         "usdt_reward": 0,
     },
     {
