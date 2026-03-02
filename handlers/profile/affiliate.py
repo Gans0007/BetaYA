@@ -43,36 +43,47 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
     bot_username = (await callback.message.bot.get_me()).username
     ref_link = f"https://t.me/{bot_username}?start={dashboard['code']}"
 
-    text = (
-        "🏅 ПАРТНЁРСКИЙ СТАТУС\n\n"
-        f"Уровень: {current_level['emoji']} {current_level['title']}\n"
-        f"💰 Доход: {dashboard['payments']} $\n"
-        f"👥 Активных: {dashboard['active']}\n\n"
-        f"📈 {current_level['percent']}% с платежей\n"
-    )
+    active = dashboard["active"]
+    invited = dashboard["invited"]
+    earned = round(dashboard["payments"], 2)
+    paid_out = round(dashboard["paid_out"], 2)
+
+    available = round(earned - paid_out, 2)
 
     if next_level:
-        text += (
-            f"\n📊 До уровня {next_level['emoji']} {next_level['title']}:\n"
-            f"ещё {need} активных рефералов\n"
-            f"➡️ будет {next_level['percent']}%\n"
+        bar = build_progress_bar(active, next_level["min_active"])
+        progress_block = (
+            "--------------------------------------\n"
+            f"🚀 До {next_level['title']} ({next_level['min_active']} активных)\n"
+            f"{bar:<20} {active} / {next_level['min_active']}\n"
+            f"Ещё активных:        {need}\n"
+            f"Будет доход:         {next_level['percent']}%\n"
         )
     else:
-        text += "\n🔥 Максимальный уровень\n"
+        progress_block = (
+            "--------------------------------------\n"
+            "🔥 Максимальный уровень достигнут\n"
+        )
 
-    text += (
-        "\nℹ️ Как зарабатывать больше:\n"
-        "• Пригласи друга → он оплачивает подписку\n"
-        "• Ты получаешь % с каждого его платежа\n"
-        "• Увеличивай команду — повышай пассивный доход\n"
-        "• Вся статистика отслеживается здесь.\n"
+    text = (
+        "📊 <b>Партнёрский кабинет</b>\n\n"
+        "<pre>"
+        f"🏆 Уровень:             {current_level['emoji']} {current_level['title']}\n"
+        f"📈 Доход:               {current_level['percent']}%\n"
+        "--------------------------------------\n"
+        f"💰 Заработано:          {earned} USDT\n"
+        f"💸 Выплачено:           {paid_out} USDT\n"
+        f"💳 Доступно:            {available} USDT\n"
+        "--------------------------------------\n"
+        f"👥 Всего в команде:     {invited}\n"
+        f"🟢 Активных:            {active}\n"
+        f"{progress_block}"
+        "--------------------------------------\n"
+        f"🔗 Твоя ссылка:\n"
+        f"{ref_link}\n"
+        "</pre>"
     )
 
-    text += (
-        "\n━━━━━━━━━━━━━━\n"
-        "🔗 Твоя партнёрская ссылка ниже:\n"
-
-    )
 
     kb = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -103,6 +114,7 @@ async def show_affiliate_menu(callback: types.CallbackQuery):
 
     await callback.message.edit_text(
         text,
+        parse_mode="HTML",
         reply_markup=kb,
         disable_web_page_preview=True
     )
@@ -257,3 +269,11 @@ async def show_affiliate_payments(callback: types.CallbackQuery):
 
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
+
+def build_progress_bar(current: int, total: int, length: int = 10):
+    if not total or total <= 0:
+        return "□" * length
+
+    ratio = min(current / total, 1)
+    filled = int(ratio * length)
+    return "■" * filled + "□" * (length - filled)
