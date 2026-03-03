@@ -17,7 +17,7 @@ async def get_dashboard(request: Request):
     async with app.state.pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            SELECT current_streak
+            SELECT current_streak,
             xp,
             league,
             league_emoji,
