@@ -22,7 +22,19 @@ async def get_dashboard(request: Request):
                 SELECT 
                     current_streak,
                     COALESCE(xp,0) as xp,
-                    COALESCE(league,'Responsible') as league
+
+                    CASE
+                        WHEN xp >= 6000 THEN 'Созидатель'
+                        WHEN xp >= 5200 THEN 'Непоколебимый'
+                        WHEN xp >= 4000 THEN 'Лидер примера'
+                        WHEN xp >= 2500 THEN 'Железный характер'
+                        WHEN xp >= 1400 THEN 'Ответственный'
+                        WHEN xp >= 700 THEN 'Ученик дисциплины'
+                        WHEN xp >= 300 THEN 'Новичок'
+                        WHEN xp >= 100 THEN 'Сомневающийся'
+                        ELSE 'Безответственный'
+                    END as league
+
                 FROM user_stats
                 WHERE user_id = $1
                 """,
