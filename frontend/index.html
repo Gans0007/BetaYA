@@ -1,123 +1,88 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <title>YA Debug</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
-body{
-  margin:0;
-  padding:20px;
-  background: var(--tg-theme-bg-color, #0f0f10);
-  color: var(--tg-theme-text-color, #ffffff);
-  font-family: Arial, sans-serif;
+body {
+    background:#111;
+    color:white;
+    font-family:Arial;
+    padding:20px;
 }
-
-.card{
-  background: var(--tg-theme-secondary-bg-color, #1b1b1f);
-  padding:20px;
-  border-radius:16px;
-  margin-bottom:15px;
+.card {
+    background:#1e1e1e;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
 }
-
-.title{
-  font-size:14px;
-  opacity:0.7;
-}
-
-.value{
-  font-size:28px;
-  font-weight:700;
-  margin-top:6px;
-}
-
-.small{
-  font-size:13px;
-  opacity:0.6;
-  margin-top:4px;
-}
-
-pre{
-  font-size:12px;
-  background:#000;
-  padding:10px;
-  border-radius:10px;
-  overflow:auto;
+pre {
+    background:black;
+    padding:10px;
+    border-radius:10px;
+    overflow:auto;
 }
 </style>
 </head>
-
 <body>
 
 <div class="card">
-  <div class="title">🔥 Current Streak</div>
-  <div class="value" id="streak">...</div>
+    <h3>🔥 Streak</h3>
+    <div id="streak">...</div>
 </div>
 
 <div class="card">
-  <div class="title">🆔 Telegram User ID</div>
-  <div class="value" id="tg_id">...</div>
+    <h3>🆔 Telegram ID</h3>
+    <div id="tgid">...</div>
 </div>
 
 <div class="card">
-  <div class="title">📦 DB Row</div>
-  <div class="small" id="db_status">...</div>
-</div>
-
-<div class="card">
-  <div class="title">🖥 Raw API Response</div>
-  <pre id="raw_json">...</pre>
+    <h3>🖥 Raw Response</h3>
+    <pre id="raw">...</pre>
 </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.expand();
+const tg = window.Telegram?.WebApp;
 
-async function loadDebug() {
-  try {
-    const response = await fetch("/api/dashboard", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        initData: tg.initData
-      })
-    });
+if (!tg) {
+    document.getElementById("raw").innerText =
+        "Telegram WebApp object NOT found. Open inside Telegram.";
+} else {
+    tg.expand();
 
-    const data = await response.json();
-
-    console.log("API RESPONSE:", data);
-
-    // Показываем всё что пришло
-    document.getElementById("raw_json").innerText =
-        JSON.stringify(data, null, 2);
-
-    // Telegram ID
-    document.getElementById("tg_id").innerText =
-        data.telegram_user_id ?? "null";
-
-    // DB row
-    if (data.db_row) {
-      document.getElementById("db_status").innerText =
-          "Найдена запись в user_stats";
-      document.getElementById("streak").innerText =
-          data.db_row.current_streak ?? 0;
+    if (!tg.initData) {
+        document.getElementById("raw").innerText =
+            "initData is EMPTY. Mini App not opened from Telegram.";
     } else {
-      document.getElementById("db_status").innerText =
-          "Запись в user_stats НЕ найдена";
-      document.getElementById("streak").innerText = 0;
+        load();
     }
-
-  } catch (error) {
-    console.error(error);
-  }
 }
 
-loadDebug();
+async function load() {
+    try {
+        const response = await fetch("/api/dashboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ initData: tg.initData })
+        });
+
+        const data = await response.json();
+
+        document.getElementById("raw").innerText =
+            JSON.stringify(data, null, 2);
+
+        document.getElementById("tgid").innerText =
+            data.telegram_user_id ?? "no id";
+
+        document.getElementById("streak").innerText =
+            data.db_row?.current_streak ?? data.streak ?? 0;
+
+    } catch (err) {
+        document.getElementById("raw").innerText =
+            "Fetch error: " + err;
+    }
+}
 </script>
 
 </body>
