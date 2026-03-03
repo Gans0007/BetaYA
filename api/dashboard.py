@@ -15,8 +15,6 @@ async def get_dashboard(request: Request):
     user_id = validate_telegram_data(init_data)
 
     async with app.state.pool.acquire() as conn:
-        row = await conn.fetchrow(
-            """
             row = await conn.fetchrow(
                 """
                 SELECT 
