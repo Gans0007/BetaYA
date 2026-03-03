@@ -17,12 +17,17 @@ async def get_dashboard(request: Request):
     async with app.state.pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            SELECT current_streak, COALESCE(xp,0) as xp, league
-            FROM user_stats
-            WHERE user_id = $1
-            """,
-            user_id
-        )
+            row = await conn.fetchrow(
+                """
+                SELECT 
+                    current_streak,
+                    COALESCE(xp,0) as xp,
+                    COALESCE(league,'Responsible') as league
+                FROM user_stats
+                WHERE user_id = $1
+                """,
+                user_id
+            )
 
     return {
         "telegram_user_id": user_id,
