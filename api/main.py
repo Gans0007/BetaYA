@@ -43,7 +43,6 @@ app.add_middleware(
 def validate_telegram_data(init_data: str):
 
     parsed_data = dict(urllib.parse.parse_qsl(init_data, strict_parsing=True))
-
     hash_received = parsed_data.pop("hash", None)
 
     if not hash_received:
@@ -53,10 +52,11 @@ def validate_telegram_data(init_data: str):
         f"{k}={v}" for k, v in sorted(parsed_data.items())
     )
 
+    # ВАЖНО: WebAppData — это обязательно
     secret_key = hmac.new(
-        key=b"WebAppData",
-        msg=BOT_TOKEN.encode(),
-        digestmod=hashlib.sha256
+        b"WebAppData",
+        BOT_TOKEN.encode(),
+        hashlib.sha256
     ).digest()
 
     hash_calculated = hmac.new(
