@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
-from main import validate_telegram_data, app
+from api.main import validate_telegram_data, app
 
 router = APIRouter()
 
@@ -14,9 +14,7 @@ async def get_dashboard(request: Request):
 
     user_id = validate_telegram_data(init_data)
 
-    pool = app.state.pool
-
-    async with pool.acquire() as conn:
+    async with app.state.pool.acquire() as conn:
         row = await conn.fetchrow(
             """
             SELECT current_streak
