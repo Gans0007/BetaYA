@@ -94,6 +94,9 @@ const statusText = document.getElementById("statusText");
 
 async function loadDashboard() {
 
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
     if (!tg.initData) {
         statusText.innerText = "Ошибка: Mini App должен быть открыт через Telegram.";
         return;
@@ -111,6 +114,10 @@ async function loadDashboard() {
             })
         });
 
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+
         const data = await response.json();
 
         if (data.error) {
@@ -123,17 +130,17 @@ async function loadDashboard() {
         document.getElementById("username").innerText =
             "👤 " + user.first_name + " (" + user.id + ")";
 
-        document.getElementById("xp").innerText = data.xp;
-        document.getElementById("streak").innerText = data.streak;
-        document.getElementById("league").innerText = data.league;
+        document.getElementById("xp").innerText = data.xp ?? 0;
+        document.getElementById("streak").innerText = data.streak ?? 0;
+        document.getElementById("league").innerText = data.league ?? "-";
 
-        updateChart(data.weekly_xp || [0,0,0,0,0,0,0]);
+        updateChart(data.weekly_xp || [0, 0, 0, 0, 0, 0, 0]);
 
         statusText.innerText = "Обновлено ✔";
 
     } catch (err) {
         statusText.innerText = "Ошибка подключения к серверу.";
-        console.error(err);
+        console.error("Dashboard error:", err);
     }
 }
 
