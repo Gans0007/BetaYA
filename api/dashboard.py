@@ -22,14 +22,14 @@ async def get_dashboard(request: Request):
                 COALESCE(ROUND(xp),0) as xp,
 
                 CASE
-                    WHEN xp >= 6000 THEN 'Созидатель'
-                    WHEN xp >= 5200 THEN 'Непоколебимый'
-                    WHEN xp >= 4000 THEN 'Лидер примера'
-                    WHEN xp >= 2500 THEN 'Железный характер'
-                    WHEN xp >= 1400 THEN 'Ответственный'
-                    WHEN xp >= 700 THEN 'Ученик дисциплины'
-                    WHEN xp >= 300 THEN 'Новичок'
-                    WHEN xp >= 100 THEN 'Сомневающийся'
+                    WHEN COALESCE(xp,0) >= 6000 THEN 'Созидатель'
+                    WHEN COALESCE(xp,0) >= 5200 THEN 'Непоколебимый'
+                    WHEN COALESCE(xp,0) >= 4000 THEN 'Лидер примера'
+                    WHEN COALESCE(xp,0) >= 2500 THEN 'Железный характер'
+                    WHEN COALESCE(xp,0) >= 1400 THEN 'Ответственный'
+                    WHEN COALESCE(xp,0) >= 700 THEN 'Ученик дисциплины'
+                    WHEN COALESCE(xp,0) >= 300 THEN 'Новичок'
+                    WHEN COALESCE(xp,0) >= 100 THEN 'Сомневающийся'
                     ELSE 'Безответственный'
                 END as league
 
