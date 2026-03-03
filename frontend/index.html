@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YA Dashboard</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: var(--tg-theme-bg-color);
+    color: var(--tg-theme-text-color);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: var(--tg-theme-secondary-bg-color);
+    padding: 16px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-box {
+    width: 30%;
+    text-align: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.05);
+}
+
+canvas {
+    background: var(--tg-theme-secondary-bg-color);
+    border-radius: 16px;
+    padding: 10px;
+}
+
+.loading {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    opacity: 0.7;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 YA Dashboard</h1>
+
+<div class="card">
+    <strong id="username">Загрузка...</strong>
+</div>
+
+<div class="card stats">
+    <div class="stat-box">
+        <div>🔥 Streak</div>
+        <h2 id="streak">-</h2>
+    </div>
+    <div class="stat-box">
+        <div>💎 EXP</div>
+        <h2 id="xp">-</h2>
+    </div>
+    <div class="stat-box">
+        <div>🏆 League</div>
+        <h2 id="league">-</h2>
+    </div>
+</div>
+
+<div class="card">
+    <canvas id="xpChart"></canvas>
+</div>
+
+<div class="loading" id="statusText">Синхронизация...</div>
+
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand();
+tg.ready();
+
+const statusText = document.getElementById("statusText");
+
+async function loadDashboard() {
+
+    if (!tg.initData) {
+        statusText.innerText = "Ошибка: Mini App должен быть открыт через Telegram.";
+        return;
+    }
+
+    try {
+
+        const response = await fetch("https://youramb.digital/api/dashboard", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                initData: tg.initData
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            statusText.innerText = "Ошибка: " + data.error;
+            return;
+        }
+
+        const user = tg.initDataUnsafe.user;
+
+        document.getElementById("username").innerText =
+            "👤 " + user.first_name + " (" + user.id + ")";
+
+        document.getElementById("xp").innerText = data.xp;
+        document.getElementById("streak").innerText = data.streak;
+        document.getElementById("league").innerText = data.league;
+
+        updateChart(data.weekly_xp || [0,0,0,0,0,0,0]);
+
+        statusText.innerText = "Обновлено ✔";
+
+    } catch (err) {
+        statusText.innerText = "Ошибка подключения к серверу.";
+        console.error(err);
+    }
+}
+
+function updateChart(values) {
+
+    const ctx = document.getElementById('xpChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+            datasets: [{
+                label: 'XP',
+                data: values,
+                tension: 0.4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: { display: true },
+                y: { display: true }
+            }
+        }
+    });
+}
+
+loadDashboard();
+
+// авто-обновление каждые 30 секунд
+setInterval(loadDashboard, 30000);
+
+</script>
+
+</body>
+</html>
