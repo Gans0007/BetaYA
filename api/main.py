@@ -42,14 +42,22 @@ app.add_middleware(
 # ----------------------------
 def validate_telegram_data(init_data: str):
 
-    parsed_data = urllib.parse.parse_qs(init_data, strict_parsing=True)
-    hash_received = parsed_data.pop("hash", [None])[0]
+    parsed_data = dict(urllib.parse.parse_qsl(init_data, strict_parsing=True))
+
+    hash_received = parsed_data.pop("hash", None)
+
+    if not hash_received:
+        raise HTTPException(status_code=400, detail="Hash missing")
 
     data_check_string = "\n".join(
-        f"{k}={v[0]}" for k, v in sorted(parsed_data.items())
+        f"{k}={v}" for k, v in sorted(parsed_data.items())
     )
 
-    secret_key = hashlib.sha256(BOT_TOKEN.encode()).digest()
+    secret_key = hmac.new(
+        key=b"WebAppData",
+        msg=BOT_TOKEN.encode(),
+        digestmod=hashlib.sha256
+    ).digest()
 
     hash_calculated = hmac.new(
         secret_key,
@@ -60,12 +68,7 @@ def validate_telegram_data(init_data: str):
     if hash_calculated != hash_received:
         raise HTTPException(status_code=403, detail="Invalid Telegram signature")
 
-    user_json = parsed_data.get("user", [None])[0]
-
-    if not user_json:
-        raise HTTPException(status_code=400, detail="User missing")
-
-    user = json.loads(user_json)
+    user = json.loads(parsed_data["user"])
 
     return user["id"]
 
