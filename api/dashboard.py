@@ -15,7 +15,11 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT streak FROM user_stats WHERE user_id = $1",
+            """
+            SELECT current_streak
+            FROM user_stats
+            WHERE user_id = $1
+            """,
             user_id
         )
 
@@ -23,5 +27,5 @@ async def get_dashboard(request: Request):
         return {"streak": 0}
 
     return {
-        "streak": row["streak"]
+        "streak": row["current_streak"]
     }
