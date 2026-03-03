@@ -3,17 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>YA Streak</title>
+<title>YA Debug</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body{
   margin:0;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  padding:20px;
   background: var(--tg-theme-bg-color, #0f0f10);
   color: var(--tg-theme-text-color, #ffffff);
   font-family: Arial, sans-serif;
@@ -21,21 +18,34 @@ body{
 
 .card{
   background: var(--tg-theme-secondary-bg-color, #1b1b1f);
-  padding:30px;
-  border-radius:20px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  padding:20px;
+  border-radius:16px;
+  margin-bottom:15px;
 }
 
-.label{
+.title{
   font-size:14px;
   opacity:0.7;
 }
 
 .value{
-  font-size:48px;
+  font-size:28px;
   font-weight:700;
-  margin-top:10px;
+  margin-top:6px;
+}
+
+.small{
+  font-size:13px;
+  opacity:0.6;
+  margin-top:4px;
+}
+
+pre{
+  font-size:12px;
+  background:#000;
+  padding:10px;
+  border-radius:10px;
+  overflow:auto;
 }
 </style>
 </head>
@@ -43,15 +53,30 @@ body{
 <body>
 
 <div class="card">
-  <div class="label">🔥 Current Streak</div>
+  <div class="title">🔥 Current Streak</div>
   <div class="value" id="streak">...</div>
+</div>
+
+<div class="card">
+  <div class="title">🆔 Telegram User ID</div>
+  <div class="value" id="tg_id">...</div>
+</div>
+
+<div class="card">
+  <div class="title">📦 DB Row</div>
+  <div class="small" id="db_status">...</div>
+</div>
+
+<div class="card">
+  <div class="title">🖥 Raw API Response</div>
+  <pre id="raw_json">...</pre>
 </div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-async function loadStreak() {
+async function loadDebug() {
   try {
     const response = await fetch("https://youramb.digital/api/dashboard", {
       method: "POST",
@@ -63,19 +88,36 @@ async function loadStreak() {
       })
     });
 
-    if (!response.ok) throw new Error("API error");
-
     const data = await response.json();
 
-    document.getElementById("streak").innerText = data.streak ?? 0;
+    console.log("API RESPONSE:", data);
+
+    // Показываем всё что пришло
+    document.getElementById("raw_json").innerText =
+        JSON.stringify(data, null, 2);
+
+    // Telegram ID
+    document.getElementById("tg_id").innerText =
+        data.telegram_user_id ?? "null";
+
+    // DB row
+    if (data.db_row) {
+      document.getElementById("db_status").innerText =
+          "Найдена запись в user_stats";
+      document.getElementById("streak").innerText =
+          data.db_row.current_streak ?? 0;
+    } else {
+      document.getElementById("db_status").innerText =
+          "Запись в user_stats НЕ найдена";
+      document.getElementById("streak").innerText = 0;
+    }
 
   } catch (error) {
-    document.getElementById("streak").innerText = "0";
     console.error(error);
   }
 }
 
-loadStreak();
+loadDebug();
 </script>
 
 </body>

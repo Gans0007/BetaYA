@@ -24,9 +24,7 @@ async def get_dashboard(request: Request):
             user_id
         )
 
-    if not row:
-        return {"streak": 0}
-
     return {
-        "streak": row["current_streak"]
+        "telegram_user_id": user_id,
+        "db_row": dict(row) if row else None
     }
