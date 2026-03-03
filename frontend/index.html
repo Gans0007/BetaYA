@@ -78,7 +78,7 @@ tg.expand();
 
 async function loadDebug() {
   try {
-    const response = await fetch("https://youramb.digital/api/dashboard", {
+    const response = await fetch("/api/dashboard", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
