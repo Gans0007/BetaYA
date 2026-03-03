@@ -38,11 +38,6 @@ pre {
 </div>
 
 <div class="card">
-    <h3>🏆 League</h3>
-    <div id="league">...</div>
-</div>
-
-<div class="card">
     <h3>🆔 Telegram ID</h3>
     <div id="tgid">...</div>
 </div>
@@ -91,8 +86,6 @@ async function load() {
         document.getElementById("xp").innerText =
             Math.floor(data.db_row?.xp ?? 0);
 
-        document.getElementById("league").innerText =
-            data.db_row?.league ?? "No league";
 
     } catch (err) {
         document.getElementById("raw").innerText =
