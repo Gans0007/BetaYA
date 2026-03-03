@@ -18,6 +18,9 @@ async def get_dashboard(request: Request):
         row = await conn.fetchrow(
             """
             SELECT current_streak
+            xp,
+            league,
+            league_emoji,
             FROM user_stats
             WHERE user_id = $1
             """,
@@ -26,5 +29,5 @@ async def get_dashboard(request: Request):
 
     return {
         "telegram_user_id": user_id,
-        "db_row": dict(row) if row else None
+        "stats": dict(row) if row else None
     }
