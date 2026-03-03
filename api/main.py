@@ -2,11 +2,11 @@ import os
 import hmac
 import hashlib
 import urllib.parse
+import json
 import asyncpg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from api.dashboard import router as dashboard_router
 
 load_dotenv()
 
@@ -14,20 +14,19 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 app = FastAPI()
+app.state.pool = None  # храним пул в состоянии приложения
 
-app.include_router(dashboard_router)
 
 # ----------------------------
 # Startup
 # ----------------------------
 @app.on_event("startup")
 async def startup():
-    global pool
-    pool = await asyncpg.create_pool(DATABASE_URL)
+    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
 
 
 # ----------------------------
-# CORS (Mini App)
+# CORS
 # ----------------------------
 app.add_middleware(
     CORSMiddleware,
@@ -39,12 +38,11 @@ app.add_middleware(
 
 
 # ----------------------------
-# Telegram initData validation
+# Telegram validation
 # ----------------------------
 def validate_telegram_data(init_data: str):
 
     parsed_data = urllib.parse.parse_qs(init_data, strict_parsing=True)
-
     hash_received = parsed_data.pop("hash", [None])[0]
 
     data_check_string = "\n".join(
@@ -62,10 +60,21 @@ def validate_telegram_data(init_data: str):
     if hash_calculated != hash_received:
         raise HTTPException(status_code=403, detail="Invalid Telegram signature")
 
-    user_data = urllib.parse.parse_qs(init_data)["user"][0]
-    user = eval(user_data)  # безопасно, т.к. подпись проверена
+    user_json = parsed_data.get("user", [None])[0]
+
+    if not user_json:
+        raise HTTPException(status_code=400, detail="User missing")
+
+    user = json.loads(user_json)
 
     return user["id"]
+
+
+# ----------------------------
+# Подключаем роутеры ПОСЛЕ объявления функций
+# ----------------------------
+from api.dashboard import router as dashboard_router
+app.include_router(dashboard_router)
 
 
 # ----------------------------

@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Request, HTTPException
-from main import validate_telegram_data, pool
+from main import validate_telegram_data, app
 
 router = APIRouter()
 
 @router.post("/api/dashboard")
 async def get_dashboard(request: Request):
+
     data = await request.json()
     init_data = data.get("initData")
 
@@ -12,6 +13,8 @@ async def get_dashboard(request: Request):
         raise HTTPException(status_code=400, detail="initData missing")
 
     user_id = validate_telegram_data(init_data)
+
+    pool = app.state.pool
 
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
