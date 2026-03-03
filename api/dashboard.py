@@ -15,29 +15,29 @@ async def get_dashboard(request: Request):
     user_id = validate_telegram_data(init_data)
 
     async with app.state.pool.acquire() as conn:
-            row = await conn.fetchrow(
-                """
-                SELECT 
-                    current_streak,
-                    COALESCE(xp,0) as xp,
+        row = await conn.fetchrow(
+            """
+            SELECT 
+                current_streak,
+                COALESCE(ROUND(xp),0) as xp,
 
-                    CASE
-                        WHEN xp >= 6000 THEN 'Созидатель'
-                        WHEN xp >= 5200 THEN 'Непоколебимый'
-                        WHEN xp >= 4000 THEN 'Лидер примера'
-                        WHEN xp >= 2500 THEN 'Железный характер'
-                        WHEN xp >= 1400 THEN 'Ответственный'
-                        WHEN xp >= 700 THEN 'Ученик дисциплины'
-                        WHEN xp >= 300 THEN 'Новичок'
-                        WHEN xp >= 100 THEN 'Сомневающийся'
-                        ELSE 'Безответственный'
-                    END as league
+                CASE
+                    WHEN xp >= 6000 THEN 'Созидатель'
+                    WHEN xp >= 5200 THEN 'Непоколебимый'
+                    WHEN xp >= 4000 THEN 'Лидер примера'
+                    WHEN xp >= 2500 THEN 'Железный характер'
+                    WHEN xp >= 1400 THEN 'Ответственный'
+                    WHEN xp >= 700 THEN 'Ученик дисциплины'
+                    WHEN xp >= 300 THEN 'Новичок'
+                    WHEN xp >= 100 THEN 'Сомневающийся'
+                    ELSE 'Безответственный'
+                END as league
 
-                FROM user_stats
-                WHERE user_id = $1
-                """,
-                user_id
-            )
+            FROM user_stats
+            WHERE user_id = $1
+            """,
+            user_id
+        )
 
     return {
         "telegram_user_id": user_id,
