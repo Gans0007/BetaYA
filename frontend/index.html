@@ -1,260 +1,205 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YA Dashboard (Demo)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>YA Dashboard</title>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <style>
-    :root{
-      --bg: var(--tg-theme-bg-color, #0f0f10);
-      --text: var(--tg-theme-text-color, #ffffff);
-      --card: var(--tg-theme-secondary-bg-color, #1b1b1f);
-      --muted: rgba(255,255,255,0.65);
-      --soft: rgba(255,255,255,0.08);
-      --soft2: rgba(0,0,0,0.25);
-      --radius: 18px;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 18px;
-      background: var(--bg);
-      color: var(--text);
-    }
-    h1 {
-      text-align: center;
-      margin: 6px 0 18px;
-      font-size: 22px;
-      letter-spacing: 0.2px;
-    }
-    .card {
-      background: var(--card);
-      padding: 16px;
-      border-radius: var(--radius);
-      margin-bottom: 14px;
-      box-shadow: 0 8px 22px var(--soft2);
-    }
-    .topline {
-      display:flex;
-      justify-content: space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    .muted { color: var(--muted); font-size: 13px; }
-    .stats {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .stat-box {
-      flex: 1;
-      text-align: center;
-      padding: 12px 10px;
-      border-radius: 14px;
-      background: var(--soft);
-    }
-    .stat-box .label{
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .stat-box .value{
-      font-size: 22px;
-      font-weight: 700;
-    }
-    .btnrow{
-      display:flex;
-      gap:10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    button {
-      border: 0;
-      border-radius: 14px;
-      padding: 11px 12px;
-      background: var(--soft);
-      color: var(--text);
-      font-weight: 600;
-      cursor: pointer;
-      flex: 1;
-      min-width: 150px;
-    }
-    button:active { transform: scale(0.99); }
-    canvas {
-      background: transparent;
-      border-radius: var(--radius);
-      width: 100%;
-      height: 10px;
-    }
-    .legend-note{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-  </style>
+<style>
+:root{
+  --bg: var(--tg-theme-bg-color, #0f0f10);
+  --text: var(--tg-theme-text-color, #ffffff);
+  --card: var(--tg-theme-secondary-bg-color, #1b1b1f);
+  --muted: rgba(255,255,255,0.65);
+  --soft: rgba(255,255,255,0.08);
+  --soft2: rgba(0,0,0,0.25);
+  --radius: 18px;
+}
+body{
+  font-family: Arial, sans-serif;
+  margin:0;
+  padding:12px;
+  background:var(--bg);
+  color:var(--text);
+}
+h1{
+  text-align:center;
+  margin:4px 0 12px;
+  font-size:20px;
+}
+.card{
+  background:var(--card);
+  padding:12px;
+  border-radius:var(--radius);
+  margin-bottom:10px;
+  box-shadow:0 6px 18px var(--soft2);
+}
+.stats{
+  display:flex;
+  gap:8px;
+}
+.stat-box{
+  flex:1;
+  text-align:center;
+  padding:10px;
+  border-radius:12px;
+  background:var(--soft);
+}
+.stat-box .label{
+  font-size:12px;
+  color:var(--muted);
+}
+.stat-box .value{
+  font-size:18px;
+  font-weight:700;
+}
+.period-switch{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.period-switch button{
+  flex:1;
+  padding:8px;
+  border:0;
+  border-radius:12px;
+  background:var(--soft);
+  color:var(--text);
+  font-weight:600;
+  cursor:pointer;
+}
+.period-switch button.active{
+  background:#2f80ed;
+}
+canvas{
+  width:100%;
+  height:200px !important;
+}
+</style>
 </head>
 
 <body>
 
-  <h1>🔥 YA Dashboard (Demo)</h1>
+<h1>🔥 YA Dashboard</h1>
 
-  <div class="card">
-    <div class="topline">
-      <strong id="username">Загрузка...</strong>
-      <span class="muted" id="status">Demo режим • без синхронизации</span>
-    </div>
-
-    <div class="btnrow">
-      <button id="btnRandom">🎲 Рандомнуть профиль</button>
-      <button id="btnRandomWeek">📈 Рандомнуть неделю</button>
-    </div>
+<div class="card stats">
+  <div class="stat-box">
+    <div class="label">🔥 Streak</div>
+    <div class="value" id="streak">12</div>
   </div>
-
-  <div class="card stats">
-    <div class="stat-box">
-      <div class="label">🔥 Streak</div>
-      <div class="value" id="streak">-</div>
-    </div>
-    <div class="stat-box">
-      <div class="label">💎 XP</div>
-      <div class="value" id="xp">-</div>
-    </div>
-    <div class="stat-box">
-      <div class="label">🏆 League</div>
-      <div class="value" id="league">-</div>
-    </div>
+  <div class="stat-box">
+    <div class="label">💎 XP</div>
+    <div class="value" id="xp">850</div>
   </div>
-
-  <div class="card">
-    <canvas id="habitsChart"></canvas>
-    <div class="legend-note">
-      Правило: если привычка подтверждена в день — линия +1, если нет — линия -1, но ниже 0 не падает.
-      3 линии: Пробежка / Чтение / Пить воду.
-    </div>
+  <div class="stat-box">
+    <div class="label">🏆 League</div>
+    <div class="value" id="league">Silver</div>
   </div>
+</div>
+
+<div class="card">
+  <div class="period-switch">
+    <button data-period="7" class="active">7D</button>
+    <button data-period="30">30D</button>
+    <button data-period="12">1Y</button>
+  </div>
+  <canvas id="habitsChart"></canvas>
+</div>
 
 <script>
-  const tg = window.Telegram.WebApp;
-  tg.expand();
+const tg = window.Telegram.WebApp;
+tg.expand();
 
-  const leagues = ["Wood", "Steel", "Bronze", "Silver", "Gold"];
+function randInt(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
 
-  function randInt(min, max){
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+function randomChecks(length, prob=0.6){
+  return Array.from({length},()=>Math.random()<prob);
+}
+
+function checksToSeries(checks){
+  let v=0;
+  const out=[];
+  for(const ok of checks){
+    if(ok) v+=1;
+    else v=Math.max(0,v-1);
+    out.push(v);
+  }
+  return out;
+}
+
+let chart;
+
+function generateData(period){
+  let length = period;
+  let labels=[];
+
+  if(period===7){
+    labels=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+  }else if(period===30){
+    labels=Array.from({length:30},(_,i)=>i+1);
+  }else{
+    labels=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   }
 
-  function pick(arr){
-    return arr[randInt(0, arr.length - 1)];
-  }
+  const run=checksToSeries(randomChecks(labels.length,0.55));
+  const read=checksToSeries(randomChecks(labels.length,0.6));
+  const water=checksToSeries(randomChecks(labels.length,0.7));
 
-  function setProfileDemo(){
-    const user = tg.initDataUnsafe?.user;
-    const name = user?.first_name || "User";
-    const id = user?.id || randInt(100000, 999999);
+  return {labels, run, read, water};
+}
 
-    document.getElementById("username").innerText = `👤 ${name} (${id})`;
-    document.getElementById("streak").innerText = String(randInt(0, 45));
-    document.getElementById("xp").innerText = String(randInt(0, 3500));
-    document.getElementById("league").innerText = pick(leagues);
-  }
+function render(period){
+  const data=generateData(period);
 
-  // Генерируем “подтверждения” на 7 дней (true/false) для каждой привычки
-  function randomWeekChecks(probTrue = 0.55){
-    return Array.from({length: 7}, () => Math.random() < probTrue);
-  }
+  if(chart) chart.destroy();
 
-  // Преобразуем подтверждения в значения линии по правилу +1/-1 (min 0)
-  function checksToSeries(checks){
-    let v = 0;
-    const out = [];
-    for (const ok of checks){
-      if (ok) v += 1;
-      else v = Math.max(0, v - 1);
-      out.push(v);
-    }
-    return out;
-  }
-
-  const labels = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-
-  let chart;
-
-  function renderChart(seriesRun, seriesRead, seriesWater){
-    const ctx = document.getElementById("habitsChart");
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "🏃 Пробежка",
-            data: seriesRun,
-            tension: 0.35
-          },
-          {
-            label: "📚 Чтение",
-            data: seriesRead,
-            tension: 0.35
-          },
-          {
-            label: "💧 Пить воду",
-            data: seriesWater,
-            tension: 0.35
-          }
-        ]
+  chart=new Chart(document.getElementById("habitsChart"),{
+    type:"line",
+    data:{
+      labels:data.labels,
+      datasets:[
+        {label:"🏃 Пробежка", data:data.run, tension:0.35},
+        {label:"📚 Чтение", data:data.read, tension:0.35},
+        {label:"💧 Вода", data:data.water, tension:0.35}
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{
+          labels:{color:"#fff"}
+        }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text') || "#fff" }
-          },
-          tooltip: { enabled: true }
+      scales:{
+        x:{
+          ticks:{color:"#aaa"},
+          grid:{color:"rgba(255,255,255,0.08)"}
         },
-        scales: {
-          x: {
-            ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || "#aaa" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0, color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || "#aaa" },
-            grid: { color: "rgba(255,255,255,0.08)" }
-          }
+        y:{
+          beginAtZero:true,
+          ticks:{precision:0,color:"#aaa"},
+          grid:{color:"rgba(255,255,255,0.08)"}
         }
       }
-    });
-  }
+    }
+  });
+}
 
-  function setWeekDemo(){
-    const runChecks = randomWeekChecks(0.55);
-    const readChecks = randomWeekChecks(0.60);
-    const waterChecks = randomWeekChecks(0.70);
+document.querySelectorAll(".period-switch button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".period-switch button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    render(parseInt(btn.dataset.period));
+  });
+});
 
-    const runSeries = checksToSeries(runChecks);
-    const readSeries = checksToSeries(readChecks);
-    const waterSeries = checksToSeries(waterChecks);
-
-    renderChart(runSeries, readSeries, waterSeries);
-  }
-
-  // init
-  setProfileDemo();
-  setWeekDemo();
-
-  document.getElementById("btnRandom").addEventListener("click", setProfileDemo);
-  document.getElementById("btnRandomWeek").addEventListener("click", setWeekDemo);
+render(7);
 </script>
 
 </body>
