@@ -14,7 +14,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 app = FastAPI()
-app.state.pool = None  # храним пул в состоянии приложения
+app.state.pool = None
 
 
 # ----------------------------
@@ -71,15 +71,36 @@ def validate_telegram_data(init_data: str):
 
 
 # ----------------------------
-# Подключаем роутеры ПОСЛЕ объявления функций
+# Dashboard endpoint
 # ----------------------------
-from api.dashboard import router as dashboard_router
-app.include_router(dashboard_router)
+@app.post("/api/dashboard")
+async def get_dashboard(data: dict):
+
+    init_data = data.get("initData")
+
+    if not init_data:
+        raise HTTPException(status_code=400, detail="initData missing")
+
+    user_id = validate_telegram_data(init_data)
+
+    async with app.state.pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT current_streak
+            FROM user_stats
+            WHERE user_id = $1
+            """,
+            user_id
+        )
+
+    if not row:
+        return {"streak": 0}
+
+    return {
+        "streak": row["current_streak"]
+    }
 
 
-# ----------------------------
-# Health check
-# ----------------------------
 @app.get("/")
 async def root():
     return {"status": "API running"}
