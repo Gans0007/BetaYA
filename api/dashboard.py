@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
+from main import validate_telegram_data, pool
 
 router = APIRouter()
 
@@ -10,12 +11,17 @@ async def get_dashboard(request: Request):
     if not init_data:
         raise HTTPException(status_code=400, detail="initData missing")
 
-    # TODO: здесь твоя validate_init_data(init_data)
+    user_id = validate_telegram_data(init_data)
 
-    # Временно можно вернуть тест
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT streak FROM user_stats WHERE user_id = $1",
+            user_id
+        )
+
+    if not row:
+        return {"streak": 0}
+
     return {
-        "xp": 125,
-        "streak": 7,
-        "league": "Silver",
-        "weekly_xp": [10, 20, 15, 30, 5, 25, 20]
+        "streak": row["streak"]
     }
