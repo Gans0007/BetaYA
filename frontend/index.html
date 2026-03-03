@@ -1,180 +1,260 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>YA Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YA Dashboard (Demo)</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: var(--tg-theme-bg-color);
-    color: var(--tg-theme-text-color);
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.card {
-    background: var(--tg-theme-secondary-bg-color);
-    padding: 16px;
-    border-radius: 16px;
-    margin-bottom: 16px;
-}
-
-.stats {
-    display: flex;
-    justify-content: space-between;
-}
-
-.stat-box {
-    width: 30%;
-    text-align: center;
-    padding: 10px;
-    border-radius: 12px;
-    background: rgba(0,0,0,0.05);
-}
-
-canvas {
-    background: var(--tg-theme-secondary-bg-color);
-    border-radius: 16px;
-    padding: 10px;
-}
-
-.loading {
-    text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
-    opacity: 0.7;
-}
-</style>
+  <style>
+    :root{
+      --bg: var(--tg-theme-bg-color, #0f0f10);
+      --text: var(--tg-theme-text-color, #ffffff);
+      --card: var(--tg-theme-secondary-bg-color, #1b1b1f);
+      --muted: rgba(255,255,255,0.65);
+      --soft: rgba(255,255,255,0.08);
+      --soft2: rgba(0,0,0,0.25);
+      --radius: 18px;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 18px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    h1 {
+      text-align: center;
+      margin: 6px 0 18px;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+    .card {
+      background: var(--card);
+      padding: 16px;
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px var(--soft2);
+    }
+    .topline {
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+    .muted { color: var(--muted); font-size: 13px; }
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .stat-box {
+      flex: 1;
+      text-align: center;
+      padding: 12px 10px;
+      border-radius: 14px;
+      background: var(--soft);
+    }
+    .stat-box .label{
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .stat-box .value{
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .btnrow{
+      display:flex;
+      gap:10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: var(--soft);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+    }
+    button:active { transform: scale(0.99); }
+    canvas {
+      background: transparent;
+      border-radius: var(--radius);
+      width: 100%;
+      height: 280px;
+    }
+    .legend-note{
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>🔥 Прогресс за месяц </h1>
+  <h1>🔥 YA Dashboard (Demo)</h1>
 
-<div class="card">
-    <strong id="username">Загрузка...</strong>
-</div>
+  <div class="card">
+    <div class="topline">
+      <strong id="username">Загрузка...</strong>
+      <span class="muted" id="status">Demo режим • без синхронизации</span>
+    </div>
 
-<div class="card stats">
+    <div class="btnrow">
+      <button id="btnRandom">🎲 Рандомнуть профиль</button>
+      <button id="btnRandomWeek">📈 Рандомнуть неделю</button>
+    </div>
+  </div>
+
+  <div class="card stats">
     <div class="stat-box">
-        <div>🔥 Стрик</div>
-        <h2 id="streak">-</h2>
+      <div class="label">🔥 Streak</div>
+      <div class="value" id="streak">-</div>
     </div>
     <div class="stat-box">
-        <div>💎 Опыт</div>
-        <h2 id="xp">-</h2>
+      <div class="label">💎 XP</div>
+      <div class="value" id="xp">-</div>
     </div>
     <div class="stat-box">
-        <div>🏆 Лига</div>
-        <h2 id="league">-</h2>
+      <div class="label">🏆 League</div>
+      <div class="value" id="league">-</div>
     </div>
-</div>
+  </div>
 
-<div class="card">
-    <canvas id="xpChart"></canvas>
-</div>
-
-<div class="loading" id="statusText">Синхронизация...</div>
+  <div class="card">
+    <canvas id="habitsChart"></canvas>
+    <div class="legend-note">
+      Правило: если привычка подтверждена в день — линия +1, если нет — линия -1, но ниже 0 не падает.
+      3 линии: Пробежка / Чтение / Пить воду.
+    </div>
+  </div>
 
 <script>
-const tg = window.Telegram.WebApp;
-tg.expand();
-tg.ready();
+  const tg = window.Telegram.WebApp;
+  tg.expand();
 
-const statusText = document.getElementById("statusText");
+  const leagues = ["Wood", "Steel", "Bronze", "Silver", "Gold"];
 
-async function loadDashboard() {
+  function randInt(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+  function pick(arr){
+    return arr[randInt(0, arr.length - 1)];
+  }
 
-    if (!tg.initData) {
-        statusText.innerText = "Ошибка: Mini App должен быть открыт через Telegram.";
-        return;
+  function setProfileDemo(){
+    const user = tg.initDataUnsafe?.user;
+    const name = user?.first_name || "User";
+    const id = user?.id || randInt(100000, 999999);
+
+    document.getElementById("username").innerText = `👤 ${name} (${id})`;
+    document.getElementById("streak").innerText = String(randInt(0, 45));
+    document.getElementById("xp").innerText = String(randInt(0, 3500));
+    document.getElementById("league").innerText = pick(leagues);
+  }
+
+  // Генерируем “подтверждения” на 7 дней (true/false) для каждой привычки
+  function randomWeekChecks(probTrue = 0.55){
+    return Array.from({length: 7}, () => Math.random() < probTrue);
+  }
+
+  // Преобразуем подтверждения в значения линии по правилу +1/-1 (min 0)
+  function checksToSeries(checks){
+    let v = 0;
+    const out = [];
+    for (const ok of checks){
+      if (ok) v += 1;
+      else v = Math.max(0, v - 1);
+      out.push(v);
     }
+    return out;
+  }
 
-    try {
+  const labels = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
-        const response = await fetch("https://youramb.digital/api/dashboard", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                initData: tg.initData
-            })
-        });
+  let chart;
 
-        if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
-        }
+  function renderChart(seriesRun, seriesRead, seriesWater){
+    const ctx = document.getElementById("habitsChart");
 
-        const data = await response.json();
+    if (chart) chart.destroy();
 
-        if (data.error) {
-            statusText.innerText = "Ошибка: " + data.error;
-            return;
-        }
-
-        const user = tg.initDataUnsafe.user;
-
-        document.getElementById("username").innerText =
-            "👤 " + user.first_name + " (" + user.id + ")";
-
-        document.getElementById("xp").innerText = data.xp ?? 0;
-        document.getElementById("streak").innerText = data.streak ?? 0;
-        document.getElementById("league").innerText = data.league ?? "-";
-
-        updateChart(data.weekly_xp || [0, 0, 0, 0, 0, 0, 0]);
-
-        statusText.innerText = "Обновлено ✔";
-
-    } catch (err) {
-        statusText.innerText = "Ошибка подключения к серверу.";
-        console.error("Dashboard error:", err);
-    }
-}
-
-function updateChart(values) {
-
-    const ctx = document.getElementById('xpChart');
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
-            datasets: [{
-                label: 'XP',
-                data: values,
-                tension: 0.4
-            }]
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "🏃 Пробежка",
+            data: seriesRun,
+            tension: 0.35
+          },
+          {
+            label: "📚 Чтение",
+            data: seriesRead,
+            tension: 0.35
+          },
+          {
+            label: "💧 Пить воду",
+            data: seriesWater,
+            tension: 0.35
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text') || "#fff" }
+          },
+          tooltip: { enabled: true }
         },
-        options: {
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                x: { display: true },
-                y: { display: true }
-            }
+        scales: {
+          x: {
+            ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || "#aaa" },
+            grid: { color: "rgba(255,255,255,0.08)" }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || "#aaa" },
+            grid: { color: "rgba(255,255,255,0.08)" }
+          }
         }
+      }
     });
-}
+  }
 
-loadDashboard();
+  function setWeekDemo(){
+    const runChecks = randomWeekChecks(0.55);
+    const readChecks = randomWeekChecks(0.60);
+    const waterChecks = randomWeekChecks(0.70);
 
-// авто-обновление каждые 30 секунд
-setInterval(loadDashboard, 30000);
+    const runSeries = checksToSeries(runChecks);
+    const readSeries = checksToSeries(readChecks);
+    const waterSeries = checksToSeries(waterChecks);
 
+    renderChart(runSeries, readSeries, waterSeries);
+  }
+
+  // init
+  setProfileDemo();
+  setWeekDemo();
+
+  document.getElementById("btnRandom").addEventListener("click", setProfileDemo);
+  document.getElementById("btnRandomWeek").addEventListener("click", setWeekDemo);
 </script>
 
 </body>
