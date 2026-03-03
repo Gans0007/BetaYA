@@ -6,6 +6,7 @@ import asyncpg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from api.dashboard import router as dashboard_router
 
 load_dotenv()
 
@@ -13,7 +14,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 app = FastAPI()
-pool = None
+
+app.include_router(dashboard_router)
 
 # ----------------------------
 # Startup
@@ -64,40 +66,6 @@ def validate_telegram_data(init_data: str):
     user = eval(user_data)  # безопасно, т.к. подпись проверена
 
     return user["id"]
-
-
-# ----------------------------
-# Dashboard endpoint
-# ----------------------------
-@app.post("/api/dashboard")
-async def dashboard(data: dict):
-
-    init_data = data.get("initData")
-
-    if not init_data:
-        raise HTTPException(status_code=400, detail="Missing initData")
-
-    user_id = validate_telegram_data(init_data)
-
-    async with pool.acquire() as conn:
-        user = await conn.fetchrow(
-            """
-            SELECT user_id, xp, current_streak, league
-            FROM users
-            WHERE user_id=$1
-            """,
-            user_id
-        )
-
-    if not user:
-        return {"error": "User not found"}
-
-    return {
-        "xp": user["xp"],
-        "streak": user["current_streak"],
-        "league": user["league"],
-        "weekly_xp": [50, 80, 120, 200, 260, 350, 480]  # позже сделаем реальный расчёт
-    }
 
 
 # ----------------------------
