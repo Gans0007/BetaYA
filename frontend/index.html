@@ -7,7 +7,10 @@
 
 <title>YA Dashboard</title>
 
+<!-- Telegram Mini App API -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- библиотека графиков -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -67,29 +70,9 @@ h1{
   font-weight:700;
 }
 
-.period-switch{
-  display:flex;
-  gap:8px;
-  margin-bottom:8px;
-}
-
-.period-switch button{
-  flex:1;
-  padding:8px;
-  border:0;
-  border-radius:12px;
-  background:var(--soft);
-  color:var(--text);
-  font-weight:600;
-}
-
-.period-switch button.active{
-  background:#2f80ed;
-}
-
 canvas{
   width:100%;
-  height:180px !important;
+  height:200px !important;
 }
 
 </style>
@@ -98,6 +81,8 @@ canvas{
 <body>
 
 <h1>🔥 YA Dashboard</h1>
+
+<!-- Блок общей статистики -->
 
 <div class="card stats">
 
@@ -118,13 +103,9 @@ canvas{
 
 </div>
 
-<div class="card">
+<!-- График привычек -->
 
-<div class="period-switch">
-<button data-period="7" class="active">7D</button>
-<button data-period="30">30D</button>
-<button data-period="12">1Y</button>
-</div>
+<div class="card">
 
 <canvas id="habitsChart"></canvas>
 
@@ -132,30 +113,51 @@ canvas{
 
 <script>
 
+/*
+========================================
+ИНИЦИАЛИЗАЦИЯ TELEGRAM MINI APP
+========================================
+*/
+
 const tg = window.Telegram.WebApp
+
+// раскрываем mini app на полный экран
 tg.expand()
 
+// запускаем загрузку данных
 loadDashboard()
+loadHabits()
+
+let chart
+
+
+
+/*
+========================================
+ЗАГРУЗКА ОСНОВНОЙ СТАТИСТИКИ
+streak / xp / league
+========================================
+*/
 
 async function loadDashboard(){
 
 try{
 
-const response = await fetch("https://youramb.digital/api/dashboard",{
-
+const response = await fetch(
+"https://youramb.digital/api/dashboard",
+{
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
-
 body:JSON.stringify({
 initData: tg.initData
 })
-
 })
 
 const data = await response.json()
+
+// отображаем данные на странице
 
 document.getElementById("streak").innerText =
 data.streak ?? 0
@@ -168,75 +170,93 @@ data.league ?? "-"
 
 }catch(e){
 
-console.log("API ERROR",e)
+console.log("Dashboard API error",e)
 
 }
 
 }
 
-let chart
 
-function randomChecks(length, prob=0.6){
-return Array.from({length},()=>Math.random()<prob)
-}
 
-function checksToSeries(checks){
-let v=0
-const out=[]
+/*
+========================================
+ЗАГРУЗКА ПРИВЫЧЕК ПОЛЬЗОВАТЕЛЯ
+========================================
+*/
 
-for(const ok of checks){
+async function loadHabits(){
 
-if(ok) v+=1
-else v=Math.max(0,v-1)
+try{
 
-out.push(v)
+const response = await fetch(
+"https://youramb.digital/api/habits",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+initData: tg.initData
+})
+})
 
-}
+const data = await response.json()
 
-return out
-}
+console.log("Habits from API:", data.habits)
 
-function generateData(period){
+// передаем привычки в функцию отрисовки графика
+renderHabits(data.habits)
 
-let labels=[]
+}catch(e){
 
-if(period===7){
-labels=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
-}
-
-else if(period===30){
-labels=Array.from({length:30},(_,i)=>i+1)
-}
-
-else{
-labels=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
-}
-
-const run=checksToSeries(randomChecks(labels.length,0.55))
-const read=checksToSeries(randomChecks(labels.length,0.6))
-const water=checksToSeries(randomChecks(labels.length,0.7))
-
-return {labels,run,read,water}
+console.log("Habits load error",e)
 
 }
 
-function render(period){
+}
 
-const data=generateData(period)
 
+
+/*
+========================================
+ПОСТРОЕНИЕ ГРАФИКА ПРИВЫЧЕК
+========================================
+
+мы берем из БД:
+
+habit.name
+habit.done_days
+habit.days
+
+и строим прогресс привычек
+*/
+
+function renderHabits(habits){
+
+// названия привычек
+const labels = habits.map(h => h.name)
+
+// прогресс привычки
+const progress = habits.map(h =>
+
+Math.round((h.done_days / h.days) * 10)
+
+)
+
+// если график уже был — удаляем
 if(chart) chart.destroy()
 
-chart=new Chart(document.getElementById("habitsChart"),{
+// создаем новый график
+chart = new Chart(document.getElementById("habitsChart"),{
 
-type:"line",
+type:"bar",
 
 data:{
-labels:data.labels,
-datasets:[
-{label:"🏃 Пробежка",data:data.run,tension:0.35},
-{label:"📚 Чтение",data:data.read,tension:0.35},
-{label:"💧 Вода",data:data.water,tension:0.35}
-]
+labels:labels,
+datasets:[{
+label:"Прогресс привычек",
+data:progress
+}]
 },
 
 options:{
@@ -247,23 +267,6 @@ maintainAspectRatio:false
 })
 
 }
-
-document.querySelectorAll(".period-switch button").forEach(btn=>{
-
-btn.onclick=()=>{
-
-document.querySelectorAll(".period-switch button")
-.forEach(b=>b.classList.remove("active"))
-
-btn.classList.add("active")
-
-render(parseInt(btn.dataset.period))
-
-}
-
-})
-
-render(7)
 
 </script>
 
