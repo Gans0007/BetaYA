@@ -2,132 +2,155 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>YA Debug</title>
+<title>YA Dashboard</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-body {
-    background:#111;
+
+body{
+    margin:0;
+    padding:16px;
+    background:#0f0f10;
     color:white;
     font-family:Arial;
-    padding:20px;
 }
 
-.card {
-    background:#1e1e1e;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:15px;
+/* USER NAME */
+
+.user{
+    font-size:15px;
+    margin-bottom:12px;
+    opacity:0.9;
 }
 
-pre {
-    background:black;
-    padding:10px;
-    border-radius:10px;
-    overflow:auto;
+/* CARD */
+
+.card{
+    background:#1b1b1f;
+    border-radius:16px;
+    padding:18px;
 }
+
+/* STATS ROW */
+
+.stats{
+    display:flex;
+    justify-content:space-between;
+}
+
+/* STAT BLOCK */
+
+.stat{
+    flex:1;
+    text-align:center;
+}
+
+/* LABEL */
+
+.label{
+    font-size:12px;
+    opacity:0.7;
+    margin-bottom:6px;
+}
+
+/* VALUE */
+
+.value{
+    font-size:20px;
+    font-weight:bold;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="card">
-    <h3>🔥 Streak</h3>
-    <div id="streak">...</div>
-</div>
+<div class="user" id="username">...</div>
 
 <div class="card">
-    <h3>💎 XP</h3>
-    <div id="xp">...</div>
+    <div class="stats">
+
+        <div class="stat">
+            <div class="label">🔥 Streak</div>
+            <div class="value" id="streak">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">💎 EXP</div>
+            <div class="value" id="xp">-</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">🏆 League</div>
+            <div class="value" id="league">-</div>
+        </div>
+
+    </div>
 </div>
 
-<div class="card">
-    <h3>🏆 League</h3>
-    <div id="league">...</div>
-</div>
-
-<div class="card">
-    <h3>🆔 Telegram ID</h3>
-    <div id="tgid">...</div>
-</div>
-
-<div class="card">
-    <h3>🖥 Raw Response</h3>
-    <pre id="raw">...</pre>
-</div>
 
 <script>
+
 const tg = window.Telegram?.WebApp;
 
-if (!tg) {
+if(!tg){
 
-    document.getElementById("raw").innerText =
-        "Telegram WebApp object NOT found. Open inside Telegram.";
+    document.body.innerHTML = "Open inside Telegram";
 
-} else {
+}else{
 
     tg.expand();
 
-    if (!tg.initData) {
+    const user = tg.initDataUnsafe?.user;
 
-        document.getElementById("raw").innerText =
-            "initData is EMPTY. Mini App not opened from Telegram.";
+    if(user){
 
-    } else {
-
-        load();
-
+        document.getElementById("username").innerText =
+            user.first_name + " (" + user.id + ")";
     }
+
+    loadDashboard();
 }
 
-async function load() {
 
-    try {
 
-        const response = await fetch("https://youramb.digital/api/dashboard", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ initData: tg.initData })
+async function loadDashboard(){
+
+    try{
+
+        const response = await fetch("https://youramb.digital/api/dashboard",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                initData: tg.initData
+            })
+
         });
 
-        const text = await response.text();
-
-        let data;
-
-        try {
-
-            data = JSON.parse(text);
-
-            document.getElementById("raw").innerText =
-                JSON.stringify(data, null, 2);
-
-        } catch {
-
-            document.getElementById("raw").innerText = text;
-            return;
-
-        }
-
-        document.getElementById("tgid").innerText =
-            data.telegram_user_id ?? "no id";
+        const data = await response.json();
 
         document.getElementById("streak").innerText =
             data.streak ?? 0;
 
         document.getElementById("xp").innerText =
-            data.xp ?? 0;
+            Math.floor(data.xp ?? 0);
 
         document.getElementById("league").innerText =
             data.league ?? "-";
 
-    } catch (err) {
+    }catch(err){
 
-        document.getElementById("raw").innerText =
-            "Fetch error: " + err;
+        console.log(err);
 
     }
 
 }
+
 </script>
 
 </body>
