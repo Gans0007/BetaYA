@@ -28,13 +28,8 @@ pre {
 <body>
 
 <div class="card">
-    <h3>🔥 Streak</h3>
+    <h3>🔥 SStreak</h3>
     <div id="streak">...</div>
-</div>
-
-<div class="card">
-    <h3>⚡ XP</h3>
-    <div id="xp">...</div>
 </div>
 
 <div class="card">
@@ -82,10 +77,6 @@ async function load() {
 
         document.getElementById("streak").innerText =
             data.db_row?.current_streak ?? data.streak ?? 0;
-
-        document.getElementById("xp").innerText =
-            Math.floor(data.db_row?.xp ?? 0);
-
 
     } catch (err) {
         document.getElementById("raw").innerText =
