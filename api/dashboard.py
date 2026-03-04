@@ -47,3 +47,28 @@ async def get_dashboard(request: Request):
         "xp": float(row["xp"]) if row else 0,
         "league": row["league"] if row else "Безответственный"
     }
+
+
+@router.post("/api/habits")
+async def get_habits(request: Request):
+
+    data = await request.json()
+    init_data = data.get("initData")
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        rows = await conn.fetch("""
+        SELECT id, name
+        FROM habits
+        WHERE user_id=$1
+        AND is_active=true
+        ORDER BY created_at
+        """, user_id)
+
+    return {
+        "habits":[dict(r) for r in rows]
+    }

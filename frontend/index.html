@@ -135,7 +135,18 @@ canvas{
 const tg = window.Telegram.WebApp
 tg.expand()
 
-loadDashboard()
+let userHabits = []
+
+init()
+
+async function init(){
+
+await loadDashboard()
+await loadHabits()
+
+render(7)
+
+}
 
 async function loadDashboard(){
 
@@ -169,6 +180,36 @@ data.league ?? "-"
 }catch(e){
 
 console.log("API ERROR",e)
+
+}
+
+}
+
+async function loadHabits(){
+
+try{
+
+const response = await fetch("https://youramb.digital/api/habits",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+initData: tg.initData
+})
+
+})
+
+const data = await response.json()
+
+userHabits = data.habits || []
+
+}catch(e){
+
+console.log("HABITS API ERROR",e)
 
 }
 
@@ -212,11 +253,7 @@ else{
 labels=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 }
 
-const run=checksToSeries(randomChecks(labels.length,0.55))
-const read=checksToSeries(randomChecks(labels.length,0.6))
-const water=checksToSeries(randomChecks(labels.length,0.7))
-
-return {labels,run,read,water}
+return {labels}
 
 }
 
@@ -226,17 +263,26 @@ const data=generateData(period)
 
 if(chart) chart.destroy()
 
+const datasets = userHabits.map(h => {
+
+const checks = randomChecks(data.labels.length,0.6)
+const series = checksToSeries(checks)
+
+return {
+label: h.name,
+data: series,
+tension:0.35
+}
+
+})
+
 chart=new Chart(document.getElementById("habitsChart"),{
 
 type:"line",
 
 data:{
 labels:data.labels,
-datasets:[
-{label:"🏃 Пробежка",data:data.run,tension:0.35},
-{label:"📚 Чтение",data:data.read,tension:0.35},
-{label:"💧 Вода",data:data.water,tension:0.35}
-]
+datasets: datasets
 },
 
 options:{
@@ -262,8 +308,6 @@ render(parseInt(btn.dataset.period))
 }
 
 })
-
-render(7)
 
 </script>
 
