@@ -135,7 +135,7 @@ canvas{
 const tg = window.Telegram.WebApp
 tg.expand()
 
-loadDashboard()
+let userHabits = []
 
 async function loadDashboard(){
 
@@ -144,7 +144,6 @@ try{
 const response = await fetch("https://youramb.digital/api/dashboard",{
 
 method:"POST",
-
 headers:{
 "Content-Type":"application/json"
 },
@@ -165,6 +164,10 @@ Math.floor(data.xp ?? 0)
 
 document.getElementById("league").innerText =
 data.league ?? "-"
+
+userHabits = data.habits || []
+
+render(7)
 
 }catch(e){
 
@@ -226,17 +229,23 @@ const data=generateData(period)
 
 if(chart) chart.destroy()
 
+const datasets = userHabits.map(habit => {
+
+return {
+label: habit.name,
+data: checksToSeries(randomChecks(data.labels.length,0.6)),
+tension:0.35
+}
+
+})
+
 chart=new Chart(document.getElementById("habitsChart"),{
 
 type:"line",
 
 data:{
 labels:data.labels,
-datasets:[
-{label:"🏃 Пробежка",data:data.run,tension:0.35},
-{label:"📚 Чтение",data:data.read,tension:0.35},
-{label:"💧 Вода",data:data.water,tension:0.35}
-]
+datasets:datasets
 },
 
 options:{
@@ -262,8 +271,6 @@ render(parseInt(btn.dataset.period))
 }
 
 })
-
-render(7)
 
 </script>
 
