@@ -22,14 +22,7 @@ app.state.pool = None
 # ----------------------------
 @app.on_event("startup")
 async def startup():
-    print("startup BEGIN")
-
-    app.state.pool = await asyncpg.create_pool(
-        DATABASE_URL,
-        timeout=10
-    )
-
-    print("DATABASECONNECTEED:)
+    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
 
 
 # ----------------------------
@@ -84,7 +77,7 @@ def validate_telegram_data(init_data: str):
 # Подключаем роутеры
 # ----------------------------
 from api.dashboard import router as dashboard_router
-app.include_router(dashboard_router, prefix="/api")
+app.include_router(dashboard_router)
 
 
 @app.get("/")
