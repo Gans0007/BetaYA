@@ -4,6 +4,7 @@ from core.database import get_pool
 
 router = APIRouter()
 
+
 @router.post("/api/dashboard")
 async def get_dashboard(request: Request):
 
@@ -17,12 +18,11 @@ async def get_dashboard(request: Request):
     if not init_data:
         return {
             "telegram_user_id": None,
-            "db_row": {"current_streak": 0},
+            "streak": 0,
+            "xp": 0,
+            "league": "Безответственный",
             "debug": "initData missing"
         }
-
-    if not init_data:
-        raise HTTPException(status_code=400, detail="initData missing")
 
     user_id = validate_telegram_data(init_data)
 
@@ -31,7 +31,10 @@ async def get_dashboard(request: Request):
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            SELECT current_streak
+            SELECT
+                COALESCE(current_streak, 0) as current_streak,
+                COALESCE(xp, 0) as xp,
+                COALESCE(league, 'Безответственный') as league
             FROM user_stats
             WHERE user_id = $1
             """,
@@ -40,7 +43,7 @@ async def get_dashboard(request: Request):
 
     return {
         "telegram_user_id": user_id,
-        "db_row": {
-            "current_streak": row["current_streak"] if row else 0
-        }
+        "streak": row["current_streak"] if row else 0,
+        "xp": float(row["xp"]) if row else 0,
+        "league": row["league"] if row else "Безответственный"
     }
