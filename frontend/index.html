@@ -37,6 +37,7 @@ pre {
     <div id="xp">...</div>
 </div>
 
+<div class="card">
     <h3>🆔 Telegram ID</h3>
     <div id="tgid">...</div>
 </div>
@@ -82,13 +83,10 @@ async function load() {
         document.getElementById("streak").innerText =
             data.db_row?.current_streak ?? data.streak ?? 0;
 
-<<<<<<< HEAD
         document.getElementById("xp").innerText =
             Math.floor(data.db_row?.xp ?? 0);
 
 
-=======
->>>>>>> 53e303f (new)
     } catch (err) {
         document.getElementById("raw").innerText =
             "Fetch error: " + err;
