@@ -30,7 +30,7 @@ async def startup():
 # ----------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://youramb.digital"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
