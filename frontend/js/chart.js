@@ -1,4 +1,4 @@
-//только график
+// только график
 
 let chart
 
@@ -17,7 +17,26 @@ datasets:datasets
 
 options:{
 responsive:true,
-maintainAspectRatio:false
+maintainAspectRatio:false,
+
+plugins:{
+legend:{
+position:"top",
+labels:{
+boxWidth:12
+}
+}
+},
+
+scales:{
+y:{
+beginAtZero:true,
+ticks:{
+stepSize:1
+}
+}
+}
+
 }
 
 })
