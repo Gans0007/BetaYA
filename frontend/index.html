@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YA Debug</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+body {
+    background:#111;
+    color:white;
+    font-family:Arial;
+    padding:20px;
+}
+.card {
+    background:#1e1e1e;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:15px;
+}
+pre {
+    background:black;
+    padding:10px;
+    border-radius:10px;
+    overflow:auto;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+    <h3>🔥 Streak</h3>
+    <div id="streak">...</div>
+</div>
+
+<div class="card">
+    <h3>🆔 Telegram ID</h3>
+    <div id="tgid">...</div>
+</div>
+
+<div class="card">
+    <h3>🖥 Raw Response</h3>
+    <pre id="raw">...</pre>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+
+if (!tg) {
+    document.getElementById("raw").innerText =
+        "Telegram WebApp object NOT found. Open inside Telegram.";
+} else {
+    tg.expand();
+
+    if (!tg.initData) {
+        document.getElementById("raw").innerText =
+            "initData is EMPTY. Mini App not opened from Telegram.";
+    } else {
+        load();
+    }
+}
+
+async function load() {
+    try {
+        const response = await fetch("https://youramb.digital/api/dashboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ initData: tg.initData })
+        });
+
+        const data = await response.json();
+
+        document.getElementById("raw").innerText =
+            JSON.stringify(data, null, 2);
+
+        document.getElementById("tgid").innerText =
+            data.telegram_user_id ?? "no id";
+
+        document.getElementById("streak").innerText =
+            data.db_row?.current_streak ?? data.streak ?? 0;
+
+    } catch (err) {
+        document.getElementById("raw").innerText =
+            "Fetch error: " + err;
+    }
+}
+</script>
+
+</body>
+</html>
