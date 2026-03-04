@@ -2,23 +2,20 @@
 <html lang="ru">
 <head>
 
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>YA Dashboard</title>
 
-<!-- Telegram Mini App API -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- библиотека графиков -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
 :root{
-  --bg: var(--tg-theme-bg-color, #0f0f10);
-  --text: var(--tg-theme-text-color, #ffffff);
-  --card: var(--tg-theme-secondary-bg-color, #1b1b1f);
+  --bg: var(--tg-theme-bg-color,#0f0f10);
+  --text: var(--tg-theme-text-color,#ffffff);
+  --card: var(--tg-theme-secondary-bg-color,#1b1b1f);
   --muted: rgba(255,255,255,0.65);
   --soft: rgba(255,255,255,0.08);
   --soft2: rgba(0,0,0,0.25);
@@ -26,7 +23,7 @@
 }
 
 body{
-  font-family: Arial;
+  font-family:Arial;
   margin:0;
   padding:12px;
   background:var(--bg);
@@ -70,9 +67,29 @@ h1{
   font-weight:700;
 }
 
+.period-switch{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.period-switch button{
+  flex:1;
+  padding:8px;
+  border:0;
+  border-radius:12px;
+  background:var(--soft);
+  color:var(--text);
+  font-weight:600;
+}
+
+.period-switch button.active{
+  background:#2f80ed;
+}
+
 canvas{
   width:100%;
-  height:200px !important;
+  height:180px !important;
 }
 
 </style>
@@ -81,8 +98,6 @@ canvas{
 <body>
 
 <h1>🔥 YA Dashboard</h1>
-
-<!-- Блок общей статистики -->
 
 <div class="card stats">
 
@@ -103,9 +118,13 @@ canvas{
 
 </div>
 
-<!-- График привычек -->
-
 <div class="card">
+
+<div class="period-switch">
+<button data-period="7" class="active">7D</button>
+<button data-period="30">30D</button>
+<button data-period="12">1Y</button>
+</div>
 
 <canvas id="habitsChart"></canvas>
 
@@ -113,51 +132,36 @@ canvas{
 
 <script>
 
-/*
-========================================
-ИНИЦИАЛИЗАЦИЯ TELEGRAM MINI APP
-========================================
-*/
-
 const tg = window.Telegram.WebApp
-
-// раскрываем mini app на полный экран
 tg.expand()
-
-// запускаем загрузку данных
-loadDashboard()
-loadHabits()
 
 let chart
 
+loadDashboard()
+loadHabits()
 
 
-/*
-========================================
-ЗАГРУЗКА ОСНОВНОЙ СТАТИСТИКИ
-streak / xp / league
-========================================
-*/
+
+/* ---------------------------
+Загрузка статистики
+--------------------------- */
 
 async function loadDashboard(){
 
-try{
+const response = await fetch("https://youramb.digital/api/dashboard",{
 
-const response = await fetch(
-"https://youramb.digital/api/dashboard",
-{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
 initData: tg.initData
 })
+
 })
 
 const data = await response.json()
-
-// отображаем данные на странице
 
 document.getElementById("streak").innerText =
 data.streak ?? 0
@@ -168,25 +172,15 @@ Math.floor(data.xp ?? 0)
 document.getElementById("league").innerText =
 data.league ?? "-"
 
-}catch(e){
-
-console.log("Dashboard API error",e)
-
-}
-
 }
 
 
 
-/*
-========================================
-ЗАГРУЗКА ПРИВЫЧЕК ПОЛЬЗОВАТЕЛЯ
-========================================
-*/
+/* ---------------------------
+Загрузка привычек из БД
+--------------------------- */
 
 async function loadHabits(){
-
-try{
 
 const response = await fetch(
 "https://youramb.digital/api/habits",
@@ -202,61 +196,41 @@ initData: tg.initData
 
 const data = await response.json()
 
-console.log("Habits from API:", data.habits)
-
-// передаем привычки в функцию отрисовки графика
 renderHabits(data.habits)
 
-}catch(e){
-
-console.log("Habits load error",e)
-
-}
-
 }
 
 
 
-/*
-========================================
-ПОСТРОЕНИЕ ГРАФИКА ПРИВЫЧЕК
-========================================
-
-мы берем из БД:
-
-habit.name
-habit.done_days
-habit.days
-
-и строим прогресс привычек
-*/
+/* ---------------------------
+Построение графика привычек
+--------------------------- */
 
 function renderHabits(habits){
 
-// названия привычек
 const labels = habits.map(h => h.name)
 
-// прогресс привычки
-const progress = habits.map(h =>
+const datasets = habits.map(h => {
 
-Math.round((h.done_days / h.days) * 10)
+const progress = Math.round((h.done_days / h.days) * 10)
 
-)
+return {
+label: h.name,
+data: Array(7).fill(progress),
+tension:0.35
+}
 
-// если график уже был — удаляем
+})
+
 if(chart) chart.destroy()
 
-// создаем новый график
 chart = new Chart(document.getElementById("habitsChart"),{
 
-type:"bar",
+type:"line",
 
 data:{
-labels:labels,
-datasets:[{
-label:"Прогресс привычек",
-data:progress
-}]
+labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"],
+datasets:datasets
 },
 
 options:{
@@ -267,6 +241,26 @@ maintainAspectRatio:false
 })
 
 }
+
+
+
+/* ---------------------------
+Переключение периодов
+(пока только визуально)
+--------------------------- */
+
+document.querySelectorAll(".period-switch button").forEach(btn=>{
+
+btn.onclick=()=>{
+
+document.querySelectorAll(".period-switch button")
+.forEach(b=>b.classList.remove("active"))
+
+btn.classList.add("active")
+
+}
+
+})
 
 </script>
 
