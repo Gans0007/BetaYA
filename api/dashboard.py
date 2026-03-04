@@ -20,7 +20,7 @@ async def get_dashboard(request: Request):
             "telegram_user_id": None,
             "streak": 0,
             "xp": 0,
-            "league": "1",
+            "league": "Безответственный",
             "debug": "initData missing"
         }
 
@@ -34,7 +34,7 @@ async def get_dashboard(request: Request):
             SELECT
                 COALESCE(current_streak, 0) as current_streak,
                 COALESCE(xp, 0) as xp,
-                COALESCE(league, '1') as league
+                COALESCE(league, 'Безответственный') as league
             FROM user_stats
             WHERE user_id = $1
             """,
@@ -45,5 +45,5 @@ async def get_dashboard(request: Request):
         "telegram_user_id": user_id,
         "streak": row["current_streak"] if row else 0,
         "xp": float(row["xp"]) if row else 0,
-        "league": row["league"] if row else "1"
+        "league": row["league"] if row else "Безответственный"
     }
