@@ -30,12 +30,6 @@ async def show_profile_menu(message: types.Message):
             ],
             [
                 InlineKeyboardButton(text="🏆 Достижения", callback_data="profile:achievements"),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔥 Web Dashboard",
-                    web_app=types.WebAppInfo(url="https://ya-miniapp.vercel.app")
-                )
             ]
         ]
     )
@@ -65,12 +59,6 @@ async def back_to_profile_menu(callback: types.CallbackQuery):
             ],
             [
                 InlineKeyboardButton(text="🏆 Достижения", callback_data="profile:achievements"),
-            ],
-            [
-                InlineKeyboardButton(
-                    text="🔥 Web Dashboard",
-                    web_app=types.WebAppInfo(url="https://ya-miniapp.vercel.app")
-                )
             ]
         ]
     )
