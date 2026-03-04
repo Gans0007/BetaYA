@@ -3,7 +3,7 @@ from api.main import validate_telegram_data
 
 router = APIRouter()
 
-@router.post("/api/dashboard")
+@router.post("/dashboard")
 async def get_dashboard(request: Request):
 
     data = await request.json()

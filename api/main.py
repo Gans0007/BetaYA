@@ -80,7 +80,7 @@ def validate_telegram_data(init_data: str):
 # Подключаем роутеры
 # ----------------------------
 from api.dashboard import router as dashboard_router
-app.include_router(dashboard_router)
+app.include_router(dashboard_router, prefix="/api")
 
 
 @app.get("/")
