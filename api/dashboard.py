@@ -18,7 +18,8 @@ async def get_dashboard(request: Request):
         row = await conn.fetchrow(
             """
             SELECT 
-                current_streak, COALESCE(ROUND(xp),0) as xp
+                current_streak, 
+                COALESCE(ROUND(xp),0) as xp
             FROM user_stats
             WHERE user_id = $1
             """,
