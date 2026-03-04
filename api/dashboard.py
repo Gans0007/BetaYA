@@ -4,7 +4,6 @@ from core.database import get_pool
 
 router = APIRouter()
 
-
 # =========================================
 # DASHBOARD
 # streak / xp / league
@@ -13,90 +12,103 @@ router = APIRouter()
 @router.post("/api/dashboard")
 async def get_dashboard(request: Request):
 
-    # безопасно читаем JSON
     try:
         data = await request.json()
-    except Exception:
+    except:
         data = {}
 
     init_data = data.get("initData")
 
     if not init_data:
         return {
-            "telegram_user_id": None,
             "streak": 0,
             "xp": 0,
-            "league": "Безответственный",
-            "debug": "initData missing"
+            "league": "Безответственный"
         }
 
-    # проверяем подпись Telegram
     user_id = validate_telegram_data(init_data)
 
     pool = await get_pool()
 
     async with pool.acquire() as conn:
 
-        row = await conn.fetchrow(
-            """
+        row = await conn.fetchrow("""
             SELECT
-                COALESCE(current_streak, 0) as current_streak,
-                COALESCE(xp, 0) as xp,
-                COALESCE(league, 'Безответственный') as league
+                COALESCE(current_streak,0) as streak,
+                COALESCE(xp,0) as xp,
+                COALESCE(league,'Безответственный') as league
             FROM user_stats
-            WHERE user_id = $1
-            """,
-            user_id
-        )
+            WHERE user_id=$1
+        """, user_id)
 
-    return {
-        "telegram_user_id": user_id,
-        "streak": row["current_streak"] if row else 0,
-        "xp": float(row["xp"]) if row else 0,
-        "league": row["league"] if row else "Безответственный"
-    }
+    if not row:
+        return {"streak":0,"xp":0,"league":"Безответственный"}
+
+    return dict(row)
 
 
 # =========================================
 # HABITS
-# список привычек пользователя
 # =========================================
 
 @router.post("/api/habits")
 async def get_habits(request: Request):
 
-    try:
-        data = await request.json()
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid JSON")
+    data = await request.json()
 
     init_data = data.get("initData")
 
     if not init_data:
-        raise HTTPException(status_code=400, detail="initData missing")
+        raise HTTPException(400,"initData missing")
 
-    # проверяем Telegram
     user_id = validate_telegram_data(init_data)
 
     pool = await get_pool()
 
     async with pool.acquire() as conn:
 
-        habits = await conn.fetch(
-            """
+        rows = await conn.fetch("""
             SELECT
                 id,
                 name,
                 done_days,
                 days
             FROM habits
-            WHERE user_id = $1
-            AND is_active = TRUE
+            WHERE user_id=$1
+            AND is_active=true
             ORDER BY created_at
-            """,
-            user_id
-        )
+        """, user_id)
 
     return {
-        "habits": [dict(h) for h in habits]
+        "habits":[dict(r) for r in rows]
+    }
+
+
+
+@router.post("/api/habit_history")
+async def get_habit_history(request: Request):
+
+    data = await request.json()
+    init_data = data.get("initData")
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        rows = await conn.fetch("""
+        SELECT
+            h.id as habit_id,
+            h.name as habit_name,
+            DATE(c.datetime) as day,
+            c.confirmed
+        FROM confirmations c
+        JOIN habits h ON h.id = c.habit_id
+        WHERE c.user_id = $1
+        ORDER BY day
+        """, user_id)
+
+    return {
+        "history": [dict(r) for r in rows]
     }
