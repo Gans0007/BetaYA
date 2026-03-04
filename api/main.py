@@ -22,7 +22,10 @@ app.state.pool = None
 # ----------------------------
 @app.on_event("startup")
 async def startup():
-    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
+    app.state.pool = await asyncpg.create_pool(
+        DATABASE_URL,
+        timeout=10
+    )
 
 
 # ----------------------------
