@@ -72,3 +72,37 @@ async def get_habits(request: Request):
     return {
         "habits":[dict(r) for r in rows]
     }
+
+
+
+
+@router.post("/api/habit_history")
+async def get_habit_history(request: Request):
+
+    data = await request.json()
+    init_data = data.get("initData")
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        rows = await conn.fetch("""
+        SELECT
+            h.id as habit_id,
+            h.name,
+            DATE(h.created_at) as created_day,
+            DATE(c.datetime) as confirm_day
+        FROM habits h
+        LEFT JOIN confirmations c
+            ON h.id = c.habit_id
+            AND c.confirmed = true
+        WHERE h.user_id=$1
+        AND h.is_active=true
+        ORDER BY h.id, confirm_day
+        """, user_id)
+
+    return {
+        "history":[dict(r) for r in rows]
+    }
