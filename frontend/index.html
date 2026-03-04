@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>YA Dashboard</title>
+<title>TrackerYA</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -15,12 +15,12 @@ body{
     font-family:Arial;
 }
 
-/* USER NAME */
+/* USER */
 
 .user{
-    font-size:15px;
-    margin-bottom:12px;
-    opacity:0.9;
+    font-size:14px;
+    margin-bottom:10px;
+    opacity:0.8;
 }
 
 /* CARD */
@@ -28,20 +28,23 @@ body{
 .card{
     background:#1b1b1f;
     border-radius:16px;
-    padding:18px;
+    padding:14px;
 }
 
-/* STATS ROW */
+/* GRID */
 
 .stats{
-    display:flex;
-    justify-content:space-between;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
 }
 
-/* STAT BLOCK */
+/* BOX */
 
 .stat{
-    flex:1;
+    background:#232328;
+    border-radius:12px;
+    padding:14px;
     text-align:center;
 }
 
@@ -56,8 +59,8 @@ body{
 /* VALUE */
 
 .value{
-    font-size:20px;
-    font-weight:bold;
+    font-size:24px;
+    font-weight:700;
 }
 
 </style>
@@ -68,24 +71,26 @@ body{
 <div class="user" id="username">...</div>
 
 <div class="card">
-    <div class="stats">
 
-        <div class="stat">
-            <div class="label">🔥 Streak</div>
-            <div class="value" id="streak">-</div>
-        </div>
+<div class="stats">
 
-        <div class="stat">
-            <div class="label">💎 EXP</div>
-            <div class="value" id="xp">-</div>
-        </div>
+<div class="stat">
+<div class="label">🔥 Streak</div>
+<div class="value" id="streak">-</div>
+</div>
 
-        <div class="stat">
-            <div class="label">🏆 League</div>
-            <div class="value" id="league">-</div>
-        </div>
+<div class="stat">
+<div class="label">💎 EXP</div>
+<div class="value" id="xp">-</div>
+</div>
 
-    </div>
+<div class="stat">
+<div class="label">🏆 League</div>
+<div class="value" id="league">-</div>
+</div>
+
+</div>
+
 </div>
 
 
@@ -107,6 +112,7 @@ if(!tg){
 
         document.getElementById("username").innerText =
             user.first_name + " (" + user.id + ")";
+
     }
 
     loadDashboard();
