@@ -15,8 +15,15 @@ if(v > maxValue) maxValue = v
 })
 })
 
-// добавляем запас
-maxValue = maxValue + 2
+/*
+добавляем запас сверху
+пример:
+3 → 5
+5 → 7
+10 → 13
+*/
+
+maxValue = Math.ceil(maxValue * 1.4) + 1
 
 chart = new Chart(document.getElementById("habitsChart"),{
 
