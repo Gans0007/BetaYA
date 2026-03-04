@@ -4,17 +4,29 @@ import hashlib
 import urllib.parse
 import json
 import asyncpg
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 
 from pathlib import Path
 from dotenv import load_dotenv
 
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+
+# ----------------------------
+# Загружаем .env
+# ----------------------------
 env_path = Path("/srv/bot2/.env")
 load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL not loaded")
+
+if not BOT_TOKEN:
+    raise RuntimeError("BOT_TOKEN not loaded")
+
 
 app = FastAPI()
 app.state.pool = None
@@ -25,7 +37,17 @@ app.state.pool = None
 # ----------------------------
 @app.on_event("startup")
 async def startup():
-    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
+
+    print("🚀 Starting API...")
+    print("📦 Connecting to PostgreSQL...")
+
+    app.state.pool = await asyncpg.create_pool(
+        DATABASE_URL,
+        min_size=1,
+        max_size=5
+    )
+
+    print("✅ PostgreSQL connected")
 
 
 # ----------------------------
@@ -33,7 +55,7 @@ async def startup():
 # ----------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://youramb.digital"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,7 +77,6 @@ def validate_telegram_data(init_data: str):
         f"{k}={v}" for k, v in sorted(parsed_data.items())
     )
 
-    # ВАЖНО: WebAppData — это обязательно
     secret_key = hmac.new(
         b"WebAppData",
         BOT_TOKEN.encode(),
@@ -83,6 +104,9 @@ from api.dashboard import router as dashboard_router
 app.include_router(dashboard_router)
 
 
+# ----------------------------
+# Test endpoint
+# ----------------------------
 @app.get("/")
 async def root():
     return {"status": "API running"}
