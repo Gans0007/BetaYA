@@ -21,7 +21,7 @@ async def get_dashboard(request: Request):
             "streak": 0,
             "xp": 0,
             "league": "Безответственный",
-            "habits": []
+            "debug": "initData missing"
         }
 
     user_id = validate_telegram_data(init_data)
@@ -29,34 +29,21 @@ async def get_dashboard(request: Request):
     pool = await get_pool()
 
     async with pool.acquire() as conn:
-
-        stats = await conn.fetchrow(
+        row = await conn.fetchrow(
             """
             SELECT
-                COALESCE(current_streak,0) as current_streak,
-                COALESCE(xp,0) as xp,
-                COALESCE(league,'Безответственный') as league
+                COALESCE(current_streak, 0) as current_streak,
+                COALESCE(xp, 0) as xp,
+                COALESCE(league, 'Безответственный') as league
             FROM user_stats
-            WHERE user_id=$1
-            """,
-            user_id
-        )
-
-        habits = await conn.fetch(
-            """
-            SELECT id, name
-            FROM habits
-            WHERE user_id=$1
-            AND is_active=true
-            ORDER BY created_at
+            WHERE user_id = $1
             """,
             user_id
         )
 
     return {
         "telegram_user_id": user_id,
-        "streak": stats["current_streak"] if stats else 0,
-        "xp": float(stats["xp"]) if stats else 0,
-        "league": stats["league"] if stats else "Безответственный",
-        "habits": [dict(h) for h in habits]
+        "streak": row["current_streak"] if row else 0,
+        "xp": float(row["xp"]) if row else 0,
+        "league": row["league"] if row else "Безответственный"
     }
