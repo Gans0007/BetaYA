@@ -53,19 +53,42 @@ render(currentPeriod)
 ========================
 */
 
-function generateLabels(period){
+function generateDates(period){
+
+const today = new Date()
+let dates = []
 
 if(period === 7){
-return ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]
+
+for(let i=6;i>=0;i--){
+let d = new Date()
+d.setDate(today.getDate()-i)
+dates.push(d.toISOString().slice(0,10))
+}
+
 }
 
 if(period === 30){
-return Array.from({length:30},(_,i)=>i+1)
+
+for(let i=29;i>=0;i--){
+let d = new Date()
+d.setDate(today.getDate()-i)
+dates.push(d.toISOString().slice(0,10))
+}
+
 }
 
 if(period === 12){
-return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+for(let i=11;i>=0;i--){
+let d = new Date()
+d.setMonth(today.getMonth()-i)
+dates.push(d.toISOString().slice(0,7))
 }
+
+}
+
+return dates
 
 }
 
@@ -78,22 +101,24 @@ return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
 
 function render(period){
 
-const labels = generateLabels(period)
+const dates = generateDates(period)
 
 const datasets = habits.map(h => {
 
 const habitHistory = history.filter(r => r.habit_id === h.id)
 
-const confirmedDays = habitHistory
+const confirmSet = new Set(
+habitHistory
 .filter(r => r.confirm_day)
 .map(r => r.confirm_day)
+)
 
 let value = 0
 let series = []
 
-for(let i=0;i<labels.length;i++){
+dates.forEach(date => {
 
-if(confirmedDays.length > i){
+if(confirmSet.has(date)){
 value += 1
 }
 else{
@@ -102,7 +127,7 @@ value = Math.max(0,value-1)
 
 series.push(value)
 
-}
+})
 
 return {
 label: h.name,
@@ -112,7 +137,7 @@ tension:0.35
 
 })
 
-buildChart(labels, datasets)
+buildChart(dates, datasets)
 
 }
 
