@@ -4,11 +4,14 @@ import hashlib
 import urllib.parse
 import json
 import asyncpg
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv()
+from pathlib import Path
+from dotenv import load_dotenv
+
+env_path = Path("/srv/bot2/.env")
+load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
