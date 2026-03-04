@@ -3,7 +3,6 @@ import hmac
 import hashlib
 import urllib.parse
 import json
-import asyncpg
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -35,20 +34,17 @@ app.state.pool = None
 # ----------------------------
 # Startup
 # ----------------------------
+from core.database import create_pool
+
 @app.on_event("startup")
 async def startup():
 
     print("🚀 Starting API...")
     print("📦 Connecting to PostgreSQL...")
 
-    app.state.pool = await asyncpg.create_pool(
-        DATABASE_URL,
-        min_size=1,
-        max_size=5
-    )
+    await create_pool()
 
     print("✅ PostgreSQL connected")
-
 
 # ----------------------------
 # CORS
