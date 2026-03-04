@@ -4,23 +4,25 @@ let habits = []
 let history = []
 let currentPeriod = 7
 
+const weekdays = ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]
+
 async function init(){
 
-    await loadDashboard()
+await loadDashboard()
 
-    habits = await loadHabits()
-    history = await loadHistory()
+habits = await loadHabits()
+history = await loadHistory()
 
-    setupButtons()
+setupButtons()
 
-    render(currentPeriod)
+render(currentPeriod)
 
 }
 
 
 /*
 ========================
-КНОПКИ ПЕРЕКЛЮЧЕНИЯ
+КНОПКИ
 ========================
 */
 
@@ -49,21 +51,28 @@ render(currentPeriod)
 
 /*
 ========================
-ГЕНЕРАЦИЯ ДАТ
+ГЕНЕРАЦИЯ ДАТ + LABELS
 ========================
 */
 
-function generateDates(period){
+function generateTimeline(period){
 
 const today = new Date()
+
 let dates = []
+let labels = []
 
 if(period === 7){
 
 for(let i=6;i>=0;i--){
+
 let d = new Date()
 d.setDate(today.getDate()-i)
+
 dates.push(d.toISOString().slice(0,10))
+
+labels.push(weekdays[d.getDay()])
+
 }
 
 }
@@ -71,9 +80,14 @@ dates.push(d.toISOString().slice(0,10))
 if(period === 30){
 
 for(let i=29;i>=0;i--){
+
 let d = new Date()
 d.setDate(today.getDate()-i)
+
 dates.push(d.toISOString().slice(0,10))
+
+labels.push(String(d.getDate()).padStart(2,"0"))
+
 }
 
 }
@@ -81,27 +95,32 @@ dates.push(d.toISOString().slice(0,10))
 if(period === 12){
 
 for(let i=11;i>=0;i--){
+
 let d = new Date()
 d.setMonth(today.getMonth()-i)
+
 dates.push(d.toISOString().slice(0,7))
-}
+
+labels.push(d.toLocaleString("ru",{month:"short"}))
 
 }
 
-return dates
+}
+
+return {dates, labels}
 
 }
 
 
 /*
 ========================
-ПОСТРОЕНИЕ ГРАФИКА
+ГРАФИК
 ========================
 */
 
 function render(period){
 
-const dates = generateDates(period)
+const timeline = generateTimeline(period)
 
 const datasets = habits.map(h => {
 
@@ -116,12 +135,11 @@ habitHistory
 let value = 0
 let series = []
 
-dates.forEach(date => {
+timeline.dates.forEach(date => {
 
 if(confirmSet.has(date)){
-value += 1
-}
-else{
+value++
+}else{
 value = Math.max(0,value-1)
 }
 
@@ -129,15 +147,15 @@ series.push(value)
 
 })
 
-return {
-label: h.name,
-data: series,
+return{
+label:h.name,
+data:series,
 tension:0.35
 }
 
 })
 
-buildChart(dates, datasets)
+buildChart(timeline.labels, datasets)
 
 }
 
