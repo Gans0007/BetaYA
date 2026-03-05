@@ -193,7 +193,7 @@ color:#e8c66a;
 .week-days{
   display:flex;
   align-items:flex-end;
-  gap:5px;
+  gap:2px;
 }
 
 /* один день — фикс ширина (чтобы ровно стояли) */
