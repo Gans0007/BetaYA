@@ -39,13 +39,46 @@ responsive:true,
 maintainAspectRatio:false,
 
 plugins:{
+
 legend:{
 position:"top",
 labels:{
 boxWidth:12
 }
-}
 },
+
+tooltip:{
+callbacks:{
+
+label:function(context){
+
+const dataset = context.dataset
+const habitId = dataset.habit_id
+
+const habit = habits.find(h => h.id === habitId)
+
+const confirmations = habit?.done_days ?? 0
+
+const streak = calculateStreak(habitId)
+
+let lines = []
+
+lines.push("Подтверждений: " + confirmations)
+
+if(streak > 1){
+lines.push("🔥 Серия: " + streak + " дня")
+}
+
+return lines
+
+}
+
+}
+
+}
+
+},
+
 
 scales:{
 y:{

@@ -19,6 +19,41 @@ render(currentPeriod)
 
 }
 
+function calculateStreak(habitId){
+
+const habitHistory = history
+  .filter(r => r.habit_id === habitId && r.confirm_day)
+  .map(r => r.confirm_day)
+  .sort()
+
+let streak = 0
+let prevDate = null
+
+for(let i = habitHistory.length - 1; i >= 0; i--){
+
+const current = new Date(habitHistory[i])
+
+if(!prevDate){
+streak++
+prevDate = current
+continue
+}
+
+const diff = (prevDate - current) / (1000*60*60*24)
+
+if(diff === 1){
+streak++
+prevDate = current
+}else{
+break
+}
+
+}
+
+return streak
+
+}
+
 
 /*
 ========================
@@ -168,7 +203,8 @@ series.push(value)
 return{
 label:h.name,
 data:series,
-tension:0.35
+tension:0.35,
+habit_id:h.id
 }
 
 })
