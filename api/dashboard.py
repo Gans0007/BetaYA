@@ -89,16 +89,29 @@ async def get_dashboard(request: Request):
         value = 0
         series = []
 
+        today = datetime.utcnow().date()
+
         for i in range(4, -1, -1):
 
-            day = (datetime.utcnow() - timedelta(days=i)).date()
+            day = (today - timedelta(days=i))
 
-            if day in days:
-                value += 1
+            # если это сегодняшний день
+            if day == today:
+
+                if day in days:
+                    series.append(value + 1)
+                else:
+                    # сегодня еще не подтверждено → точка 0
+                    series.append(value)
+
             else:
-                value -= 1
 
-            series.append(value)
+                if day in days:
+                    value += 1
+                else:
+                    value -= 1
+
+                series.append(value)
 
         # ACTIVE STREAK
 
