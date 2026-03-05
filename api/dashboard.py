@@ -17,13 +17,7 @@ async def get_dashboard(request: Request):
     init_data = data.get("initData")
 
     if not init_data:
-        return {
-            "telegram_user_id": None,
-            "streak": 0,
-            "xp": 0,
-            "league": "Безответственный",
-            "habits": []
-        }
+        return {"habits": []}
 
     user_id = validate_telegram_data(init_data)
 
@@ -31,10 +25,7 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
 
-        # --------------------------
         # USER STATS
-        # --------------------------
-
         row = await conn.fetchrow("""
         SELECT
         COALESCE(current_streak,0) as current_streak,
@@ -44,60 +35,94 @@ async def get_dashboard(request: Request):
         WHERE user_id=$1
         """, user_id)
 
-        # --------------------------
-        # HABITS
-        # --------------------------
+        # ОДИН SQL НА ВСЕ ПРИВЫЧКИ
+        rows = await conn.fetch("""
 
-        habits_rows = await conn.fetch("""
+        SELECT
+            h.id,
+            h.name,
+            DATE(c.datetime) as day
 
-        SELECT id,name
-        FROM habits
-        WHERE user_id=$1
-        AND is_active=true
-        ORDER BY created_at
+        FROM habits h
+
+        LEFT JOIN confirmations c
+            ON c.habit_id = h.id
+            AND c.user_id = h.user_id
+            AND c.datetime >= NOW() - INTERVAL '30 days'
+
+        WHERE h.user_id = $1
+        AND h.is_active = true
+
+        ORDER BY h.id, day
 
         """, user_id)
 
-        habits=[]
+    # =========================================
+    # ГРУППИРУЕМ ДАННЫЕ
+    # =========================================
 
-        for h in habits_rows:
+    habits_map = {}
 
-            confirmations = await conn.fetch("""
+    for r in rows:
 
-            SELECT DATE(datetime) as day
-            FROM confirmations
-            WHERE habit_id=$1
-            AND user_id=$2
-            AND datetime >= NOW() - INTERVAL '5 days'
+        hid = r["id"]
 
-            """, h["id"], user_id)
+        if hid not in habits_map:
 
-            days=[r["day"] for r in confirmations]
+            habits_map[hid] = {
+                "id": hid,
+                "name": r["name"],
+                "days": set()
+            }
 
-            series=[]
+        if r["day"]:
+            habits_map[hid]["days"].add(r["day"])
 
-            value=0
 
-            for i in range(4,-1,-1):
+    habits = []
 
-                day=(datetime.utcnow()-timedelta(days=i)).date()
+    for habit in habits_map.values():
 
-                if day in days:
-                    value+=1
-                else:
-                    value-=1
+        days = habit["days"]
 
-                series.append(value)
+        # SERIES (+1 / -1)
+        value = 0
+        series = []
 
-            habits.append({
-                "id":h["id"],
-                "name":h["name"],
-                "series":series
-            })
+        for i in range(4, -1, -1):
+
+            day = (datetime.utcnow() - timedelta(days=i)).date()
+
+            if day in days:
+                value += 1
+            else:
+                value -= 1
+
+            series.append(value)
+
+        # ACTIVE STREAK
+
+        streak = 0
+
+        for i in range(365):
+
+            day = (datetime.utcnow() - timedelta(days=i)).date()
+
+            if day in days:
+                streak += 1
+            else:
+                break
+
+        habits.append({
+
+            "id": habit["id"],
+            "name": habit["name"],
+            "series": series,
+            "streak": streak
+
+        })
 
     return {
-
-        "telegram_user_id": user_id,
 
         "streak": row["current_streak"] if row else 0,
         "xp": float(row["xp"]) if row else 0,

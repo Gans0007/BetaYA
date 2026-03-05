@@ -94,6 +94,10 @@ function renderHabits(habits){
                 ${habit.name}
             </div>
 
+            <div class="habit-streak">
+                🔥 Стрик: ${habit.streak} дней
+            </div>
+
         </div>
 
         <div class="habit-chart">
