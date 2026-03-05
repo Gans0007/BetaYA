@@ -158,6 +158,22 @@ const datasets = habits.map(h => {
 
 const habitHistory = history.filter(r => r.habit_id === h.id)
 
+let series = []
+
+timeline.dates.forEach(date => {
+
+if(period === 12){
+
+// считаем подтверждения за месяц
+const monthChecks = habitHistory.filter(r =>
+r.confirm_day && r.confirm_day.startsWith(date)
+)
+
+series.push(monthChecks.length)
+
+}else{
+
+// логика для дней (7 и 30)
 const confirmSet = new Set(
 habitHistory
 .filter(r => r.confirm_day)
@@ -165,33 +181,16 @@ habitHistory
 )
 
 let value = 0
-let series = []
-
-timeline.dates.forEach(date => {
-
-if(period === 12){
-
-const monthChecks = habitHistory.filter(r =>
-r.confirm_day && r.confirm_day.startsWith(date)
-)
-
-if(monthChecks.length > 0){
-value++
-}else{
-value = Math.max(0,value-1)
-}
-
-}else{
 
 if(confirmSet.has(date)){
-value++
+value = 1
 }else{
-value = Math.max(0,value-1)
-}
-
+value = 0
 }
 
 series.push(value)
+
+}
 
 })
 
@@ -207,5 +206,3 @@ habit_id:h.id
 buildChart(timeline.labels, datasets, timeline.dates)
 
 }
-
-init()
