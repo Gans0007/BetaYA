@@ -131,16 +131,16 @@ async def month_confirmations(request: Request):
         rows = await conn.fetch("""
 
         SELECT
-            TO_CHAR(datetime, 'YYYY-MM') as month,
-            COUNT(*) as total
+            TO_CHAR(date_trunc('month', datetime), 'YYYY-MM') AS month,
+            COUNT(id)::int AS total
 
         FROM confirmations
 
         WHERE user_id = $1
-        AND confirmed = true
+        AND confirmed IS TRUE
 
-        GROUP BY TO_CHAR(datetime,'YYYY-MM')
-        ORDER BY month
+        GROUP BY date_trunc('month', datetime)
+        ORDER BY date_trunc('month', datetime)
 
         """, user_id)
 
