@@ -158,22 +158,6 @@ const datasets = habits.map(h => {
 
 const habitHistory = history.filter(r => r.habit_id === h.id)
 
-let series = []
-
-timeline.dates.forEach(date => {
-
-if(period === 12){
-
-// считаем подтверждения за месяц
-const monthChecks = habitHistory.filter(r =>
-r.confirm_day && r.confirm_day.startsWith(date)
-)
-
-series.push(monthChecks.length)
-
-}else{
-
-// логика для дней (7 и 30)
 const confirmSet = new Set(
 habitHistory
 .filter(r => r.confirm_day)
@@ -181,16 +165,35 @@ habitHistory
 )
 
 let value = 0
+let series = []
 
-if(confirmSet.has(date)){
-value = 1
+timeline.dates.forEach(date => {
+
+if(period === 12){
+
+// дата вида 2026-03
+const monthChecks = habitHistory.filter(r => 
+r.confirm_day && r.confirm_day.startsWith(date)
+)
+
+if(monthChecks.length > 0){
+value++
 }else{
-value = 0
+value = Math.max(0, value-1)
+}
+
+}else{
+
+// обычная логика для дней
+if(confirmSet.has(date)){
+value++
+}else{
+value = Math.max(0,value-1)
+}
+
 }
 
 series.push(value)
-
-}
 
 })
 
