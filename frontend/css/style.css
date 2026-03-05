@@ -195,3 +195,41 @@ right:20%;
 height:1px;
 background:rgba(255,255,255,0.05);
 }
+
+
+
+
+
+/* ======================
+SCREENS
+====================== */
+
+.screen{
+display:block;
+}
+
+.hidden{
+display:none;
+}
+
+
+/* ======================
+LEADERBOARD
+====================== */
+
+.leader-row{
+display:flex;
+justify-content:space-between;
+padding:8px 4px;
+border-bottom:1px solid rgba(255,255,255,0.06);
+font-size:13px;
+}
+
+.leader-row:last-child{
+border:none;
+}
+
+.leader-row span:last-child{
+color:#a970ff;
+font-weight:600;
+}

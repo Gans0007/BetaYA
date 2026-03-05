@@ -199,3 +199,31 @@ buildChart(timeline.labels, datasets, timeline.dates)
 }
 
 document.addEventListener("DOMContentLoaded", init)
+
+
+
+
+async function renderLeaderboard(){
+
+const data = await apiPost("/api/leaderboard")
+
+const list = document.getElementById("leaderboard-list")
+
+list.innerHTML = ""
+
+data.forEach((u,i)=>{
+
+const row = document.createElement("div")
+row.className="leader-row"
+
+row.innerHTML=`
+<span>#${i+1}</span>
+<span>${u.user_id}</span>
+<span>${u.xp}</span>
+`
+
+list.appendChild(row)
+
+})
+
+}
