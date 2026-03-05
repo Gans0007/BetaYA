@@ -158,17 +158,17 @@ color:#e8c66a;
 }
 
 .header-title{
-  font-size: 52px;
+  font-size: 42px;
   font-weight: 800;
   letter-spacing: 0.2px;
   line-height: 1;
 }
 
 .header-settings{
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1;
-  opacity: 0.9;
-  margin-top: 10px; /* чуть ниже как в макете */
+  opacity: 0.85;
+  margin-top: 8px;
 }
 
 /* строка: месяц слева, дни справа */
@@ -184,7 +184,7 @@ color:#e8c66a;
 
 /* месяц */
 .header-month{
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -200,32 +200,30 @@ color:#e8c66a;
 
 /* один день — фикс ширина (чтобы ровно стояли) */
 .day{
-  width: 36px;
+  width: 32px;
   text-align:center;
   opacity: 0.55;
 }
 
 /* число */
 .day-number{
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 1;
 
-  border-radius: 999px;
-  margin-bottom: 8px;
+  border-radius: 50%;
+  margin-bottom: 6px;
 }
 
 /* день недели */
 .day-name{
-  font-size: 13px;
-  line-height: 1;
+  font-size: 12px;
   opacity: 0.65;
 }
 
