@@ -1,4 +1,4 @@
-//только работа с API
+// только работа с API
 const tg = window.Telegram.WebApp
 tg.expand()
 
@@ -39,5 +39,19 @@ async function loadHistory(){
 const data = await apiPost("/api/habit_history")
 
 return data.history || []
+
+}
+
+/*
+========================
+МЕСЯЧНАЯ СТАТИСТИКА
+========================
+*/
+
+async function loadMonthStats(){
+
+const data = await apiPost("/api/month_confirmations")
+
+return data.months || []
 
 }

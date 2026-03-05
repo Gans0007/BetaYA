@@ -106,3 +106,37 @@ async def get_habit_history(request: Request):
     return {
         "history":[dict(r) for r in rows]
     }
+
+
+
+@router.post("/api/month_confirmations")
+async def month_confirmations(request: Request):
+
+    data = await request.json()
+    init_data = data.get("initData")
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        rows = await conn.fetch("""
+
+        SELECT
+            TO_CHAR(datetime,'YYYY-MM') as month,
+            COUNT(*) as total
+
+        FROM confirmations
+
+        WHERE user_id = $1
+        AND confirmed = true
+
+        GROUP BY month
+        ORDER BY month
+
+        """, user_id)
+
+    return {
+        "months":[dict(r) for r in rows]
+    }

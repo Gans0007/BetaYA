@@ -2,6 +2,8 @@
 
 let habits = []
 let history = []
+let monthStats = []
+
 let currentPeriod = 7
 
 const weekdays = ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]
@@ -12,48 +14,13 @@ await loadDashboard()
 
 habits = await loadHabits()
 history = await loadHistory()
+monthStats = await loadMonthStats()
 
 setupButtons()
 
 render(currentPeriod)
 
 }
-
-function calculateStreak(habitId){
-
-const habitHistory = history
-  .filter(r => r.habit_id === habitId && r.confirm_day)
-  .map(r => r.confirm_day)
-  .sort()
-
-let streak = 0
-let prevDate = null
-
-for(let i = habitHistory.length - 1; i >= 0; i--){
-
-const current = new Date(habitHistory[i])
-
-if(!prevDate){
-streak++
-prevDate = current
-continue
-}
-
-const diff = (prevDate - current) / (1000*60*60*24)
-
-if(diff === 1){
-streak++
-prevDate = current
-}else{
-break
-}
-
-}
-
-return streak
-
-}
-
 
 /*
 ========================
@@ -154,6 +121,45 @@ function render(period){
 
 const timeline = generateTimeline(period)
 
+/*
+========================
+ГОДОВОЙ ГРАФИК
+========================
+*/
+
+if(period === 12){
+
+const totals = timeline.dates.map(month => {
+
+const row = monthStats.find(r => r.month === month)
+
+return row ? parseInt(row.total) : 0
+
+})
+
+const datasets = [
+
+{
+label:"Подтверждения",
+data:totals,
+tension:0.35,
+borderWidth:3
+}
+
+]
+
+buildChart(timeline.labels, datasets, timeline.dates)
+
+return
+
+}
+
+/*
+========================
+7 и 30 дней
+========================
+*/
+
 const datasets = habits.map(h => {
 
 const habitHistory = history.filter(r => r.habit_id === h.id)
@@ -169,26 +175,10 @@ let series = []
 
 timeline.dates.forEach(date => {
 
-if(period === 12){
-
-const monthChecks = habitHistory.filter(r => 
-r.confirm_day && r.confirm_day.startsWith(date)
-)
-
-if(monthChecks.length > 0){
-value++
-}else{
-value = Math.max(0, value-1)
-}
-
-}else{
-
 if(confirmSet.has(date)){
 value++
 }else{
 value = Math.max(0,value-1)
-}
-
 }
 
 series.push(value)
