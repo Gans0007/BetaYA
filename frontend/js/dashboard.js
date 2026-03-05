@@ -5,29 +5,40 @@ const initData = tg.initData
 
 async function loadDashboard(){
 
-    try{
-
-        const response = await fetch("/api/dashboard",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-                initData:initData
-            })
+    const response = await fetch("/api/dashboard",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            initData:initData
         })
+    })
 
-        const data = await response.json()
+    const data = await response.json()
 
-        console.log("API DATA:",data)
+    renderHabits(data.habits)
 
-        renderHabits(data.habits)
+}
 
-    }catch(e){
+function randomSeries(){
 
-        console.log("API ERROR",e)
+    let v=0
+    const arr=[]
+
+    for(let i=0;i<5;i++){
+
+        if(Math.random()>0.4){
+            v++
+        }else{
+            v=Math.max(0,v-1)
+        }
+
+        arr.push(v)
 
     }
+
+    return arr
 
 }
 
@@ -37,33 +48,71 @@ function renderHabits(habits){
 
     list.innerHTML=""
 
-    if(!habits || habits.length===0){
+    habits.forEach((habit,i)=>{
 
-        list.innerHTML="<p class='empty'>Нет активных привычек</p>"
-        return
+        const id="chart-"+i
 
-    }
+        const card=document.createElement("div")
 
-    habits.forEach(habit=>{
+        card.className="habit-card"
 
-        const item=document.createElement("div")
+        card.innerHTML=`
 
-        item.className="habit-card"
+        <div class="habit-info">
 
-        item.innerHTML=`
-
-            <div class="habit-left">
-                <div class="habit-name">${habit.name}</div>
+            <div class="habit-name">
+                ${habit.name}
             </div>
 
-            <div class="habit-right">
-                ✔
+            <div class="habit-streak">
+                🔥 Стрик: ${Math.floor(Math.random()*12)+1} дней
             </div>
+
+        </div>
+
+        <div class="habit-chart">
+            <canvas id="${id}"></canvas>
+        </div>
 
         `
 
-        list.appendChild(item)
+        list.appendChild(card)
 
+        drawChart(id)
+
+    })
+
+}
+
+function drawChart(id){
+
+    const ctx=document.getElementById(id)
+
+    const data=randomSeries()
+
+    new Chart(ctx,{
+        type:"line",
+        data:{
+            labels:["","","","",""],
+            datasets:[
+                {
+                    data:data,
+                    borderColor:"#f4d47c",
+                    borderWidth:2,
+                    pointRadius:3,
+                    tension:0.4
+                }
+            ]
+        },
+        options:{
+            plugins:{
+                legend:false
+            },
+            scales:{
+                x:{display:false},
+                y:{display:false}
+            }
+        }
     })
 
 }

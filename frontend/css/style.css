@@ -1,11 +1,11 @@
 body{
 
 background:#0b0b0c;
-color:#ffffff;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+color:#fff;
+
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 
 margin:0;
-padding:0;
 
 }
 
@@ -21,9 +21,7 @@ padding:20px;
 
 text-align:center;
 font-size:22px;
-font-weight:700;
-
-margin-bottom:25px;
+margin-bottom:20px;
 
 }
 
@@ -31,8 +29,7 @@ margin-bottom:25px;
 
 display:flex;
 flex-direction:column;
-
-gap:14px;
+gap:16px;
 
 }
 
@@ -42,48 +39,54 @@ gap:14px;
 
 background:#1a1a1d;
 
-border-radius:14px;
+border-radius:18px;
 
-padding:18px;
+padding:16px;
 
 display:flex;
 justify-content:space-between;
 align-items:center;
 
-box-shadow:0 6px 20px rgba(0,0,0,0.35);
-
-transition:0.2s;
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 
 }
 
-.habit-card:active{
+/* текст */
 
-transform:scale(0.97);
+.habit-info{
+
+display:flex;
+flex-direction:column;
+gap:6px;
 
 }
 
 .habit-name{
 
-font-size:18px;
+font-size:17px;
 font-weight:600;
 
 }
 
-.habit-right{
+.habit-streak{
 
-font-size:20px;
-opacity:0.6;
+font-size:13px;
+opacity:0.7;
 
 }
 
-/* если нет привычек */
+/* график */
 
-.empty{
+.habit-chart{
 
-text-align:center;
-opacity:0.6;
-font-size:14px;
+width:120px;
+height:60px;
 
-margin-top:40px;
+}
+
+canvas{
+
+width:100% !important;
+height:100% !important;
 
 }
