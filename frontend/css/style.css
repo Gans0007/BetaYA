@@ -194,6 +194,7 @@ color:#e8c66a;
   display:flex;
   align-items:flex-end;
   gap:2px;
+  margin-right:10px;
 }
 
 /* один день — фикс ширина (чтобы ровно стояли) */
