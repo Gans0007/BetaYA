@@ -62,7 +62,7 @@ async def get_habits(request: Request):
     async with pool.acquire() as conn:
 
         rows = await conn.fetch("""
-        SELECT id, name
+        SELECT id, name, done_days
         FROM habits
         WHERE user_id=$1
         AND is_active=true
