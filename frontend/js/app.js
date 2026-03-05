@@ -227,3 +227,30 @@ list.appendChild(row)
 })
 
 }
+
+
+
+
+async function renderAnalytics(){
+
+const habits = await loadHabits()
+
+const container = document.getElementById("analytics-habits")
+
+container.innerHTML = ""
+
+habits.forEach(h => {
+
+const row = document.createElement("div")
+row.className = "habit-row"
+
+row.innerHTML = `
+<span>${h.name}</span>
+<span class="habit-progress">${h.done_days ?? 0} дней</span>
+`
+
+container.appendChild(row)
+
+})
+
+}

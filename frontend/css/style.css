@@ -233,3 +233,33 @@ border:none;
 color:#a970ff;
 font-weight:600;
 }
+
+
+/* ======================
+HABITS LIST
+====================== */
+
+.habit-row{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:10px 6px;
+
+border-bottom:1px solid rgba(255,255,255,0.05);
+
+font-size:14px;
+
+}
+
+.habit-row:last-child{
+border:none;
+}
+
+.habit-progress{
+
+color:#a970ff;
+font-weight:600;
+
+}
