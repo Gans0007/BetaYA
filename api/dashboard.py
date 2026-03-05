@@ -131,24 +131,18 @@ async def month_confirmations(request: Request):
         rows = await conn.fetch("""
 
         SELECT
-            TO_CHAR(m.month,'YYYY-MM') as month,
-            COUNT(c.id) as total
+            TO_CHAR(datetime, 'YYYY-MM') as month,
+            COUNT(*) as total
 
-        FROM generate_series(
-            date_trunc('month', NOW()) - interval '11 months',
-            date_trunc('month', NOW()),
-            interval '1 month'
-        ) m(month)
+        FROM confirmations
 
-        LEFT JOIN confirmations c
-            ON date_trunc('month', c.datetime) = m.month
-            AND c.user_id = $1
+        WHERE user_id = $1
 
-        GROUP BY m.month
-        ORDER BY m.month
+        GROUP BY month
+        ORDER BY month
 
         """, user_id)
 
     return {
-        "months":[dict(r) for r in rows]
+        "months": [dict(r) for r in rows]
     }
