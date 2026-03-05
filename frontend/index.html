@@ -26,52 +26,7 @@
 </div>
 
 
-<script>
-
-const tg = window.Telegram.WebApp
-const initData = tg.initData
-
-async function loadHabits(){
-
-    const response = await fetch("/api/dashboard",{
-
-        method:"POST",
-
-        headers:{
-            "Content-Type":"application/json"
-        },
-
-        body: JSON.stringify({
-            initData:initData
-        })
-
-    })
-
-    const data = await response.json()
-
-    const list = document.getElementById("habits-list")
-
-    list.innerHTML = ""
-
-    data.habits.forEach(habit => {
-
-        const item = document.createElement("div")
-
-        item.className = "habit-card"
-
-        item.innerHTML = `
-            <div class="habit-name">${habit.name}</div>
-        `
-
-        list.appendChild(item)
-
-    })
-
-}
-
-loadHabits()
-
-</script>
+<script src="js/dashboard.js"></script>
 
 </body>
 </html>
