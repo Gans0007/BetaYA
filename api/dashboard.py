@@ -8,22 +8,8 @@ router = APIRouter()
 @router.post("/api/dashboard")
 async def get_dashboard(request: Request):
 
-    try:
-        data = await request.json()
-    except:
-        data = {}
-
+    data = await request.json()
     init_data = data.get("initData")
-
-    if not init_data:
-        return {
-            "telegram_user_id": None,
-            "streak": 0,
-            "xp": 0,
-            "league": "Безответственный",
-            "habits": [],
-            "debug": "initData missing"
-        }
 
     user_id = validate_telegram_data(init_data)
 
@@ -31,43 +17,47 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
 
-        # --------------------------
-        # USER STATS
-        # --------------------------
-        row = await conn.fetchrow(
-            """
-            SELECT
-                COALESCE(current_streak,0) as current_streak,
-                COALESCE(xp,0) as xp,
-                COALESCE(league,'Безответственный') as league
-            FROM user_stats
-            WHERE user_id = $1
-            """,
-            user_id
-        )
+        habits_rows = await conn.fetch("""
 
-        # --------------------------
-        # HABITS
-        # --------------------------
-        habits = await conn.fetch(
-            """
-            SELECT name
-            FROM habits
-            WHERE user_id = $1
-            AND is_active = TRUE
-            ORDER BY created_at
-            """,
-            user_id
-        )
+        SELECT id,name
+        FROM habits
+        WHERE user_id=$1
+        AND is_active=true
+        ORDER BY created_at
 
-    return {
+        """,user_id)
 
-        "telegram_user_id": user_id,
+        habits=[]
 
-        "streak": row["current_streak"] if row else 0,
-        "xp": float(row["xp"]) if row else 0,
-        "league": row["league"] if row else "Безответственный",
+        for h in habits_rows:
 
-        "habits": [dict(h) for h in habits]
+            confirmations = await conn.fetch("""
 
-    }
+            SELECT DATE(datetime) as day
+            FROM confirmations
+            WHERE habit_id=$1
+            AND user_id=$2
+            AND datetime >= NOW() - INTERVAL '5 days'
+
+            """,h["id"],user_id)
+
+            days=[r["day"] for r in confirmations]
+
+            series=[]
+
+            for i in range(4,-1,-1):
+
+                day=(datetime.utcnow()-timedelta(days=i)).date()
+
+                if day in days:
+                    series.append(1)
+                else:
+                    series.append(0)
+
+            habits.append({
+                "id":h["id"],
+                "name":h["name"],
+                "series":series
+            })
+
+    return {"habits":habits}
