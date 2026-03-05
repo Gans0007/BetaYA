@@ -1,191 +1,77 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
 
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>YA Dashboard</title>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Прогресс привычек</title>
 
 <link rel="stylesheet" href="css/style.css">
 
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 </head>
+
 
 <body>
 
-<!-- ======================
-DASHBOARD SCREEN
-====================== -->
+<div class="container">
 
-<div id="dashboard-screen" class="screen">
+<h1 class="title">Прогресс привычек</h1>
 
-<h1>🔥 YA Dashboard</h1>
-
-<div class="card stats">
-
-<div class="stat-box">
-<div class="label">🔥 Streak</div>
-<div class="value" id="streak">-</div>
-</div>
-
-<div class="stat-box">
-<div class="label">💎 XP</div>
-<div class="value" id="xp">-</div>
-</div>
-
-<div class="stat-box">
-<div class="label">🏆 League</div>
-<div class="value" id="league">-</div>
-</div>
+<div id="habits-list" class="habits"></div>
 
 </div>
 
-<div class="card">
-
-<div class="chart-title">Динамика привычек</div>
-
-<div class="period-switch">
-<button data-period="7" class="active">7D</button>
-<button data-period="30">30D</button>
-<button data-period="12">1Y</button>
-</div>
-
-<div class="chart-container">
-<canvas id="habitsChart"></canvas>
-</div>
-
-</div>
-
-</div>
-
-<!-- ======================
-LEADERBOARD SCREEN
-====================== -->
-
-<div id="leaderboard-screen" class="screen hidden">
-
-<h1>🏆 Рейтинг</h1>
-
-<div class="card">
-
-<div id="leaderboard-list">
-
-<div class="leader-row">
-<span>#1</span>
-<span>Loading...</span>
-<span>XP</span>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- ======================
-ANALYTICS SCREEN
-====================== -->
-
-<div id="analytics-screen" class="screen hidden">
-
-<h1>🎯 Аналитика</h1>
-
-<div class="card">
-
-<div id="analytics-habits">
-
-<div class="habit-row">
-<span>Loading...</span>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- ======================
-SCRIPTS
-====================== -->
-
-<script src="js/api.js"></script>
-<script src="js/chart.js"></script>
-<script src="js/app.js"></script>
 
 <script>
 
-function showScreen(name){
+const tg = window.Telegram.WebApp
+const initData = tg.initData
 
-document.querySelectorAll(".screen").forEach(s=>{
-s.classList.add("hidden")
-})
+async function loadHabits(){
 
-document.getElementById(name+"-screen").classList.remove("hidden")
+    const response = await fetch("/api/dashboard",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+            initData:initData
+        })
+
+    })
+
+    const data = await response.json()
+
+    const list = document.getElementById("habits-list")
+
+    list.innerHTML = ""
+
+    data.habits.forEach(habit => {
+
+        const item = document.createElement("div")
+
+        item.className = "habit-card"
+
+        item.innerHTML = `
+            <div class="habit-name">${habit.name}</div>
+        `
+
+        list.appendChild(item)
+
+    })
 
 }
 
-/* ======================
-NAVIGATION
-====================== */
-
-document.addEventListener("DOMContentLoaded", ()=>{
-
-document.getElementById("nav-leaderboard").onclick = ()=>{
-showScreen("leaderboard")
-
-if(typeof renderLeaderboard === "function"){
-renderLeaderboard()
-}
-
-}
-
-document.getElementById("nav-dashboard").onclick = ()=>{
-showScreen("dashboard")
-}
-
-document.getElementById("nav-analytics").onclick = ()=>{
-showScreen("analytics")
-
-if(typeof renderAnalytics === "function"){
-renderAnalytics()
-}
-
-}
-
-})
+loadHabits()
 
 </script>
-
-<!-- ======================
-BOTTOM NAVIGATION
-====================== -->
-
-<div class="bottom-nav">
-
-<div class="nav-item active" id="nav-dashboard">
-<span class="icon">🏠</span>
-<span class="text">Dashboard</span>
-</div>
-
-<div class="nav-item" id="nav-leaderboard">
-<span class="icon">🏆</span>
-<span class="text">Рейтинг</span>
-</div>
-
-<div class="nav-item" id="nav-analytics">
-<span class="icon">🎯</span>
-<span class="text">Аналитика</span>
-</div>
-
-<div class="nav-item">
-<span class="icon">👤</span>
-<span class="text">Профиль</span>
-</div>
-
-</div>
 
 </body>
 </html>
