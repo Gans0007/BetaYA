@@ -137,8 +137,9 @@ async def month_confirmations(request: Request):
         FROM confirmations
 
         WHERE user_id = $1
+        AND confirmed = true
 
-        GROUP BY month
+        GROUP BY TO_CHAR(datetime,'YYYY-MM')
         ORDER BY month
 
         """, user_id)
