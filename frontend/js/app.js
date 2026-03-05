@@ -105,7 +105,6 @@ let d = new Date()
 d.setDate(today.getDate()-i)
 
 dates.push(d.toISOString().slice(0,10))
-
 labels.push(weekdays[d.getDay()])
 
 }
@@ -120,7 +119,6 @@ let d = new Date()
 d.setDate(today.getDate()-i)
 
 dates.push(d.toISOString().slice(0,10))
-
 labels.push(String(d.getDate()).padStart(2,"0"))
 
 }
@@ -135,7 +133,6 @@ let d = new Date()
 d.setMonth(today.getMonth()-i)
 
 dates.push(d.toISOString().slice(0,7))
-
 labels.push(d.toLocaleString("ru",{month:"short"}))
 
 }
@@ -174,20 +171,18 @@ timeline.dates.forEach(date => {
 
 if(period === 12){
 
-// дата вида 2026-03
-const monthChecks = habitHistory.filter(r => 
-    r.confirm_day && r.confirm_day.startsWith(date)
+const monthChecks = habitHistory.filter(r =>
+r.confirm_day && r.confirm_day.startsWith(date)
 )
 
 if(monthChecks.length > 0){
 value++
 }else{
-value = Math.max(0, value-1)
+value = Math.max(0,value-1)
 }
 
 }else{
 
-// обычная логика для дней
 if(confirmSet.has(date)){
 value++
 }else{
@@ -209,7 +204,7 @@ habit_id:h.id
 
 })
 
-buildChart(timeline.labels, datasets)
+buildChart(timeline.labels, datasets, timeline.dates)
 
 }
 

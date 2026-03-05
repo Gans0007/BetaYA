@@ -7,14 +7,10 @@ let chart
 
 
 // =====================================
-// ФУНКЦИЯ: confirmationsUntil
-// Считает количество подтверждений
-// привычки ДО выбранной даты
+// confirmationsUntil
 // =====================================
 
 function confirmationsUntil(habitId, date){
-
-console.log("📊 confirmationsUntil()", habitId, date)
 
 const count = history.filter(r =>
 r.habit_id === habitId &&
@@ -28,14 +24,10 @@ return count
 
 
 // =====================================
-// ФУНКЦИЯ: streakUntil
-// Считает серию привычки
-// на выбранную дату
+// streakUntil
 // =====================================
 
 function streakUntil(habitId, date){
-
-console.log("🔥 streakUntil()", habitId, date)
 
 const days = history
 .filter(r =>
@@ -76,19 +68,12 @@ return streak
 
 
 // =====================================
-// ФУНКЦИЯ: buildChart
-// Создает график Chart.js
+// buildChart
 // =====================================
 
-function buildChart(labels, datasets){
+function buildChart(labels, datasets, dates){
 
 if(chart) chart.destroy()
-
-
-// =====================================
-// Находим максимальное значение графика
-// чтобы корректно построить ось Y
-// =====================================
 
 let maxValue = 0
 
@@ -101,17 +86,14 @@ if(v > maxValue) maxValue = v
 maxValue = Math.ceil(maxValue * 1.4) + 1
 
 
-// =====================================
-// Создаем график
-// =====================================
-
 chart = new Chart(document.getElementById("habitsChart"),{
 
 type:"line",
 
 data:{
 labels:labels,
-datasets:datasets
+datasets:datasets,
+dates:dates
 },
 
 options:{
@@ -119,17 +101,7 @@ options:{
 responsive:true,
 maintainAspectRatio:false,
 
-
-// =====================================
-// ПЛАГИНЫ
-// =====================================
-
 plugins:{
-
-
-// ----------------------------
-// Легенда привычек
-// ----------------------------
 
 legend:{
 position:"top",
@@ -138,35 +110,21 @@ boxWidth:12
 }
 },
 
-
-// ----------------------------
-// TOOLTIP
-// Показывает статистику
-// на выбранную точку графика
-// ----------------------------
-
 tooltip:{
 callbacks:{
-
 
 label:function(context){
 
 const dataset = context.dataset
 const habitId = dataset.habit_id
 
-// индекс точки графика
 const index = context.dataIndex
 
-// дата выбранной точки
-const date = context.chart.data.labels[index]
+// ВАЖНО: теперь используем реальные даты
+const date = context.chart.data.dates[index]
 
-
-// считаем подтверждения на тот момент
 const confirmations = confirmationsUntil(habitId, date)
-
-// считаем серию на тот момент
 const streak = streakUntil(habitId, date)
-
 
 let lines = []
 
@@ -185,11 +143,6 @@ return lines
 }
 
 },
-
-
-// =====================================
-// ОСЬ Y
-// =====================================
 
 scales:{
 y:{
