@@ -112,8 +112,15 @@ async def get_habit_history(request: Request):
 @router.post("/api/month_confirmations")
 async def month_confirmations(request: Request):
 
-    data = await request.json()
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
     init_data = data.get("initData")
+
+    if not init_data:
+        return {"months": []}
 
     user_id = validate_telegram_data(init_data)
 
@@ -125,7 +132,7 @@ async def month_confirmations(request: Request):
 
         SELECT
             TO_CHAR(m.month,'YYYY-MM') as month,
-            COALESCE(COUNT(c.id),0) as total
+            COUNT(c.id) as total
 
         FROM generate_series(
             date_trunc('month', NOW()) - interval '11 months',
@@ -136,7 +143,6 @@ async def month_confirmations(request: Request):
         LEFT JOIN confirmations c
             ON date_trunc('month', c.datetime) = m.month
             AND c.user_id = $1
-            AND c.confirmed = true
 
         GROUP BY m.month
         ORDER BY m.month
