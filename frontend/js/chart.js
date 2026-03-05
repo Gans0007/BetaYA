@@ -65,7 +65,7 @@ let lines = []
 
 lines.push("Подтверждений: " + confirmations)
 
-if(streak > 1){
+if(streak >= 1){
 lines.push("🔥 Серия: " + streak + " дня")
 }
 
