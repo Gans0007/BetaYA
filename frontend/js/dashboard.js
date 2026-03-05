@@ -187,40 +187,44 @@ function drawChart(id,series){
    ========================================= */
 function renderWeek(){
 
-const weekContainer=document.getElementById("week-days")
-const monthName=document.getElementById("month-name")
+  const weekContainer = document.getElementById("week-days")
+  const monthName = document.getElementById("month-name")
 
-const today=new Date()
+  const today = new Date()
+  today.setHours(0,0,0,0)
 
-const months=[
-"Январь","Февраль","Март","Апрель",
-"Май","Июнь","Июль","Август",
-"Сентябрь","Октябрь","Ноябрь","Декабрь"
-]
+  const months = [
+    "Январь","Февраль","Март","Апрель",
+    "Май","Июнь","Июль","Август",
+    "Сентябрь","Октябрь","Ноябрь","Декабрь"
+  ]
 
-const days=["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]
+  const days = ["Вс","Пн","Вт","Ср","Чт","Пт","Сб"]
 
-monthName.innerText=months[today.getMonth()]
+  monthName.innerText = months[today.getMonth()]
+  weekContainer.innerHTML = ""
 
-weekContainer.innerHTML=""
+  // показываем последние 7 дней включая сегодня
+  for(let i = 6; i >= 0; i--){
 
-for(let i=6;i>=0;i--){
+    const d = new Date(today)
+    d.setDate(today.getDate() - i)
 
-const d=new Date()
-d.setDate(today.getDate()-i)
+    const el = document.createElement("div")
+    el.className = "day"
 
-const el=document.createElement("div")
-el.className="day"
+    // подсветка сегодняшнего дня
+    if(d.getTime() === today.getTime()){
+      el.classList.add("today")
+    }
 
-el.innerHTML=`
-<div class="day-number">${d.getDate()}</div>
-<div class="day-name">${days[d.getDay()]}</div>
-`
+    el.innerHTML = `
+      <div class="day-number">${d.getDate()}</div>
+      <div class="day-name">${days[d.getDay()]}</div>
+    `
 
-weekContainer.appendChild(el)
-
-}
-
+    weekContainer.appendChild(el)
+  }
 }
 
 renderWeek()
