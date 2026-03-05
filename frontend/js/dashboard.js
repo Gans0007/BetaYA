@@ -1,7 +1,9 @@
 const tg = window.Telegram.WebApp
+tg.expand()
+
 const initData = tg.initData
 
-async function loadHabits(){
+async function loadDashboard(){
 
     try{
 
@@ -19,33 +21,51 @@ async function loadHabits(){
 
         console.log("API DATA:",data)
 
-        const list = document.getElementById("habits-list")
-
-        list.innerHTML=""
-
-        if(!data.habits){
-            list.innerHTML="<p>Нет привычек</p>"
-            return
-        }
-
-        data.habits.forEach(habit =>{
-
-            const item=document.createElement("div")
-
-            item.className="habit-card"
-
-            item.innerHTML=`<div class="habit-name">${habit.name}</div>`
-
-            list.appendChild(item)
-
-        })
+        renderHabits(data.habits)
 
     }catch(e){
 
-        console.log("Ошибка API",e)
+        console.log("API ERROR",e)
 
     }
 
 }
 
-loadHabits()
+function renderHabits(habits){
+
+    const list=document.getElementById("habits-list")
+
+    list.innerHTML=""
+
+    if(!habits || habits.length===0){
+
+        list.innerHTML="<p class='empty'>Нет активных привычек</p>"
+        return
+
+    }
+
+    habits.forEach(habit=>{
+
+        const item=document.createElement("div")
+
+        item.className="habit-card"
+
+        item.innerHTML=`
+
+            <div class="habit-left">
+                <div class="habit-name">${habit.name}</div>
+            </div>
+
+            <div class="habit-right">
+                ✔
+            </div>
+
+        `
+
+        list.appendChild(item)
+
+    })
+
+}
+
+loadDashboard()

@@ -1,8 +1,8 @@
 body{
 
-background:#0c0c0c;
-color:white;
-font-family:Arial;
+background:#0b0b0c;
+color:#ffffff;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
 
 margin:0;
 padding:0;
@@ -20,8 +20,10 @@ padding:20px;
 .title{
 
 text-align:center;
-font-size:24px;
-margin-bottom:30px;
+font-size:22px;
+font-weight:700;
+
+margin-bottom:25px;
 
 }
 
@@ -29,24 +31,59 @@ margin-bottom:30px;
 
 display:flex;
 flex-direction:column;
-gap:15px;
+
+gap:14px;
 
 }
 
+/* карточка привычки */
+
 .habit-card{
 
-background:#1b1b1b;
+background:#1a1a1d;
+
+border-radius:14px;
 
 padding:18px;
 
-border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 
-font-size:18px;
+box-shadow:0 6px 20px rgba(0,0,0,0.35);
+
+transition:0.2s;
+
+}
+
+.habit-card:active{
+
+transform:scale(0.97);
 
 }
 
 .habit-name{
 
+font-size:18px;
 font-weight:600;
+
+}
+
+.habit-right{
+
+font-size:20px;
+opacity:0.6;
+
+}
+
+/* если нет привычек */
+
+.empty{
+
+text-align:center;
+opacity:0.6;
+font-size:14px;
+
+margin-top:40px;
 
 }
