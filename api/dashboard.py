@@ -147,3 +147,36 @@ async def month_confirmations(request: Request):
     return {
         "months": [dict(r) for r in rows]
     }
+
+
+
+
+@router.post("/api/leaderboard")
+async def get_leaderboard(request: Request):
+
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
+    init_data = data.get("initData")
+
+    if not init_data:
+        return []
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        rows = await conn.fetch("""
+        SELECT
+            u.user_id,
+            COALESCE(u.xp,0) as xp
+        FROM user_stats u
+        ORDER BY xp DESC
+        LIMIT 10
+        """)
+
+    return [dict(r) for r in rows]
