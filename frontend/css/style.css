@@ -11,9 +11,16 @@ margin:0;
 
 .container{
 
-max-width:420px;
-margin:auto;
-padding:20px;
+width:100%;
+max-width:500px;
+
+margin:0 auto;
+
+padding-left:18px;
+padding-right:18px;
+padding-top:20px;
+
+box-sizing:border-box;
 
 }
 
