@@ -80,19 +80,14 @@ return streak
 // Создает график Chart.js
 // =====================================
 
-function buildChart(labels, dates, datasets){
+function buildChart(labels, datasets){
 
 if(chart) chart.destroy()
 
 
-// добавляем даты в dataset
-datasets.forEach(d=>{
-d.dates = dates
-})
-
-
 // =====================================
-// Находим максимум для оси Y
+// Находим максимальное значение графика
+// чтобы корректно построить ось Y
 // =====================================
 
 let maxValue = 0
@@ -125,10 +120,17 @@ responsive:true,
 maintainAspectRatio:false,
 
 
+// =====================================
+// ПЛАГИНЫ
+// =====================================
+
 plugins:{
 
 
+// ----------------------------
 // Легенда привычек
+// ----------------------------
+
 legend:{
 position:"top",
 labels:{
@@ -137,22 +139,34 @@ boxWidth:12
 },
 
 
-// TOOLTIP — статистика на выбранную дату
+// ----------------------------
+// TOOLTIP
+// Показывает статистику
+// на выбранную точку графика
+// ----------------------------
+
 tooltip:{
 callbacks:{
+
 
 label:function(context){
 
 const dataset = context.dataset
 const habitId = dataset.habit_id
 
+// индекс точки графика
 const index = context.dataIndex
 
-// берем реальную дату
-const date = dataset.dates[index]
+// дата выбранной точки
+const date = context.chart.data.labels[index]
 
+
+// считаем подтверждения на тот момент
 const confirmations = confirmationsUntil(habitId, date)
+
+// считаем серию на тот момент
 const streak = streakUntil(habitId, date)
+
 
 let lines = []
 
@@ -173,7 +187,10 @@ return lines
 },
 
 
-// ось Y
+// =====================================
+// ОСЬ Y
+// =====================================
+
 scales:{
 y:{
 beginAtZero:true,
