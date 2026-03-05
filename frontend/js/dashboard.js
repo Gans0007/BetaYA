@@ -134,21 +134,27 @@ function drawChart(id,series){
 
         data:{
 
-            // 5 последних дней
             labels:["","","","",""],
 
             datasets:[{
 
-                // данные приходят из API
                 data:series,
 
-                borderColor:"#f4d47c",
+                borderColor:"#e8c66a",
 
-                borderWidth:2,
+                borderWidth:3,
 
-                pointRadius:3,
+                pointRadius:4,
 
-                tension:0.4
+                pointHoverRadius:4,
+
+                pointBackgroundColor:"#e8c66a",
+
+                pointBorderWidth:0,
+
+                tension:0.45,
+
+                fill:false
 
             }]
 
@@ -161,7 +167,8 @@ function drawChart(id,series){
             maintainAspectRatio:false,
 
             plugins:{
-                legend:false
+                legend:false,
+                tooltip:{enabled:false}
             },
 
             scales:{
