@@ -190,12 +190,10 @@ color:#e8c66a;
   white-space: nowrap;
 }
 
-/* дни: равномерно распределяем по ширине */
 .week-days{
   display:flex;
-  flex: 1;
-  justify-content:space-between;
   align-items:flex-end;
+  gap:12px;
 }
 
 /* один день — фикс ширина (чтобы ровно стояли) */
