@@ -31,24 +31,19 @@ habits.forEach((habit,i)=>{
 
 const chartId="chart-"+i
 
-/* ===== КВАДРАТЫ МЕСЯЦА ===== */
-
-let monthCells=""
-
 const confirmedDays = new Set(habit.days || [])
 
+/* =========================
+МЕСЯЦ
+========================= */
+
+let monthCells=""
 let completedMonth = 0
 
 for(let day=1; day<=daysInMonth; day++){
 
-const date = new Date(
-now.getFullYear(),
-now.getMonth(),
-day
-)
-
 const dateStr =
-date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
+now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(day).padStart(2,"0")
 
 const active = confirmedDays.has(dateStr)
 ? "cell active"
@@ -62,8 +57,6 @@ monthCells += `<div class="${active}"></div>`
 
 }
 
-/* ===== ПРОЦЕНТ МЕСЯЦ ===== */
-
 let percentMonth = Math.floor(
 (completedMonth / daysInMonth) * 100
 )
@@ -71,10 +64,11 @@ let percentMonth = Math.floor(
 percentMonth = Math.max(0,Math.min(100,percentMonth))
 
 
-/* ===== КВАДРАТЫ ГОДА ===== */
+/* =========================
+ГОД
+========================= */
 
 let yearCells=""
-
 let completedYear = 0
 
 for(let i=0;i<daysInYear;i++){
@@ -82,7 +76,7 @@ for(let i=0;i<daysInYear;i++){
 const date = new Date(
 now.getFullYear(),
 0,
-i + 1
+i+1
 )
 
 const dateStr =
@@ -100,8 +94,6 @@ yearCells += `<div class="${active}"></div>`
 
 }
 
-/* ===== ПРОЦЕНТ ГОД ===== */
-
 let percentYear = Math.floor(
 (completedYear / daysInYear) * 100
 )
@@ -109,7 +101,9 @@ let percentYear = Math.floor(
 percentYear = Math.max(0,Math.min(100,percentYear))
 
 
-/* ===== КАРТОЧКА ===== */
+/* =========================
+КАРТОЧКА
+========================= */
 
 const wrap=document.createElement("div")
 wrap.className="habit-wrap"
@@ -165,7 +159,9 @@ ${percentMonth}% выполнено
 
 `
 
-/* toggle overlay */
+/* =========================
+ОТКРЫТИЕ КАРТОЧКИ
+========================= */
 
 const main = wrap.querySelector(".habit-main")
 
@@ -173,13 +169,16 @@ main.addEventListener("click",()=>{
 wrap.classList.toggle("active")
 })
 
-/* переключатель */
+
+/* =========================
+ПЕРЕКЛЮЧАТЕЛЬ
+========================= */
 
 const grid = wrap.querySelector(".grid")
+const progress = wrap.querySelector(".progress")
 
 const monthBtn = wrap.querySelector(".switch-btn:nth-child(1)")
 const yearBtn = wrap.querySelector(".switch-btn:nth-child(2)")
-const progress = wrap.querySelector(".progress")
 
 monthBtn.onclick=()=>{
 
