@@ -9,14 +9,6 @@ gap:18px;
 }
 
 /* =========================
-WRAP
-========================= */
-
-.habit-wrap{
-position:relative;
-}
-
-/* =========================
 КАРТОЧКА
 ========================= */
 
@@ -77,20 +69,17 @@ OVERLAY БЛОК
 
 .habit-overlay{
 
-position:absolute;
-left:0;
-top:100%;
-
-width:100%;
-
-margin-top:10px;
+max-height:0;
+overflow:hidden;
 
 opacity:0;
 transform:translateY(-10px);
 
-pointer-events:none;
+transition:
 
-transition:all .35s ease;
+max-height .45s ease,
+opacity .25s ease,
+transform .35s ease;
 
 }
 
@@ -98,10 +87,12 @@ transition:all .35s ease;
 
 .habit-wrap.active .habit-overlay{
 
+max-height:500px;
+
 opacity:1;
 transform:translateY(0);
 
-pointer-events:auto;
+margin-top:10px;
 
 }
 
