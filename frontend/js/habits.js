@@ -34,6 +34,14 @@ const chartId="chart-"+i
 const confirmedDays = new Set(habit.days || [])
 
 /* =========================
+СТРИК (ПОКАЗЫВАЕМ >=2)
+========================= */
+
+const streakHTML = habit.streak >= 2
+? `<div class="habit-streak">🔥 Стрик: ${habit.streak} дней</div>`
+: ""
+
+/* =========================
 МЕСЯЦ
 ========================= */
 
@@ -118,9 +126,7 @@ wrap.innerHTML=`
 
 <div class="habit-name">${habit.name}</div>
 
-<div class="habit-streak">
-🔥 Стрик: ${habit.streak} дней
-</div>
+${streakHTML}
 
 </div>
 
@@ -168,7 +174,6 @@ const main = wrap.querySelector(".habit-main")
 main.addEventListener("click",()=>{
 wrap.classList.toggle("active")
 })
-
 
 /* =========================
 ПЕРЕКЛЮЧАТЕЛЬ
