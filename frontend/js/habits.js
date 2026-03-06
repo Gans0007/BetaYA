@@ -37,6 +37,8 @@ let monthCells=""
 
 const confirmedDays = new Set(habit.days || [])
 
+let completedMonth = 0
+
 for(let day=1; day<=daysInMonth; day++){
 
 const date = new Date(
@@ -51,9 +53,22 @@ const active = confirmedDays.has(dateStr)
 ? "cell active"
 : "cell"
 
+if(active === "cell active"){
+completedMonth++
+}
+
 monthCells += `<div class="${active}"></div>`
 
 }
+
+/* ===== ПРОЦЕНТ ===== */
+
+let percentMonth = Math.floor(
+(completedMonth / daysInMonth) * 100
+)
+
+percentMonth = Math.max(0, Math.min(100, percentMonth))
+
 
 /* ===== ГОД ===== */
 
@@ -129,7 +144,7 @@ ${monthCells}
 </div>
 
 <div class="progress">
-3% выполнено
+${percentMonth}% выполнено
 </div>
 
 </div>
