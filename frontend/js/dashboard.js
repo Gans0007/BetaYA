@@ -1,6 +1,7 @@
 import {getDashboard} from "./api.js"
 import {renderHabits} from "./habits.js"
 import {renderWeek} from "./calendar.js"
+import {initNavigation} from "./navigation.js"
 
 const tg = window.Telegram.WebApp
 tg.expand()
@@ -17,3 +18,4 @@ renderHabits(data.habits)
 
 renderWeek()
 loadDashboard()
+initNavigation()
