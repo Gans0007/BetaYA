@@ -119,3 +119,7 @@ toggleHabit(card)
 list.appendChild(card)
 
 drawChart(chartId,habit.series)
+
+})   // закрывает habits.forEach
+
+}    // закрывает renderHabits
