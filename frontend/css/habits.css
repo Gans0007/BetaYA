@@ -129,23 +129,25 @@ padding-bottom:6px;
 
 }
 
-/* ===== СКРОЛЛ ГОДОВОГО КАЛЕНДАРЯ ===== */
+/* ===== ГОДОВОЙ КАЛЕНДАРЬ СКРОЛЛ ===== */
 
 .grid.year{
 overflow-x:auto;
 overflow-y:hidden;
+scrollbar-width:thin;          /* Firefox */
+scrollbar-color:#e8c66a #111;  /* Firefox */
 }
 
 /* ширина полосы */
 
 .grid.year::-webkit-scrollbar{
-height:6px;
+height:4px;
 }
 
 /* дорожка */
 
 .grid.year::-webkit-scrollbar-track{
-background:#141414;
+background:#0f0f10;
 border-radius:10px;
 }
 
