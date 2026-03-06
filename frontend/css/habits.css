@@ -1,61 +1,45 @@
-/* =========================================
-СПИСОК ПРИВЫЧЕК
-========================================= */
+/* =========================
+СПИСОК
+========================= */
 
 .habits{
 display:flex;
 flex-direction:column;
-gap:16px;
+gap:18px;
 }
 
+/* =========================
+WRAP
+========================= */
 
+.habit-wrap{
+position:relative;
+}
 
-/* =========================================
-КАРТОЧКА ПРИВЫЧКИ
-========================================= */
+/* =========================
+КАРТОЧКА
+========================= */
 
 .habit-card{
 
 background:#1a1a1d;
 border-radius:18px;
-
 padding:16px;
 
 box-shadow:0 10px 30px rgba(0,0,0,0.4);
 
-transition:all .25s ease;
-
 }
 
-.habit-card:hover{
-
-transform:scale(1.01);
-
-}
-
-
-.habit-card{
-cursor:default;
-}
+/* =========================
+ВЕРХ
+========================= */
 
 .habit-main{
-cursor:pointer;
-}
-
-
-/* =========================================
-ВЕРХНЯЯ ЧАСТЬ КАРТОЧКИ
-========================================= */
-
-.habit-main{
-
 display:flex;
 justify-content:space-between;
 align-items:center;
-
+cursor:pointer;
 }
-
-
 
 .habit-info{
 display:flex;
@@ -63,25 +47,19 @@ flex-direction:column;
 gap:6px;
 }
 
-
-
 .habit-name{
 font-size:17px;
 font-weight:600;
 }
-
-
 
 .habit-streak{
 font-size:13px;
 opacity:0.7;
 }
 
-
-
-/* =========================================
+/* =========================
 ГРАФИК
-========================================= */
+========================= */
 
 .habit-chart{
 width:120px;
@@ -89,85 +67,62 @@ height:60px;
 }
 
 canvas{
-width:100% !important;
-height:100% !important;
+width:100%!important;
+height:100%!important;
 }
 
+/* =========================
+OVERLAY БЛОК
+========================= */
 
-
-/* =========================================
-РАСКРЫВАЮЩИЙСЯ БЛОК
-========================================= */
-
-.habit-details{
-
-max-height:0;
-overflow:hidden;
+.habit-overlay{
 
 margin-top:10px;
 
-/* прозрачный блок */
-background:transparent;
-
-border-radius:14px;
-
-padding:14px;
-
-/* можно оставить легкий blur */
-backdrop-filter:blur(6px);
-
-transition:
-
-max-height 0.45s cubic-bezier(.4,0,.2,1),
-opacity 0.35s ease,
-transform 0.35s ease;
-
 opacity:0;
-transform:translateY(-6px);
+transform:translateY(-10px);
+
+pointer-events:none;
+
+transition:all .35s ease;
 
 }
 
+/* активное состояние */
 
-.habit-details.active{
-
-max-height:350px;
+.habit-wrap.active .habit-overlay{
 
 opacity:1;
-
 transform:translateY(0);
+
+pointer-events:auto;
 
 }
 
-
-/* =========================================
-СЕТКА ДНЕЙ
-========================================= */
+/* =========================
+СЕТКА
+========================= */
 
 .grid{
 
 display:grid;
-
 grid-template-columns:repeat(31,1fr);
+gap:2px;
 
-gap:3px;
+padding:12px;
 
-margin-top:10px;
+background:rgba(255,255,255,0.02);
+border-radius:14px;
 
 }
-
 
 .grid.year{
-
 grid-template-columns:repeat(53,1fr);
-
 }
 
-.grid.year .cell{
-
-border-radius:2px;
-
-}
-
+/* =========================
+КЛЕТКИ
+========================= */
 
 .cell{
 
@@ -175,21 +130,20 @@ width:100%;
 aspect-ratio:1;
 
 background:#2b1d16;
-
 border-radius:3px;
 
 }
 
+.grid.year .cell{
 
-.cell.active{
-background:#ff9d2f;
+width:6px;
+height:6px;
+
 }
 
-
-
-/* =========================================
-НИЖНИЙ БЛОК
-========================================= */
+/* =========================
+НИЗ
+========================= */
 
 .habit-footer{
 
@@ -197,11 +151,9 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 
-margin-top:14px;
+margin-top:12px;
 
 }
-
-
 
 /* переключатель */
 
@@ -210,14 +162,10 @@ margin-top:14px;
 display:flex;
 
 background:#1a1a1d;
-
 border-radius:12px;
-
 overflow:hidden;
 
 }
-
-
 
 .switch-btn{
 
@@ -225,12 +173,9 @@ border:none;
 background:none;
 
 padding:8px 14px;
-
 color:#aaa;
 
 }
-
-
 
 .switch-btn.active{
 
@@ -239,24 +184,6 @@ color:#000;
 
 }
 
-
-
-/* процент */
-
 .progress{
 opacity:0.8;
-}
-
-
-/* =========================================
-ГОДОВОЙ РЕЖИМ
-========================================= */
-
-.grid.year .cell{
-
-width:6px;
-height:6px;
-
-border-radius:2px;
-
 }

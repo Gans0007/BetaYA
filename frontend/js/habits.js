@@ -1,52 +1,18 @@
 import {drawChart} from "./charts.js"
 
-
-/* =========================================
-ПЕРЕКЛЮЧЕНИЕ БЛОКА ПРИВЫЧКИ
-========================================= */
-
-function toggleHabit(card){
-
-const details = card.querySelector(".habit-details")
-
-details.classList.toggle("active")
-
-}
-
-
-
-/* =========================================
-ОТРИСОВКА СПИСКА ПРИВЫЧЕК
-========================================= */
-
 export function renderHabits(habits){
 
 const list=document.getElementById("habits-list")
-
 list.innerHTML=""
 
-
-
 if(!habits || habits.length===0){
-
-list.innerHTML="<p>Нет активных привычек</p>"
+list.innerHTML="<p>Нет привычек</p>"
 return
-
 }
 
-
-
-/* =========================================
-ДАТА
-========================================= */
+/* ===== ДАТА ===== */
 
 const now = new Date()
-
-
-
-/* =========================================
-ДНИ В МЕСЯЦЕ
-========================================= */
 
 const daysInMonth = new Date(
 now.getFullYear(),
@@ -54,59 +20,38 @@ now.getMonth()+1,
 0
 ).getDate()
 
-
-
-/* =========================================
-ДНИ В ГОДУ
-========================================= */
-
 const startOfYear = new Date(now.getFullYear(),0,1)
 const endOfYear = new Date(now.getFullYear(),11,31)
 
 const daysInYear =
 Math.floor((endOfYear-startOfYear)/(1000*60*60*24))+1
 
+/* ===== КВАДРАТЫ ===== */
 
+let monthCells=""
 
-/* =========================================
-ГЕНЕРАЦИЯ КВАДРАТОВ МЕСЯЦА
-========================================= */
-
-let monthCellsHTML=""
-
-for(let d=1; d<=daysInMonth; d++){
-
-monthCellsHTML+=`<div class="cell"></div>`
-
+for(let i=0;i<daysInMonth;i++){
+monthCells+=`<div class="cell"></div>`
 }
 
+let yearCells=""
 
-
-/* =========================================
-ГЕНЕРАЦИЯ КВАДРАТОВ ГОДА
-========================================= */
-
-let yearCellsHTML=""
-
-for(let d=1; d<=daysInYear; d++){
-
-yearCellsHTML+=`<div class="cell"></div>`
-
+for(let i=0;i<daysInYear;i++){
+yearCells+=`<div class="cell"></div>`
 }
 
-
+/* ===== РЕНДЕР ===== */
 
 habits.forEach((habit,i)=>{
 
 const chartId="chart-"+i
 
-const card=document.createElement("div")
+const wrap=document.createElement("div")
+wrap.className="habit-wrap"
 
-card.className="habit-card"
+wrap.innerHTML=`
 
-
-
-card.innerHTML=`
+<div class="habit-card">
 
 <div class="habit-main">
 
@@ -126,16 +71,15 @@ card.innerHTML=`
 
 </div>
 
+</div>
 
-
-<div class="habit-details">
+<div class="habit-overlay">
 
 <div class="grid">
 
-${monthCellsHTML}
+${monthCells}
 
 </div>
-
 
 <div class="habit-footer">
 
@@ -156,58 +100,44 @@ ${monthCellsHTML}
 
 `
 
+/* toggle overlay */
 
-
-/* =========================================
-TOGGLE РАСКРЫТИЯ КАРТОЧКИ
-========================================= */
-
-const main = card.querySelector(".habit-main")
+const main = wrap.querySelector(".habit-main")
 
 main.addEventListener("click",()=>{
-toggleHabit(card)
+
+wrap.classList.toggle("active")
+
 })
 
+/* переключатель */
 
+const grid = wrap.querySelector(".grid")
 
-/* =========================================
-ПЕРЕКЛЮЧАТЕЛЬ МЕСЯЦ / ГОД
-========================================= */
+const monthBtn = wrap.querySelector(".switch-btn:nth-child(1)")
+const yearBtn = wrap.querySelector(".switch-btn:nth-child(2)")
 
-const grid = card.querySelector(".grid")
-
-const monthBtn = card.querySelector(".switch-btn:nth-child(1)")
-const yearBtn = card.querySelector(".switch-btn:nth-child(2)")
-
-
-
-monthBtn.addEventListener("click",()=>{
+monthBtn.onclick=()=>{
 
 monthBtn.classList.add("active")
 yearBtn.classList.remove("active")
 
 grid.classList.remove("year")
+grid.innerHTML=monthCells
 
-grid.innerHTML = monthCellsHTML
+}
 
-})
-
-
-
-yearBtn.addEventListener("click",()=>{
+yearBtn.onclick=()=>{
 
 yearBtn.classList.add("active")
 monthBtn.classList.remove("active")
 
 grid.classList.add("year")
+grid.innerHTML=yearCells
 
-grid.innerHTML = yearCellsHTML
+}
 
-})
-
-
-
-list.appendChild(card)
+list.appendChild(wrap)
 
 drawChart(chartId,habit.series)
 
