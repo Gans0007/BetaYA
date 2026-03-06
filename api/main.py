@@ -61,7 +61,10 @@ app.add_middleware(
 # Подключаем роутеры
 # ----------------------------
 from api.dashboard import router as dashboard_router
+from api.leaderboard import router as leaderboard_router
+
 app.include_router(dashboard_router)
+app.include_router(leaderboard_router)
 
 
 # ----------------------------
