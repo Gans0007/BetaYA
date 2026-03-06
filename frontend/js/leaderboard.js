@@ -1,39 +1,47 @@
 async function loadLeaderboard(){
 
-const response = await fetch("/api/leaderboard")
-const data = await response.json()
+    const response = await fetch("/api/leaderboard")
+    const data = await response.json()
 
-const list = document.getElementById("leaderboard-list")
+    const list = document.getElementById("leaderboard-list")
 
-list.innerHTML=""
+    list.innerHTML=""
 
-data.leaders.forEach(user=>{
+    data.leaders.forEach(user=>{
 
-const item=document.createElement("div")
+        const item=document.createElement("div")
 
-item.className="leader-row"
+        item.className="leader-row"
 
-item.innerHTML=`
+        let rankClass="rank"
 
-<div class="rank">${user.rank}</div>
+        if(user.rank===1) rankClass+=" gold"
+        if(user.rank===2) rankClass+=" silver"
+        if(user.rank===3) rankClass+=" bronze"
 
-<div class="leader-name">
-${user.username}
-</div>
+        item.innerHTML=`
 
-<div class="leader-xp">
-${user.xp}
-</div>
+        <div class="${rankClass}">
+            ${user.rank}
+        </div>
 
-<div class="leader-cup">
-🏆
-</div>
+        <div class="leader-name">
+            ${user.username || "Unknown"}
+        </div>
 
-`
+        <div class="leader-xp">
+            ${user.xp.toLocaleString()}
+        </div>
 
-list.appendChild(item)
+        <div class="leader-cup">
+            🏆
+        </div>
 
-})
+        `
+
+        list.appendChild(item)
+
+    })
 
 }
 
