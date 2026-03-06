@@ -3,75 +3,182 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ============================= -->
+    <!-- META                         -->
+    <!-- ============================= -->
 
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Habits</title>
+
+
+    <!-- ============================= -->
+    <!-- CSS                          -->
+    <!-- ============================= -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/habits.css">
+    <link rel="stylesheet" href="css/navigation.css">
+
+
+    <!-- ============================= -->
+    <!-- TELEGRAM MINI APP            -->
+    <!-- ============================= -->
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+    <!-- ============================= -->
+    <!-- CHART JS                     -->
+    <!-- ============================= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
+
+
 <body>
+
+
+
+<!-- ======================================= -->
+<!-- APP CONTAINER                          -->
+<!-- ======================================= -->
 
 <div class="container">
 
-<div class="header">
 
-    <div class="header-top">
 
-        <div class="header-title">
-            Привычки
+    <!-- ======================================= -->
+    <!-- HEADER                                  -->
+    <!-- ======================================= -->
+
+    <div class="header">
+
+
+        <!-- HEADER TOP -->
+
+        <div class="header-top">
+
+            <div class="header-title">
+                Привычки
+            </div>
+
+            <div class="header-settings">
+                ⚙
+            </div>
+
         </div>
 
-        <div class="header-settings">
-            ⚙
+
+
+        <!-- HEADER CALENDAR -->
+
+        <div class="header-calendar">
+
+            <div class="header-month" id="month-name">
+                Март
+            </div>
+
+            <div class="week-days" id="week-days"></div>
+
         </div>
+
 
     </div>
 
-    <div class="header-calendar">
 
-        <div class="header-month" id="month-name">
-            Март
-        </div>
 
-        <div class="week-days" id="week-days"></div>
+    <!-- ======================================= -->
+    <!-- HABITS LIST                            -->
+    <!-- ======================================= -->
 
-    </div>
+    <div id="habits-list" class="habits"></div>
 
-</div>
 
-<div id="habits-list" class="habits"></div>
 
 </div>
+
+
+
+<!-- ======================================= -->
+<!-- BOTTOM NAVIGATION                      -->
+<!-- ======================================= -->
 
 <div class="bottom-menu">
 
+
+
+    <!-- HABITS -->
+
     <div class="menu-item active">
+
         <div class="menu-icon">🏃</div>
-        <div class="menu-label">Привычки</div>
+
+        <div class="menu-label">
+            Привычки
+        </div>
+
     </div>
 
+
+
+    <!-- STATISTICS -->
+
     <div class="menu-item">
+
         <div class="menu-icon">📊</div>
-        <div class="menu-label">Статистика</div>
+
+        <div class="menu-label">
+            Статистика
+        </div>
+
     </div>
 
+
+
+    <!-- PARTNERS -->
+
     <div class="menu-item">
+
         <div class="menu-icon">🤝</div>
-        <div class="menu-label">Партнерка</div>
+
+        <div class="menu-label">
+            Партнерка
+        </div>
+
     </div>
 
+
+
+    <!-- LEADERBOARD -->
+
     <div class="menu-item">
+
         <div class="menu-icon">🏆</div>
-        <div class="menu-label">Рейтинг</div>
+
+        <div class="menu-label">
+            Рейтинг
+        </div>
+
     </div>
+
+
 
 </div>
 
-<script src="js/dashboard.js"></script>
+
+
+<!-- ======================================= -->
+<!-- JAVASCRIPT                              -->
+<!-- ======================================= -->
+
+<script type="module" src="js/dashboard.js"></script>
+
+
 
 </body>
 </html>
