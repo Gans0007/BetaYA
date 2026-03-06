@@ -1,7 +1,6 @@
 import {drawChart} from "./charts.js"
 
 
-
 /* =========================================
 ПЕРЕКЛЮЧЕНИЕ БЛОКА ПРИВЫЧКИ
 ========================================= */
@@ -32,6 +31,30 @@ if(!habits || habits.length===0){
 
 list.innerHTML="<p>Нет активных привычек</p>"
 return
+
+}
+
+
+
+/* =========================================
+ОПРЕДЕЛЯЕМ ДНИ В ТЕКУЩЕМ МЕСЯЦЕ
+========================================= */
+
+const now = new Date()
+
+const daysInMonth = new Date(
+now.getFullYear(),
+now.getMonth()+1,
+0
+).getDate()
+
+
+
+let cellsHTML=""
+
+for(let d=1; d<=daysInMonth; d++){
+
+cellsHTML+=`<div class="cell"></div>`
 
 }
 
@@ -73,18 +96,7 @@ card.innerHTML=`
 
 <div class="grid">
 
-<div class="cell active"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
-<div class="cell"></div>
+${cellsHTML}
 
 </div>
 
@@ -120,6 +132,6 @@ list.appendChild(card)
 
 drawChart(chartId,habit.series)
 
-})   // закрывает habits.forEach
+})
 
-}    // закрывает renderHabits
+}

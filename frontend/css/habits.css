@@ -143,16 +143,14 @@ transform:translateY(0);
 
 .grid{
 
-display:grid;
-
-grid-template-columns:repeat(21,1fr);
+display:flex;
+flex-wrap:wrap;
 
 gap:6px;
 
 margin-top:10px;
 
 }
-
 
 
 .cell{
