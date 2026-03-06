@@ -94,6 +94,16 @@ transition:0.35s ease;
 
 margin-top:10px;
 
+/* новый фон */
+
+background:rgba(26,26,29,0.75);
+
+border-radius:14px;
+
+padding:14px;
+
+backdrop-filter:blur(6px);
+
 }
 
 

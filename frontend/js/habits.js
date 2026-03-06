@@ -110,12 +110,12 @@ card.innerHTML=`
 
 
 
-card.addEventListener("click",()=>toggleHabit(card))
+const main = card.querySelector(".habit-main")
+
+main.addEventListener("click",()=>{
+toggleHabit(card)
+})
 
 list.appendChild(card)
 
 drawChart(chartId,habit.series)
-
-})
-
-}
