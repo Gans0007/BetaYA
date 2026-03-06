@@ -77,6 +77,12 @@ OVERLAY БЛОК
 
 .habit-overlay{
 
+position:absolute;
+left:0;
+top:100%;
+
+width:100%;
+
 margin-top:10px;
 
 opacity:0;
@@ -97,6 +103,11 @@ transform:translateY(0);
 
 pointer-events:auto;
 
+}
+
+.habit-wrap{
+position:relative;
+margin-bottom:12px;
 }
 
 /* =========================
