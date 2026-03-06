@@ -132,6 +132,7 @@ async def get_dashboard(request: Request):
             "name": habit["name"],
             "series": series,
             "streak": streak
+            "days": [d.isoformat() for d in days]
 
         })
 

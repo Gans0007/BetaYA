@@ -30,8 +30,18 @@ Math.floor((endOfYear-startOfYear)/(1000*60*60*24))+1
 
 let monthCells=""
 
-for(let i=0;i<daysInMonth;i++){
-monthCells+=`<div class="cell"></div>`
+const confirmedDays = new Set(
+(habit.days || []).map(d => new Date(d).getDate())
+)
+
+for(let day=1; day<=daysInMonth; day++){
+
+const active = confirmedDays.has(day)
+? "cell active"
+: "cell"
+
+monthCells += `<div class="${active}"></div>`
+
 }
 
 let yearCells=""
