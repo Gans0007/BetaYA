@@ -143,27 +143,40 @@ transform:translateY(0);
 
 .grid{
 
-display:flex;
-flex-wrap:wrap;
+display:grid;
 
-gap:6px;
+grid-template-columns:repeat(31,1fr);
+
+gap:3px;
 
 margin-top:10px;
 
 }
 
 
-.cell{
+.grid.year{
 
-width:18px;
-height:18px;
-
-background:#2b1d16;
-
-border-radius:4px;
+grid-template-columns:repeat(53,1fr);
 
 }
 
+.grid.year .cell{
+
+border-radius:2px;
+
+}
+
+
+.cell{
+
+width:100%;
+aspect-ratio:1;
+
+background:#2b1d16;
+
+border-radius:3px;
+
+}
 
 
 .cell.active{
