@@ -118,6 +118,10 @@ border-radius:14px;
 
 }
 
+/* =========================
+ГОДОВОЙ КАЛЕНДАРЬ
+========================= */
+
 .grid.year{
 
 grid-template-columns:repeat(53,10px);
@@ -125,43 +129,29 @@ grid-template-columns:repeat(53,10px);
 overflow-x:auto;
 overflow-y:hidden;
 
-padding-bottom:6px;
+padding-bottom:14px; /* отступ от клеток */
+
+scrollbar-width:thin;
+scrollbar-color:#ffffff #0f0f10;
 
 }
 
-/* ===== ГОДОВОЙ КАЛЕНДАРЬ СКРОЛЛ ===== */
 
-.grid.year{
-overflow-x:auto;
-overflow-y:hidden;
-scrollbar-width:thin;          /* Firefox */
-scrollbar-color:#e8c66a #111;  /* Firefox */
-}
-
-/* ширина полосы */
+/* ===== ТОНКИЙ ПРЕМИУМ СКРОЛЛ ===== */
 
 .grid.year::-webkit-scrollbar{
-height:4px;
+height:3px;
 }
-
-/* дорожка */
 
 .grid.year::-webkit-scrollbar-track{
-background:#0f0f10;
-border-radius:10px;
+background:transparent;
 }
-
-/* ползунок */
 
 .grid.year::-webkit-scrollbar-thumb{
-background:#e8c66a;
+
+background:#ffffff;
 border-radius:10px;
-}
 
-/* hover эффект */
-
-.grid.year::-webkit-scrollbar-thumb:hover{
-background:#f3d47c;
 }
 
 /* =========================
