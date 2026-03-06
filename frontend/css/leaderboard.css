@@ -36,6 +36,20 @@ transform:scale(1.02);
 
 }
 
+/* выделение пользователя */
+
+.my-row{
+
+border:2px solid #FFD700;
+
+background:linear-gradient(
+180deg,
+rgba(255,215,0,0.15),
+rgba(40,40,45,0.8)
+);
+
+}
+
 /* квадрат позиции */
 
 .rank{
@@ -57,7 +71,7 @@ color:white;
 
 }
 
-/* 🥇 1 место */
+/* 🥇 */
 
 .rank.gold{
 
@@ -71,7 +85,7 @@ color:#000;
 
 }
 
-/* 🥈 2 место */
+/* 🥈 */
 
 .rank.silver{
 
@@ -85,7 +99,7 @@ color:#000;
 
 }
 
-/* 🥉 3 место */
+/* 🥉 */
 
 .rank.bronze{
 
@@ -125,5 +139,15 @@ font-weight:600;
 .leader-cup{
 
 font-size:20px;
+
+}
+
+/* разделитель */
+
+.leader-divider{
+
+text-align:center;
+margin:10px;
+opacity:0.4;
 
 }

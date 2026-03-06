@@ -1,47 +1,101 @@
 async function loadLeaderboard(){
 
-    const response = await fetch("/api/leaderboard")
-    const data = await response.json()
+const tg = window.Telegram.WebApp
 
-    const list = document.getElementById("leaderboard-list")
+const response = await fetch("/api/leaderboard",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+initData:tg.initData
+})
+})
 
-    list.innerHTML=""
+const data = await response.json()
 
-    data.leaders.forEach(user=>{
+const list = document.getElementById("leaderboard-list")
 
-        const item=document.createElement("div")
+list.innerHTML=""
 
-        item.className="leader-row"
+data.leaders.forEach(user=>{
 
-        let rankClass="rank"
+const item=document.createElement("div")
 
-        if(user.rank===1) rankClass+=" gold"
-        if(user.rank===2) rankClass+=" silver"
-        if(user.rank===3) rankClass+=" bronze"
+item.className="leader-row"
 
-        item.innerHTML=`
+if(user.rank===data.my_rank){
+item.classList.add("my-row")
+}
 
-        <div class="${rankClass}">
-            ${user.rank}
-        </div>
+let rankClass="rank"
 
-        <div class="leader-name">
-            ${user.username || "Unknown"}
-        </div>
+if(user.rank===1) rankClass+=" gold"
+if(user.rank===2) rankClass+=" silver"
+if(user.rank===3) rankClass+=" bronze"
 
-        <div class="leader-xp">
-            ${user.xp.toLocaleString()}
-        </div>
+item.innerHTML=`
 
-        <div class="leader-cup">
-            🏆
-        </div>
+<div class="${rankClass}">
+${user.rank}
+</div>
 
-        `
+<div class="leader-name">
+${user.username || "Unknown"}
+</div>
 
-        list.appendChild(item)
+<div class="leader-xp">
+${user.xp.toLocaleString()}
+</div>
 
-    })
+<div class="leader-cup">
+🏆
+</div>
+
+`
+
+list.appendChild(item)
+
+})
+
+/* если меня нет в топ 10 */
+
+if(data.my_rank && data.my_rank>10){
+
+const divider=document.createElement("div")
+
+divider.className="leader-divider"
+divider.innerHTML="..."
+
+list.appendChild(divider)
+
+const myRow=document.createElement("div")
+
+myRow.className="leader-row my-row"
+
+myRow.innerHTML=`
+
+<div class="rank">
+${data.my_rank}
+</div>
+
+<div class="leader-name">
+${data.my_username || "You"}
+</div>
+
+<div class="leader-xp">
+${data.my_xp.toLocaleString()}
+</div>
+
+<div class="leader-cup">
+🏆
+</div>
+
+`
+
+list.appendChild(myRow)
+
+}
 
 }
 
