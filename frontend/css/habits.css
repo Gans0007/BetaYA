@@ -106,13 +106,15 @@ overflow:hidden;
 
 margin-top:10px;
 
-background:rgba(40,40,45,0.55);
+/* прозрачный блок */
+background:transparent;
 
 border-radius:14px;
 
 padding:14px;
 
-backdrop-filter:blur(10px);
+/* можно оставить легкий blur */
+backdrop-filter:blur(6px);
 
 transition:
 
