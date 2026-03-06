@@ -3,256 +3,90 @@
 
 <head>
 
-    <!-- ============================= -->
-    <!-- META                         -->
-    <!-- ============================= -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habits</title>
 
-    <title>Habits</title>
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/header.css">
+<link rel="stylesheet" href="css/habits.css">
+<link rel="stylesheet" href="css/navigation.css">
 
-
-    <!-- ============================= -->
-    <!-- CSS                          -->
-    <!-- ============================= -->
-
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/header.css">
-    <link rel="stylesheet" href="css/habits.css">
-    <link rel="stylesheet" href="css/navigation.css">
-
-
-    <!-- ============================= -->
-    <!-- TELEGRAM MINI APP            -->
-    <!-- ============================= -->
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-
-    <!-- ============================= -->
-    <!-- CHART JS                     -->
-    <!-- ============================= -->
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
-
 
 
 <body>
 
 
-
-<!-- ======================================= -->
-<!-- APP CONTAINER                          -->
-<!-- ======================================= -->
-
 <div class="container">
 
 
+<div class="header">
 
-    <!-- ======================================= -->
-    <!-- HEADER                                  -->
-    <!-- ======================================= -->
+<div class="header-top">
 
-    <div class="header">
+<div class="header-title">
+Привычки
+</div>
 
+<div class="header-settings">
+⚙
+</div>
 
-        <!-- HEADER TOP -->
-
-        <div class="header-top">
-
-            <div class="header-title">
-                Привычки
-            </div>
-
-            <div class="header-settings">
-                ⚙
-            </div>
-
-        </div>
+</div>
 
 
+<div class="header-calendar">
 
-        <!-- HEADER CALENDAR -->
+<div class="header-month" id="month-name">
+Март
+</div>
 
-        <div class="header-calendar">
+<div class="week-days" id="week-days"></div>
 
-            <div class="header-month" id="month-name">
-                Март
-            </div>
+</div>
 
-            <div class="week-days" id="week-days"></div>
-
-        </div>
-
-
-    </div>
+</div>
 
 
 
-    <!-- ======================================= -->
-    <!-- HABITS LIST                            -->
-    <!-- ======================================= -->
-
-    <div id="habits-list" class="habits"></div>
-
+<div id="habits-list" class="habits"></div>
 
 
 </div>
 
-<!-- ======================================= -->
-<!-- HABIT DETAILS SHEET -->
-<!-- ======================================= -->
 
-<div id="habit-sheet" class="habit-sheet">
-
-    <div class="sheet-content">
-
-        <!-- HANDLE -->
-        <div class="sheet-handle"></div>
-
-        <!-- HEADER -->
-        <div class="sheet-header">
-
-            <div class="sheet-time">
-                5:00
-            </div>
-
-            <div class="sheet-streak">
-                🔥 Стрик: 0 дней
-            </div>
-
-        </div>
-
-        <!-- CHART -->
-        <div class="sheet-chart">
-            <canvas id="habit-big-chart"></canvas>
-        </div>
-
-        <!-- CALENDAR GRID -->
-        <div class="sheet-calendar">
-
-            <!-- просто заглушка квадратов -->
-            <div class="grid">
-                <!-- 30 клеток -->
-                <div class="cell active"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-                <div class="cell"></div>
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="sheet-footer">
-
-            <div class="switch">
-
-                <button class="switch-btn active">
-                    Месяц
-                </button>
-
-                <button class="switch-btn">
-                    Год
-                </button>
-
-            </div>
-
-            <div class="progress">
-                3% выполнено
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- ======================================= -->
-<!-- BOTTOM NAVIGATION                      -->
-<!-- ======================================= -->
 
 <div class="bottom-menu">
 
+<div class="menu-item active">
+<div class="menu-icon">🏃</div>
+<div class="menu-label">Привычки</div>
+</div>
 
+<div class="menu-item">
+<div class="menu-icon">📊</div>
+<div class="menu-label">Статистика</div>
+</div>
 
-    <!-- HABITS -->
+<div class="menu-item">
+<div class="menu-icon">🤝</div>
+<div class="menu-label">Партнерка</div>
+</div>
 
-    <div class="menu-item active">
-
-        <div class="menu-icon">🏃</div>
-
-        <div class="menu-label">
-            Привычки
-        </div>
-
-    </div>
-
-
-
-    <!-- STATISTICS -->
-
-    <div class="menu-item">
-
-        <div class="menu-icon">📊</div>
-
-        <div class="menu-label">
-            Статистика
-        </div>
-
-    </div>
-
-
-
-    <!-- PARTNERS -->
-
-    <div class="menu-item">
-
-        <div class="menu-icon">🤝</div>
-
-        <div class="menu-label">
-            Партнерка
-        </div>
-
-    </div>
-
-
-
-    <!-- LEADERBOARD -->
-
-    <div class="menu-item">
-
-        <div class="menu-icon">🏆</div>
-
-        <div class="menu-label">
-            Рейтинг
-        </div>
-
-    </div>
-
-
+<div class="menu-item">
+<div class="menu-icon">🏆</div>
+<div class="menu-label">Рейтинг</div>
+</div>
 
 </div>
 
 
-
-<!-- ======================================= -->
-<!-- JAVASCRIPT                              -->
-<!-- ======================================= -->
-
 <script type="module" src="js/dashboard.js"></script>
-
-
 
 </body>
 </html>

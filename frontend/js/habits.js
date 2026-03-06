@@ -3,14 +3,14 @@ import {drawChart} from "./charts.js"
 
 
 /* =========================================
-ОТКРЫТИЕ ВЫЕЗЖАЮЩЕГО ОКНА ПРИВЫЧКИ
+ПЕРЕКЛЮЧЕНИЕ БЛОКА ПРИВЫЧКИ
 ========================================= */
 
-function openHabitSheet(){
+function toggleHabit(card){
 
-const sheet=document.getElementById("habit-sheet")
+const details = card.querySelector(".habit-details")
 
-sheet.classList.add("active")
+details.classList.toggle("active")
 
 }
 
@@ -24,13 +24,9 @@ export function renderHabits(habits){
 
 const list=document.getElementById("habits-list")
 
-/* очищаем контейнер */
-
 list.innerHTML=""
 
 
-
-/* если привычек нет */
 
 if(!habits || habits.length===0){
 
@@ -40,8 +36,6 @@ return
 }
 
 
-
-/* создаём карточки привычек */
 
 habits.forEach((habit,i)=>{
 
@@ -53,17 +47,9 @@ card.className="habit-card"
 
 
 
-/* при клике открываем подробное окно */
-
-card.onclick=openHabitSheet
-
-
-
-/* =========================================
-HTML карточки привычки
-========================================= */
-
 card.innerHTML=`
+
+<div class="habit-main">
 
 <div class="habit-info">
 
@@ -79,19 +65,54 @@ card.innerHTML=`
 <canvas id="${chartId}"></canvas>
 </div>
 
+</div>
+
+
+
+<div class="habit-details">
+
+<div class="grid">
+
+<div class="cell active"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+<div class="cell"></div>
+
+</div>
+
+
+<div class="habit-footer">
+
+<div class="switch">
+
+<button class="switch-btn active">Месяц</button>
+<button class="switch-btn">Год</button>
+
+</div>
+
+<div class="progress">
+3% выполнено
+</div>
+
+</div>
+
+</div>
+
 `
 
 
 
-/* добавляем карточку в список */
+card.addEventListener("click",()=>toggleHabit(card))
 
 list.appendChild(card)
-
-
-
-/* =========================================
-РИСУЕМ МИНИ ГРАФИК
-========================================= */
 
 drawChart(chartId,habit.series)
 

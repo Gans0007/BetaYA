@@ -9,26 +9,39 @@ gap:16px;
 }
 
 
+
 /* =========================================
 КАРТОЧКА ПРИВЫЧКИ
 ========================================= */
 
 .habit-card{
+
 background:#1a1a1d;
 border-radius:18px;
+
 padding:16px;
+
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
+
+cursor:pointer;
+
+}
+
+
+
+/* =========================================
+ВЕРХНЯЯ ЧАСТЬ КАРТОЧКИ
+========================================= */
+
+.habit-main{
 
 display:flex;
 justify-content:space-between;
 align-items:center;
 
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 
-/* =========================================
-ИНФОРМАЦИЯ О ПРИВЫЧКЕ
-========================================= */
 
 .habit-info{
 display:flex;
@@ -36,10 +49,14 @@ flex-direction:column;
 gap:6px;
 }
 
+
+
 .habit-name{
 font-size:17px;
 font-weight:600;
 }
+
+
 
 .habit-streak{
 font-size:13px;
@@ -47,16 +64,15 @@ opacity:0.7;
 }
 
 
+
 /* =========================================
-МИНИ ГРАФИК ПРИВЫЧКИ
+ГРАФИК
 ========================================= */
 
 .habit-chart{
 width:120px;
 height:60px;
 }
-
-/* чтобы график занимал весь контейнер */
 
 canvas{
 width:100% !important;
@@ -66,118 +82,60 @@ height:100% !important;
 
 
 /* =========================================
-ВЫЕЗЖАЮЩЕЕ ОКНО ПРИВЫЧКИ (BOTTOM SHEET)
+РАСКРЫВАЮЩИЙСЯ БЛОК
 ========================================= */
 
-.habit-sheet{
+.habit-details{
 
-position:fixed;
+max-height:0;
+overflow:hidden;
 
-left:0;
-right:0;
-bottom:0;
+transition:0.35s ease;
 
-max-height:80vh;
-
-background:#0f1115;
-
-border-radius:24px 24px 0 0;
-
-/* изначально окно спрятано */
-transform:translateY(100%);
-
-transition:0.35s;
-
-z-index:999;
+margin-top:10px;
 
 }
 
-/* когда окно активно — выезжает вверх */
-
-.habit-sheet.active{
-transform:translateY(0);
-}
 
 
+.habit-details.active{
 
-/* =========================================
-СОДЕРЖИМОЕ ВЫЕЗЖАЮЩЕГО ОКНА
-========================================= */
-
-.sheet-content{
-padding:20px;
-}
-
-
-/* маленькая полоска сверху (ручка для свайпа) */
-
-.sheet-handle{
-
-width:40px;
-height:4px;
-
-background:#444;
-
-border-radius:3px;
-
-margin:auto;
-margin-bottom:20px;
+max-height:300px;
 
 }
 
 
 
 /* =========================================
-ЗАГОЛОВОК ОКНА
-========================================= */
-
-.sheet-header{
-margin-bottom:20px;
-}
-
-.sheet-time{
-font-size:28px;
-font-weight:700;
-}
-
-.sheet-streak{
-opacity:0.7;
-margin-top:4px;
-}
-
-
-
-/* =========================================
-БОЛЬШОЙ ГРАФИК ПРИВЫЧКИ
-========================================= */
-
-.sheet-chart{
-height:120px;
-margin-bottom:20px;
-}
-
-
-
-/* =========================================
-СЕТКА ДНЕЙ (КАЛЕНДАРЬ ПРИВЫЧКИ)
+СЕТКА ДНЕЙ
 ========================================= */
 
 .grid{
+
 display:grid;
-grid-template-columns:repeat(15,1fr);
+
+grid-template-columns:repeat(21,1fr);
+
 gap:6px;
+
+margin-top:10px;
+
 }
 
+
+
 .cell{
+
 width:18px;
 height:18px;
 
 background:#2b1d16;
 
 border-radius:4px;
+
 }
 
-/* день выполнен */
+
 
 .cell.active{
 background:#ff9d2f;
@@ -186,28 +144,36 @@ background:#ff9d2f;
 
 
 /* =========================================
-НИЖНЯЯ ЧАСТЬ ОКНА
+НИЖНИЙ БЛОК
 ========================================= */
 
-.sheet-footer{
+.habit-footer{
 
 display:flex;
 justify-content:space-between;
 align-items:center;
 
-margin-top:20px;
+margin-top:14px;
 
 }
 
 
-/* переключатель месяц / год */
+
+/* переключатель */
 
 .switch{
+
 display:flex;
+
 background:#1a1a1d;
+
 border-radius:12px;
+
 overflow:hidden;
+
 }
+
+
 
 .switch-btn{
 
@@ -220,7 +186,7 @@ color:#aaa;
 
 }
 
-/* активная кнопка */
+
 
 .switch-btn.active{
 
@@ -230,7 +196,8 @@ color:#000;
 }
 
 
-/* процент выполнения */
+
+/* процент */
 
 .progress{
 opacity:0.8;
