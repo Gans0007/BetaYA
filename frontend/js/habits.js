@@ -35,13 +35,19 @@ const chartId="chart-"+i
 
 let monthCells=""
 
-const confirmedDays = new Set(
-(habit.days || []).map(d => new Date(d).getDate())
-)
+const confirmedDays = new Set(habit.days || [])
 
 for(let day=1; day<=daysInMonth; day++){
 
-const active = confirmedDays.has(day)
+const date = new Date(
+now.getFullYear(),
+now.getMonth(),
+day
+)
+
+const dateStr = date.toISOString().slice(0,10)
+
+const active = confirmedDays.has(dateStr)
 ? "cell active"
 : "cell"
 
