@@ -47,13 +47,14 @@ now.getMonth(),
 day
 )
 
-const dateStr = date.toISOString().slice(0,10)
+const dateStr =
+date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
 
 const active = confirmedDays.has(dateStr)
 ? "cell active"
 : "cell"
 
-if(active === "cell active"){
+if(active==="cell active"){
 completedMonth++
 }
 
@@ -61,20 +62,20 @@ monthCells += `<div class="${active}"></div>`
 
 }
 
-/* ===== ПРОЦЕНТ ===== */
+/* ===== ПРОЦЕНТ МЕСЯЦ ===== */
 
 let percentMonth = Math.floor(
 (completedMonth / daysInMonth) * 100
 )
 
-percentMonth = Math.max(0, Math.min(100, percentMonth))
+percentMonth = Math.max(0,Math.min(100,percentMonth))
 
 
-/* ===== ГОД ===== */
+/* ===== КВАДРАТЫ ГОДА ===== */
 
 let yearCells=""
 
-const confirmedDaysYear = new Set(habit.days || [])
+let completedYear = 0
 
 for(let i=0;i<daysInYear;i++){
 
@@ -85,17 +86,28 @@ i + 1
 )
 
 const dateStr =
-date.getFullYear() + "-" +
-String(date.getMonth()+1).padStart(2,"0") + "-" +
-String(date.getDate()).padStart(2,"0")
+date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
 
-const active = confirmedDaysYear.has(dateStr)
+const active = confirmedDays.has(dateStr)
 ? "cell active"
 : "cell"
+
+if(active==="cell active"){
+completedYear++
+}
 
 yearCells += `<div class="${active}"></div>`
 
 }
+
+/* ===== ПРОЦЕНТ ГОД ===== */
+
+let percentYear = Math.floor(
+(completedYear / daysInYear) * 100
+)
+
+percentYear = Math.max(0,Math.min(100,percentYear))
+
 
 /* ===== КАРТОЧКА ===== */
 
@@ -167,6 +179,7 @@ const grid = wrap.querySelector(".grid")
 
 const monthBtn = wrap.querySelector(".switch-btn:nth-child(1)")
 const yearBtn = wrap.querySelector(".switch-btn:nth-child(2)")
+const progress = wrap.querySelector(".progress")
 
 monthBtn.onclick=()=>{
 
@@ -175,6 +188,8 @@ yearBtn.classList.remove("active")
 
 grid.classList.remove("year")
 grid.innerHTML=monthCells
+
+progress.innerHTML = percentMonth + "% выполнено"
 
 }
 
@@ -185,6 +200,8 @@ monthBtn.classList.remove("active")
 
 grid.classList.add("year")
 grid.innerHTML=yearCells
+
+progress.innerHTML = percentYear + "% выполнено"
 
 }
 
