@@ -59,8 +59,27 @@ monthCells += `<div class="${active}"></div>`
 
 let yearCells=""
 
+const confirmedDaysYear = new Set(habit.days || [])
+
 for(let i=0;i<daysInYear;i++){
-yearCells+=`<div class="cell"></div>`
+
+const date = new Date(
+now.getFullYear(),
+0,
+i + 1
+)
+
+const dateStr =
+date.getFullYear() + "-" +
+String(date.getMonth()+1).padStart(2,"0") + "-" +
+String(date.getDate()).padStart(2,"0")
+
+const active = confirmedDaysYear.has(dateStr)
+? "cell active"
+: "cell"
+
+yearCells += `<div class="${active}"></div>`
+
 }
 
 /* ===== КАРТОЧКА ===== */
