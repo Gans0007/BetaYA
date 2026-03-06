@@ -35,6 +35,7 @@ async def get_dashboard(request: Request):
         WHERE user_id=$1
         """, user_id)
 
+
         # ОДИН SQL НА ВСЕ ПРИВЫЧКИ
         rows = await conn.fetch("""
 
