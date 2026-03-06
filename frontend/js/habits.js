@@ -1,10 +1,36 @@
 import {drawChart} from "./charts.js"
 
+
+
+/* =========================================
+ОТКРЫТИЕ ВЫЕЗЖАЮЩЕГО ОКНА ПРИВЫЧКИ
+========================================= */
+
+function openHabitSheet(){
+
+const sheet=document.getElementById("habit-sheet")
+
+sheet.classList.add("active")
+
+}
+
+
+
+/* =========================================
+ОТРИСОВКА СПИСКА ПРИВЫЧЕК
+========================================= */
+
 export function renderHabits(habits){
 
 const list=document.getElementById("habits-list")
 
+/* очищаем контейнер */
+
 list.innerHTML=""
+
+
+
+/* если привычек нет */
 
 if(!habits || habits.length===0){
 
@@ -13,6 +39,10 @@ return
 
 }
 
+
+
+/* создаём карточки привычек */
+
 habits.forEach((habit,i)=>{
 
 const chartId="chart-"+i
@@ -20,6 +50,18 @@ const chartId="chart-"+i
 const card=document.createElement("div")
 
 card.className="habit-card"
+
+
+
+/* при клике открываем подробное окно */
+
+card.onclick=openHabitSheet
+
+
+
+/* =========================================
+HTML карточки привычки
+========================================= */
 
 card.innerHTML=`
 
@@ -39,7 +81,17 @@ card.innerHTML=`
 
 `
 
+
+
+/* добавляем карточку в список */
+
 list.appendChild(card)
+
+
+
+/* =========================================
+РИСУЕМ МИНИ ГРАФИК
+========================================= */
 
 drawChart(chartId,habit.series)
 
