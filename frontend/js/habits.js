@@ -37,10 +37,16 @@ return
 
 
 /* =========================================
-ОПРЕДЕЛЯЕМ ДНИ В ТЕКУЩЕМ МЕСЯЦЕ
+ДАТА
 ========================================= */
 
 const now = new Date()
+
+
+
+/* =========================================
+ДНИ В МЕСЯЦЕ
+========================================= */
 
 const daysInMonth = new Date(
 now.getFullYear(),
@@ -50,11 +56,41 @@ now.getMonth()+1,
 
 
 
-let cellsHTML=""
+/* =========================================
+ДНИ В ГОДУ
+========================================= */
+
+const startOfYear = new Date(now.getFullYear(),0,1)
+const endOfYear = new Date(now.getFullYear(),11,31)
+
+const daysInYear =
+Math.floor((endOfYear-startOfYear)/(1000*60*60*24))+1
+
+
+
+/* =========================================
+ГЕНЕРАЦИЯ КВАДРАТОВ МЕСЯЦА
+========================================= */
+
+let monthCellsHTML=""
 
 for(let d=1; d<=daysInMonth; d++){
 
-cellsHTML+=`<div class="cell"></div>`
+monthCellsHTML+=`<div class="cell"></div>`
+
+}
+
+
+
+/* =========================================
+ГЕНЕРАЦИЯ КВАДРАТОВ ГОДА
+========================================= */
+
+let yearCellsHTML=""
+
+for(let d=1; d<=daysInYear; d++){
+
+yearCellsHTML+=`<div class="cell"></div>`
 
 }
 
@@ -96,7 +132,7 @@ card.innerHTML=`
 
 <div class="grid">
 
-${cellsHTML}
+${monthCellsHTML}
 
 </div>
 
@@ -122,11 +158,54 @@ ${cellsHTML}
 
 
 
+/* =========================================
+TOGGLE РАСКРЫТИЯ КАРТОЧКИ
+========================================= */
+
 const main = card.querySelector(".habit-main")
 
 main.addEventListener("click",()=>{
 toggleHabit(card)
 })
+
+
+
+/* =========================================
+ПЕРЕКЛЮЧАТЕЛЬ МЕСЯЦ / ГОД
+========================================= */
+
+const grid = card.querySelector(".grid")
+
+const monthBtn = card.querySelector(".switch-btn:nth-child(1)")
+const yearBtn = card.querySelector(".switch-btn:nth-child(2)")
+
+
+
+monthBtn.addEventListener("click",()=>{
+
+monthBtn.classList.add("active")
+yearBtn.classList.remove("active")
+
+grid.classList.remove("year")
+
+grid.innerHTML = monthCellsHTML
+
+})
+
+
+
+yearBtn.addEventListener("click",()=>{
+
+yearBtn.classList.add("active")
+monthBtn.classList.remove("active")
+
+grid.classList.add("year")
+
+grid.innerHTML = yearCellsHTML
+
+})
+
+
 
 list.appendChild(card)
 
