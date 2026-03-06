@@ -131,7 +131,7 @@ async def get_dashboard(request: Request):
             "id": habit["id"],
             "name": habit["name"],
             "series": series,
-            "streak": streak
+            "streak": streak,
             "days": [d.isoformat() for d in days]
 
         })

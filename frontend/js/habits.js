@@ -26,7 +26,12 @@ const endOfYear = new Date(now.getFullYear(),11,31)
 const daysInYear =
 Math.floor((endOfYear-startOfYear)/(1000*60*60*24))+1
 
-/* ===== КВАДРАТЫ ===== */
+
+habits.forEach((habit,i)=>{
+
+const chartId="chart-"+i
+
+/* ===== КВАДРАТЫ МЕСЯЦА ===== */
 
 let monthCells=""
 
@@ -44,17 +49,15 @@ monthCells += `<div class="${active}"></div>`
 
 }
 
+/* ===== ГОД ===== */
+
 let yearCells=""
 
 for(let i=0;i<daysInYear;i++){
 yearCells+=`<div class="cell"></div>`
 }
 
-/* ===== РЕНДЕР ===== */
-
-habits.forEach((habit,i)=>{
-
-const chartId="chart-"+i
+/* ===== КАРТОЧКА ===== */
 
 const wrap=document.createElement("div")
 wrap.className="habit-wrap"
@@ -115,9 +118,7 @@ ${monthCells}
 const main = wrap.querySelector(".habit-main")
 
 main.addEventListener("click",()=>{
-
 wrap.classList.toggle("active")
-
 })
 
 /* переключатель */
