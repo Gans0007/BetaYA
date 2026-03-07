@@ -193,6 +193,8 @@ gap:12px;
 
 padding-top:6px;
 
+justify-content:space-between;
+
 }
 
 .profile-flag{
@@ -224,5 +226,26 @@ font-weight:700;
 
 font-size:13px;
 opacity:0.6;
+
+}
+
+
+.profile-league{
+
+width:40px;
+height:40px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+.profile-league img{
+
+width:36px;
+height:36px;
+
+object-fit:contain;
 
 }
