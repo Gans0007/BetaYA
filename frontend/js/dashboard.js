@@ -1,5 +1,4 @@
-import {getDashboard} from "./api.js"
-import {renderHabits} from "./habits.js"
+import {loadHabitsDashboard} from "./habits.js"
 import {renderWeek} from "./calendar.js"
 import {initNavigation} from "./navigation.js"
 
@@ -8,15 +7,8 @@ tg.expand()
 
 const initData = tg.initData
 
-async function loadDashboard(){
-
-const data = await getDashboard(initData)
-
-renderHabits(data.habits)
-
-}
-
 renderWeek()
-loadDashboard()
-initNavigation()
 
+loadHabitsDashboard(initData)
+
+initNavigation()

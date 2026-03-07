@@ -227,6 +227,8 @@ export async function loadHabitsDashboard(initData){
 
 const data = await getDashboard(initData)
 
+console.log("API DATA:", data)
+
 /* ======================
 XP BAR
 ====================== */
