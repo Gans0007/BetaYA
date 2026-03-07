@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
+from services.xp_service import LEAGUES
 
 router = APIRouter()
 
@@ -36,7 +37,10 @@ async def get_dashboard(request: Request):
         """, user_id)
 
 
-        # ОДИН SQL НА ВСЕ ПРИВЫЧКИ
+        # =========================
+        # ПОЛУЧАЕМ ПРИВЫЧКИ
+        # =========================
+
         rows = await conn.fetch("""
 
         SELECT
@@ -58,9 +62,9 @@ async def get_dashboard(request: Request):
 
         """, user_id)
 
-    # =========================================
+    # =========================
     # ГРУППИРУЕМ ДАННЫЕ
-    # =========================================
+    # =========================
 
     habits_map = {}
 
@@ -79,14 +83,16 @@ async def get_dashboard(request: Request):
         if r["day"]:
             habits_map[hid]["days"].add(r["day"])
 
-
     habits = []
 
     for habit in habits_map.values():
 
         days = habit["days"]
 
-        # SERIES (+1 / -1)
+        # =========================
+        # SERIES
+        # =========================
+
         value = 0
         series = []
 
@@ -96,13 +102,11 @@ async def get_dashboard(request: Request):
 
             day = (today - timedelta(days=i))
 
-            # если это сегодняшний день
             if day == today:
 
                 if day in days:
                     series.append(value + 1)
                 else:
-                    # сегодня еще не подтверждено → точка 0
                     series.append(value)
 
             else:
@@ -114,7 +118,9 @@ async def get_dashboard(request: Request):
 
                 series.append(value)
 
+        # =========================
         # ACTIVE STREAK
+        # =========================
 
         streak = 0
 
@@ -137,15 +143,47 @@ async def get_dashboard(request: Request):
 
         })
 
+    # =========================
+    # XP PROGRESS
+    # =========================
+
+    xp_user = float(row["xp"]) if row else 0
+    current_league = row["league"] if row else "Безответственный"
+
+    idx = next((i for i,l in enumerate(LEAGUES) if l["name"] == current_league), 0)
+
+    current_xp_need = LEAGUES[idx]["xp"]
+
+    if idx < len(LEAGUES) - 1:
+        next_xp_need = LEAGUES[idx + 1]["xp"]
+    else:
+        next_xp_need = current_xp_need
+
+    xp_progress = xp_user - current_xp_need
+    xp_range = next_xp_need - current_xp_need
+
+    xp_percent = int((xp_progress / xp_range) * 100) if xp_range else 100
+    xp_percent = max(0, min(100, xp_percent))
+
+    # =========================
+    # RETURN
+    # =========================
+
     return {
 
         "streak": row["current_streak"] if row else 0,
-        "xp": float(row["xp"]) if row else 0,
-        "league": row["league"] if row else "Безответственный",
+
+        "xp": xp_user,
+        "league": current_league,
+
+        "xp_current": int(xp_user),
+        "xp_next": int(next_xp_need),
+        "xp_percent": xp_percent,
 
         "habits": habits
 
     }
+
 
 # =========================
 # LEADERBOARD
@@ -170,7 +208,6 @@ async def get_leaderboard(request: Request):
 
     async with pool.acquire() as conn:
 
-        # TOP 10
         rows = await conn.fetch("""
 
         SELECT
@@ -188,7 +225,6 @@ async def get_leaderboard(request: Request):
 
         """)
 
-        # МОЕ МЕСТО
         my = await conn.fetchrow("""
 
         SELECT
@@ -214,11 +250,10 @@ async def get_leaderboard(request: Request):
         })
 
     return {
-
         "leaders": leaders,
-
-        "my_rank": my["last_global_rank"] if my else None,
-        "my_xp": int(my["xp"]) if my else 0,
-        "my_username": my["username"] if my else None
-
+        "me": {
+            "rank": my["last_global_rank"] if my else None,
+            "username": my["username"] if my else "You",
+            "xp": int(my["xp"]) if my else 0
+        }
     }

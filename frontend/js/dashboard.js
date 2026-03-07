@@ -19,3 +19,44 @@ renderHabits(data.habits)
 renderWeek()
 loadDashboard()
 initNavigation()
+
+/* =========================
+LOAD DASHBOARD
+========================= */
+
+export async function loadHabitsDashboard(initData){
+
+const data = await getDashboard(initData)
+
+/* ======================
+XP BAR
+====================== */
+
+const xpText = document.getElementById("xp-text")
+const xpFill = document.getElementById("xp-fill")
+
+if(xpText && xpFill){
+
+xpText.innerText = data.xp_current + " / " + data.xp_next
+
+xpFill.style.width = data.xp_percent + "%"
+
+}
+
+/* ======================
+LEAGUE
+====================== */
+
+const leagueText = document.getElementById("league-name")
+
+if(leagueText){
+leagueText.innerText = data.league
+}
+
+/* ======================
+HABITS
+====================== */
+
+renderHabits(data.habits)
+
+}
