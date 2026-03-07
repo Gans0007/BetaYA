@@ -32,7 +32,7 @@ async def get_dashboard(request: Request):
         COALESCE(s.current_streak,0) as current_streak,
         COALESCE(s.xp,0) as xp,
         COALESCE(s.league,'Безответственный') as league,
-        COALESCE(u.nickname,'Player') as nickname
+        COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
         WHERE s.user_id=$1
