@@ -232,19 +232,29 @@ opacity:0.6;
 
 .profile-league{
 
-width:40px;
-height:40px;
-
 display:flex;
 align-items:center;
-justify-content:center;
+gap:8px;
 
 }
 
+/* текст лиги */
+
+.league-text{
+
+font-size:14px;
+font-weight:600;
+
+color:#e8c66a;
+
+}
+
+/* иконка */
+
 .profile-league img{
 
-width:36px;
-height:36px;
+width:48px;
+height:48px;
 
 object-fit:contain;
 
