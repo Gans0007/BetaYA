@@ -26,14 +26,16 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
 
-        # USER STATS
+        # USER STATS + NICKNAME
         row = await conn.fetchrow("""
         SELECT
-        COALESCE(current_streak,0) as current_streak,
-        COALESCE(xp,0) as xp,
-        COALESCE(league,'Безответственный') as league
-        FROM user_stats
-        WHERE user_id=$1
+        COALESCE(s.current_streak,0) as current_streak,
+        COALESCE(s.xp,0) as xp,
+        COALESCE(s.league,'Безответственный') as league,
+        COALESCE(u.nickname,'Player') as nickname
+        FROM user_stats s
+        JOIN users u ON u.user_id = s.user_id
+        WHERE s.user_id=$1
         """, user_id)
 
 
@@ -89,10 +91,6 @@ async def get_dashboard(request: Request):
 
         days = habit["days"]
 
-        # =========================
-        # SERIES
-        # =========================
-
         value = 0
         series = []
 
@@ -117,10 +115,6 @@ async def get_dashboard(request: Request):
                     value -= 1
 
                 series.append(value)
-
-        # =========================
-        # ACTIVE STREAK
-        # =========================
 
         streak = 0
 
@@ -170,6 +164,8 @@ async def get_dashboard(request: Request):
     # =========================
 
     return {
+
+        "nickname": row["nickname"] if row else "Player",
 
         "streak": row["current_streak"] if row else 0,
 

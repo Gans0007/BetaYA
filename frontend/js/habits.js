@@ -243,6 +243,16 @@ xpFill.style.width = data.xp_percent + "%"
 }
 
 /* ======================
+PLAYER NAME
+====================== */
+
+const playerName = document.getElementById("player-name")
+
+if(playerName){
+playerName.innerText = data.nickname
+}
+
+/* ======================
 LEAGUE
 ====================== */
 
