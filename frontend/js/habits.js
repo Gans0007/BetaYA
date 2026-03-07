@@ -255,6 +255,20 @@ playerName.innerText = data.nickname
 }
 
 /* ======================
+PLAYER AVATAR
+====================== */
+
+const avatar = document.getElementById("player-avatar")
+
+const tg = window.Telegram.WebApp
+
+if(avatar && tg.initDataUnsafe?.user?.photo_url){
+
+avatar.src = tg.initDataUnsafe.user.photo_url
+
+}
+
+/* ======================
 LEAGUE
 ====================== */
 
