@@ -18,18 +18,19 @@ height:100vh;
 display:flex;
 flex-direction:column;
 
-padding-bottom:72px; /* место под навигацию */
+padding-bottom:72px;
 box-sizing:border-box;
 }
 
-/* страницы */
-#dashboard-page,
-#leaderboard-page,
-#chat-page{
+/* =========================
+PAGES
+========================= */
+
+.page{
 
 flex:1;
 
-display:flex;
+display:none;
 
 flex-direction:column;
 
@@ -37,6 +38,10 @@ height:100%;
 
 overflow:hidden;
 
+}
+
+.page.active{
+display:flex;
 }
 
 /* =========================

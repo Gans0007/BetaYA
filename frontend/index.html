@@ -28,7 +28,7 @@
 DASHBOARD PAGE
 ====================== -->
 
-<div id="dashboard-page">
+<div id="dashboard-page" class="page active">
 
 <div class="page-content">
 
@@ -103,11 +103,12 @@ DASHBOARD PAGE
 
 </div>
 
+
 <!-- ======================
 LEADERBOARD PAGE
 ====================== -->
 
-<div id="leaderboard-page" style="display:none">
+<div id="leaderboard-page" class="page">
 
 <div class="page-content">
 
@@ -126,7 +127,7 @@ LEADERBOARD PAGE
 CHAT PAGE
 ====================== -->
 
-<div id="chat-page" style="display:none">
+<div id="chat-page" class="page">
 
 <div class="chat-container">
 
@@ -178,7 +179,8 @@ CHAT PAGE
 
 </div>
 
-</div> <!-- container -->
+</div>
+
 
 <!-- ======================
 BOTTOM NAVIGATION
@@ -186,17 +188,17 @@ BOTTOM NAVIGATION
 
 <div class="bottom-nav">
 
-<div class="nav-item active" data-page="dashboard" onclick="openDashboard()">
+<div class="nav-item active" data-page="dashboard">
 <img src="img/nav/habits.png" class="nav-icon">
 <span class="nav-label">Привычки</span>
 </div>
 
-<div class="nav-item" data-page="chat" onclick="openChat()">
+<div class="nav-item" data-page="chat">
 <img src="img/nav/chat.png" class="nav-icon">
 <span class="nav-label">Общение</span>
 </div>
 
-<div class="nav-item" data-page="leaderboard" onclick="openLeaderboard()">
+<div class="nav-item" data-page="leaderboard">
 <img src="img/nav/leaderboard.png" class="nav-icon">
 <span class="nav-label">Рейтинг</span>
 </div>
@@ -218,42 +220,19 @@ SCRIPTS
 const tg = window.Telegram.WebApp
 tg.ready()
 
-const initData = tg.initData
-window.initData = initData
+window.initData = tg.initData
 
 </script>
 
 <script type="module" src="js/dashboard.js"></script>
 <script src="js/leaderboard.js"></script>
-<script src="js/navigation.js"></script>
+<script type="module" src="js/navigation.js"></script>
 
-<script>
+<script type="module">
 
-function openLeaderboard(){
+import { initNavigation } from "./js/navigation.js"
 
-document.getElementById("dashboard-page").style.display="none"
-document.getElementById("leaderboard-page").style.display="block"
-document.getElementById("chat-page").style.display="none"
-
-loadLeaderboard()
-
-}
-
-function openDashboard(){
-
-document.getElementById("dashboard-page").style.display="block"
-document.getElementById("leaderboard-page").style.display="none"
-document.getElementById("chat-page").style.display="none"
-
-}
-
-function openChat(){
-
-document.getElementById("dashboard-page").style.display="none"
-document.getElementById("leaderboard-page").style.display="none"
-document.getElementById("chat-page").style.display="block"
-
-}
+initNavigation()
 
 </script>
 
