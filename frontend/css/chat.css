@@ -67,6 +67,8 @@ flex:1;
 
 display:flex;
 flex-direction:column;
+
+min-height:0;
 }
 
 /* title */
@@ -105,6 +107,10 @@ overflow-y:auto;
 display:flex;
 flex-direction:column;
 gap:12px;
+
+min-height:0;
+
+scroll-behavior:smooth;
 }
 
 /* friend card */
@@ -117,6 +123,12 @@ border-radius:14px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+
+transition:0.15s;
+}
+
+.friend-card:active{
+transform:scale(0.97);
 }
 
 .friend-left{
@@ -156,7 +168,7 @@ width:22px;
 /* ===== ADD FRIEND ===== */
 
 .add-friend{
-margin-top:auto;
+flex-shrink:0;
 text-align:center;
 padding-top:10px;
 }
@@ -170,4 +182,23 @@ font-weight:600;
 color:white;
 font-size:16px;
 cursor:pointer;
+}
+
+/* ===== GAME STYLE SCROLLBAR ===== */
+
+.friends-list::-webkit-scrollbar{
+width:4px;
+}
+
+.friends-list::-webkit-scrollbar-track{
+background:transparent;
+}
+
+.friends-list::-webkit-scrollbar-thumb{
+background:#2c2c3a;
+border-radius:10px;
+}
+
+.friends-list::-webkit-scrollbar-thumb:hover{
+background:#3b3b52;
 }
