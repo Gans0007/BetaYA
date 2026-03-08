@@ -26,79 +26,98 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
 
-        # USER STATS + NICKNAME
+        # USER DATA
         row = await conn.fetchrow("""
         SELECT
-        COALESCE(s.current_streak,0) as current_streak,
-        COALESCE(s.xp,0) as xp,
-        COALESCE(s.league,'Безответственный') as league,
-        COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
+            COALESCE(s.current_streak,0) as current_streak,
+            COALESCE(s.xp,0) as xp,
+            COALESCE(s.league,'Безответственный') as league,
+            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
         WHERE s.user_id=$1
         """, user_id)
 
+        # HABITS
+        habits_rows = await conn.fetch("""
+        SELECT id, name
+        FROM habits
+        WHERE user_id=$1
+        AND is_active=true
+        ORDER BY id
+        """, user_id)
 
-        # =========================
-        # ПОЛУЧАЕМ ПРИВЫЧКИ
-        # =========================
+        # CONFIRMATIONS (30 дней)
+        confirmations_rows = await conn.fetch("""
+        SELECT habit_id, DATE(datetime) as day
+        FROM confirmations
+        WHERE user_id=$1
+        AND datetime >= NOW() - INTERVAL '30 days'
+        """, user_id)
 
-        rows = await conn.fetch("""
-
-        SELECT
-            h.id,
-            h.name,
-            DATE(c.datetime) as day
-
-        FROM habits h
-
-        LEFT JOIN confirmations c
-            ON c.habit_id = h.id
-            AND c.user_id = h.user_id
-            AND c.datetime >= NOW() - INTERVAL '30 days'
-
-        WHERE h.user_id = $1
-        AND h.is_active = true
-
-        ORDER BY h.id, day
-
+        # STREAK SQL
+        streak_rows = await conn.fetch("""
+        SELECT habit_id,
+        COUNT(*) AS streak
+        FROM (
+            SELECT habit_id,
+                   DATE(datetime) as day,
+                   DATE(datetime) - INTERVAL '1 day' *
+                   ROW_NUMBER() OVER (
+                       PARTITION BY habit_id
+                       ORDER BY DATE(datetime) DESC
+                   ) as grp
+            FROM confirmations
+            WHERE user_id=$1
+            GROUP BY habit_id, DATE(datetime)
+        ) t
+        WHERE day >= CURRENT_DATE - INTERVAL '365 days'
+        GROUP BY habit_id, grp
+        HAVING MAX(day) = CURRENT_DATE
         """, user_id)
 
     # =========================
-    # ГРУППИРУЕМ ДАННЫЕ
+    # confirmations map
     # =========================
 
-    habits_map = {}
+    confirmations = {}
 
-    for r in rows:
+    for r in confirmations_rows:
 
-        hid = r["id"]
+        hid = r["habit_id"]
 
-        if hid not in habits_map:
+        if hid not in confirmations:
+            confirmations[hid] = set()
 
-            habits_map[hid] = {
-                "id": hid,
-                "name": r["name"],
-                "days": set()
-            }
+        confirmations[hid].add(r["day"])
 
-        if r["day"]:
-            habits_map[hid]["days"].add(r["day"])
+    # =========================
+    # streak map
+    # =========================
+
+    streak_map = {r["habit_id"]: r["streak"] for r in streak_rows}
+
+    # =========================
+    # habits
+    # =========================
 
     habits = []
 
-    for habit in habits_map.values():
+    today = datetime.utcnow().date()
 
-        days = habit["days"]
+    for h in habits_rows:
+
+        hid = h["id"]
+        name = h["name"]
+
+        days = confirmations.get(hid, set())
 
         value = 0
         series = []
 
-        today = datetime.utcnow().date()
-
         for i in range(4, -1, -1):
 
-            day = (today - timedelta(days=i))
+            day = today - timedelta(days=i)
 
             if day == today:
 
@@ -116,29 +135,18 @@ async def get_dashboard(request: Request):
 
                 series.append(value)
 
-        streak = 0
-
-        for i in range(365):
-
-            day = (datetime.utcnow() - timedelta(days=i)).date()
-
-            if day in days:
-                streak += 1
-            else:
-                break
-
         habits.append({
 
-            "id": habit["id"],
-            "name": habit["name"],
+            "id": hid,
+            "name": name,
             "series": series,
-            "streak": streak,
+            "streak": streak_map.get(hid, 0),
             "days": [d.isoformat() for d in days]
 
         })
 
     # =========================
-    # XP PROGRESS
+    # XP
     # =========================
 
     xp_user = float(row["xp"]) if row else 0
@@ -159,14 +167,9 @@ async def get_dashboard(request: Request):
     xp_percent = int((xp_progress / xp_range) * 100) if xp_range else 100
     xp_percent = max(0, min(100, xp_percent))
 
-    # =========================
-    # RETURN
-    # =========================
-
     return {
 
         "nickname": row["nickname"] if row else "Player",
-
         "streak": row["current_streak"] if row else 0,
 
         "xp": xp_user,
