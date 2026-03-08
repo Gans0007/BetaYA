@@ -3,10 +3,27 @@ background:#0b0b0c;
 color:#fff;
 font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
 margin:0;
+height:100vh;
 }
+
+/* главный контейнер */
 
 .container{
 max-width:420px;
 margin:auto;
-padding:20px;
+
+height:100vh;
+
+display:flex;
+flex-direction:column;
+}
+
+/* страницы */
+
+#dashboard-page,
+#leaderboard-page,
+#chat-page{
+flex:1;
+display:flex;
+flex-direction:column;
 }

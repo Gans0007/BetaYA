@@ -2,14 +2,7 @@ body{
 margin:0;
 }
 
-.chat-container{
-padding:16px;
-padding-top:8px;
-display:flex;
-flex-direction:column;
-height:100%;
-gap:12px;
-}
+/* PAGE */
 
 #chat-page{
 height:100vh;
@@ -17,28 +10,29 @@ display:flex;
 flex-direction:column;
 }
 
-.chat-main{
-background:rgba(10,15,35,0.9);
-border-radius:18px;
-padding:18px;
+/* container */
 
+.chat-container{
 flex:1;
-
 display:flex;
 flex-direction:column;
+padding:14px;
+gap:12px;
 }
 
+/* ===== CLAN BLOCK ===== */
+
 .clan-block{
-background:rgba(15,20,40,0.7);
+background:rgba(15,20,40,0.85);
 border-radius:18px;
-padding:18px;
-margin-bottom:20px;
+padding:14px;
+flex-shrink:0;
 }
 
 .clan-title{
 font-size:20px;
 font-weight:600;
-margin-bottom:10px;
+margin-bottom:6px;
 }
 
 .clan-row{
@@ -59,23 +53,42 @@ padding:10px 18px;
 border-radius:10px;
 color:white;
 font-weight:600;
+cursor:pointer;
 }
+
+/* ===== CHAT MAIN BLOCK ===== */
+
+.chat-main{
+background:rgba(10,15,35,0.95);
+border-radius:20px;
+padding:18px;
+
+flex:1;
+
+display:flex;
+flex-direction:column;
+}
+
+/* title */
 
 .chat-title{
 text-align:center;
 font-size:22px;
-margin:20px 0;
+margin-bottom:10px;
 }
+
+/* tabs */
 
 .chat-tabs{
 display:flex;
 justify-content:center;
 gap:30px;
-margin-bottom:20px;
+margin-bottom:10px;
 }
 
 .chat-tab{
-opacity:0.6;
+opacity:0.5;
+font-size:16px;
 }
 
 .chat-tab.active{
@@ -83,16 +96,24 @@ opacity:1;
 font-weight:600;
 }
 
+/* ===== FRIEND LIST ===== */
+
 .friends-list{
+flex:1;
+overflow-y:auto;
+
 display:flex;
 flex-direction:column;
 gap:12px;
 }
 
+/* friend card */
+
 .friend-card{
-background:rgba(20,25,45,0.8);
-padding:12px;
+background:rgba(20,25,45,0.85);
+padding:14px;
 border-radius:14px;
+
 display:flex;
 justify-content:space-between;
 align-items:center;
@@ -108,6 +129,7 @@ gap:12px;
 width:48px;
 height:48px;
 border-radius:50%;
+object-fit:cover;
 }
 
 .friend-name{
@@ -119,6 +141,8 @@ font-size:13px;
 color:#9aa0b5;
 }
 
+/* right */
+
 .friend-right{
 display:flex;
 align-items:center;
@@ -129,17 +153,21 @@ gap:6px;
 width:22px;
 }
 
+/* ===== ADD FRIEND ===== */
+
 .add-friend{
-margin-top:30px;
+margin-top:auto;
 text-align:center;
+padding-top:10px;
 }
 
 .add-friend-btn{
 background:linear-gradient(180deg,#f7b64d,#c27a1a);
 border:none;
 padding:14px 26px;
-border-radius:12px;
+border-radius:14px;
 font-weight:600;
 color:white;
 font-size:16px;
+cursor:pointer;
 }
