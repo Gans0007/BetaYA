@@ -3,7 +3,7 @@ margin:0;
 }
 
 /* ======================================
-PAGE
+CHAT PAGE (экран фиксирован)
 ====================================== */
 
 #chat-page{
@@ -11,6 +11,7 @@ flex:1;
 display:flex;
 flex-direction:column;
 height:100%;
+overflow:hidden; /* запрещаем скролл всей страницы */
 }
 
 /* ======================================
@@ -27,11 +28,13 @@ flex-direction:column;
 padding:14px;
 gap:12px;
 
+overflow:hidden; /* фиксируем экран */
+
 min-height:0;
 }
 
 /* ======================================
-CLAN BLOCK
+CLAN BLOCK (фиксирован)
 ====================================== */
 
 .clan-block{
@@ -42,7 +45,7 @@ border-radius:18px;
 
 padding:14px;
 
-flex-shrink:0;
+flex-shrink:0; /* никогда не сжимается */
 
 }
 
@@ -82,7 +85,7 @@ cursor:pointer;
 }
 
 /* ======================================
-CHAT MAIN
+MAIN CHAT BLOCK
 ====================================== */
 
 .chat-main{
@@ -93,10 +96,12 @@ border-radius:20px;
 
 padding:18px;
 
-flex:1;
+flex:1; /* занимает всё оставшееся пространство */
 
 display:flex;
 flex-direction:column;
+
+overflow:hidden;
 
 min-height:0;
 
@@ -139,9 +144,9 @@ FRIENDS LIST
 
 .friends-list{
 
-flex:1;
+flex:1; /* занимает всё пространство */
 
-overflow-y:auto;
+overflow-y:auto; /* скролл только здесь */
 
 display:flex;
 flex-direction:column;
@@ -154,12 +159,11 @@ padding-right:4px;
 
 }
 
-/* когда друзей нет — блок остаётся той же высоты */
+/* если друзей нет — блок всё равно остаётся того же размера */
 
 .friends-list:empty::after{
 content:"";
-display:block;
-height:100%;
+flex:1;
 }
 
 /* ======================================
@@ -225,7 +229,7 @@ width:22px;
 }
 
 /* ======================================
-ADD FRIEND BUTTON
+ADD FRIEND BUTTON (фиксированный)
 ====================================== */
 
 .add-friend{
