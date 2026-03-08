@@ -40,18 +40,12 @@ box-shadow:0 10px 30px rgba(0,0,0,0.4);
 .clan-title{
 font-size:17px;
 font-weight:600;
-
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+margin-bottom:6px;
 }
 
 .clan-sub{
 color:#9aa0b5;
-font-size:13px;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+font-size:12px;
 }
 
 .clan-row{
