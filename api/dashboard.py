@@ -26,7 +26,10 @@ async def get_dashboard(request: Request):
 
     async with pool.acquire() as conn:
 
+        # =========================
         # USER DATA
+        # =========================
+
         row = await conn.fetchrow("""
         SELECT
             COALESCE(s.current_streak,0) as current_streak,
@@ -38,7 +41,10 @@ async def get_dashboard(request: Request):
         WHERE s.user_id=$1
         """, user_id)
 
+        # =========================
         # HABITS
+        # =========================
+
         habits_rows = await conn.fetch("""
         SELECT id, name
         FROM habits
@@ -47,7 +53,10 @@ async def get_dashboard(request: Request):
         ORDER BY id
         """, user_id)
 
-        # CONFIRMATIONS (30 дней)
+        # =========================
+        # CONFIRMATIONS
+        # =========================
+
         confirmations_rows = await conn.fetch("""
         SELECT habit_id, DATE(datetime) as day
         FROM confirmations
@@ -55,7 +64,10 @@ async def get_dashboard(request: Request):
         AND datetime >= NOW() - INTERVAL '30 days'
         """, user_id)
 
-        # STREAK SQL
+        # =========================
+        # STREAK
+        # =========================
+
         streak_rows = await conn.fetch("""
         SELECT habit_id,
         COUNT(*) AS streak
@@ -74,6 +86,27 @@ async def get_dashboard(request: Request):
         WHERE day >= CURRENT_DATE - INTERVAL '365 days'
         GROUP BY habit_id, grp
         HAVING MAX(day) = CURRENT_DATE
+        """, user_id)
+
+        # =========================
+        # REFERRALS
+        # =========================
+
+        ref_rows = await conn.fetch("""
+
+        SELECT
+            u.user_id,
+            COALESCE(u.username, u.first_name, 'User') as name,
+            COALESCE(s.xp,0) as xp
+
+        FROM referrals r
+        JOIN users u ON u.user_id = r.user_id
+        LEFT JOIN user_stats s ON s.user_id = u.user_id
+
+        WHERE r.affiliate_id=$1
+
+        ORDER BY s.xp DESC
+
         """, user_id)
 
     # =========================
@@ -146,6 +179,20 @@ async def get_dashboard(request: Request):
         })
 
     # =========================
+    # referrals
+    # =========================
+
+    referrals = []
+
+    for r in ref_rows:
+
+        referrals.append({
+            "user_id": r["user_id"],
+            "name": r["name"],
+            "xp": int(r["xp"])
+        })
+
+    # =========================
     # XP
     # =========================
 
@@ -179,10 +226,10 @@ async def get_dashboard(request: Request):
         "xp_next": int(next_xp_need),
         "xp_percent": xp_percent,
 
-        "habits": habits
+        "habits": habits,
+        "referrals": referrals
 
     }
-
 
 # =========================
 # LEADERBOARD

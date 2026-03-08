@@ -49,3 +49,57 @@ ${user.first_name || "You"} (Вы)
 list.prepend(card)
 
 }
+
+/* реферал */
+export function renderReferrals(referrals){
+
+const list = document.querySelector(".friends-list")
+
+if(!list) return
+
+/* очистка старых */
+
+const old = document.querySelectorAll(".friend-card.ref")
+old.forEach(el=>el.remove())
+
+referrals.forEach(user=>{
+
+const card=document.createElement("div")
+
+card.className="friend-card ref"
+
+card.innerHTML=`
+
+<div class="friend-left">
+
+<img src="img/default-avatar.png" class="friend-avatar">
+
+<div>
+
+<div class="friend-name">
+${user.name}
+</div>
+
+<div class="friend-status">
+Друг
+</div>
+
+</div>
+
+</div>
+
+<div class="friend-right">
+
+<div class="friend-cups">
+🏆 ${user.xp}
+</div>
+
+</div>
+
+`
+
+list.appendChild(card)
+
+})
+
+}

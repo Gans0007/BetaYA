@@ -1,6 +1,7 @@
 import {drawChart} from "./charts.js"
 import {getDashboard} from "./api.js"
 import {renderChatUser} from "./chat.js"
+import {renderReferrals} from "./chat.js"
 
 export function renderHabits(habits){
 
@@ -231,6 +232,10 @@ const data = await getDashboard(initData)
 console.log("API DATA:", data)
 
 renderChatUser(data.xp_current)
+
+if(data.referrals){
+renderReferrals(data.referrals)
+}
 
 /* ======================
 XP BAR
