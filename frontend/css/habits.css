@@ -1,229 +1,280 @@
-/* =========================
-СПИСОК
-========================= */
+body{
+margin:0;
+}
 
-.habits{
+/* ======================================
+PAGE
+====================================== */
+
+#chat-page{
+flex:1;
 display:flex;
 flex-direction:column;
-gap:18px;
+height:100%;
 }
 
-/* =========================
-КАРТОЧКА
-========================= */
+/* ======================================
+CONTAINER
+====================================== */
 
-.habit-card{
+.chat-container{
 
-background:#1a1a1d;
+flex:1;
+
+display:flex;
+flex-direction:column;
+
+padding:14px;
+gap:12px;
+
+min-height:0;
+}
+
+/* ======================================
+CLAN BLOCK
+====================================== */
+
+.clan-block{
+
+background:rgba(15,20,40,0.85);
+
 border-radius:18px;
-padding:16px;
 
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
+padding:14px;
+
+flex-shrink:0;
 
 }
 
-/* =========================
-ВЕРХ
-========================= */
+.clan-title{
+font-size:20px;
+font-weight:600;
+margin-bottom:6px;
+}
 
-.habit-main{
+.clan-row{
 display:flex;
 justify-content:space-between;
 align-items:center;
-cursor:pointer;
 }
 
-.habit-info{
+.clan-sub{
+color:#9aa0b5;
+font-size:14px;
+}
+
+.clan-btn{
+
+background:linear-gradient(180deg,#f7b64d,#c27a1a);
+
+border:none;
+
+padding:10px 18px;
+
+border-radius:10px;
+
+color:white;
+
+font-weight:600;
+
+cursor:pointer;
+
+}
+
+/* ======================================
+CHAT MAIN
+====================================== */
+
+.chat-main{
+
+background:rgba(10,15,35,0.95);
+
+border-radius:20px;
+
+padding:18px;
+
+flex:1;
+
 display:flex;
 flex-direction:column;
-gap:6px;
+
+min-height:0;
+
 }
 
-.habit-name{
-font-size:17px;
+/* ======================================
+TITLE
+====================================== */
+
+.chat-title{
+text-align:center;
+font-size:22px;
+margin-bottom:10px;
+}
+
+/* ======================================
+TABS
+====================================== */
+
+.chat-tabs{
+display:flex;
+justify-content:center;
+gap:30px;
+margin-bottom:10px;
+}
+
+.chat-tab{
+opacity:0.5;
+font-size:16px;
+}
+
+.chat-tab.active{
+opacity:1;
 font-weight:600;
 }
 
-.habit-streak{
-font-size:13px;
-opacity:0.7;
-}
+/* ======================================
+FRIENDS LIST
+====================================== */
 
-/* =========================
-ГРАФИК
-========================= */
+.friends-list{
 
-.habit-chart{
-width:120px;
-height:60px;
-}
+flex:1;
 
-canvas{
-width:100%!important;
-height:100%!important;
-}
+overflow-y:auto;
 
-/* =========================
-OVERLAY БЛОК
-========================= */
+display:flex;
+flex-direction:column;
 
-.habit-overlay{
+gap:12px;
 
-max-height:0;
-overflow:hidden;
+min-height:0;
 
-opacity:0;
-transform:translateY(-10px);
-
-transition:
-
-max-height .45s ease,
-opacity .25s ease,
-transform .35s ease;
+padding-right:4px;
 
 }
 
-/* активное состояние */
+/* когда друзей нет — блок остаётся той же высоты */
 
-.habit-wrap.active .habit-overlay{
-
-max-height:500px;
-
-opacity:1;
-transform:translateY(0);
-
-margin-top:10px;
-
+.friends-list:empty::after{
+content:"";
+display:block;
+height:100%;
 }
 
-.habit-wrap{
-position:relative;
-margin-bottom:12px;
-}
+/* ======================================
+FRIEND CARD
+====================================== */
 
-/* =========================
-СЕТКА
-========================= */
+.friend-card{
 
-.grid{
+background:rgba(20,25,45,0.85);
 
-display:grid;
-grid-template-columns:repeat(31,1fr);
-gap:2px;
+padding:14px;
 
-padding:12px;
-
-background:rgba(255,255,255,0.02);
 border-radius:14px;
 
-}
+display:flex;
 
-/* =========================
-ГОДОВОЙ КАЛЕНДАРЬ
-========================= */
+justify-content:space-between;
 
-.grid.year{
+align-items:center;
 
-grid-template-columns:repeat(53,10px);
-
-overflow-x:auto;
-overflow-y:hidden;
-
-padding-bottom:14px; /* отступ от клеток */
-
-scrollbar-width:thin;
-scrollbar-color:#ffffff #0f0f10;
+transition:0.15s;
 
 }
 
-
-/* ===== ТОНКИЙ ПРЕМИУМ СКРОЛЛ ===== */
-
-.grid.year::-webkit-scrollbar{
-height:3px;
+.friend-card:active{
+transform:scale(0.97);
 }
 
-.grid.year::-webkit-scrollbar-track{
+.friend-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.friend-avatar{
+width:48px;
+height:48px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.friend-name{
+font-weight:600;
+}
+
+.friend-status{
+font-size:13px;
+color:#9aa0b5;
+}
+
+/* ======================================
+RIGHT SIDE
+====================================== */
+
+.friend-right{
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+.cup-icon{
+width:22px;
+}
+
+/* ======================================
+ADD FRIEND BUTTON
+====================================== */
+
+.add-friend{
+
+flex-shrink:0;
+
+text-align:center;
+
+padding-top:12px;
+
+}
+
+.add-friend-btn{
+
+background:linear-gradient(180deg,#f7b64d,#c27a1a);
+
+border:none;
+
+padding:14px 26px;
+
+border-radius:14px;
+
+font-weight:600;
+
+color:white;
+
+font-size:16px;
+
+cursor:pointer;
+
+}
+
+/* ======================================
+GAME STYLE SCROLLBAR
+====================================== */
+
+.friends-list::-webkit-scrollbar{
+width:4px;
+}
+
+.friends-list::-webkit-scrollbar-track{
 background:transparent;
 }
 
-.grid.year::-webkit-scrollbar-thumb{
-
-background:#ffffff;
+.friends-list::-webkit-scrollbar-thumb{
+background:#2c2c3a;
 border-radius:10px;
-
 }
 
-/* =========================
-КЛЕТКИ
-========================= */
-
-.cell{
-
-width:100%;
-aspect-ratio:1;
-
-background:#2b1d16;
-border-radius:3px;
-
-}
-
-.cell.active{
-background:#22c55e;
-}
-
-.grid.year .cell{
-
-width:8px;
-height:8px;
-
-border-radius:2px;
-
-}
-
-/* =========================
-НИЗ
-========================= */
-
-.habit-footer{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-margin-top:12px;
-
-}
-
-/* переключатель */
-
-.switch{
-
-display:flex;
-
-background:#1a1a1d;
-border-radius:12px;
-overflow:hidden;
-
-}
-
-.switch-btn{
-
-border:none;
-background:none;
-
-padding:8px 14px;
-color:#aaa;
-
-}
-
-.switch-btn.active{
-
-background:#e8c66a;
-color:#000;
-
-}
-
-.progress{
-opacity:0.8;
+.friends-list::-webkit-scrollbar-thumb:hover{
+background:#3b3b52;
 }
