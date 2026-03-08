@@ -50,8 +50,8 @@ ICON
 
 .nav-icon{
 
-width:26px;
-height:26px;
+width:36px;
+height:36px;
 
 opacity:0.7;
 
@@ -87,8 +87,8 @@ flex:1.6;
 
 .nav-item.active .nav-icon{
 
-width:36px;
-height:36px;
+width:46px;
+height:46px;
 
 opacity:1;
 
