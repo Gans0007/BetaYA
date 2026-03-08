@@ -1,14 +1,16 @@
-export function renderChatUser(){
+export function renderChatUser(xp){
 
 const tg = window.Telegram.WebApp
-
 const user = tg.initDataUnsafe?.user
 
 if(!user) return
 
 const list = document.querySelector(".friends-list")
-
 if(!list) return
+
+/* чтобы не дублировалось */
+
+if(document.querySelector(".friend-card.me")) return
 
 const card = document.createElement("div")
 card.className = "friend-card me"
@@ -38,7 +40,7 @@ ${user.first_name || "You"} (Вы)
 <img src="img/cup.png" class="cup-icon">
 
 <div class="friend-cups">
-0
+${xp || 0}
 </div>
 
 </div>
