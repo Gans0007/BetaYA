@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+export function initNavigation(){
 
 const items = document.querySelectorAll(".nav-item")
 
@@ -14,4 +14,4 @@ item.classList.add("active")
 
 })
 
-})
+}
