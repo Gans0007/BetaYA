@@ -1,35 +1,38 @@
 export function initNavigation(){
 
 const items = document.querySelectorAll(".nav-item")
-const pages = document.querySelectorAll(".page")
+
+/* кешируем страницы один раз */
+
+const pages = {
+dashboard: document.getElementById("dashboard-page"),
+chat: document.getElementById("chat-page"),
+leaderboard: document.getElementById("leaderboard-page")
+}
+
+let activePage = pages.dashboard
 
 items.forEach(item => {
 
 item.addEventListener("click", () => {
 
-const page = item.dataset.page
+const pageName = item.dataset.page
 
-/* активная иконка */
+/* активная кнопка */
 
 items.forEach(i => i.classList.remove("active"))
 item.classList.add("active")
 
 /* переключение страниц */
 
-pages.forEach(p => p.classList.remove("active"))
+if(activePage){
+activePage.classList.remove("active")
+}
 
-const activePage = document.getElementById(page + "-page")
+activePage = pages[pageName]
 
 if(activePage){
 activePage.classList.add("active")
-}
-
-/* фикс скролла */
-
-const scroll = activePage?.querySelector(".page-content")
-
-if(scroll){
-scroll.scrollTop = 0
 }
 
 })
