@@ -22,7 +22,7 @@ padding-bottom:72px;
 
 box-sizing:border-box;
 
-position:relative;   /* ДОБАВИТЬ */
+overflow:hidden;   /* ДОБАВИТЬ */
 }
 
 /* =========================
@@ -41,15 +41,18 @@ height:100%;
 
 overflow:hidden;
 
+visibility:hidden;
+
 }
 
 .page.active{
+
 display:flex;
+
+visibility:visible;
+
 }
 
-.page.active{
-display:flex;
-}
 
 /* =========================
 SCROLL CONTAINER
