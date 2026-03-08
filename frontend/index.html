@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/habits.css">
 <link rel="stylesheet" href="css/navigation.css">
 <link rel="stylesheet" href="css/leaderboard.css">
+<link rel="stylesheet" href="css/chat.css">
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -115,6 +116,122 @@ LEADERBOARD PAGE
 </div>
 
 
+
+<!-- ==================================================================
+CHAT PAGE
+================================================================== -->
+
+<div id="chat-page" style="display:none">
+
+<div class="chat-container">
+
+<div class="clan-block">
+
+<div class="clan-title">
+Вступи в клан или создай новый!
+</div>
+
+<div class="clan-row">
+
+<div class="clan-sub">
+Найди клан или создай новый
+</div>
+
+<button class="clan-btn">
+Показать
+</button>
+
+</div>
+
+</div>
+
+
+<div class="chat-title">
+Общение
+</div>
+
+
+<div class="chat-tabs">
+
+<div class="chat-tab active">
+В сети
+</div>
+
+<div class="chat-tab">
+Список лидеров
+</div>
+
+</div>
+
+
+<div class="friends-list">
+
+<div class="friend-card">
+
+<div class="friend-left">
+
+<img src="img/avatars/avatar1.png" class="friend-avatar">
+
+<div class="friend-info">
+
+<div class="friend-name">ТОЛЬ</div>
+<div class="friend-status">• online</div>
+
+</div>
+
+</div>
+
+<div class="friend-right">
+
+<img src="img/icons/cup.png" class="cup-icon">
+<span>0</span>
+
+</div>
+
+</div>
+
+
+<div class="friend-card">
+
+<div class="friend-left">
+
+<img src="img/avatars/avatar1.png" class="friend-avatar">
+
+<div class="friend-info">
+
+<div class="friend-name">ТОЛЬ</div>
+<div class="friend-status">• online</div>
+
+</div>
+
+</div>
+
+<div class="friend-right">
+
+<img src="img/icons/cup.png" class="cup-icon">
+<span>0</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="add-friend">
+
+<button class="add-friend-btn">
++ Добавляй друзей!
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
 <!-- ======================
 BOTTOM NAVIGATION
 ====================== -->
@@ -129,7 +246,7 @@ BOTTOM NAVIGATION
 
 </div>
 
-<div class="nav-item" data-page="chat">
+<div class="nav-item" data-page="chat" onclick="openChat()">>
 
 <img src="img/nav/chat.png" class="nav-icon">
 
@@ -181,6 +298,7 @@ function openLeaderboard(){
 
 document.getElementById("dashboard-page").style.display="none"
 document.getElementById("leaderboard-page").style.display="block"
+document.getElementById("chat-page").style.display="none"
 
 loadLeaderboard()
 
@@ -190,6 +308,15 @@ function openDashboard(){
 
 document.getElementById("dashboard-page").style.display="block"
 document.getElementById("leaderboard-page").style.display="none"
+document.getElementById("chat-page").style.display="none"
+
+}
+
+function openChat(){
+
+document.getElementById("dashboard-page").style.display="none"
+document.getElementById("leaderboard-page").style.display="none"
+document.getElementById("chat-page").style.display="block"
 
 }
 
