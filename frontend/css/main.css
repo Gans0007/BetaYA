@@ -16,14 +16,33 @@ height:100vh;
 
 display:flex;
 flex-direction:column;
+
+padding-bottom:72px; /* место под навигацию */
+box-sizing:border-box;
 }
 
 /* страницы */
-
 #dashboard-page,
 #leaderboard-page,
 #chat-page{
+
 flex:1;
+
 display:flex;
 flex-direction:column;
+
+height:100%;
+
+overflow:hidden;
+
+}
+
+.page-content{
+
+flex:1;
+
+overflow-y:auto;
+
+padding:14px;
+
 }
