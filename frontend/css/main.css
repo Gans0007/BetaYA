@@ -42,7 +42,9 @@ SCROLL CONTAINER
 
 .page-content{
 flex:1;
-overflow-y:auto;
 min-height:0;
 padding:14px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
 }
