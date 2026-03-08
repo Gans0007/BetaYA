@@ -8,9 +8,10 @@ if(!user) return
 const list = document.querySelector(".friends-list")
 if(!list) return
 
-/* чтобы не дублировалось */
+/* очищаем старую карточку */
 
-if(document.querySelector(".friend-card.me")) return
+const old = document.querySelector(".friend-card.me")
+if(old) old.remove()
 
 const card = document.createElement("div")
 card.className = "friend-card me"
@@ -38,7 +39,7 @@ ${user.first_name || "You"} (Вы)
 <div class="friend-right">
 
 <div class="friend-cups">
-🏆 ${Math.floor(xp ?? 0)}
+🏆 ${Math.floor(xp)}
 </div>
 
 </div>
