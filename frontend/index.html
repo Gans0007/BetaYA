@@ -162,6 +162,17 @@ BOTTOM NAVIGATION
 SCRIPTS
 ====================== -->
 
+<script>
+
+const tg = window.Telegram.WebApp
+tg.ready()
+
+const initData = tg.initData
+
+window.initData = initData
+
+</script>
+
 <script type="module" src="js/dashboard.js"></script>
 <script src="js/leaderboard.js"></script>
 <script src="js/navigation.js"></script>
