@@ -35,10 +35,23 @@ flex-shrink:0;
 box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
+
+
 .clan-title{
-font-size:20px;
+font-size:17px;
 font-weight:600;
-margin-bottom:6px;
+
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.clan-sub{
+color:#9aa0b5;
+font-size:13px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 .clan-row{
