@@ -121,27 +121,41 @@ BOTTOM NAVIGATION
 
 <div class="bottom-nav">
 
-<a class="nav-item active" onclick="openDashboard()">
-<div class="nav-icon">🏠</div>
-<div class="nav-label">Привычки</div>
-</a>
+<div class="nav-item active" data-page="dashboard" onclick="openDashboard()">
 
-<a class="nav-item">
-<div class="nav-icon">👋</div>
-<div class="nav-label">Общение</div>
-</a>
+<img src="img/nav/habits.png" class="nav-icon">
 
-<a class="nav-item" onclick="openLeaderboard()">
-<div class="nav-icon">🏆</div>
-<div class="nav-label">Лидерборд</div>
-</a>
-
-<a class="nav-item">
-<div class="nav-icon">🤝</div>
-<div class="nav-label">Партнёрка</div>
-</a>
+<span class="nav-label">Привычки</span>
 
 </div>
+
+<div class="nav-item" data-page="chat">
+
+<img src="img/nav/chat.png" class="nav-icon">
+
+<span class="nav-label">Общение</span>
+
+</div>
+
+<div class="nav-item" data-page="leaderboard" onclick="openLeaderboard()">
+
+<img src="img/nav/leaderboard.png" class="nav-icon">
+
+<span class="nav-label">Рейтинг</span>
+
+</div>
+
+<div class="nav-item" data-page="partners">
+
+<img src="img/nav/partners.png" class="nav-icon">
+
+<span class="nav-label">Партнерка</span>
+
+</div>
+
+</div>
+
+<script src="js/navigation.js"></script>
 
 
 <!-- ======================
