@@ -122,10 +122,9 @@ LEADERBOARD PAGE
 </div>
 
 
-
-<!-- ==================================================================
+<!-- ======================
 CHAT PAGE
-================================================================== -->
+====================== -->
 
 <div id="chat-page" style="display:none">
 
@@ -179,7 +178,7 @@ CHAT PAGE
 
 </div>
 
-</div>
+</div> <!-- container -->
 
 <!-- ======================
 BOTTOM NAVIGATION
@@ -188,35 +187,23 @@ BOTTOM NAVIGATION
 <div class="bottom-nav">
 
 <div class="nav-item active" data-page="dashboard" onclick="openDashboard()">
-
 <img src="img/nav/habits.png" class="nav-icon">
-
 <span class="nav-label">Привычки</span>
-
 </div>
 
 <div class="nav-item" data-page="chat" onclick="openChat()">
-
 <img src="img/nav/chat.png" class="nav-icon">
-
 <span class="nav-label">Общение</span>
-
 </div>
 
 <div class="nav-item" data-page="leaderboard" onclick="openLeaderboard()">
-
 <img src="img/nav/leaderboard.png" class="nav-icon">
-
 <span class="nav-label">Рейтинг</span>
-
 </div>
 
 <div class="nav-item" data-page="partners">
-
 <img src="img/nav/partners.png" class="nav-icon">
-
 <span class="nav-label">Партнерка</span>
-
 </div>
 
 </div>
@@ -232,7 +219,6 @@ const tg = window.Telegram.WebApp
 tg.ready()
 
 const initData = tg.initData
-
 window.initData = initData
 
 </script>
