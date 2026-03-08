@@ -272,3 +272,13 @@ border-radius:10px;
 .friends-list::-webkit-scrollbar-thumb:hover{
 background:#3b3b52;
 }
+
+/* ======================================
+CHAT PAGE FIXED SCREEN
+====================================== */
+
+#chat-page .page-content{
+overflow:hidden;
+display:flex;
+flex-direction:column;
+}
