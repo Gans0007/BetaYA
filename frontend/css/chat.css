@@ -27,15 +27,12 @@ CLAN BLOCK
 ====================================== */
 
 .clan-block{
-
-background:rgba(15,20,40,0.85);
-
+background:#1a1a1d;
 border-radius:18px;
-
-padding:14px;
-
+padding:16px;
 flex-shrink:0;
 
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 .clan-title{
@@ -78,20 +75,15 @@ MAIN BLOCK
 ====================================== */
 
 .chat-main{
-
-background:rgba(10,15,35,0.95);
-
-border-radius:20px;
-
-padding:18px;
+background:#1a1a1d;
+border-radius:18px;
+padding:16px;
 
 flex:1;
-
 display:flex;
 flex-direction:column;
 
-min-height:0;
-
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 /* ======================================
@@ -156,25 +148,26 @@ FRIEND CARD
 ====================================== */
 
 .friend-card{
-
-background:rgba(20,25,45,0.85);
+background:#1a1a1d;
 
 padding:14px;
-
 border-radius:14px;
 
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
 
 transition:0.15s;
 
+box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
 .friend-card:active{
 transform:scale(0.97);
+}
+
+.friend-card:hover{
+transform:translateY(-2px);
 }
 
 .friend-left{
