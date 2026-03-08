@@ -31,20 +31,20 @@ PAGES
 
 .page{
 
-position:absolute;
-
-top:0;
-left:0;
-
-width:100%;
-height:100%;
+flex:1;
 
 display:none;
 
 flex-direction:column;
 
+height:100%;
+
 overflow:hidden;
 
+}
+
+.page.active{
+display:flex;
 }
 
 .page.active{
