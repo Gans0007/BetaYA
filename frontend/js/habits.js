@@ -230,7 +230,7 @@ const data = await getDashboard(initData)
 
 console.log("API DATA:", data)
 
-renderChatUser(data.xp)
+renderChatUser(data.xp_current)
 
 /* ======================
 XP BAR

@@ -37,10 +37,8 @@ ${user.first_name || "You"} (Вы)
 
 <div class="friend-right">
 
-<img src="img/cup.png" class="cup-icon">
-
 <div class="friend-cups">
-${xp || 0}
+🏆 ${Math.floor(xp ?? 0)}
 </div>
 
 </div>
