@@ -1,7 +1,7 @@
-import {loadHabitsDashboard} from "./habits.js"
+import {renderHabits} from "./habits.js"
 import {renderWeek} from "./calendar.js"
 import {initNavigation} from "./navigation.js"
-import {renderChatUser} from "./chat.js"
+import {renderChatUser, renderReferrals} from "./chat.js"
 
 const tg = window.Telegram.WebApp
 tg.expand()
@@ -10,7 +10,7 @@ const initData = tg.initData
 
 async function loadDashboard(){
 
-const [userRes, habitsRes, refRes, leaderboardRes] = await Promise.all([
+const [userRes, habitsRes, refRes] = await Promise.all([
 
 fetch("/api/user",{
 method:"POST",
@@ -28,12 +28,6 @@ fetch("/api/referrals",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
 body:JSON.stringify({initData})
-}),
-
-fetch("/api/leaderboard",{
-method:"POST",
-headers:{ "Content-Type":"application/json"},
-body:JSON.stringify({initData})
 })
 
 ])
@@ -41,7 +35,6 @@ body:JSON.stringify({initData})
 const user = await userRes.json()
 const habits = await habitsRes.json()
 const referrals = await refRes.json()
-const leaderboard = await leaderboardRes.json()
 
 /* USER */
 
@@ -55,15 +48,15 @@ user.xp_percent + "%"
 
 /* HABITS */
 
-loadHabitsDashboard(habits.habits)
+renderHabits(habits.habits)
 
-/* CHAT USERS */
+/* CHAT */
 
-renderChatUser(referrals.referrals)
+renderChatUser(user.xp_current)
+renderReferrals(referrals.referrals)
 
 }
 
 renderWeek()
 loadDashboard()
-
 initNavigation()
