@@ -20,7 +20,7 @@ card.innerHTML = `
 
 <div class="friend-left">
 
-<img src="${user.photo_url || 'img/default-avatar.png'}" class="friend-avatar">
+<img src="img/avatar/avatar_1.png" class="friend-avatar">
 
 <div>
 
