@@ -44,6 +44,5 @@ SCROLL CONTAINER
 flex:1;
 min-height:0;
 padding:14px;
-padding-bottom:90px; /* место под нижнюю навигацию */
 overflow-y:auto;
 }
