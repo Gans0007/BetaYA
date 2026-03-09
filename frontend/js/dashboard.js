@@ -46,6 +46,13 @@ document.getElementById("xp-text").innerText =
 document.getElementById("xp-fill").style.width =
 user.xp_percent + "%"
 
+/* AVATAR */
+
+const avatar = document.getElementById("player-avatar")
+if(avatar){
+avatar.src = "img/avatar/avatar_1.png"
+}
+
 /* HABITS */
 
 renderHabits(habits.habits)
