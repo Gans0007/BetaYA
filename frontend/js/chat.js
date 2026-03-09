@@ -1,14 +1,10 @@
 export function renderChatUser(xp){
 
 const tg = window.Telegram.WebApp
-const user = tg.initDataUnsafe?.user
-
-if(!user) return
+const user = tg.initDataUnsafe?.user || {}
 
 const list = document.querySelector(".friends-list")
 if(!list) return
-
-/* очищаем старую карточку */
 
 const old = document.querySelector(".friend-card.me")
 if(old) old.remove()
@@ -39,7 +35,7 @@ ${user.first_name || "You"} (Вы)
 <div class="friend-right">
 
 <div class="friend-cups">
-🏆 ${Math.floor(xp)}
+🏆 ${Math.floor(xp || 0)}
 </div>
 
 </div>
@@ -49,6 +45,9 @@ ${user.first_name || "You"} (Вы)
 list.prepend(card)
 
 }
+
+
+
 
 /* реферал */
 export function renderReferrals(referrals){
@@ -72,7 +71,7 @@ card.innerHTML=`
 
 <div class="friend-left">
 
-<img src="img/default-avatar.png" class="friend-avatar">
+<img src="img/avatar/avatar_1.png" class="friend-avatar">
 
 <div>
 
