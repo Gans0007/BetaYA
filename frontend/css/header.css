@@ -146,15 +146,12 @@ gap:12px;
 
 .profile-flag{
 
-width:44px;
-height:44px;
+width:64px;
+height:64px;
 
-border-radius:10px;
+border-radius:14px;
 
 object-fit:cover;
-
-background:none;
-border:none;
 
 }
 
