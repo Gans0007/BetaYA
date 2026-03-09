@@ -18,6 +18,8 @@ const list = document.getElementById("leaderboard-list")
 
 list.innerHTML=""
 
+/* ===== ТОП 100 ===== */
+
 data.leaders.forEach(user=>{
 
 const item=document.createElement("div")
@@ -58,9 +60,9 @@ list.appendChild(item)
 
 })
 
-/* если меня нет в топ 10 */
+/* ===== ЕСЛИ Я НЕ В ТОП 100 ===== */
 
-if(data.my_rank && data.my_rank>10){
+if(data.my_rank && data.my_rank > 100){
 
 const divider=document.createElement("div")
 

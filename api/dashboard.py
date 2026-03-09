@@ -267,7 +267,7 @@ async def get_leaderboard(request: Request):
         WHERE u.last_global_rank IS NOT NULL
 
         ORDER BY u.last_global_rank
-        LIMIT 10
+        LIMIT 100
 
         """)
 
