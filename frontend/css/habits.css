@@ -108,7 +108,9 @@ margin-bottom:12px;
 .grid{
 
 display:grid;
-grid-template-columns:repeat(31,1fr);
+grid-template-columns:repeat(7,10px);
+grid-template-rows:repeat(6,10px);
+grid-auto-flow:column;
 gap:2px;
 
 padding:12px;

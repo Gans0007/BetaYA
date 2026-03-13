@@ -55,26 +55,42 @@ streakHTML =
 }
 
 /* =========================
-МЕСЯЦ
+МЕСЯЦ (GitHub style)
 ========================= */
 
 let monthCells=""
 let completedMonth = 0
 
-for(let day=1; day<=daysInMonth; day++){
+const year = now.getFullYear()
+const month = now.getMonth()
+
+const monthStart = new Date(year, month, 1)
+const monthEnd = new Date(year, month + 1, 0)
+
+// понедельник недели начала
+const start = new Date(monthStart)
+start.setDate(monthStart.getDate() - ((monthStart.getDay()+6)%7))
+
+// воскресенье недели конца
+const end = new Date(monthEnd)
+end.setDate(monthEnd.getDate() + (6 - ((monthEnd.getDay()+6)%7)))
+
+for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+
+let cellClass="cell"
 
 const dateStr =
-now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(day).padStart(2,"0")
+d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
 
-const active = confirmedDays.has(dateStr)
-? "cell active"
-: "cell"
-
-if(active==="cell active"){
+if(
+d.getMonth()===month &&
+confirmedDays.has(dateStr)
+){
+cellClass="cell active"
 completedMonth++
 }
 
-monthCells += `<div class="${active}"></div>`
+monthCells+=`<div class="${cellClass}"></div>`
 
 }
 
@@ -84,7 +100,6 @@ let percentMonth = Math.floor(
 
 percentMonth = Math.max(0,Math.min(100,percentMonth))
 
-
 /* =========================
 ГОД (GitHub style)
 ========================= */
@@ -92,26 +107,25 @@ percentMonth = Math.max(0,Math.min(100,percentMonth))
 let yearCells = ""
 let completedYear = 0
 
-const startOfYear = new Date(now.getFullYear(),0,1)
+const yearStart = new Date(now.getFullYear(),0,1)
+const yearEnd = new Date(now.getFullYear(),11,31)
 
-const totalWeeks = 53
+// понедельник первой недели
+const startYear = new Date(yearStart)
+startYear.setDate(yearStart.getDate() - ((yearStart.getDay()+6)%7))
 
-for(let week=0; week<totalWeeks; week++){
+// воскресенье последней недели
+const endYear = new Date(yearEnd)
+endYear.setDate(yearEnd.getDate() + (6 - ((yearEnd.getDay()+6)%7)))
 
-for(let day=0; day<7; day++){
-
-const date = new Date(
-now.getFullYear(),
-0,
-week*7 + day + 1
-)
+for(let d = new Date(startYear); d <= endYear; d.setDate(d.getDate()+1)){
 
 let cellClass="cell"
 
-if(date.getFullYear()===now.getFullYear()){
+if(d.getFullYear()===now.getFullYear()){
 
 const dateStr =
-date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
+d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
 
 if(confirmedDays.has(dateStr)){
 cellClass="cell active"
@@ -121,8 +135,6 @@ completedYear++
 }
 
 yearCells+=`<div class="${cellClass}"></div>`
-
-}
 
 }
 
