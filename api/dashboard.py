@@ -129,7 +129,7 @@ async def get_habits(request: Request):
         ) t
         WHERE day >= CURRENT_DATE - INTERVAL '365 days'
         GROUP BY habit_id, grp
-        HAVING MAX(day) = CURRENT_DATE
+        HAVING MAX(day) >= CURRENT_DATE - INTERVAL '1 day'
         """, user_id)
 
     confirmations = {}
