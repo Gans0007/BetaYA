@@ -109,28 +109,12 @@ async def get_habits(request: Request):
         SELECT habit_id, DATE(datetime) as day
         FROM confirmations
         WHERE user_id=$1
-        AND datetime >= NOW() - INTERVAL '30 days'
+        AND datetime >= NOW() - INTERVAL '365 days'
         """, user_id)
 
-        streak_rows = await conn.fetch("""
-        SELECT habit_id,
-        COUNT(*) AS streak
-        FROM (
-            SELECT habit_id,
-                   DATE(datetime) as day,
-                   DATE(datetime) - INTERVAL '1 day' *
-                   ROW_NUMBER() OVER (
-                       PARTITION BY habit_id
-                       ORDER BY DATE(datetime) DESC
-                   ) as grp
-            FROM confirmations
-            WHERE user_id=$1
-            GROUP BY habit_id, DATE(datetime)
-        ) t
-        WHERE day >= CURRENT_DATE - INTERVAL '365 days'
-        GROUP BY habit_id, grp
-        HAVING MAX(day) >= CURRENT_DATE - INTERVAL '1 day'
-        """, user_id)
+    # =========================
+    # ГРУППИРУЕМ CONFIRMATIONS
+    # =========================
 
     confirmations = {}
 
@@ -143,11 +127,9 @@ async def get_habits(request: Request):
 
         confirmations[hid].add(r["day"])
 
-    streak_map = {r["habit_id"]: r["streak"] for r in streak_rows}
-
     habits = []
 
-    today = datetime.utcnow().date()
+    today = datetime.now().date()
 
     for h in habits_rows:
 
@@ -155,6 +137,21 @@ async def get_habits(request: Request):
         name = h["name"]
 
         days = confirmations.get(hid, set())
+
+        # =========================
+        # STREAK (подряд дни)
+        # =========================
+
+        streak = 0
+        check_day = today
+
+        while check_day in days:
+            streak += 1
+            check_day -= timedelta(days=1)
+
+        # =========================
+        # SERIES ДЛЯ ГРАФИКА
+        # =========================
 
         value = 0
         series = []
@@ -184,7 +181,7 @@ async def get_habits(request: Request):
             "id": hid,
             "name": name,
             "series": series,
-            "streak": streak_map.get(hid, 0),
+            "streak": streak,
             "days": [d.isoformat() for d in days]
 
         })
