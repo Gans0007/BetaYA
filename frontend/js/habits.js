@@ -178,12 +178,12 @@ ${streakHTML}
 <div class="weekdays">
 
 <div>Пн</div>
-<div></div>
+<div>Вт</div>
 <div>Ср</div>
-<div></div>
+<div>Чт</div>
 <div>Пт</div>
-<div></div>
-<div></div>
+<div>Сб</div>
+<div>Вс</div>
 
 </div>
 
