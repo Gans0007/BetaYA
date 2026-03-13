@@ -40,9 +40,19 @@ const confirmedDays = new Set(habit.days || [])
 СТРИК (ПОКАЗЫВАЕМ >=2)
 ========================= */
 
-const streakHTML = habit.streak >= 2
-? `<div class="habit-streak">🔥 Стрик: ${habit.streak} дней</div>`
-: ""
+let streakHTML = ""
+
+if(habit.streak >= 1){
+
+const word =
+habit.streak === 1 ? "день" :
+habit.streak <= 4 ? "дня" :
+"дней"
+
+streakHTML =
+`<div class="habit-streak">🔥 Стрик: ${habit.streak} ${word}</div>`
+
+}
 
 /* =========================
 МЕСЯЦ
