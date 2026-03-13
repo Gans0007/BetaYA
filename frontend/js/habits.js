@@ -93,7 +93,6 @@ let yearCells = ""
 let completedYear = 0
 
 const startOfYear = new Date(now.getFullYear(),0,1)
-const startDay = startOfYear.getDay()
 
 const totalWeeks = 53
 
@@ -101,19 +100,15 @@ for(let week=0; week<totalWeeks; week++){
 
 for(let day=0; day<7; day++){
 
-const index = week*7 + day - startDay
-
-let cellClass = "cell"
-
-if(index >= 0){
-
 const date = new Date(
 now.getFullYear(),
 0,
-index + 1
+week*7 + day + 1
 )
 
-if(date.getFullYear() === now.getFullYear()){
+let cellClass="cell"
+
+if(date.getFullYear()===now.getFullYear()){
 
 const dateStr =
 date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
@@ -125,13 +120,15 @@ completedYear++
 
 }
 
-}
-
-yearCells += `<div class="${cellClass}"></div>`
+yearCells+=`<div class="${cellClass}"></div>`
 
 }
 
 }
+
+const percentYear = Math.floor(
+(completedYear / 365) * 100
+)
 
 /* =========================
 КАРТОЧКА
@@ -164,9 +161,25 @@ ${streakHTML}
 
 <div class="habit-overlay">
 
+<div class="year-wrapper">
+
+<div class="weekdays">
+
+<div>Пн</div>
+<div></div>
+<div>Ср</div>
+<div></div>
+<div>Пт</div>
+<div></div>
+<div></div>
+
+</div>
+
 <div class="grid">
 
 ${monthCells}
+
+</div>
 
 </div>
 
