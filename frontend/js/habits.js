@@ -86,41 +86,52 @@ percentMonth = Math.max(0,Math.min(100,percentMonth))
 
 
 /* =========================
-ГОД
+ГОД (GitHub style)
 ========================= */
 
-let yearCells=""
+let yearCells = ""
 let completedYear = 0
 
-for(let i=0;i<daysInYear;i++){
+const startOfYear = new Date(now.getFullYear(),0,1)
+const startDay = startOfYear.getDay()
+
+const totalWeeks = 53
+
+for(let week=0; week<totalWeeks; week++){
+
+for(let day=0; day<7; day++){
+
+const index = week*7 + day - startDay
+
+let cellClass = "cell"
+
+if(index >= 0){
 
 const date = new Date(
 now.getFullYear(),
 0,
-i+1
+index + 1
 )
+
+if(date.getFullYear() === now.getFullYear()){
 
 const dateStr =
 date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0")
 
-const active = confirmedDays.has(dateStr)
-? "cell active"
-: "cell"
-
-if(active==="cell active"){
+if(confirmedDays.has(dateStr)){
+cellClass="cell active"
 completedYear++
 }
 
-yearCells += `<div class="${active}"></div>`
+}
 
 }
 
-let percentYear = Math.floor(
-(completedYear / daysInYear) * 100
-)
+yearCells += `<div class="${cellClass}"></div>`
 
-percentYear = Math.max(0,Math.min(100,percentYear))
+}
 
+}
 
 /* =========================
 КАРТОЧКА
