@@ -71,7 +71,7 @@ type:"line",
 
 data:{
 
-labels:["","","","",""],
+labels:["","","","","","",""],
 
 datasets:[{
 
