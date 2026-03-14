@@ -260,7 +260,13 @@ progress.innerHTML = percentYear + "% выполнено"
 
 list.appendChild(wrap)
 
-drawChart(chartId,habit.series)
+const series = (habit.series || []).slice(-7)
+
+while(series.length < 7){
+series.unshift(0)
+}
+
+drawChart(chartId,series)
 
 })
 
