@@ -171,9 +171,9 @@ ${streakHTML}
 
 <div class="habit-overlay">
 
-<div class="year-wrapper">
+<div class="calendar">
 
-<div class="weekdays">
+<div class="calendar-weekdays">
 
 <div>Пн</div>
 <div>Вт</div>
@@ -186,9 +186,7 @@ ${streakHTML}
 </div>
 
 <div class="grid">
-
 ${monthCells}
-
 </div>
 
 </div>
