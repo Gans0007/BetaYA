@@ -105,12 +105,23 @@ margin-bottom:12px;
 СЕТКА
 ========================= */
 
+/* =========================
+СЕТКА
+========================= */
+
 .grid{
 
 display:grid;
-grid-template-columns:repeat(7,10px);
-grid-template-rows:repeat(6,10px);
+
+/* строки = дни недели */
+
+grid-template-rows:repeat(7,10px);
+
+/* колонки создаются автоматически */
+
 grid-auto-flow:column;
+grid-auto-columns:10px;
+
 gap:2px;
 
 padding:12px;
@@ -128,10 +139,11 @@ border-radius:14px;
 
 display:grid;
 
-grid-template-columns:repeat(53,10px);
 grid-template-rows:repeat(7,10px);
 
+/* колонки создаются автоматически */
 grid-auto-flow:column;
+grid-auto-columns:10px;
 
 gap:2px;
 
@@ -193,16 +205,31 @@ border-radius:10px;
 }
 
 /* =========================
-КЛЕТКИ
+ГОДОВОЙ КАЛЕНДАРЬ
 ========================= */
+
+.grid.year{
+
+grid-template-rows:repeat(7,8px);
+grid-auto-columns:8px;
+
+overflow-x:auto;
+overflow-y:hidden;
+
+padding-bottom:14px;
+
+}
 
 .cell{
 
 width:100%;
-aspect-ratio:1;
+height:100%;
 
 background:#2b1d16;
+
 border-radius:3px;
+
+transition:background .2s;
 
 }
 

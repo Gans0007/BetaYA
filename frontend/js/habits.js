@@ -55,27 +55,29 @@ streakHTML =
 }
 
 /* =========================
-МЕСЯЦ (GitHub style)
+MONTH GRID (GitHub style)
 ========================= */
 
 let monthCells=""
-let completedMonth = 0
+let completedMonth=0
 
 const year = now.getFullYear()
 const month = now.getMonth()
 
-const monthStart = new Date(year, month, 1)
-const monthEnd = new Date(year, month + 1, 0)
+const monthStart = new Date(year,month,1)
+const monthEnd = new Date(year,month+1,0)
 
-// понедельник недели начала
-const start = new Date(monthStart)
-start.setDate(monthStart.getDate() - ((monthStart.getDay()+6)%7))
+const gridStart = new Date(monthStart)
+gridStart.setDate(
+monthStart.getDate()-((monthStart.getDay()+6)%7)
+)
 
-// воскресенье недели конца
-const end = new Date(monthEnd)
-end.setDate(monthEnd.getDate() + (6 - ((monthEnd.getDay()+6)%7)))
+const gridEnd = new Date(monthEnd)
+gridEnd.setDate(
+monthEnd.getDate()+(6-((monthEnd.getDay()+6)%7))
+)
 
-for(let d = new Date(start); d <= end; d.setDate(d.getDate()+1)){
+for(let d=new Date(gridStart); d<=gridEnd; d.setDate(d.getDate()+1)){
 
 let cellClass="cell"
 
@@ -86,11 +88,15 @@ if(
 d.getMonth()===month &&
 confirmedDays.has(dateStr)
 ){
-cellClass="cell active"
+cellClass="cell l3"
 completedMonth++
 }
 
-monthCells+=`<div class="${cellClass}"></div>`
+const dayRow=(d.getDay()+6)%7 + 1
+
+monthCells+=`
+<div class="${cellClass}" style="grid-row:${dayRow}"></div>
+`
 
 }
 
@@ -101,46 +107,64 @@ let percentMonth = Math.floor(
 percentMonth = Math.max(0,Math.min(100,percentMonth))
 
 /* =========================
-ГОД (GitHub style)
+YEAR GRID (GitHub style)
 ========================= */
 
-let yearCells = ""
-let completedYear = 0
+let yearCells=""
+let completedYear=0
 
-const yearStart = new Date(now.getFullYear(),0,1)
-const yearEnd = new Date(now.getFullYear(),11,31)
+const year = now.getFullYear()
 
-// понедельник первой недели
-const startYear = new Date(yearStart)
-startYear.setDate(yearStart.getDate() - ((yearStart.getDay()+6)%7))
+const yearStart = new Date(year,0,1)
+const yearEnd = new Date(year,11,31)
 
-// воскресенье последней недели
-const endYear = new Date(yearEnd)
-endYear.setDate(yearEnd.getDate() + (6 - ((yearEnd.getDay()+6)%7)))
+/* первый понедельник сетки */
 
-for(let d = new Date(startYear); d <= endYear; d.setDate(d.getDate()+1)){
+const gridStart = new Date(yearStart)
+gridStart.setDate(
+yearStart.getDate() - ((yearStart.getDay()+6)%7)
+)
+
+/* последний воскресенье */
+
+const gridEnd = new Date(yearEnd)
+gridEnd.setDate(
+yearEnd.getDate() + (6 - ((yearEnd.getDay()+6)%7))
+)
+
+let weekIndex=0
+
+for(let d=new Date(gridStart); d<=gridEnd; d.setDate(d.getDate()+1)){
 
 let cellClass="cell"
-
-if(d.getFullYear()===now.getFullYear()){
 
 const dateStr =
 d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
 
+if(d.getFullYear()===year){
+
 if(confirmedDays.has(dateStr)){
-cellClass="cell active"
+cellClass="cell l3"
 completedYear++
 }
 
 }
 
-yearCells+=`<div class="${cellClass}"></div>`
+/* позиция */
+
+const dayRow = (d.getDay()+6)%7 + 1
+
+yearCells+=`
+<div class="${cellClass}" style="grid-row:${dayRow}"></div>
+`
 
 }
 
 const percentYear = Math.floor(
 (completedYear / 365) * 100
 )
+
+
 
 /* =========================
 КАРТОЧКА
