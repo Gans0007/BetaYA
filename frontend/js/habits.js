@@ -13,34 +13,18 @@ list.innerHTML="<p>Нет привычек</p>"
 return
 }
 
-/* ===== ДАТА ===== */
-
 const now = new Date()
-
-const daysInMonth = new Date(
-now.getFullYear(),
-now.getMonth()+1,
-0
-).getDate()
-
-const startOfYear = new Date(now.getFullYear(),0,1)
-const endOfYear = new Date(now.getFullYear(),11,31)
-
-const daysInYear =
-Math.floor((endOfYear-startOfYear)/(1000*60*60*24))+1
-
 
 habits.forEach((habit,i)=>{
 
 const chartId="chart-"+i
-
 const confirmedDays = new Set(habit.days || [])
 
 /* =========================
-СТРИК (ПОКАЗЫВАЕМ >=2)
+СТРИК
 ========================= */
 
-let streakHTML = ""
+let streakHTML=""
 
 if(habit.streak >= 1){
 
@@ -55,7 +39,7 @@ streakHTML =
 }
 
 /* =========================
-MONTH GRID (GitHub style)
+МЕСЯЦ
 ========================= */
 
 let monthCells=""
@@ -67,17 +51,17 @@ const month = now.getMonth()
 const monthStart = new Date(year,month,1)
 const monthEnd = new Date(year,month+1,0)
 
-const gridStart = new Date(monthStart)
-gridStart.setDate(
+const monthGridStart = new Date(monthStart)
+monthGridStart.setDate(
 monthStart.getDate()-((monthStart.getDay()+6)%7)
 )
 
-const gridEnd = new Date(monthEnd)
-gridEnd.setDate(
+const monthGridEnd = new Date(monthEnd)
+monthGridEnd.setDate(
 monthEnd.getDate()+(6-((monthEnd.getDay()+6)%7))
 )
 
-for(let d=new Date(gridStart); d<=gridEnd; d.setDate(d.getDate()+1)){
+for(let d=new Date(monthGridStart); d<=monthGridEnd; d.setDate(d.getDate()+1)){
 
 let cellClass="cell"
 
@@ -88,7 +72,7 @@ if(
 d.getMonth()===month &&
 confirmedDays.has(dateStr)
 ){
-cellClass="cell l3"
+cellClass="cell active"
 completedMonth++
 }
 
@@ -100,6 +84,8 @@ monthCells+=`
 
 }
 
+const daysInMonth = new Date(year,month+1,0).getDate()
+
 let percentMonth = Math.floor(
 (completedMonth / daysInMonth) * 100
 )
@@ -107,7 +93,7 @@ let percentMonth = Math.floor(
 percentMonth = Math.max(0,Math.min(100,percentMonth))
 
 /* =========================
-YEAR GRID (GitHub style)
+ГОД
 ========================= */
 
 let yearCells=""
@@ -116,23 +102,17 @@ let completedYear=0
 const yearStart = new Date(year,0,1)
 const yearEnd = new Date(year,11,31)
 
-/* первый понедельник сетки */
-
-const gridStart = new Date(yearStart)
-gridStart.setDate(
+const yearGridStart = new Date(yearStart)
+yearGridStart.setDate(
 yearStart.getDate() - ((yearStart.getDay()+6)%7)
 )
 
-/* последний воскресенье */
-
-const gridEnd = new Date(yearEnd)
-gridEnd.setDate(
+const yearGridEnd = new Date(yearEnd)
+yearGridEnd.setDate(
 yearEnd.getDate() + (6 - ((yearEnd.getDay()+6)%7))
 )
 
-let weekIndex=0
-
-for(let d=new Date(gridStart); d<=gridEnd; d.setDate(d.getDate()+1)){
+for(let d=new Date(yearGridStart); d<=yearGridEnd; d.setDate(d.getDate()+1)){
 
 let cellClass="cell"
 
@@ -142,13 +122,11 @@ d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate(
 if(d.getFullYear()===year){
 
 if(confirmedDays.has(dateStr)){
-cellClass="cell l3"
+cellClass="cell active"
 completedYear++
 }
 
 }
-
-/* позиция */
 
 const dayRow = (d.getDay()+6)%7 + 1
 
@@ -161,8 +139,6 @@ yearCells+=`
 const percentYear = Math.floor(
 (completedYear / 365) * 100
 )
-
-
 
 /* =========================
 КАРТОЧКА
@@ -282,6 +258,10 @@ progress.innerHTML = percentYear + "% выполнено"
 
 list.appendChild(wrap)
 
+/* =========================
+ГРАФИК
+========================= */
+
 const series = (habit.series || []).slice(-7)
 
 while(series.length < 7){
@@ -293,7 +273,6 @@ drawChart(chartId,series)
 })
 
 }
-
 
 /* =========================
 LOAD DASHBOARD
@@ -311,9 +290,7 @@ if(data.referrals){
 renderReferrals(data.referrals)
 }
 
-/* ======================
-XP BAR
-====================== */
+/* XP */
 
 const xpText = document.getElementById("xp-text")
 const xpFill = document.getElementById("xp-fill")
@@ -321,14 +298,11 @@ const xpFill = document.getElementById("xp-fill")
 if(xpText && xpFill){
 
 xpText.innerText = data.xp_current + " / " + data.xp_next
-
 xpFill.style.width = data.xp_percent + "%"
 
 }
 
-/* ======================
-PLAYER NAME
-====================== */
+/* NAME */
 
 const playerName = document.getElementById("player-name")
 
@@ -336,9 +310,7 @@ if(playerName){
 playerName.innerText = data.nickname
 }
 
-/* ======================
-PLAYER AVATAR
-====================== */
+/* AVATAR */
 
 const avatar = document.getElementById("player-avatar")
 
@@ -346,9 +318,7 @@ if(avatar){
 avatar.src = "img/avatar/avatar_1.png"
 }
 
-/* ======================
-LEAGUE
-====================== */
+/* LEAGUE */
 
 const leagueText = document.getElementById("league-text")
 
@@ -356,9 +326,7 @@ if(leagueText){
 leagueText.innerText = data.league
 }
 
-/* ======================
-HABITS
-====================== */
+/* HABITS */
 
 renderHabits(data.habits)
 
