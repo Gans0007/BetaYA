@@ -113,8 +113,6 @@ YEAR GRID (GitHub style)
 let yearCells=""
 let completedYear=0
 
-const year = now.getFullYear()
-
 const yearStart = new Date(year,0,1)
 const yearEnd = new Date(year,11,31)
 
