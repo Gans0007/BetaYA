@@ -40,11 +40,7 @@ overlay.innerHTML = `
             <!-- LEFT: DONUT -->
             <div class="behavior-card">
 
-                <div class="donut">
-                    <div class="donut-inner">
-                        <span class="donut-text">0 / 0</span>
-                    </div>
-                </div>
+                <div class="donut"></div>
 
                 <div class="donut-legend">
                     <div class="legend-item green">
@@ -112,15 +108,20 @@ const { completed, missed, index } = calculateBehavior(habitsData, "month")
 const total = completed + missed || 1
 const percent = (completed / total) * 100
 
+// небольшой gap между секторами
+const gap = 1.5
+const greenEnd = Math.max(0, percent - gap)
+const redStart = Math.min(100, percent + gap)
+
 const donut = overlay.querySelector(".donut")
 if(donut){
 donut.style.background = `conic-gradient(
-#22c55e 0% ${percent}%,
-#ef4444 ${percent}% 100%
+#22c55e 0% ${greenEnd}%,
+#0f1116 ${greenEnd}% ${redStart}%,
+#ef4444 ${redStart}% 100%
 )`
 }
 
-overlay.querySelector(".donut-text").innerText = `${completed} / ${missed}`
 overlay.querySelector(".completed-val").innerText = completed
 overlay.querySelector(".missed-val").innerText = missed
 
