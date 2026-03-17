@@ -336,6 +336,8 @@ border-radius:50%;
 top:0;
 left:0;
 
+transform: rotate(-90deg);
+
 background:conic-gradient(
 #ef4444 0deg 34deg,
 transparent 34deg 36deg,
