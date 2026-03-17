@@ -62,10 +62,12 @@ overlay.innerHTML = `
 
                 <div class="gauge">
 
-                    <div class="gauge-arc"></div>
-                    <div class="gauge-pointer" id="gauge-pointer"></div>
+                    <div class="gauge-semicircle">
+                        <div class="gauge-arc"></div>
+                        <div class="gauge-pointer" id="gauge-pointer"></div>
+                    </div>
 
-                    <div class="gauge-center">
+                    <div class="gauge-info">
                         <div class="gauge-value">0</div>
                         <div class="gauge-label">Нейтрально</div>
                     </div>
@@ -128,23 +130,27 @@ const pointer = overlay.querySelector("#gauge-pointer")
 const valueEl = overlay.querySelector(".gauge-value")
 const labelEl = overlay.querySelector(".gauge-label")
 
+const safeIndex = Math.max(0, Math.min(100, index))
+
+// угол от -90 до +90 (180 градусов)
+const angle = -90 + (safeIndex * 1.8)
+
 if(pointer){
-const angle = -90 + (index * 1.8)
-pointer.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`
+pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`
 }
 
 if(valueEl){
-valueEl.innerText = index
+valueEl.innerText = safeIndex
 }
 
-// состояние
+// зоны
 let label = "Нейтрально"
 
-if(index < 20) label = "Макс. лень"
-else if(index < 40) label = "Лень"
-else if(index < 60) label = "Нейтрально"
-else if(index < 80) label = "Настойчивость"
-else label = "Экстрем. Настойчивость"
+if(safeIndex < 20) label = "Макс. лень"
+else if(safeIndex < 40) label = "Лень"
+else if(safeIndex < 60) label = "Нейтрально"
+else if(safeIndex < 80) label = "Настойчивость"
+else label = "Экстремум"
 
 if(labelEl){
 labelEl.innerText = label
