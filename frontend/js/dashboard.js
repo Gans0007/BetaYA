@@ -43,8 +43,11 @@ document.getElementById("player-name").innerText = user.nickname
 document.getElementById("xp-text").innerText =
 `${user.xp_current} / ${user.xp_next}`
 
-document.getElementById("xp-fill").style.width =
-user.xp_percent + "%"
+const xpFill = document.getElementById("xp-fill")
+
+if(xpFill){
+xpFill.style.width = (user.xp_percent || 0) + "%"
+}
 
 /* AVATAR */
 
