@@ -14,15 +14,73 @@ overlay.className = "profile-overlay hidden"
 overlay.innerHTML = `
 <div class="profile-modal">
 
+    <!-- =========================
+    HEADER
+    ========================== -->
     <div class="profile-modal-header">
-        <div>Профиль</div>
+        <div class="profile-header-left">
+            <img src="img/avatar/avatar_1.png" class="profile-avatar">
+            <div>
+                <div class="profile-name">Player</div>
+                <div class="profile-sub">Бронза I</div>
+            </div>
+        </div>
+
         <div class="profile-close">✕</div>
     </div>
 
+    <!-- =========================
+    CONTENT
+    ========================== -->
     <div class="profile-modal-content">
-        <div style="opacity:0.6; text-align:center; margin-top:40px;">
-            Здесь будет профиль
+
+        <!-- =========================
+        BEHAVIOR BLOCK
+        ========================== -->
+        <div class="behavior-block">
+
+            <!-- donut -->
+            <div class="behavior-left">
+                <div class="donut-placeholder">
+                    45 / 20
+                </div>
+                <div class="behavior-label">
+                    Выполнено / Пропущено
+                </div>
+            </div>
+
+            <!-- index -->
+            <div class="behavior-right">
+                <div class="gauge-placeholder">
+                    69%
+                </div>
+                <div class="behavior-label">
+                    Настойчивость
+                </div>
+            </div>
+
         </div>
+
+        <!-- =========================
+        HEATMAP BLOCK (заглушка)
+        ========================== -->
+        <div class="profile-section">
+            <div class="section-title">Активность</div>
+            <div class="heatmap-placeholder">
+                Heatmap
+            </div>
+        </div>
+
+        <!-- =========================
+        GRAPH BLOCK (заглушка)
+        ========================== -->
+        <div class="profile-section">
+            <div class="section-title">Прогресс</div>
+            <div class="graph-placeholder">
+                Graph
+            </div>
+        </div>
+
     </div>
 
 </div>
