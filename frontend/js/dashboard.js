@@ -1,33 +1,40 @@
-import {renderHabits} from "./habits.js"
-import {renderWeek} from "./calendar.js"
-import {initNavigation} from "./navigation.js"
-import {renderChatUser, renderReferrals} from "./chat.js"
+import { renderHabits } from "./habits.js"
+import { renderWeek } from "./calendar.js"
+import { initNavigation } from "./navigation.js"
+import { renderChatUser, renderReferrals } from "./chat.js"
+import { initProfileModal } from "./components/profileModal.js"
 
 const tg = window.Telegram.WebApp
 tg.expand()
 
 const initData = tg.initData
 
+// ==========================
+// LOAD DASHBOARD DATA
+// ==========================
+
 async function loadDashboard(){
+
+try{
 
 const [userRes, habitsRes, refRes] = await Promise.all([
 
 fetch("/api/user",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
-body:JSON.stringify({initData})
+body:JSON.stringify({ initData })
 }),
 
 fetch("/api/habits",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
-body:JSON.stringify({initData})
+body:JSON.stringify({ initData })
 }),
 
 fetch("/api/referrals",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
-body:JSON.stringify({initData})
+body:JSON.stringify({ initData })
 })
 
 ])
@@ -36,37 +43,76 @@ const user = await userRes.json()
 const habits = await habitsRes.json()
 const referrals = await refRes.json()
 
-/* USER */
+// ==========================
+// USER
+// ==========================
 
-document.getElementById("player-name").innerText = user.nickname
+renderUser(user)
 
-document.getElementById("xp-text").innerText =
-`${user.xp_current} / ${user.xp_next}`
+// ==========================
+// HABITS
+// ==========================
 
+renderHabits(habits.habits)
+
+// ==========================
+// CHAT
+// ==========================
+
+renderChatUser(user.xp_current)
+renderReferrals(referrals.referrals)
+
+}catch(err){
+
+console.error("Dashboard load error:", err)
+
+}
+
+}
+
+// ==========================
+// USER RENDER
+// ==========================
+
+function renderUser(user){
+
+// имя
+const nameEl = document.getElementById("player-name")
+if(nameEl){
+nameEl.innerText = user.nickname || "Player"
+}
+
+// XP текст
+const xpText = document.getElementById("xp-text")
+if(xpText){
+xpText.innerText = `${user.xp_current} / ${user.xp_next}`
+}
+
+// XP прогресс
 const xpFill = document.getElementById("xp-fill")
-
 if(xpFill){
 xpFill.style.width = (user.xp_percent || 0) + "%"
 }
 
-/* AVATAR */
-
+// аватар
 const avatar = document.getElementById("player-avatar")
 if(avatar){
 avatar.src = "img/avatar/avatar_1.png"
 }
 
-/* HABITS */
+}
 
-renderHabits(habits.habits)
+// ==========================
+// INIT APP
+// ==========================
 
-/* CHAT */
+function init(){
 
-renderChatUser(user.xp_current)
-renderReferrals(referrals.referrals)
+renderWeek()
+initNavigation()
+initProfileModal()
+loadDashboard()
 
 }
 
-renderWeek()
-loadDashboard()
-initNavigation()
+init()
