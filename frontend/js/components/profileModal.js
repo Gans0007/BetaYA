@@ -116,9 +116,8 @@ const redStart = Math.min(100, percent + gap)
 const donut = overlay.querySelector(".donut")
 if(donut){
 donut.style.background = `conic-gradient(
-#22c55e 0% ${greenEnd}%,
-#0f1116 ${greenEnd}% ${redStart}%,
-#ef4444 ${redStart}% 100%
+#22c55e 0% ${percent}%,
+#ef4444 ${percent}% 100%
 )`
 }
 
