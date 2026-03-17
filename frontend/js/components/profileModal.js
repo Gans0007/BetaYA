@@ -2,7 +2,9 @@ import { calculateBehavior } from "../utils/calculations.js"
 
 export function initProfileModal(){
 
-// защита от повторной инициализации
+// ==========================
+// ЗАЩИТА ОТ ПОВТОРНОЙ ИНИЦИАЛИЗАЦИИ
+// ==========================
 if(document.querySelector(".profile-overlay")) return
 
 const avatar = document.getElementById("player-avatar")
@@ -80,13 +82,11 @@ function updateBehaviorUI(){
 
 const { completed, missed, index } = calculateBehavior(habitsData, "month")
 
-// donut
 const donut = overlay.querySelector(".donut-placeholder")
 if(donut){
 donut.innerText = `${completed} / ${missed}`
 }
 
-// индекс
 const gauge = overlay.querySelector(".gauge-placeholder")
 if(gauge){
 gauge.innerText = `${index}%`
@@ -108,11 +108,14 @@ overlay.classList.add("active")
 
 document.body.style.overflow = "hidden"
 
-// загрузка привычек
+// ==========================
+// ЗАГРУЗКА HABITS
+// ==========================
+
 fetch("/api/habits",{
 method:"POST",
 headers:{ "Content-Type":"application/json"},
-body:JSON.stringify({ initData: window.Telegram.WebApp.initData })
+body:JSON.stringify({ initData: window.initData })
 })
 .then(res => res.json())
 .then(data => {
@@ -153,10 +156,11 @@ closeModal()
 }
 })
 
-// ESC
+// ESC (фикс!)
 document.addEventListener("keydown",(e)=>{
 if(e.key === "Escape"){
 closeModal()
+}
 })
 
 }
