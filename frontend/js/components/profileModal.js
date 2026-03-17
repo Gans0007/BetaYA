@@ -2,9 +2,7 @@ import { calculateBehavior } from "../utils/calculations.js"
 
 export function initProfileModal(){
 
-// ==========================
-// ЗАЩИТА ОТ ПОВТОРНОЙ ИНИЦИАЛИЗАЦИИ
-// ==========================
+// защита
 if(document.querySelector(".profile-overlay")) return
 
 const avatar = document.getElementById("player-avatar")
@@ -13,7 +11,7 @@ if(!avatar) return
 let habitsData = []
 
 // ==========================
-// СОЗДАЕМ MODAL HTML
+// HTML
 // ==========================
 
 const overlay = document.createElement("div")
@@ -31,24 +29,49 @@ overlay.innerHTML = `
                 <div class="profile-sub">Бронза I</div>
             </div>
         </div>
-
         <div class="profile-close">✕</div>
     </div>
 
     <!-- CONTENT -->
     <div class="profile-modal-content">
 
-        <!-- BEHAVIOR BLOCK -->
         <div class="behavior-block">
 
-            <div class="behavior-left">
-                <div class="donut-placeholder">0 / 0</div>
-                <div class="behavior-label">Выполнено / Пропущено</div>
+            <!-- LEFT: DONUT -->
+            <div class="behavior-card">
+
+                <div class="donut">
+                    <div class="donut-inner">
+                        <span class="donut-text">0 / 0</span>
+                    </div>
+                </div>
+
+                <div class="donut-legend">
+                    <div class="legend-item green">
+                        <span></span> Выполнено: <b class="completed-val">0</b>
+                    </div>
+                    <div class="legend-item red">
+                        <span></span> Пропущено: <b class="missed-val">0</b>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="behavior-right">
-                <div class="gauge-placeholder">0%</div>
-                <div class="behavior-label">Настойчивость</div>
+            <!-- RIGHT: GAUGE -->
+            <div class="behavior-card">
+
+                <div class="gauge">
+
+                    <div class="gauge-arc"></div>
+                    <div class="gauge-pointer" id="gauge-pointer"></div>
+
+                    <div class="gauge-center">
+                        <div class="gauge-value">0</div>
+                        <div class="gauge-label">Нейтрально</div>
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
@@ -75,27 +98,62 @@ document.body.appendChild(overlay)
 const closeBtn = overlay.querySelector(".profile-close")
 
 // ==========================
-// ОБНОВЛЕНИЕ UI
+// UI UPDATE
 // ==========================
 
 function updateBehaviorUI(){
 
 const { completed, missed, index } = calculateBehavior(habitsData, "month")
 
-const donut = overlay.querySelector(".donut-placeholder")
+// ===== DONUT =====
+
+const total = completed + missed || 1
+const percent = (completed / total) * 100
+
+const donut = overlay.querySelector(".donut")
 if(donut){
-donut.innerText = `${completed} / ${missed}`
+donut.style.background = `conic-gradient(
+#22c55e 0% ${percent}%,
+#ef4444 ${percent}% 100%
+)`
 }
 
-const gauge = overlay.querySelector(".gauge-placeholder")
-if(gauge){
-gauge.innerText = `${index}%`
+overlay.querySelector(".donut-text").innerText = `${completed} / ${missed}`
+overlay.querySelector(".completed-val").innerText = completed
+overlay.querySelector(".missed-val").innerText = missed
+
+// ===== GAUGE =====
+
+const pointer = overlay.querySelector("#gauge-pointer")
+const valueEl = overlay.querySelector(".gauge-value")
+const labelEl = overlay.querySelector(".gauge-label")
+
+if(pointer){
+const angle = -90 + (index * 1.8)
+pointer.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`
+}
+
+if(valueEl){
+valueEl.innerText = index
+}
+
+// состояние
+let label = "Нейтрально"
+
+if(index < 20) label = "Макс. лень"
+else if(index < 40) label = "Лень"
+else if(index < 60) label = "Нейтрально"
+else if(index < 80) label = "Настойчивость"
+else label = "Экстрем. Настойчивость"
+
+if(labelEl){
+labelEl.innerText = label
 }
 
 }
 
 // ==========================
-// ОТКРЫТИЕ
+// OPEN
 // ==========================
 
 avatar.addEventListener("click", ()=>{
@@ -107,10 +165,6 @@ overlay.classList.add("active")
 },10)
 
 document.body.style.overflow = "hidden"
-
-// ==========================
-// ЗАГРУЗКА HABITS
-// ==========================
 
 fetch("/api/habits",{
 method:"POST",
@@ -131,7 +185,7 @@ console.error("Habits load error:", err)
 })
 
 // ==========================
-// ЗАКРЫТИЕ
+// CLOSE
 // ==========================
 
 function closeModal(){
@@ -146,17 +200,14 @@ document.body.style.overflow = ""
 
 }
 
-// крестик
 closeBtn.addEventListener("click", closeModal)
 
-// клик вне
 overlay.addEventListener("click",(e)=>{
 if(e.target === overlay){
 closeModal()
 }
 })
 
-// ESC (фикс!)
 document.addEventListener("keydown",(e)=>{
 if(e.key === "Escape"){
 closeModal()
