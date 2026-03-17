@@ -309,9 +309,10 @@ background:#22c55e;
 background:#ef4444;
 }
 
-/* GAUGE */
+/* =========================
+GAUGE FINAL (PRO)
+========================= */
 
-/* ОБЩИЙ */
 .gauge{
 display:flex;
 flex-direction:column;
@@ -321,31 +322,41 @@ align-items:center;
 /* ПОЛУКРУГ */
 .gauge-semicircle{
 position:relative;
-width:140px;
-height:70px;
+width:160px;
+height:90px;
 overflow:hidden;
 }
 
 /* ДУГА */
 .gauge-arc{
 position:absolute;
-width:140px;
-height:140px;
+width:160px;
+height:160px;
 border-radius:50%;
 top:0;
 left:0;
 
 background:conic-gradient(
-#ef4444 0deg 36deg,
-#f97316 36deg 72deg,
-#facc15 72deg 108deg,
-#22c55e 108deg 144deg,
-#16a34a 144deg 180deg,
+#ef4444 0deg 34deg,
+transparent 34deg 36deg,
+
+#f97316 36deg 70deg,
+transparent 70deg 72deg,
+
+#facc15 72deg 106deg,
+transparent 106deg 108deg,
+
+#22c55e 108deg 142deg,
+transparent 142deg 144deg,
+
+#16a34a 144deg 178deg,
+transparent 178deg 180deg,
+
 transparent 180deg 360deg
 );
 
-mask: radial-gradient(circle, transparent 58%, black 59%);
--webkit-mask: radial-gradient(circle, transparent 58%, black 59%);
+mask: radial-gradient(circle, transparent 50%, black 51%);
+-webkit-mask: radial-gradient(circle, transparent 50%, black 51%);
 }
 
 /* СТРЕЛКА */
@@ -355,28 +366,47 @@ bottom:0;
 left:50%;
 
 width:4px;
-height:65px;
+height:75px;
 
-background:white;
+background:linear-gradient(white, #aaa);
 border-radius:2px;
 
 transform-origin:bottom center;
 transform:translateX(-50%) rotate(-90deg);
 
+transition: transform 0.6s cubic-bezier(.4,2,.6,1);
+
+/* лёгкое свечение */
+box-shadow:0 0 6px rgba(255,255,255,0.4);
 }
 
-/* ЦЕНТР */
+/* кружок в основании */
+.gauge-pointer::after{
+content:"";
+position:absolute;
+bottom:-6px;
+left:50%;
+transform:translateX(-50%);
+
+width:10px;
+height:10px;
+background:white;
+border-radius:50%;
+}
+
+/* ТЕКСТ ПОД ДУГОЙ */
 .gauge-info{
-margin-top:8px;
+margin-top:14px;
 text-align:center;
 }
 
 .gauge-value{
-font-size:22px;
+font-size:24px;
 font-weight:700;
+transition: all .3s ease;
 }
 
 .gauge-label{
 font-size:12px;
-opacity:0.6;
+opacity:0.7;
 }

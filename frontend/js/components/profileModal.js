@@ -124,7 +124,7 @@ overlay.querySelector(".donut-text").innerText = `${completed} / ${missed}`
 overlay.querySelector(".completed-val").innerText = completed
 overlay.querySelector(".missed-val").innerText = missed
 
-// ===== GAUGE =====
+// ===== GAUGE FINAL =====
 
 const pointer = overlay.querySelector("#gauge-pointer")
 const valueEl = overlay.querySelector(".gauge-value")
@@ -132,25 +132,53 @@ const labelEl = overlay.querySelector(".gauge-label")
 
 const safeIndex = Math.max(0, Math.min(100, index))
 
-// угол от -90 до +90 (180 градусов)
+// угол (180°)
 const angle = -90 + (safeIndex * 1.8)
 
+// стрелка
 if(pointer){
 pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`
 }
 
-if(valueEl){
-valueEl.innerText = safeIndex
+// ===== АНИМАЦИЯ ЧИСЛА =====
+
+function animateValue(el, start, end, duration = 500){
+let startTime = null
+
+function step(timestamp){
+if(!startTime) startTime = timestamp
+const progress = Math.min((timestamp - startTime) / duration, 1)
+
+const value = Math.floor(progress * (end - start) + start)
+el.innerText = value
+
+if(progress < 1){
+requestAnimationFrame(step)
+}
 }
 
-// зоны
-let label = "Нейтрально"
+requestAnimationFrame(step)
+}
 
-if(safeIndex < 20) label = "Макс. лень"
+if(valueEl){
+const prev = parseInt(valueEl.innerText) || 0
+animateValue(valueEl, prev, safeIndex)
+
+// цвет
+if(safeIndex < 40) valueEl.style.color = "#ef4444"
+else if(safeIndex < 60) valueEl.style.color = "#facc15"
+else valueEl.style.color = "#22c55e"
+}
+
+// ===== СТАТУС =====
+
+let label = "Баланс"
+
+if(safeIndex < 20) label = "Критическая лень"
 else if(safeIndex < 40) label = "Лень"
-else if(safeIndex < 60) label = "Нейтрально"
+else if(safeIndex < 60) label = "Баланс"
 else if(safeIndex < 80) label = "Настойчивость"
-else label = "Экстремум"
+else label = "Жесткая дисциплина"
 
 if(labelEl){
 labelEl.innerText = label
