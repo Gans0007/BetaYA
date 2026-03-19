@@ -100,6 +100,22 @@ if(avatar){
 avatar.src = "img/avatar/avatar_1.png"
 }
 
+// ==========================
+// LEAGUE
+// ==========================
+
+const leagueText = document.getElementById("league-text")
+const leagueIcon = document.getElementById("league-icon")
+
+if(leagueText){
+    leagueText.innerText = user.league?.name || "—"
+}
+
+if(leagueIcon){
+    leagueIcon.src = user.league?.icon || ""
+}
+
+
 }
 
 // ==========================
