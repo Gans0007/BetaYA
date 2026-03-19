@@ -42,8 +42,8 @@ async def create_users_table():
                 current_streak INTEGER DEFAULT 0,
                 max_streak INTEGER DEFAULT 0,
                 last_streak_date DATE,
-                league TEXT DEFAULT 'Безответственный',
-                league_emoji TEXT DEFAULT '🕳️',
+                league TEXT DEFAULT 'Бронза I',
+                league_emoji TEXT DEFAULT '🥉',
                 usdt_payments NUMERIC(18,6) DEFAULT 0
             )
         """)

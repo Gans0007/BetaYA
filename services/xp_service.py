@@ -23,70 +23,30 @@ XP_DIFFICULTY = {
 # Лиги и их условия + цитата
 # ------------------------------------------
 LEAGUES = [
-    {
-        "name": "Безответственный",
-        "emoji": "🕳️",
-        "stars": 0,
-        "xp": 0,
-        "quote": "Поглощён ленью и оправданиями. Всё время «потом». Начало пути — ноль осознанности."
-    },
-    {
-        "name": "Сомневающийся",
-        "emoji": "🌫️",
-        "stars": 2,
-        "xp": 100,
-        "quote": "Хочет меняться, но туман сомнений мешает видеть путь."
-    },
-    {
-        "name": "Новичок",
-        "emoji": "🌱",
-        "stars": 5,
-        "xp": 300,
-        "quote": "Сделал первый шаг. Маленький росток через бетон привычек."
-    },
-    {
-        "name": "Ученик дисциплины",
-        "emoji": "🔥",
-        "stars": 10,
-        "xp": 700,
-        "quote": "Учится терпению и контролю. Уже чувствует вкус победы над собой."
-    },
-    {
-        "name": "Ответственный",
-        "emoji": "🛡️",
-        "stars": 18,
-        "xp": 1400,
-        "quote": "Держит слово. Делает, даже когда не хочется."
-    },
-    {
-        "name": "Железный характер",
-        "emoji": "⚔️",
-        "stars": 28,
-        "xp": 2500,
-        "quote": "Не сдаётся. Каждый день — как бой с самим собой."
-    },
-    {
-        "name": "Лидер примера",
-        "emoji": "🦁",
-        "stars": 40,
-        "xp": 4000,
-        "quote": "Действиями вдохновляет других. Лидер — не по словам, а по поступкам."
-    },
-    {
-        "name": "Непоколебимый",
-        "emoji": "🪨",
-        "stars": 50,
-        "xp": 5200,
-        "quote": "Никакие обстоятельства не могут сбить с курса."
-    },
-    {
-        "name": "Созидатель",
-        "emoji": "🌅",
-        "stars": 60,
-        "xp": 6000,
-        "quote": "Создает, а не разрушает. Ведёт, вдохновляет, созидает новый мир."
-    },
+    # 🟤 БРОНЗА
+    {"name": "Бронза I", "emoji": "🥉", "stars": 0, "xp": 0, "icon": "league_1.png", "quote": "Начало пути. Дисциплина только зарождается."},
+    {"name": "Бронза II", "emoji": "🥉", "stars": 2, "xp": 100, "icon": "league_1.png", "quote": "Ты уже не стоишь на месте."},
+    {"name": "Бронза III", "emoji": "🥉", "stars": 5, "xp": 300, "icon": "league_1.png", "quote": "Появляется ритм и первые результаты."},
+    {"name": "Бронза IV", "emoji": "🥉", "stars": 10, "xp": 700, "icon": "league_1.png", "quote": "Ты начинаешь контролировать себя."},
+    {"name": "Бронза V", "emoji": "🥉", "stars": 18, "xp": 1400, "icon": "league_1.png", "quote": "Ты уже не слабый игрок."},
+
+    # ⚪ СЕРЕБРО
+    {"name": "Серебро I", "emoji": "🥈", "stars": 28, "xp": 2500, "icon": "league_1.png", "quote": "Дисциплина становится нормой."},
+    {"name": "Серебро II", "emoji": "🥈", "stars": 40, "xp": 4000, "icon": "league_1.png", "quote": "Ты уже отличаешься от большинства."},
+    {"name": "Серебро III", "emoji": "🥈", "stars": 50, "xp": 5200, "icon": "league_1.png", "quote": "Ты держишь систему."},
+    {"name": "Серебро IV", "emoji": "🥈", "stars": 60, "xp": 6000, "icon": "league_1.png", "quote": "Стабильность — твоя сила."},
+    {"name": "Серебро V", "emoji": "🥈", "stars": 70, "xp": 7000, "icon": "league_1.png", "quote": "Ты почти на другом уровне."},
+
+    # 🟡 ЗОЛОТО
+    {"name": "Золото I", "emoji": "🥇", "stars": 85, "xp": 8500, "icon": "league_1.png", "quote": "Ты уже элита."},
+    {"name": "Золото II", "emoji": "🥇", "stars": 100, "xp": 10000, "icon": "league_1.png", "quote": "Ты управляешь собой."},
+    {"name": "Золото III", "emoji": "🥇", "stars": 120, "xp": 12000, "icon": "league_1.png", "quote": "Ты создаёшь правила."},
+    {"name": "Золото IV", "emoji": "🥇", "stars": 140, "xp": 14000, "icon": "league_1.png", "quote": "Ты доминируешь."},
+    {"name": "Золото V", "emoji": "🥇", "stars": 160, "xp": 17000, "icon": "league_1.png", "quote": "Максимум. Ты система."},
 ]
+
+def get_league_by_name(name: str):
+    return next((l for l in LEAGUES if l["name"] == name), LEAGUES[0])
 
 async def add_xp_for_confirmation(conn, user_id: int, habit_id: int):
     """
@@ -160,7 +120,7 @@ async def check_next_league(user_id: int):
             SELECT 
                 COALESCE(s.xp, 0) as xp,
                 COALESCE(s.total_stars, 0) as total_stars,
-                COALESCE(s.league, 'Безответственный') as league
+                COALESCE(s.league, 'Бронза I') as league
             FROM users u
             LEFT JOIN user_stats s ON s.user_id = u.user_id
         WHERE u.user_id = $1

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
-from services.xp_service import LEAGUES
+from services.xp_service import LEAGUES, get_league_by_name
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ async def get_user(request: Request):
         SELECT
             COALESCE(s.current_streak,0) as current_streak,
             COALESCE(s.xp,0) as xp,
-            COALESCE(s.league,'Безответственный') as league,
+            COALESCE(s.league,'Бронза I') as league,
             COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
@@ -42,7 +42,7 @@ async def get_user(request: Request):
         """, user_id)
 
     xp_user = float(row["xp"]) if row else 0
-    current_league = row["league"] if row else "Безответственный"
+    current_league = row["league"] if row else "Бронза I"
 
     idx = next((i for i,l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
@@ -56,8 +56,15 @@ async def get_user(request: Request):
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
 
-    xp_percent = int((xp_progress / xp_range) * 100) if xp_range else 100
+
+    if xp_range > 0:
+        xp_percent = int((xp_progress / xp_range) * 100)
+    else:
+        xp_percent = 100
+
     xp_percent = max(0, min(100, xp_percent))
+
+    league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
     return {
 
@@ -65,8 +72,10 @@ async def get_user(request: Request):
         "streak": row["current_streak"] if row else 0,
 
         "xp": xp_user,
-        "league": current_league,
-
+        "league": {
+           "name": league_obj["name"],
+            "icon": f"/img/leagues/{league_obj['icon']}"
+        },
         "xp_current": int(xp_user),
         "xp_next": int(next_xp_need),
         "xp_percent": xp_percent

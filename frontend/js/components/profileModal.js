@@ -26,7 +26,7 @@ overlay.innerHTML = `
             <img src="img/avatar/avatar_1.png" class="profile-avatar">
             <div>
                 <div class="profile-name">Player</div>
-                <div class="profile-sub">Бронза I</div>
+                <div class="profile-sub">...</div>
             </div>
         </div>
         <div class="profile-close">✕</div>
@@ -34,6 +34,13 @@ overlay.innerHTML = `
 
     <!-- CONTENT -->
     <div class="profile-modal-content">
+    <div class="period-switcher">
+        <div class="switcher-bg"></div>
+
+        <div class="period-option active" data-period="week">Еженедельно</div>
+        <div class="period-option" data-period="month">Ежемесячно</div>
+        <div class="period-option" data-period="year">Ежегодно</div>
+    </div>
 
         <div class="behavior-block">
 
@@ -191,6 +198,28 @@ labelEl.innerText = label
 // ==========================
 
 avatar.addEventListener("click", ()=>{
+
+// ===== USER DATA =====
+fetch("/api/user",{
+method:"POST",
+headers:{ "Content-Type":"application/json"},
+body:JSON.stringify({ initData: window.initData })
+})
+.then(res => res.json())
+.then(user => {
+
+const nameEl = overlay.querySelector(".profile-name")
+const subEl = overlay.querySelector(".profile-sub")
+
+if(nameEl) nameEl.innerText = user.nickname || "Player"
+if(subEl) subEl.innerText = user.league.name
+
+})
+.catch(err => {
+console.error("User load error:", err)
+})
+
+
 
 overlay.classList.remove("hidden")
 

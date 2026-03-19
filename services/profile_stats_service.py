@@ -11,6 +11,9 @@ from services.achievements.achievements_service import (
 )
 from core.database import get_pool
 
+from services.xp_service import get_league_by_name
+
+
 
 class ProfileStatsService:
 
@@ -36,7 +39,7 @@ class ProfileStatsService:
         league_name = user["league"]
         league_emoji = user["league_emoji"]
 
-        league_data = next((l for l in LEAGUES if l["name"] == league_name), None)
+        league_data = get_league_by_name(league_name)
         league_quote = league_data["quote"] if league_data else "—"
 
         current_index = next((i for i, l in enumerate(LEAGUES) if l["name"] == league_name), 0)
