@@ -27,8 +27,8 @@ LEAGUES = [
     {"name": "Бронза I", "emoji": "🥉", "stars": 0, "xp": 0, "icon": "league_1.png", "quote": "Начало пути. Дисциплина только зарождается."},
     {"name": "Бронза II", "emoji": "🥉", "stars": 2, "xp": 100, "icon": "league_2.png", "quote": "Ты уже не стоишь на месте."},
     {"name": "Бронза III", "emoji": "🥉", "stars": 5, "xp": 300, "icon": "league_3.png", "quote": "Появляется ритм и первые результаты."},
-    {"name": "Бронза IV", "emoji": "🥉", "stars": 10, "xp": 700, "icon": "league_1.png", "quote": "Ты начинаешь контролировать себя."},
-    {"name": "Бронза V", "emoji": "🥉", "stars": 18, "xp": 1400, "icon": "league_1.png", "quote": "Ты уже не слабый игрок."},
+    {"name": "Бронза IV", "emoji": "🥉", "stars": 10, "xp": 700, "icon": "league_4.png", "quote": "Ты начинаешь контролировать себя."},
+    {"name": "Бронза V", "emoji": "🥉", "stars": 18, "xp": 1400, "icon": "league_5.png", "quote": "Ты уже не слабый игрок."},
 
     # ⚪ СЕРЕБРО
     {"name": "Серебро I", "emoji": "🥈", "stars": 28, "xp": 2500, "icon": "league_1.png", "quote": "Дисциплина становится нормой."},
