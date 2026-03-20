@@ -61,8 +61,10 @@ app.add_middleware(
 # Подключаем роутеры
 # ----------------------------
 from api.dashboard import router as dashboard_router
+from api.profile import router as profile_router
 
 app.include_router(dashboard_router)
+app.include_router(profile_router)
 
 # ----------------------------
 # Test endpoint
