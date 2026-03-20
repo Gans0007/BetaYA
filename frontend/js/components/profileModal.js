@@ -1,3 +1,6 @@
+import { renderHeatmap } from "../components/heatmap.js"
+
+
 export function initProfileModal(){
 
 // защита
@@ -85,7 +88,7 @@ overlay.innerHTML = `
 
         <div class="profile-section">
             <div class="section-title">Активность</div>
-            <div class="heatmap-placeholder">Heatmap</div>
+            <div class="heatmap"></div>
         </div>
 
         <div class="profile-section">
@@ -116,6 +119,7 @@ const missedEl = overlay.querySelector(".missed-val")
 const pointer = overlay.querySelector(".gauge-pointer")
 const valueEl = overlay.querySelector(".gauge-value")
 const labelEl = overlay.querySelector(".gauge-label")
+const heatmapContainer = overlay.querySelector(".heatmap")
 
 const options = overlay.querySelectorAll(".period-option")
 const bg = overlay.querySelector(".switcher-bg")
@@ -153,6 +157,8 @@ function renderProfile(){
         console.error("Profile data is invalid:", profileData)
         return
     }
+
+    renderHeatmap(heatmapContainer, profileData.heatmap)
 
     const { user, behavior } = profileData
     const { completed, missed, index } = behavior

@@ -1,0 +1,46 @@
+.heatmap-grid {
+    display: flex;
+    gap: 4px;
+}
+
+.heatmap-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.heatmap-cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: #2a2d35;
+    transition: 0.2s;
+}
+
+.heatmap-cell:hover {
+    transform: scale(1.2);
+}
+
+/* уровни */
+
+.lvl-0 {
+    background: #2a2d35;
+}
+
+.lvl-1 {
+    background: #14532d;
+}
+
+.lvl-2 {
+    background: #22c55e;
+}
+
+.lvl-3 {
+    background: #4ade80;
+}
+
+/* пустые клетки */
+
+.heatmap-cell.empty {
+    opacity: 0.2;
+}
