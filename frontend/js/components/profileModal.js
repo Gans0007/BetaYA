@@ -10,6 +10,10 @@ if(!avatar) return
 
 let habitsData = []
 
+let profileState = {
+    range: "month"
+}
+
 // ==========================
 // HTML
 // ==========================
@@ -102,13 +106,38 @@ document.body.appendChild(overlay)
 
 const closeBtn = overlay.querySelector(".profile-close")
 
+
+const options = overlay.querySelectorAll(".period-option")
+const bg = overlay.querySelector(".switcher-bg")
+
+options.forEach((opt, index) => {
+
+    opt.addEventListener("click", () => {
+
+        // UI active
+        options.forEach(o => o.classList.remove("active"))
+        opt.classList.add("active")
+
+        // state
+        profileState.range = opt.dataset.period
+
+        // движение bg
+        bg.style.transform = `translateX(${index * 100}%)`
+
+        // обновление данных
+        updateBehaviorUI()
+
+    })
+
+})
+
 // ==========================
 // UI UPDATE
 // ==========================
 
 function updateBehaviorUI(){
 
-const { completed, missed, index } = calculateBehavior(habitsData, "month")
+const { completed, missed, index } = calculateBehavior(habitsData, profileState.range)
 
 // ===== DONUT =====
 

@@ -1,0 +1,51 @@
+/* =========================
+HEADER
+========================= */
+
+.profile-modal-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+padding:16px;
+
+font-weight:600;
+font-size:18px;
+
+border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+.profile-close{
+cursor:pointer;
+opacity:0.6;
+}
+
+.profile-close:hover{
+opacity:1;
+}
+
+/* =========================
+PROFILE HEADER
+========================= */
+
+.profile-header-left{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.profile-avatar{
+width:46px;
+height:46px;
+border-radius:12px;
+object-fit:cover;
+}
+
+.profile-name{
+font-weight:600;
+}
+
+.profile-sub{
+font-size:12px;
+opacity:0.6;
+}

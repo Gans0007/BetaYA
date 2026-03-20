@@ -1,0 +1,47 @@
+/* =========================
+PERIOD SWITCHER
+========================= */
+
+.period-switcher{
+position:relative;
+display:flex;
+
+background:#15171c;
+border-radius:16px;
+
+padding:4px;
+margin-bottom:18px;
+}
+
+.period-option{
+flex:1;
+text-align:center;
+padding:10px 0;
+
+font-size:13px;
+color:#888;
+
+cursor:pointer;
+z-index:2;
+
+transition:0.2s;
+}
+
+.period-option.active{
+color:#fff;
+}
+
+/* двигающийся фон */
+.switcher-bg{
+position:absolute;
+top:4px;
+left:4px;
+
+width:calc(33.333% - 4px);
+height:calc(100% - 8px);
+
+background:#2a2d35;
+border-radius:12px;
+
+transition: transform 0.3s ease;
+}

@@ -1,0 +1,33 @@
+/* =========================
+SECTIONS
+========================= */
+
+.profile-section{
+background:#15171c;
+border-radius:18px;
+
+padding:14px;
+margin-bottom:14px;
+}
+
+.section-title{
+font-size:14px;
+margin-bottom:10px;
+opacity:0.7;
+}
+
+/* placeholders */
+
+.heatmap-placeholder,
+.graph-placeholder{
+height:80px;
+border-radius:10px;
+
+background:rgba(255,255,255,0.05);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+opacity:0.5;
+}
