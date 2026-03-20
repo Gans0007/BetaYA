@@ -1,4 +1,5 @@
 import { renderHeatmap } from "../components/heatmap.js"
+import { renderGraph } from "../components/graph.js"
 
 
 export function initProfileModal(){
@@ -93,7 +94,7 @@ overlay.innerHTML = `
 
         <div class="profile-section">
             <div class="section-title">Прогресс</div>
-            <div class="graph-placeholder">Graph</div>
+            <canvas class="graph"></canvas>
         </div>
 
     </div>
@@ -120,6 +121,7 @@ const pointer = overlay.querySelector(".gauge-pointer")
 const valueEl = overlay.querySelector(".gauge-value")
 const labelEl = overlay.querySelector(".gauge-label")
 const heatmapContainer = overlay.querySelector(".heatmap")
+const graphCanvas = overlay.querySelector(".graph")
 
 const options = overlay.querySelectorAll(".period-option")
 const bg = overlay.querySelector(".switcher-bg")
@@ -207,6 +209,8 @@ function renderProfile(){
     else label = "Жесткая дисциплина"
 
     labelEl.innerText = label
+
+    renderGraph(graphCanvas, profileData.graph)
 }
 
 // ==========================

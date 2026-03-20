@@ -145,10 +145,36 @@ async def get_profile(request: Request):
         d += timedelta(days=1)
 
     # =========================
-    # GRAPH (простая версия)
+    # GRAPH (behavior curve)
     # =========================
 
-    graph = heatmap[-14:]  # последние 14 дней
+    graph = []
+
+    score = 0
+
+    d = start_date
+
+    while d <= today:
+
+        done_count = 0
+
+        for hid in habit_ids:
+            if hid in confirmations and d in confirmations[hid]:
+                done_count += 1
+ 
+        total_today = len(habit_ids)
+  
+        # баланс дня
+        day_score = done_count - (total_today - done_count)
+
+        score += day_score
+
+        graph.append({
+            "date": d.isoformat(),
+            "score": score
+        })
+
+        d += timedelta(days=1)
 
     # =========================
     # USER DATA (XP / LEAGUE)
