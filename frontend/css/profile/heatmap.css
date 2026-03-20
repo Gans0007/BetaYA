@@ -15,15 +15,15 @@ WRAPPER
 .heatmap-days {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 4px; 
 }
 
 .heatmap-day-label {
     height: 12px;
-    font-size: 10px;
-    opacity: 0.5;
     display: flex;
     align-items: center;
+    font-size: 10px;
+    opacity: 0.5;
 }
 
 /* =========================
