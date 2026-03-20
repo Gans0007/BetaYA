@@ -1,3 +1,35 @@
+/* =========================
+WRAPPER
+========================= */
+
+.heatmap-wrapper {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+/* =========================
+ДНИ НЕДЕЛИ
+========================= */
+
+.heatmap-days {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.heatmap-day-label {
+    height: 12px;
+    font-size: 10px;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+}
+
+/* =========================
+GRID
+========================= */
+
 .heatmap-grid {
     display: flex;
     gap: 4px;
@@ -23,23 +55,10 @@
 
 /* уровни */
 
-.lvl-0 {
-    background: #2a2d35;
-}
-
-.lvl-1 {
-    background: #14532d;
-}
-
-.lvl-2 {
-    background: #22c55e;
-}
-
-.lvl-3 {
-    background: #4ade80;
-}
-
-/* пустые клетки */
+.lvl-0 { background: #2a2d35; }
+.lvl-1 { background: #14532d; }
+.lvl-2 { background: #22c55e; }
+.lvl-3 { background: #4ade80; }
 
 .heatmap-cell.empty {
     opacity: 0.2;

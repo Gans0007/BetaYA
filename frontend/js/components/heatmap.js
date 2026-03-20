@@ -4,21 +4,39 @@ export function renderHeatmap(container, data){
 
     container.innerHTML = ""
 
-    const map = document.createElement("div")
-    map.className = "heatmap-grid"
+    const wrapper = document.createElement("div")
+    wrapper.className = "heatmap-wrapper"
 
     // =========================
-    // ГРУППИРУЕМ ПО НЕДЕЛЯМ
+    // ДНИ НЕДЕЛИ
     // =========================
+
+    const days = ["Пн","Вт","Ср","Чт","Пт","Сб","Вс"]
+
+    const daysCol = document.createElement("div")
+    daysCol.className = "heatmap-days"
+
+    days.forEach(d => {
+        const el = document.createElement("div")
+        el.className = "heatmap-day-label"
+        el.innerText = d
+        daysCol.appendChild(el)
+    })
+
+    // =========================
+    // ГРУППИРОВКА
+    // =========================
+
+    const grid = document.createElement("div")
+    grid.className = "heatmap-grid"
 
     const weeks = []
-
     let currentWeek = []
 
     data.forEach((day, i) => {
 
         const date = new Date(day.date)
-        const dayOfWeek = (date.getDay() + 6) % 7 + 1 // Пн = 1
+        const dayOfWeek = (date.getDay() + 6) % 7 + 1
 
         if(i === 0){
             for(let j = 1; j < dayOfWeek; j++){
@@ -43,7 +61,7 @@ export function renderHeatmap(container, data){
     }
 
     // =========================
-    // РЕНДЕР
+    // РЕНДЕР КЛЕТОК
     // =========================
 
     weeks.forEach(week => {
@@ -59,8 +77,6 @@ export function renderHeatmap(container, data){
             if(day){
                 const val = day.value
 
-                cell.dataset.value = val
-
                 if(val === 0) cell.classList.add("lvl-0")
                 else if(val < 2) cell.classList.add("lvl-1")
                 else if(val < 4) cell.classList.add("lvl-2")
@@ -72,12 +88,17 @@ export function renderHeatmap(container, data){
             }
 
             col.appendChild(cell)
-
         })
 
-        map.appendChild(col)
-
+        grid.appendChild(col)
     })
 
-    container.appendChild(map)
+    // =========================
+    // СБОРКА
+    // =========================
+
+    wrapper.appendChild(daysCol)
+    wrapper.appendChild(grid)
+
+    container.appendChild(wrapper)
 }
