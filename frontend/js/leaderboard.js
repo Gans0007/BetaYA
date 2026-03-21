@@ -26,8 +26,8 @@ const item=document.createElement("div")
 
 item.className="leader-row"
 
-if(user.rank===data.my_rank){
-item.classList.add("my-row")
+if(user.rank === data.me?.rank){
+    item.classList.add("my-row")
 }
 
 let rankClass="rank"
@@ -42,8 +42,14 @@ item.innerHTML=`
 ${user.rank}
 </div>
 
+<div class="leader-left">
+
+<img src="img/avatar/${user.avatar || "avatar_1.png"}" class="leader-avatar">
+
 <div class="leader-name">
 ${user.username || "Unknown"}
+</div>
+
 </div>
 
 <div class="leader-xp">
@@ -62,7 +68,7 @@ list.appendChild(item)
 
 /* ===== ЕСЛИ Я НЕ В ТОП 100 ===== */
 
-if(data.my_rank && data.my_rank > 100){
+if(data.me?.rank && data.me.rank > 100){
 
 const divider=document.createElement("div")
 
@@ -78,15 +84,21 @@ myRow.className="leader-row my-row"
 myRow.innerHTML=`
 
 <div class="rank">
-${data.my_rank}
+${data.me.rank}
 </div>
 
+<div class="leader-left">
+
+<img src="img/avatar/${data.me.avatar || "avatar_1.png"}" class="leader-avatar">
+
 <div class="leader-name">
-${data.my_username || "You"}
+${data.me.username || "You"}
+</div>
+
 </div>
 
 <div class="leader-xp">
-${data.my_xp.toLocaleString()}
+${(data.me.xp || 0).toLocaleString()}
 </div>
 
 <div class="leader-cup">

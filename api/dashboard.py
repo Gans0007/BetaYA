@@ -223,6 +223,7 @@ async def get_referrals(request: Request):
         SELECT
             u.user_id,
             COALESCE(u.username, u.first_name, 'User') as name,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar,
             COALESCE(s.xp,0) as xp
 
         FROM referrals r
@@ -241,6 +242,7 @@ async def get_referrals(request: Request):
 
         referrals.append({
             "user_id": r["user_id"],
+            "avatar": r["avatar"],
             "name": r["name"],
             "xp": int(r["xp"])
         })
@@ -276,6 +278,7 @@ async def get_leaderboard(request: Request):
         SELECT
             u.last_global_rank,
             COALESCE(u.username, u.first_name, 'Unknown') as username,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar,
             s.xp
 
         FROM users u
@@ -293,6 +296,7 @@ async def get_leaderboard(request: Request):
         SELECT
             u.last_global_rank,
             COALESCE(u.username, u.first_name, 'You') as username,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar,
             s.xp
 
         FROM users u
@@ -308,6 +312,7 @@ async def get_leaderboard(request: Request):
 
         leaders.append({
             "rank": r["last_global_rank"],
+            "avatar": r["avatar"],
             "username": r["username"],
             "xp": int(r["xp"])
         })
@@ -316,6 +321,7 @@ async def get_leaderboard(request: Request):
         "leaders": leaders,
         "me": {
             "rank": my["last_global_rank"] if my else None,
+            "avatar": my["avatar"] if my else "avatar_1.png",
             "username": my["username"] if my else "You",
             "xp": int(my["xp"]) if my else 0
         }

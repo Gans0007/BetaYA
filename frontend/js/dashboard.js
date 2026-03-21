@@ -40,6 +40,8 @@ body:JSON.stringify({ initData })
 ])
 
 const user = await userRes.json()
+window.currentUserAvatar = user.avatar || "avatar_1.png"
+
 const habits = await habitsRes.json()
 const referrals = await refRes.json()
 
