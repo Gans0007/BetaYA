@@ -38,13 +38,13 @@ async def get_profile(request: Request):
         user_row = await conn.fetchrow("""
         SELECT
             COALESCE(s.current_streak, 0) as current_streak,
-            COALESCE(s.xp, 0) as xp,
+            COALESCE(s.xp, 0)::float as xp,
             COALESCE(s.league, 'Бронза I') as league,
             COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
             COALESCE(u.avatar, 'avatar_1.png') as avatar
-        FROM user_stats s
-        JOIN users u ON u.user_id = s.user_id
-        WHERE s.user_id = $1
+        FROM users u
+        LEFT JOIN user_stats s ON u.user_id = s.user_id
+        WHERE u.user_id = $1
         """, user_id)
 
         habits_rows = await conn.fetch("""
@@ -238,7 +238,11 @@ async def view_profile(request: Request):
     except:
         data = {}
 
-    target_user_id = data.get("user_id")
+    try:
+        target_user_id = int(data.get("user_id"))
+    except:
+        return {"status": "error", "message": "invalid_user_id"}
+
     range_type = data.get("range", "month")
 
     if range_type not in ("week", "month", "year"):
@@ -254,17 +258,37 @@ async def view_profile(request: Request):
         user_row = await conn.fetchrow("""
         SELECT
             COALESCE(s.current_streak, 0) as current_streak,
-            COALESCE(s.xp, 0) as xp,
+            COALESCE(s.xp, 0)::float as xp,
             COALESCE(s.league, 'Бронза I') as league,
             COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
             COALESCE(u.avatar, 'avatar_1.png') as avatar
-        FROM user_stats s
-        JOIN users u ON u.user_id = s.user_id
-        WHERE s.user_id = $1
+        FROM users u
+        LEFT JOIN user_stats s ON u.user_id = s.user_id
+        WHERE u.user_id = $1
         """, target_user_id)
 
         if not user_row:
-            return {"status": "error", "message": "user_not_found"}
+            return {
+                "user": {
+                    "nickname": "Player",
+                    "avatar": "avatar_1.png",
+                    "league": {
+                        "name": "Бронза I",
+                        "icon": "/img/leagues/bronze_1.png"
+                    },
+                    "xp_current": 0,
+                    "xp_next": 100,
+                    "xp_percent": 0
+                },
+                "behavior": {
+                    "completed": 0,
+                    "missed": 0,
+                    "index": 0
+                },
+                "heatmap": [],
+                "graph": [],
+                "is_view_only": True
+            }
 
         habits_rows = await conn.fetch("""
         SELECT id
@@ -368,8 +392,8 @@ async def view_profile(request: Request):
 
         d += timedelta(days=1)
 
-    xp_user = float(user_row["xp"])
-    current_league = user_row["league"]
+    xp_user = float(user_row["xp"] or 0) if user_row else 0
+    current_league = user_row["league"] if user_row else "Бронза I"
 
     idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
