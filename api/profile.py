@@ -6,7 +6,6 @@ from services.xp_service import LEAGUES, get_league_by_name
 
 router = APIRouter()
 
-
 @router.post("/api/profile")
 async def get_profile(request: Request):
 
