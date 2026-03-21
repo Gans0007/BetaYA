@@ -97,7 +97,7 @@ xpFill.style.width = (user.xp_percent || 0) + "%"
 // аватар
 const avatar = document.getElementById("player-avatar")
 if(avatar){
-avatar.src = "img/avatar/avatar_1.png"
+    avatar.src = `img/avatar/${user.avatar || "avatar_1.png"}`
 }
 
 // ==========================

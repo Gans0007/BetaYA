@@ -32,19 +32,20 @@ async def get_user(request: Request):
 
         row = await conn.fetchrow("""
         SELECT
-            COALESCE(s.current_streak,0) as current_streak,
-            COALESCE(s.xp,0) as xp,
-            COALESCE(s.league,'Бронза I') as league,
-            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
+            COALESCE(s.current_streak, 0) as current_streak,
+            COALESCE(s.xp, 0) as xp,
+            COALESCE(s.league, 'Бронза I') as league,
+            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
-        WHERE s.user_id=$1
+        WHERE s.user_id = $1
         """, user_id)
 
     xp_user = float(row["xp"]) if row else 0
     current_league = row["league"] if row else "Бронза I"
 
-    idx = next((i for i,l in enumerate(LEAGUES) if l["name"] == current_league), 0)
+    idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
     current_xp_need = LEAGUES[idx]["xp"]
 
@@ -56,7 +57,6 @@ async def get_user(request: Request):
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
 
-
     if xp_range > 0:
         xp_percent = int((xp_progress / xp_range) * 100)
     else:
@@ -67,21 +67,18 @@ async def get_user(request: Request):
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
     return {
-
         "nickname": row["nickname"] if row else "Player",
         "streak": row["current_streak"] if row else 0,
-
+        "avatar": row["avatar"] if row else "avatar_1.png",
         "xp": xp_user,
         "league": {
-           "name": league_obj["name"],
+            "name": league_obj["name"],
             "icon": f"/img/leagues/{league_obj['icon']}"
         },
         "xp_current": int(xp_user),
         "xp_next": int(next_xp_need),
         "xp_percent": xp_percent
-
     }
-
 
 # =========================
 # HABITS

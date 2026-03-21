@@ -6,6 +6,12 @@ from services.xp_service import LEAGUES, get_league_by_name
 
 router = APIRouter()
 
+AVAILABLE_AVATARS = {
+    "avatar_1.png",
+    "avatar_2.png"
+}
+
+
 @router.post("/api/profile")
 async def get_profile(request: Request):
 
@@ -29,30 +35,23 @@ async def get_profile(request: Request):
 
     async with pool.acquire() as conn:
 
-        # =========================
-        # USER
-        # =========================
-
         user_row = await conn.fetchrow("""
         SELECT
-            COALESCE(s.current_streak,0) as current_streak,
-            COALESCE(s.xp,0) as xp,
-            COALESCE(s.league,'Бронза I') as league,
-            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname
+            COALESCE(s.current_streak, 0) as current_streak,
+            COALESCE(s.xp, 0) as xp,
+            COALESCE(s.league, 'Бронза I') as league,
+            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
-        WHERE s.user_id=$1
+        WHERE s.user_id = $1
         """, user_id)
-
-        # =========================
-        # HABITS
-        # =========================
 
         habits_rows = await conn.fetch("""
         SELECT id
         FROM habits
-        WHERE user_id=$1
-        AND is_active=true
+        WHERE user_id = $1
+        AND is_active = true
         """, user_id)
 
         habit_ids = [h["id"] for h in habits_rows]
@@ -60,13 +59,9 @@ async def get_profile(request: Request):
         confirmations_rows = await conn.fetch("""
         SELECT habit_id, DATE(datetime) as day
         FROM confirmations
-        WHERE user_id=$1
+        WHERE user_id = $1
         AND datetime >= NOW() - INTERVAL '365 days'
         """, user_id)
-
-    # =========================
-    # ДАТЫ ДЛЯ RANGE
-    # =========================
 
     today = datetime.now().date()
 
@@ -76,10 +71,6 @@ async def get_profile(request: Request):
         start_date = datetime(today.year, 1, 1).date()
     else:
         start_date = datetime(today.year, today.month, 1).date()
-
-    # =========================
-    # ГРУППИРУЕМ CONFIRMATIONS
-    # =========================
 
     confirmations = {}
 
@@ -91,10 +82,6 @@ async def get_profile(request: Request):
             confirmations[hid] = set()
 
         confirmations[hid].add(day)
-
-    # =========================
-    # BEHAVIOR
-    # =========================
 
     completed = 0
     missed = 0
@@ -120,10 +107,6 @@ async def get_profile(request: Request):
     if total > 0:
         index = int((completed / total) * 100)
 
-    # =========================
-    # HEATMAP
-    # =========================
-
     heatmap = []
 
     d = start_date
@@ -143,14 +126,8 @@ async def get_profile(request: Request):
 
         d += timedelta(days=1)
 
-    # =========================
-    # GRAPH (behavior curve)
-    # =========================
-
     graph = []
-
     score = 0
-
     d = start_date
 
     while d <= today:
@@ -160,12 +137,9 @@ async def get_profile(request: Request):
         for hid in habit_ids:
             if hid in confirmations and d in confirmations[hid]:
                 done_count += 1
- 
-        total_today = len(habit_ids)
-  
-        # баланс дня
-        day_score = done_count - (total_today - done_count)
 
+        total_today = len(habit_ids)
+        day_score = done_count - (total_today - done_count)
         score += day_score
 
         graph.append({
@@ -174,10 +148,6 @@ async def get_profile(request: Request):
         })
 
         d += timedelta(days=1)
-
-    # =========================
-    # USER DATA (XP / LEAGUE)
-    # =========================
 
     xp_user = float(user_row["xp"]) if user_row else 0
     current_league = user_row["league"] if user_row else "Бронза I"
@@ -203,14 +173,10 @@ async def get_profile(request: Request):
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
-    # =========================
-    # RESPONSE
-    # =========================
-
     return {
-
         "user": {
             "nickname": user_row["nickname"] if user_row else "Player",
+            "avatar": user_row["avatar"] if user_row else "avatar_1.png",
             "league": {
                 "name": league_obj["name"],
                 "icon": f"/img/leagues/{league_obj['icon']}"
@@ -219,13 +185,45 @@ async def get_profile(request: Request):
             "xp_next": int(next_xp_need),
             "xp_percent": xp_percent
         },
-
         "behavior": {
             "completed": completed,
             "missed": missed,
             "index": index
         },
-
         "heatmap": heatmap,
         "graph": graph
+    }
+
+
+@router.post("/api/profile/avatar")
+async def update_avatar(request: Request):
+
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
+    init_data = data.get("initData")
+    avatar = data.get("avatar")
+
+    if not init_data or not avatar:
+        return {"status": "error", "message": "missing_data"}
+
+    if avatar not in AVAILABLE_AVATARS:
+        return {"status": "error", "message": "invalid_avatar"}
+
+    user_id = validate_telegram_data(init_data)
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        await conn.execute("""
+        UPDATE users
+        SET avatar = $1
+        WHERE user_id = $2
+        """, avatar, user_id)
+
+    return {
+        "status": "ok",
+        "avatar": avatar
     }
