@@ -135,7 +135,7 @@ document.addEventListener("click", (e)=>{
     const userId = el.dataset.userId
     if(!userId) return
 
-    if(userId == window.currentUserId){
+    if(Number(userId) === Number(window.currentUserId)){
         return
     }
 

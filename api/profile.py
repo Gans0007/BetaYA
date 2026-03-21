@@ -239,9 +239,13 @@ async def view_profile(request: Request):
         data = {}
 
     target_user_id = data.get("user_id")
+    range_type = data.get("range", "month")
+
+    if range_type not in ("week", "month", "year"):
+        range_type = "month"
 
     if not target_user_id:
-        return {"status": "error"}
+        return {"status": "error", "message": "missing_user_id"}
 
     pool = await get_pool()
 
@@ -260,7 +264,109 @@ async def view_profile(request: Request):
         """, target_user_id)
 
         if not user_row:
-            return {"status": "error"}
+            return {"status": "error", "message": "user_not_found"}
+
+        habits_rows = await conn.fetch("""
+        SELECT id
+        FROM habits
+        WHERE user_id = $1
+        AND is_active = true
+        """, target_user_id)
+
+        habit_ids = [h["id"] for h in habits_rows]
+
+        confirmations_rows = await conn.fetch("""
+        SELECT habit_id, DATE(datetime) as day
+        FROM confirmations
+        WHERE user_id = $1
+        AND datetime >= NOW() - INTERVAL '365 days'
+        """, target_user_id)
+
+    today = datetime.now().date()
+
+    if range_type == "week":
+        start_date = today - timedelta(days=6)
+    elif range_type == "year":
+        start_date = datetime(today.year, 1, 1).date()
+    else:
+        start_date = datetime(today.year, today.month, 1).date()
+
+    confirmations = {}
+
+    for r in confirmations_rows:
+        hid = r["habit_id"]
+        day = r["day"]
+
+        if hid not in confirmations:
+            confirmations[hid] = set()
+
+        confirmations[hid].add(day)
+
+    completed = 0
+    missed = 0
+
+    d = start_date
+
+    while d <= today:
+
+        done_count = 0
+
+        for hid in habit_ids:
+            if hid in confirmations and d in confirmations[hid]:
+                done_count += 1
+
+        completed += done_count
+        missed += (len(habit_ids) - done_count)
+
+        d += timedelta(days=1)
+
+    index = 0
+    total = completed + missed
+
+    if total > 0:
+        index = int((completed / total) * 100)
+
+    heatmap = []
+
+    d = start_date
+
+    while d <= today:
+
+        value = 0
+
+        for hid in habit_ids:
+            if hid in confirmations and d in confirmations[hid]:
+                value += 1
+
+        heatmap.append({
+            "date": d.isoformat(),
+            "value": value
+        })
+
+        d += timedelta(days=1)
+
+    graph = []
+    score = 0
+    d = start_date
+
+    while d <= today:
+
+        done_count = 0
+
+        for hid in habit_ids:
+            if hid in confirmations and d in confirmations[hid]:
+                done_count += 1
+
+        total_today = len(habit_ids)
+        day_score = done_count - (total_today - done_count)
+        score += day_score
+
+        graph.append({
+            "date": d.isoformat(),
+            "score": score
+        })
+
+        d += timedelta(days=1)
 
     xp_user = float(user_row["xp"])
     current_league = user_row["league"]
@@ -298,5 +404,12 @@ async def view_profile(request: Request):
             "xp_next": int(next_xp_need),
             "xp_percent": xp_percent
         },
+        "behavior": {
+            "completed": completed,
+            "missed": missed,
+            "index": index
+        },
+        "heatmap": heatmap,
+        "graph": graph,
         "is_view_only": True
     }
