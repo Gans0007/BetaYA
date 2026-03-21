@@ -71,7 +71,11 @@ card.innerHTML=`
 
 <div class="friend-left">
 
-<img src="img/avatar/${user.avatar || "avatar_1.png"}" class="friend-avatar">
+<img 
+    src="img/avatar/${user.avatar || "avatar_1.png"}" 
+    class="friend-avatar"
+    data-user-id="${user.user_id}"
+>
 
 <div>
 

@@ -44,7 +44,11 @@ ${user.rank}
 
 <div class="leader-left">
 
-<img src="img/avatar/${user.avatar || "avatar_1.png"}" class="leader-avatar">
+<img 
+    src="img/avatar/${user.avatar || "avatar_1.png"}" 
+    class="leader-avatar"
+    data-user-id="${user.user_id}"
+>
 
 <div class="leader-name">
 ${user.username || "Unknown"}

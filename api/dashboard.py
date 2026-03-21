@@ -276,6 +276,7 @@ async def get_leaderboard(request: Request):
         rows = await conn.fetch("""
 
         SELECT
+            u.user_id,
             u.last_global_rank,
             COALESCE(u.username, u.first_name, 'Unknown') as username,
             COALESCE(u.avatar, 'avatar_1.png') as avatar,
@@ -311,6 +312,7 @@ async def get_leaderboard(request: Request):
     for r in rows:
 
         leaders.append({
+            "user_id": r["user_id"],
             "rank": r["last_global_rank"],
             "avatar": r["avatar"],
             "username": r["username"],

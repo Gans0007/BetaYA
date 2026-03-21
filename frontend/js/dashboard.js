@@ -3,9 +3,11 @@ import { renderWeek } from "./calendar.js"
 import { initNavigation } from "./navigation.js"
 import { renderChatUser, renderReferrals } from "./chat.js"
 import { initProfileModal } from "./components/profileModal.js"
+import { initUserProfileModal, openUserProfile } from "./components/userProfileModal.js"
 
 const tg = window.Telegram.WebApp
 tg.expand()
+window.currentUserId = tg.initDataUnsafe?.user?.id
 
 const initData = tg.initData
 
@@ -120,6 +122,27 @@ if(leagueIcon){
 
 }
 
+
+// ==========================
+// Ловим клики (ОБЩИЙ обработчик)
+// ==========================
+
+document.addEventListener("click", (e)=>{
+
+    const el = e.target.closest("[data-user-id]")
+    if(!el) return
+
+    const userId = el.dataset.userId
+    if(!userId) return
+
+    if(userId == window.currentUserId){
+        return
+    }
+
+    openUserProfile(userId)
+
+})
+
 // ==========================
 // INIT APP
 // ==========================
@@ -129,6 +152,7 @@ function init(){
 renderWeek()
 initNavigation()
 initProfileModal()
+initUserProfileModal()
 loadDashboard()
 
 }

@@ -227,3 +227,76 @@ async def update_avatar(request: Request):
         "status": "ok",
         "avatar": avatar
     }
+
+
+
+@router.post("/api/profile/view")
+async def view_profile(request: Request):
+
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
+    target_user_id = data.get("user_id")
+
+    if not target_user_id:
+        return {"status": "error"}
+
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        user_row = await conn.fetchrow("""
+        SELECT
+            COALESCE(s.current_streak, 0) as current_streak,
+            COALESCE(s.xp, 0) as xp,
+            COALESCE(s.league, 'Бронза I') as league,
+            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
+            COALESCE(u.avatar, 'avatar_1.png') as avatar
+        FROM user_stats s
+        JOIN users u ON u.user_id = s.user_id
+        WHERE s.user_id = $1
+        """, target_user_id)
+
+        if not user_row:
+            return {"status": "error"}
+
+    xp_user = float(user_row["xp"])
+    current_league = user_row["league"]
+
+    idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
+
+    current_xp_need = LEAGUES[idx]["xp"]
+
+    if idx < len(LEAGUES) - 1:
+        next_xp_need = LEAGUES[idx + 1]["xp"]
+    else:
+        next_xp_need = current_xp_need
+
+    xp_progress = xp_user - current_xp_need
+    xp_range = next_xp_need - current_xp_need
+
+    if xp_range > 0:
+        xp_percent = int((xp_progress / xp_range) * 100)
+    else:
+        xp_percent = 100
+
+    xp_percent = max(0, min(100, xp_percent))
+
+    league_obj = get_league_by_name(current_league) or LEAGUES[0]
+
+    return {
+        "user": {
+            "nickname": user_row["nickname"],
+            "avatar": user_row["avatar"],
+            "league": {
+                "name": league_obj["name"],
+                "icon": f"/img/leagues/{league_obj['icon']}"
+            },
+            "xp_current": int(xp_user),
+            "xp_next": int(next_xp_need),
+            "xp_percent": xp_percent
+        },
+        "is_view_only": True
+    }
