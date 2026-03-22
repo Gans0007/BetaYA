@@ -53,7 +53,9 @@ async def get_user(request: Request):
     current_stars_need = LEAGUES[idx]["stars"]
 
     if idx < len(LEAGUES) - 1:
-        next_xp_need = LEAGUES[idx + 1]["xp"]
+        next_league = LEAGUES[idx + 1]
+
+        next_xp_need = next_league["xp"]
         next_stars_need = next_league["stars"]
     else:
         next_xp_need = current_xp_need
