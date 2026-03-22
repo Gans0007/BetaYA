@@ -78,8 +78,12 @@ async def get_user(request: Request):
     stars_progress = stars_user - current_stars_need
     stars_range = next_stars_need - current_stars_need
 
-    stars_progress = max(0, stars_progress)
-    stars_range = max(1, stars_range)
+    if stars_range > 0:
+        stars_percent = int((stars_progress / stars_range) * 100)
+    else:
+        stars_percent = 100
+
+    stars_percent = max(0, min(100, stars_percent))
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
@@ -95,8 +99,9 @@ async def get_user(request: Request):
         "xp_current": int(xp_user),
         "xp_next": int(next_xp_need),
         "xp_percent": xp_percent,
-        "stars_current": int(stars_progress),
-        "stars_next": int(stars_range),
+        "stars_current": int(stars_user),
+        "stars_next": int(next_stars_need),
+        "stars_percent": stars_percent,
     }
 
 
