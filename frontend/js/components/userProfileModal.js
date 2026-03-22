@@ -91,7 +91,8 @@ export function initUserProfileModal(){
         isLoading: false,
         requestId: 0,
         userId: null,
-        range: "month"
+        range: "month",
+        cache: {}
     }
 
     bg.style.transform = `translateX(100%)`
@@ -256,6 +257,15 @@ export function initUserProfileModal(){
     }
 
     async function loadUserProfile(){
+        if(!state.userId || state.isLoading) return
+
+        const cacheKey = `${state.userId}_${state.range}`
+
+        // ⚡ если есть кеш — используем сразу
+        if(state.cache[cacheKey]){
+            renderUserProfile(state.cache[cacheKey])
+            return
+        }
 
         if(!state.userId || state.isLoading) return
 
@@ -264,7 +274,9 @@ export function initUserProfileModal(){
 
         const currentRequestId = state.requestId
 
-        renderLoadingState()
+        if(!state.cache[cacheKey]){
+            renderLoadingState()
+        }
 
         try{
             const res = await fetch("/api/profile/view", {
@@ -277,6 +289,14 @@ export function initUserProfileModal(){
             })
 
             const data = await res.json()
+
+            if(data && data.user && data.behavior){
+                state.cache[cacheKey] = data
+            }
+
+            if(Object.keys(state.cache).length > 50){
+                state.cache = {}
+            }
 
             if(currentRequestId !== state.requestId) return
 
