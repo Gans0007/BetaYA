@@ -92,6 +92,13 @@ if(xpText){
 xpText.innerText = `${user.xp_current} / ${user.xp_next}`
 }
 
+// STARS текст
+const starsText = document.getElementById("stars-text")
+
+if(starsText){
+    starsText.innerText = `${user.stars_current} / ${user.stars_next}`
+}
+
 // XP прогресс
 const xpFill = document.getElementById("xp-fill")
 if(xpFill){

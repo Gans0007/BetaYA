@@ -34,6 +34,7 @@ async def get_user(request: Request):
         SELECT
             COALESCE(s.current_streak, 0) as current_streak,
             COALESCE(s.xp, 0) as xp,
+            COALESCE(s.total_stars, 0) as total_stars,
             COALESCE(s.league, 'Бронза I') as league,
             COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
             COALESCE(u.avatar, 'avatar_1.png') as avatar
@@ -43,16 +44,20 @@ async def get_user(request: Request):
         """, user_id)
 
     xp_user = float(row["xp"]) if row else 0
+    stars_user = int(row["total_stars"]) if row else 0
     current_league = row["league"] if row else "Бронза I"
 
     idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
     current_xp_need = LEAGUES[idx]["xp"]
+    current_stars_need = LEAGUES[idx]["stars"]
 
     if idx < len(LEAGUES) - 1:
         next_xp_need = LEAGUES[idx + 1]["xp"]
+        next_stars_need = next_league["stars"]
     else:
         next_xp_need = current_xp_need
+        next_stars_need = current_stars_need
 
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
@@ -63,6 +68,16 @@ async def get_user(request: Request):
         xp_percent = 100
 
     xp_percent = max(0, min(100, xp_percent))
+
+    # =========================
+    # STARS PROGRESS
+    # =========================
+
+    stars_progress = stars_user - current_stars_need
+    stars_range = next_stars_need - current_stars_need
+
+    stars_progress = max(0, stars_progress)
+    stars_range = max(1, stars_range)
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
@@ -77,8 +92,13 @@ async def get_user(request: Request):
         },
         "xp_current": int(xp_user),
         "xp_next": int(next_xp_need),
-        "xp_percent": xp_percent
+        "xp_percent": xp_percent,
+        "stars_current": int(stars_progress),
+        "stars_next": int(stars_range),
     }
+
+
+
 
 # =========================
 # HABITS
