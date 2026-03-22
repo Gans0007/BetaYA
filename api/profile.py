@@ -30,8 +30,18 @@ async def get_profile(request: Request):
         return {}
 
     user_id = validate_telegram_data(init_data)
-
     pool = await get_pool()
+
+    today = datetime.now().date()
+
+    if range_type == "week":
+        start_date = today - timedelta(days=6)
+    elif range_type == "month":
+        start_date = today.replace(day=1)
+    elif range_type == "year":
+        start_date = today.replace(month=1, day=1)
+    else:
+        start_date = today - timedelta(days=6)
 
     async with pool.acquire() as conn:
 
@@ -57,89 +67,38 @@ async def get_profile(request: Request):
         habit_ids = [h["id"] for h in habits_rows]
 
         confirmations_rows = await conn.fetch("""
-        SELECT habit_id, DATE(datetime) as day
+        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
         FROM confirmations
         WHERE user_id = $1
-        AND datetime >= NOW() - INTERVAL '365 days'
-        """, user_id)
+        AND datetime >= $2
+        GROUP BY DATE(datetime)
+        """, user_id, start_date)
 
-    today = datetime.now().date()
+    # 🔥 супер быстрый словарь
+    day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
 
-    if range_type == "week":
-        start_date = today - timedelta(days=6)
-    elif range_type == "year":
-        start_date = datetime(today.year, 1, 1).date()
-    else:
-        start_date = datetime(today.year, today.month, 1).date()
-
-    confirmations = {}
-
-    for r in confirmations_rows:
-        hid = r["habit_id"]
-        day = r["day"]
-
-        if hid not in confirmations:
-            confirmations[hid] = set()
-
-        confirmations[hid].add(day)
+    total_habits = len(habit_ids)
 
     completed = 0
     missed = 0
-
-    d = start_date
-
-    while d <= today:
-
-        done_count = 0
-
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                done_count += 1
-
-        completed += done_count
-        missed += (len(habit_ids) - done_count)
-
-        d += timedelta(days=1)
-
-    index = 0
-    total = completed + missed
-
-    if total > 0:
-        index = int((completed / total) * 100)
-
     heatmap = []
-
-    d = start_date
-
-    while d <= today:
-
-        value = 0
-
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                value += 1
-
-        heatmap.append({
-            "date": d.isoformat(),
-            "value": value
-        })
-
-        d += timedelta(days=1)
-
     graph = []
+
     score = 0
     d = start_date
 
     while d <= today:
+        done = day_counts.get(d, 0)
 
-        done_count = 0
+        completed += done
+        missed += (total_habits - done)
 
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                done_count += 1
+        heatmap.append({
+            "date": d.isoformat(),
+            "value": done
+        })
 
-        total_today = len(habit_ids)
-        day_score = done_count - (total_today - done_count)
+        day_score = done - (total_habits - done)
         score += day_score
 
         graph.append({
@@ -148,6 +107,12 @@ async def get_profile(request: Request):
         })
 
         d += timedelta(days=1)
+
+    index = 0
+    total = completed + missed
+
+    if total > 0:
+        index = int((completed / total) * 100)
 
     xp_user = float(user_row["xp"]) if user_row else 0
     current_league = user_row["league"] if user_row else "Бронза I"
@@ -164,11 +129,7 @@ async def get_profile(request: Request):
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
 
-    if xp_range > 0:
-        xp_percent = int((xp_progress / xp_range) * 100)
-    else:
-        xp_percent = 100
-
+    xp_percent = int((xp_progress / xp_range) * 100) if xp_range > 0 else 100
     xp_percent = max(0, min(100, xp_percent))
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
@@ -193,7 +154,6 @@ async def get_profile(request: Request):
         "heatmap": heatmap,
         "graph": graph
     }
-
 
 @router.post("/api/profile/avatar")
 async def update_avatar(request: Request):
@@ -253,6 +213,17 @@ async def view_profile(request: Request):
 
     pool = await get_pool()
 
+    today = datetime.now().date()
+
+    if range_type == "week":
+        start_date = today - timedelta(days=6)
+    elif range_type == "month":
+        start_date = today.replace(day=1)
+    elif range_type == "year":
+        start_date = today.replace(month=1, day=1)
+    else:
+        start_date = today - timedelta(days=6)
+
     async with pool.acquire() as conn:
 
         user_row = await conn.fetchrow("""
@@ -300,89 +271,37 @@ async def view_profile(request: Request):
         habit_ids = [h["id"] for h in habits_rows]
 
         confirmations_rows = await conn.fetch("""
-        SELECT habit_id, DATE(datetime) as day
+        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
         FROM confirmations
         WHERE user_id = $1
-        AND datetime >= NOW() - INTERVAL '365 days'
-        """, target_user_id)
+        AND datetime >= $2
+        GROUP BY DATE(datetime)
+        """, target_user_id, start_date)
 
-    today = datetime.now().date()
+    day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
 
-    if range_type == "week":
-        start_date = today - timedelta(days=6)
-    elif range_type == "year":
-        start_date = datetime(today.year, 1, 1).date()
-    else:
-        start_date = datetime(today.year, today.month, 1).date()
-
-    confirmations = {}
-
-    for r in confirmations_rows:
-        hid = r["habit_id"]
-        day = r["day"]
-
-        if hid not in confirmations:
-            confirmations[hid] = set()
-
-        confirmations[hid].add(day)
+    total_habits = len(habit_ids)
 
     completed = 0
     missed = 0
-
-    d = start_date
-
-    while d <= today:
-
-        done_count = 0
-
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                done_count += 1
-
-        completed += done_count
-        missed += (len(habit_ids) - done_count)
-
-        d += timedelta(days=1)
-
-    index = 0
-    total = completed + missed
-
-    if total > 0:
-        index = int((completed / total) * 100)
-
     heatmap = []
-
-    d = start_date
-
-    while d <= today:
-
-        value = 0
-
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                value += 1
-
-        heatmap.append({
-            "date": d.isoformat(),
-            "value": value
-        })
-
-        d += timedelta(days=1)
-
     graph = []
+
     score = 0
     d = start_date
 
     while d <= today:
+        done = day_counts.get(d, 0)
 
-        done_count = 0
+        completed += done
+        missed += (total_habits - done)
 
-        for hid in habit_ids:
-            if hid in confirmations and d in confirmations[hid]:
-                done_count += 1
+        heatmap.append({
+            "date": d.isoformat(),
+            "value": done
+        })
 
-        total_today = len(habit_ids)
-        day_score = done_count - (total_today - done_count)
+        day_score = done - (total_habits - done)
         score += day_score
 
         graph.append({
@@ -392,8 +311,14 @@ async def view_profile(request: Request):
 
         d += timedelta(days=1)
 
-    xp_user = float(user_row["xp"] or 0) if user_row else 0
-    current_league = user_row["league"] if user_row else "Бронза I"
+    index = 0
+    total = completed + missed
+
+    if total > 0:
+        index = int((completed / total) * 100)
+
+    xp_user = float(user_row["xp"] or 0)
+    current_league = user_row["league"]
 
     idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
@@ -407,11 +332,7 @@ async def view_profile(request: Request):
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
 
-    if xp_range > 0:
-        xp_percent = int((xp_progress / xp_range) * 100)
-    else:
-        xp_percent = 100
-
+    xp_percent = int((xp_progress / xp_range) * 100) if xp_range > 0 else 100
     xp_percent = max(0, min(100, xp_percent))
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
