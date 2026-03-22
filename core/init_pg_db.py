@@ -147,4 +147,10 @@ async def create_users_table():
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_challenge_id ON habits(challenge_id)")
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_completed_challenge_id ON completed_challenges(challenge_id)")
 
+        # 🔥 Индексы для профиля
+
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_confirmations_user_datetime ON confirmations(user_id, datetime)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_confirmations_user_datetime_habit ON confirmations(user_id, datetime, habit_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_user_active ON habits(user_id, is_active)")
+
         print("✅ Таблицы успешно созданы или уже существуют.")
