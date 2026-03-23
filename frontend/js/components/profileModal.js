@@ -1,5 +1,6 @@
 import { renderHeatmap } from "../components/heatmap.js"
 import { renderGraph } from "../components/graph.js"
+import { initInfoTooltip } from "../components/infoTooltip.js"
 
 const AVAILABLE_AVATARS = [
     "avatar_1.png",
@@ -72,46 +73,62 @@ export function initProfileModal(){
                 <div class="period-option" data-period="year">Ежегодно</div>
             </div>
 
-            <div class="behavior-block">
+<div class="behavior-block">
 
-                <div class="behavior-card">
-                    <div class="donut"></div>
+    <div class="behavior-card">
+        <div class="card-header">
+            <div class="section-title">Выполнение</div>
+            <div class="info-btn" data-info="donut">i</div>
+        </div>
 
-                    <div class="donut-legend">
-                        <div class="legend-item green">
-                            <span></span> Выполнено: <b class="completed-val">0</b>
-                        </div>
-                        <div class="legend-item red">
-                            <span></span> Пропущено: <b class="missed-val">0</b>
-                        </div>
-                    </div>
-                </div>
+        <div class="donut"></div>
 
-                <div class="behavior-card">
-                    <div class="gauge">
-                        <div class="gauge-semicircle">
-                            <div class="gauge-arc"></div>
-                            <div class="gauge-pointer"></div>
-                        </div>
+        <div class="donut-legend">
+            <div class="legend-item green">
+                <span></span> Выполнено: <b class="completed-val">0</b>
+            </div>
+            <div class="legend-item red">
+                <span></span> Пропущено: <b class="missed-val">0</b>
+            </div>
+        </div>
+    </div>
 
-                        <div class="gauge-info">
-                            <div class="gauge-value" data-value="0">0</div>
-                            <div class="gauge-label">Нейтрально</div>
-                        </div>
-                    </div>
-                </div>
+    <div class="behavior-card">
+        <div class="card-header">
+            <div class="section-title">Индекс</div>
+            <div class="info-btn" data-info="gauge">i</div>
+        </div>
 
+        <div class="gauge">
+            <div class="gauge-semicircle">
+                <div class="gauge-arc"></div>
+                <div class="gauge-pointer"></div>
             </div>
 
-            <div class="profile-section">
-                <div class="section-title">Активность</div>
-                <div class="heatmap"></div>
+            <div class="gauge-info">
+                <div class="gauge-value" data-value="0">0</div>
+                <div class="gauge-label">Нейтрально</div>
             </div>
+        </div>
+    </div>
 
-            <div class="profile-section">
-                <div class="section-title">Прогресс</div>
-                <canvas class="graph"></canvas>
-            </div>
+</div>
+
+<div class="profile-section">
+    <div class="card-header">
+        <div class="section-title">Активность</div>
+        <div class="info-btn" data-info="heatmap">i</div>
+    </div>
+    <div class="heatmap"></div>
+</div>
+
+<div class="profile-section">
+    <div class="card-header">
+        <div class="section-title">Прогресс</div>
+        <div class="info-btn" data-info="graph">i</div>
+    </div>
+    <canvas class="graph"></canvas>
+</div>
 
         </div>
 
@@ -119,6 +136,7 @@ export function initProfileModal(){
     `
 
     document.body.appendChild(overlay)
+    initInfoTooltip(PROFILE_INFO)
 
     const closeBtn = overlay.querySelector(".profile-close")
 
