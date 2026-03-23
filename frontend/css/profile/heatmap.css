@@ -56,10 +56,10 @@ GRID
 /* уровни */
 
 .lvl-0 { background: #2a2d35; }
-.lvl-1 { background: #14532d; }
-.lvl-2 { background: #22c55e; }
-.lvl-3 { background: #4ade80; }
-
+.lvl-1 { background: #0e4429; }
+.lvl-2 { background: #006d32; }
+.lvl-3 { background: #26a641; }
+.lvl-4 { background: #39d353; }
 .heatmap-cell.empty {
     opacity: 0.2;
 }

@@ -78,9 +78,10 @@ export function renderHeatmap(container, data){
                 const val = day.value
 
                 if(val === 0) cell.classList.add("lvl-0")
-                else if(val < 2) cell.classList.add("lvl-1")
-                else if(val < 4) cell.classList.add("lvl-2")
-                else cell.classList.add("lvl-3")
+                else if(val === 1) cell.classList.add("lvl-1")
+                else if(val === 2) cell.classList.add("lvl-2")
+                else if(val === 3) cell.classList.add("lvl-3")
+                else cell.classList.add("lvl-4")
 
                 cell.title = `${day.date} — ${val}`
             }else{
