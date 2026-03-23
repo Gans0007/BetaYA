@@ -6,6 +6,13 @@ const AVAILABLE_AVATARS = [
     "avatar_2.png"
 ]
 
+const PROFILE_INFO = {
+    donut: "Показывает сколько привычек ты выполнил и сколько пропустил за выбранный период.",
+    gauge: "Индекс дисциплины — рассчитывается на основе выполнения привычек.",
+    heatmap: "Твоя активность по дням. Чем ярче — тем больше выполнено.",
+    graph: "Динамика твоего прогресса со временем."
+}
+
 export function initProfileModal(){
 
     if(document.querySelector(".profile-overlay")) return
