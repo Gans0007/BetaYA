@@ -4,7 +4,8 @@ import { initInfoTooltip } from "../components/infoTooltip.js"
 
 const AVAILABLE_AVATARS = [
     "avatar_1.png",
-    "avatar_2.png"
+    "avatar_2.png",
+    "avatar_3.png"
 ]
 
 const PROFILE_INFO = {
