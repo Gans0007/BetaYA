@@ -69,15 +69,18 @@ align-items:center;
 
 .gauge-semicircle{
 position:relative;
-width:160px;
-height:90px;
+width:100%;
+max-width:160px; /* ограничение сверху */
+height:auto;
+aspect-ratio: 2 / 1; /* сохраняем форму */
+margin:0 auto;
 overflow:hidden;
 }
 
 .gauge-arc{
 position:absolute;
-width:160px;
-height:160px;
+width:100%;
+height:100%;
 border-radius:50%;
 top:0;
 left:0;
