@@ -8,7 +8,8 @@ router = APIRouter()
 
 AVAILABLE_AVATARS = {
     "avatar_1.png",
-    "avatar_2.png"
+    "avatar_2.png",
+    "avatar_3.png",
 }
 
 
