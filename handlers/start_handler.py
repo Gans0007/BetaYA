@@ -6,6 +6,7 @@ from datetime import datetime
 from aiogram import Router, types
 from aiogram.filters import CommandStart
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from core.database import get_pool
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -186,11 +187,25 @@ async def start_command(message: types.Message, state: FSMContext):
         logging.info("⏳ FSM: waiting_for_nickname")
         return
 
-    logging.info("📲 Ник существует — показываем меню пользователю")
+    inline_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🚀 Добавить привычку / челлендж",
+                callback_data="open_add_menu"
+            )]
+        ]
+    )
+
     await message.answer(
         welcome_text(nickname),
-        reply_markup=main_menu_kb(),
+        reply_markup=inline_kb,
         parse_mode="HTML"
+    )
+
+    # 👇 тихо добавляем меню без мусора
+    await message.answer(
+        " ",
+        reply_markup=main_menu_kb()
     )
 
 
@@ -240,11 +255,26 @@ async def process_nickname(message: types.Message, state: FSMContext):
         logging.info(f"💾 Ник сохранён: {message.from_user.id} → {nickname}")
 
     logging.info("🎉 Ник успешно установлен, показываем меню")
+    inline_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🚀 Добавить привычку / челлендж",
+                callback_data="open_add_menu"
+            )]
+        ]
+    )
+ 
     await message.answer(
         welcome_text(nickname),
-        reply_markup=main_menu_kb(),
+        reply_markup=inline_kb,
         parse_mode="HTML"
     )
+
+    await message.answer(
+        " ",
+        reply_markup=main_menu_kb()
+    )
+
 
     logging.info("🧼 FSM cleared")
     await state.clear()
