@@ -250,7 +250,7 @@ async def process_nickname(message: types.Message, state: FSMContext):
     )
  
     await message.answer(
-        welcome_text(nickname) + "\n\n👇 Главное меню:",
+        welcome_text(nickname) + "<b>👇 Добавь первую привычку или выбери челлендж:👇</b>",
         reply_markup=main_menu_kb(),
         parse_mode="HTML"
     )
@@ -284,5 +284,4 @@ def welcome_text(nickname: str | None = None) -> str:
         "⚠️ <b>Важно:</b>\n"
         "Не добавляй сразу всё.\n"
         "Начни с 1–2 привычек и доведи их до результата.\n\n"
-        "<b>👇 Добавь первую привычку или выбери челлендж</b>"
     )
