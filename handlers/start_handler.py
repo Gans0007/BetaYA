@@ -265,13 +265,9 @@ async def process_nickname(message: types.Message, state: FSMContext):
     )
  
     await message.answer(
-        welcome_text(nickname),
+        welcome_text(nickname) + "\n\n👇 Главное меню:",
+        reply_markup=main_menu_kb(),
         parse_mode="HTML"
-    )
-
-    await message.answer(
-        " Главное меню здесь👇 ",
-        reply_markup=main_menu_kb()
     )
 
 
