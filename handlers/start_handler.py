@@ -188,7 +188,7 @@ async def start_command(message: types.Message, state: FSMContext):
         return
 
     await message.answer(
-        welcome_text(nickname) + "\n\n👇 Главное меню:",
+        welcome_text(nickname) + "<b>👇 Добавь первую привычку или выбери челлендж:👇</b>",
         reply_markup=main_menu_kb(),
         parse_mode="HTML"
     )
