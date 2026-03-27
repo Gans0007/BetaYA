@@ -271,7 +271,7 @@ async def process_nickname(message: types.Message, state: FSMContext):
     )
 
     await message.answer(
-        " ",
+        " Главное меню здесь👇 ",
         reply_markup=main_menu_kb()
     )
 
