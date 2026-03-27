@@ -266,7 +266,6 @@ async def process_nickname(message: types.Message, state: FSMContext):
  
     await message.answer(
         welcome_text(nickname),
-        reply_markup=inline_kb,
         parse_mode="HTML"
     )
 
