@@ -187,25 +187,10 @@ async def start_command(message: types.Message, state: FSMContext):
         logging.info("⏳ FSM: waiting_for_nickname")
         return
 
-    inline_kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(
-                text="🚀 Добавить привычку / челлендж",
-                callback_data="open_add_menu"
-            )]
-        ]
-    )
-
     await message.answer(
-        welcome_text(nickname),
-        reply_markup=inline_kb,
+        welcome_text(nickname) + "\n\n👇 Главное меню:",
+        reply_markup=main_menu_kb(),
         parse_mode="HTML"
-    )
-
-    # 👇 тихо добавляем меню без мусора
-    await message.answer(
-        " ",
-        reply_markup=main_menu_kb()
     )
 
 
