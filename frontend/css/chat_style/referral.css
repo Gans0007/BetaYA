@@ -1,0 +1,63 @@
+.referral-modal{
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.referral-overlay{
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+}
+
+.referral-content{
+    position: relative;
+    background: #1c1c1e;
+    border-radius: 20px;
+    padding: 20px;
+    width: 280px;
+    text-align: center;
+    z-index: 2;
+}
+
+.referral-title{
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+#referral-qr{
+    margin: 10px auto 20px;
+}
+
+.referral-copy{
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #6c5ce7;
+    color: #fff;
+    font-size: 14px;
+}
+
+/* toast */
+
+.referral-toast{
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2ecc71;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.referral-toast.show{
+    opacity: 1;
+}

@@ -80,6 +80,8 @@ console.error("Dashboard load error:", err)
 
 function renderUser(user){
 
+window.refLink = user.ref_link || ""
+
 // имя
 const nameEl = document.getElementById("player-name")
 if(nameEl){

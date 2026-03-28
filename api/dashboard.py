@@ -37,11 +37,21 @@ async def get_user(request: Request):
             COALESCE(s.total_stars, 0) as total_stars,
             COALESCE(s.league, 'Бронза I') as league,
             COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
-            COALESCE(u.avatar, 'avatar_1.png') as avatar
+            COALESCE(u.avatar, 'avatar_1.png') as avatar,
+            COALESCE(u.referral_code, '') as referral_code
         FROM user_stats s
         JOIN users u ON u.user_id = s.user_id
         WHERE s.user_id = $1
         """, user_id)
+
+    bot_username = "LiteVAmbitionBot"
+
+    referral_code = row["referral_code"] if row and row["referral_code"] else ""
+
+    ref_link = (
+        f"https://t.me/{bot_username}?start={referral_code}"
+        if referral_code else ""
+    )
 
     xp_user = float(row["xp"]) if row else 0
     stars_user = int(row["total_stars"]) if row else 0
@@ -92,6 +102,7 @@ async def get_user(request: Request):
         "streak": row["current_streak"] if row else 0,
         "avatar": row["avatar"] if row else "avatar_1.png",
         "xp": xp_user,
+        "ref_link": ref_link,
         "league": {
             "name": league_obj["name"],
             "icon": f"/img/leagues/{league_obj['icon']}"

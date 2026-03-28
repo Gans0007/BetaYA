@@ -1,3 +1,5 @@
+import { openReferral } from "./chat_components/referral.js"
+
 export function renderChatUser(xp){
 
 const tg = window.Telegram.WebApp
@@ -106,3 +108,18 @@ list.appendChild(card)
 })
 
 }
+
+
+// ==========================
+// КНОПКА ДОБАВИТЬ ДРУЗЕЙ
+// ==========================
+
+setTimeout(()=>{
+
+    const btn = document.querySelector(".add-friend-btn")
+
+    if(btn){
+        btn.onclick = openReferral
+    }
+
+}, 0)
