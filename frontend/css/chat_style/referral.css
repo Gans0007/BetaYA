@@ -57,3 +57,22 @@
     font-size: 15px;
     font-weight: 600;
 }
+
+.referral-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* затемнение */
+
+.referral-overlay{
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+}
