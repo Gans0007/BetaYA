@@ -41,7 +41,7 @@ modal.innerHTML = `
 
     <div class="referral-text">
         Любой, кто отсканирует этот код,<br>
-        будет добавлен в твою систему
+        будет мгновенно добавлен в друзья.
     </div>
 
     <button class="referral-copy">
