@@ -96,8 +96,22 @@ modal.innerHTML = `
     // ПОДЕЛИТЬСЯ
     // =========================
     modal.querySelector(".referral-share").onclick = () => {
-        const url = `https://t.me/share/url?url=${encodeURIComponent(link)}`
-        window.open(url, "_blank")
+
+        const text = `🔥 Я прокачиваю дисциплину через этого бота
+
+    🏆 Привычки, челленджи, рейтинг
+ 
+    Залетай и попробуй 👇`
+
+        const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(text)}`
+
+        const tg = window.Telegram?.WebApp
+
+        if (tg?.openTelegramLink) {
+            tg.openTelegramLink(url)
+        } else {
+            window.location.href = url
+        }
     }
 
     // =========================
