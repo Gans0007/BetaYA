@@ -1,63 +1,59 @@
-.referral-modal{
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-}
-
-.referral-overlay{
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-}
-
 .referral-content{
     position: relative;
-    background: #1c1c1e;
-    border-radius: 20px;
-    padding: 20px;
-    width: 280px;
+    background: rgba(28,28,30,0.95);
+    border-radius: 24px;
+    padding: 22px;
+    width: 300px;
     text-align: center;
     z-index: 2;
+
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
-.referral-title{
+/* крестик */
+
+.referral-close{
+    position: absolute;
+    top: 10px;
+    right: 12px;
     font-size: 18px;
-    margin-bottom: 15px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.referral-close:hover{
     color: #fff;
 }
 
-#referral-qr{
-    margin: 10px auto 20px;
+/* QR wrapper */
+
+.referral-qr-wrapper{
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff;
+    display: inline-block;
+    margin: 10px 0 16px;
 }
+
+/* текст */
+
+.referral-text{
+    font-size: 13px;
+    color: #9aa0b5;
+    margin-bottom: 18px;
+    line-height: 1.4;
+}
+
+/* кнопка */
 
 .referral-copy{
     width: 100%;
-    padding: 12px;
-    border-radius: 10px;
+    padding: 14px;
+    border-radius: 14px;
     border: none;
-    background: #6c5ce7;
+    background: linear-gradient(180deg,#6c5ce7,#4b3fd1);
     color: #fff;
-    font-size: 14px;
-}
-
-/* toast */
-
-.referral-toast{
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #2ecc71;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 10px;
-    opacity: 0;
-    transition: 0.3s;
-}
-
-.referral-toast.show{
-    opacity: 1;
+    font-size: 15px;
+    font-weight: 600;
 }

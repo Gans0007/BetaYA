@@ -23,27 +23,44 @@ export function openReferral(){
     modal = document.createElement("div")
     modal.className = "referral-modal"
 
-    modal.innerHTML = `
+modal.innerHTML = `
 
-    <div class="referral-overlay"></div>
+<div class="referral-overlay"></div>
 
-    <div class="referral-content">
+<div class="referral-content">
 
-        <div class="referral-title">
-            Пригласи друга
-        </div>
+    <div class="referral-close">✕</div>
 
-        <div id="referral-qr"></div>
-
-        <button class="referral-copy">
-            Скопировать ссылку
-        </button>
-
+    <div class="referral-title">
+        Пригласи друга
     </div>
 
-    `
+    <div class="referral-qr-wrapper">
+        <div id="referral-qr"></div>
+    </div>
+
+    <div class="referral-text">
+        Любой, кто отсканирует этот код,<br>
+        будет добавлен в твою систему
+    </div>
+
+    <button class="referral-copy">
+        Скопировать ссылку
+    </button>
+
+</div>
+`
 
     document.body.appendChild(modal)
+
+
+    // =========================
+    // ЗАКРЫТИЕ ПО ХРЕСТИКУ
+    // =========================
+
+    modal.querySelector(".referral-close").onclick = () => {
+        modal.style.display = "none"
+    }
 
     // =========================
     // ЗАКРЫТИЕ ПО ФОНУ
