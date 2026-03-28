@@ -114,12 +114,12 @@ list.appendChild(card)
 // КНОПКА ДОБАВИТЬ ДРУЗЕЙ
 // ==========================
 
-setTimeout(()=>{
+document.addEventListener("click", (e)=>{
 
-    const btn = document.querySelector(".add-friend-btn")
+    const btn = e.target.closest(".add-friend-btn")
 
     if(btn){
-        btn.onclick = openReferral
+        openReferral()
     }
 
-}, 0)
+})
