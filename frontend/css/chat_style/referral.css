@@ -1,17 +1,125 @@
+/* =========================
+MODAL
+========================= */
+
+.referral-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* затемнение */
+
+.referral-overlay{
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+}
+
+
+/* =========================
+CONTENT
+========================= */
+
 .referral-content{
     position: relative;
+    z-index: 2;
+
     background: rgba(28,28,30,0.95);
     border-radius: 24px;
     padding: 22px;
     width: 300px;
     text-align: center;
-    z-index: 2;
 
     backdrop-filter: blur(10px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.6);
+
+    overflow: hidden;
 }
 
-/* крестик */
+
+/* =========================
+НЕОНОВАЯ РАМКА (FIXED)
+========================= */
+
+.referral-content::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    border-radius:24px;
+    padding:1.5px;
+
+    pointer-events: none; /* 🔥 ВАЖНО — фикс кликов */
+    z-index: 0;
+
+    filter: drop-shadow(0 0 6px rgba(34,255,150,0.6))
+            drop-shadow(0 0 12px rgba(34,255,150,0.4));
+
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(34,255,150,0.0) 30%,
+        rgba(34,255,150,0.8) 45%,
+        rgba(34,255,150,1) 50%,
+        rgba(34,255,150,0.8) 55%,
+        rgba(34,255,150,0.0) 70%,
+        transparent 100%
+    );
+
+    background-size: 100% 300%;
+
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+    animation: neonRun 4s linear infinite;
+}
+
+@keyframes neonRun{
+    0%{
+        background-position: 0% 120%;
+        opacity:0;
+    }
+    15%{
+        opacity:1;
+    }
+    85%{
+        opacity:1;
+    }
+    100%{
+        background-position: 0% -120%;
+        opacity:0;
+    }
+}
+
+
+/* =========================
+Z-INDEX ДЛЯ КОНТЕНТА
+========================= */
+
+.referral-close,
+.referral-title,
+.referral-qr-wrapper,
+.referral-text,
+.referral-actions{
+    position: relative;
+    z-index: 1;
+}
+
+
+/* =========================
+CLOSE BUTTON
+========================= */
 
 .referral-close{
     position: absolute;
@@ -37,27 +145,28 @@
     color: #fff;
 }
 
-.referral-close:hover{
-    color: #fff;
-}
 
-/* QR wrapper */
+/* =========================
+QR
+========================= */
 
 .referral-qr-wrapper{
     padding: 12px;
     border-radius: 16px;
     background: #fff;
+
     display: inline-block;
     margin: 10px 0 16px;
-}
 
-.referral-qr-wrapper{
     box-shadow:
         0 0 20px rgba(255,255,255,0.08),
         0 0 40px rgba(255,255,255,0.05);
 }
 
-/* текст */
+
+/* =========================
+TEXT
+========================= */
 
 .referral-text{
     font-size: 13px;
@@ -66,42 +175,62 @@
     line-height: 1.4;
 }
 
-/* кнопка */
 
-.referral-copy{
-    width: 100%;
+/* =========================
+BUTTONS
+========================= */
+
+.referral-actions{
+    display: flex;
+    gap: 10px;
+}
+
+.referral-copy,
+.referral-share{
+    flex:1;
+
     padding: 14px;
     border-radius: 14px;
     border: none;
+
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.15s;
+}
+
+/* копировать */
+
+.referral-copy{
     background: linear-gradient(180deg,#6c5ce7,#4b3fd1);
     color: #fff;
-    font-size: 15px;
-    font-weight: 600;
 }
 
-.referral-modal{
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
+/* поделиться */
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.referral-share{
+    background: linear-gradient(180deg,#2dd4bf,#22c55e);
+    color: #02130f;
 }
 
-/* затемнение */
+/* нажатие */
 
-.referral-overlay{
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(6px);
+.referral-copy:active,
+.referral-share:active{
+    transform: scale(0.96);
 }
+
+
+/* =========================
+TOAST
+========================= */
 
 .referral-toast{
     position: fixed;
     top: 50%;
     left: 50%;
+
     transform: translate(-50%, -50%) scale(0.9);
 
     background: rgba(20,20,22,0.95);
@@ -122,99 +251,4 @@
 .referral-toast.show{
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
-}
-
-
-.referral-actions{
-    display: flex;
-    gap: 10px;
-}
-
-.referral-copy,
-.referral-share{
-    flex:1;
-
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-/* копировать */
-.referral-copy{
-    background: linear-gradient(180deg,#6c5ce7,#4b3fd1);
-    color: #fff;
-}
-
-/* поделиться */
-.referral-share{
-    background: linear-gradient(180deg,#2dd4bf,#22c55e);
-    color: #02130f;
-}
-
-.referral-copy:active,
-.referral-share:active{
-    transform: scale(0.96);
-}
-
-
-
-.referral-content{
-    overflow: hidden;
-}
-
-/* неоновая рамка */
-
-.referral-content::before{
-    content:"";
-    position:absolute;
-    inset:0;
-
-    border-radius:24px;
-    padding:1.5px;
-
-    filter: drop-shadow(0 0 6px rgba(34,255,150,0.6))
-            drop-shadow(0 0 12px rgba(34,255,150,0.4));
-
-    background: linear-gradient(
-        180deg,
-        transparent 0%,
-        rgba(34,255,150,0.0) 30%,
-        rgba(34,255,150,0.8) 45%,
-        rgba(34,255,150,1) 50%,
-        rgba(34,255,150,0.8) 55%,
-        rgba(34,255,150,0.0) 70%,
-        transparent 100%
-    );
-
-    background-size: 100% 300%;   /* ВАЖНО */
-
-    -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-            mask-composite: exclude;
-
-    animation: neonRun 4s linear infinite;
-}
-
-/* движение снизу вверх */
-@keyframes neonRun{
-    0%{
-        background-position: 0% 120%;
-        opacity:0;
-    }
-    15%{
-        opacity:1;
-    }
-    85%{
-        opacity:1;
-    }
-    100%{
-        background-position: 0% -120%;
-        opacity:0;
-    }
 }
