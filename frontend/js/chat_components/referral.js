@@ -44,9 +44,16 @@ modal.innerHTML = `
         будет мгновенно добавлен в друзья.
     </div>
 
-    <button class="referral-copy">
-        Скопировать ссылку
-    </button>
+    <div class="referral-actions">
+
+        <button class="referral-copy">
+            Скопировать
+        </button>
+
+        <button class="referral-share">
+            Поделиться
+        </button>
+    </div>
 
 </div>
 `
@@ -83,6 +90,14 @@ modal.innerHTML = `
             fallbackCopy(link)
         }
 
+    }
+
+    // =========================
+    // ПОДЕЛИТЬСЯ
+    // =========================
+    modal.querySelector(".referral-share").onclick = () => {
+        const url = `https://t.me/share/url?url=${encodeURIComponent(link)}`
+        window.open(url, "_blank")
     }
 
     // =========================
