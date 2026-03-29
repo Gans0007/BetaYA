@@ -7,7 +7,8 @@ const items = document.querySelectorAll(".nav-item")
 const pages = {
 dashboard: document.getElementById("dashboard-page"),
 chat: document.getElementById("chat-page"),
-leaderboard: document.getElementById("leaderboard-page")
+leaderboard: document.getElementById("leaderboard-page"),
+partners: document.getElementById("partners-page")
 }
 
 let activePage = pages.dashboard

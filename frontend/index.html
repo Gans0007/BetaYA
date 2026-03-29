@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/chat.css">
 <link rel="stylesheet" href="css/profile/profile.css">
 <link rel="stylesheet" href="css/chat_style/referral.css">
+<link rel="stylesheet" href="css/partners_style/partners.css">
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -184,6 +185,20 @@ CHAT PAGE
 </div>
 
 <!-- ======================
+PARTNERS PAGE
+====================== -->
+
+<div id="partners-page" class="page">
+
+<div class="page-content">
+
+<div id="partners-root"></div>
+
+</div>
+
+</div>
+
+<!-- ======================
 BOTTOM NAVIGATION
 ====================== -->
 
@@ -234,7 +249,13 @@ window.initData = tg.initData
 import { initNavigation } from "./js/navigation.js"
 
 initNavigation()
+</script>
 
+
+<script type="module">
+import { renderPartners } from "./js/partners_components/partners.js"
+
+renderPartners()
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
