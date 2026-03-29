@@ -39,9 +39,7 @@ activePage.classList.add("active")
 }
 
 if(pageName === "partners"){
-    if(!document.querySelector(".partners-container")){
-        renderPartners()
-    }
+    renderPartners()
 }
 
 })
