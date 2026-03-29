@@ -7,7 +7,7 @@ root.innerHTML = `
 
 <div class="partners-container">
 
-<h2 class="partners-title">Партнерка</h2>
+<h2 class="partners-title">В разработке</h2>
 
 <div class="partners-buttons">
 
