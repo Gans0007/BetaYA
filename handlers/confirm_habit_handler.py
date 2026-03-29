@@ -94,12 +94,18 @@ async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
 
     data = await state.get_data()
 
-    # ❗ на всякий случай, если нет — перезапросим
     if not data:
         start = await habit_service.start_confirmation(user_id, habit_id)
         reverify = start["reverify"]
     else:
         reverify = data["reverify"]
+
+    # 🔥 чистим старое UI
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
 
     await state.update_data(
         habit_id=habit_id,
@@ -108,7 +114,11 @@ async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
 
     await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
-    await callback.answer("📸 Отправь фото / видео / кружочек")
+    # ❗ убираем loader
+    await callback.answer()
+
+    # 🔥 показываем нормальное сообщение
+    await callback.message.answer("📸 Отправь фото / видео / кружочек")
 
 # ================================
 # 🔹 Отмена подтверждения
