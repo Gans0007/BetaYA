@@ -136,3 +136,13 @@ transition:0.2s;
 #toggle-media:hover{
 background:#26262b;
 }
+
+
+
+.settings-buttons button.active{
+background:#2d6cdf;
+}
+
+#toggle-media.active{
+background:#2d6cdf;
+}

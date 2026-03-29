@@ -2,10 +2,11 @@ const userId = window.Telegram.WebApp.initDataUnsafe.user.id
 
 export function openSettingsModal(){
 
-if(document.querySelector(".settings-overlay")){
-    const overlay = document.querySelector(".settings-overlay")
-    overlay.classList.remove("hidden")
-    setTimeout(() => overlay.classList.add("active"), 10)
+const existing = document.querySelector(".settings-overlay")
+
+if(existing){
+    existing.classList.remove("hidden")
+    setTimeout(() => existing.classList.add("active"), 10)
     return
 }
 
@@ -45,13 +46,12 @@ overlay.innerHTML = `
 
         <div class="settings-block">
             <div class="settings-label">Публикация медиа</div>
-            <button id="toggle-media">Переключить</button>
+            <button id="toggle-media">Загрузка...</button>
         </div>
 
     </div>
 
 </div>
-
 `
 
 document.body.appendChild(overlay)
@@ -77,21 +77,23 @@ overlay.addEventListener("click", (e)=>{
 })
 
 function closeModal(){
-
     overlay.classList.remove("active")
-
-    setTimeout(()=>{
-        overlay.remove()   // 💥 ВОТ ЭТО ГЛАВНОЕ
-    }, 250)
-
+    setTimeout(()=> overlay.remove(), 250)
 }
 
 // =========================
-// КНОПКИ (заглушки пока)
+// КНОПКИ
 // =========================
 
-overlay.querySelectorAll("[data-tone]").forEach(btn=>{
+const toneButtons = overlay.querySelectorAll("[data-tone]")
+const tzButtons = overlay.querySelectorAll("[data-tz]")
+const toggleBtn = overlay.querySelector("#toggle-media")
 
+// =========================
+// ТОН
+// =========================
+
+toneButtons.forEach(btn=>{
 btn.addEventListener("click", async ()=>{
 
 const tone = btn.dataset.tone
@@ -105,16 +107,19 @@ await fetch("/api/settings/tone", {
     })
 })
 
+toneButtons.forEach(b=>b.classList.remove("active"))
+btn.classList.add("active")
+
 showToast("Тон обновлён")
 
 })
-
 })
 
+// =========================
+// TIMEZONE
+// =========================
 
-
-overlay.querySelectorAll("[data-tz]").forEach(btn=>{
-
+tzButtons.forEach(btn=>{
 btn.addEventListener("click", async ()=>{
 
 const tz = btn.dataset.tz
@@ -128,14 +133,17 @@ await fetch("/api/settings/timezone", {
     })
 })
 
+tzButtons.forEach(b=>b.classList.remove("active"))
+btn.classList.add("active")
+
 showToast("Регион обновлён")
 
 })
-
 })
 
-
-
+// =========================
+// TOGGLE MEDIA
+// =========================
 
 toggleBtn.addEventListener("click", async ()=>{
 
@@ -147,15 +155,80 @@ await fetch("/api/settings/toggle_media", {
     })
 })
 
+toggleBtn.classList.toggle("active")
+
+if(toggleBtn.classList.contains("active")){
+    toggleBtn.innerText = "🟢 Включено"
+}else{
+    toggleBtn.innerText = "⚪ Выключено"
+}
+
 showToast("Настройка обновлена")
 
 })
+
+// =========================
+// ЗАГРУЗКА НАСТРОЕК
+// =========================
+
+loadSettings(overlay)
 
 }
 
 
 // =========================
-// TOAST (reuse)
+// LOAD SETTINGS
+// =========================
+
+async function loadSettings(overlay){
+
+try{
+
+const res = await fetch("/api/settings", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+        user_id: userId
+    })
+})
+
+const data = await res.json()
+
+if(!data.ok) return
+
+// ТОН
+overlay.querySelectorAll("[data-tone]").forEach(btn=>{
+    if(btn.dataset.tone === data.tone){
+        btn.classList.add("active")
+    }
+})
+
+// TIMEZONE
+overlay.querySelectorAll("[data-tz]").forEach(btn=>{
+    if(btn.dataset.tz === data.timezone){
+        btn.classList.add("active")
+    }
+})
+
+// MEDIA
+const toggleBtn = overlay.querySelector("#toggle-media")
+
+if(data.share_on){
+    toggleBtn.classList.add("active")
+    toggleBtn.innerText = "🟢 Включено"
+}else{
+    toggleBtn.innerText = "⚪ Выключено"
+}
+
+}catch(e){
+console.error("SETTINGS LOAD ERROR", e)
+}
+
+}
+
+
+// =========================
+// TOAST
 // =========================
 
 function showToast(text){
