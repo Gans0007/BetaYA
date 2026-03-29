@@ -4,6 +4,8 @@ from core.database import get_pool
 
 from services.habit_view_service import send_habit_card, build_active_list
 from services.user_stats_service import increment_finished_habits
+from services.fsm_ui import clear_fsm_ui
+from aiogram.fsm.context import FSMContext
 
 router = Router()
 
@@ -135,19 +137,27 @@ async def back_from_card(callback: types.CallbackQuery):
 # 🔹 Возврат к списку (callback)
 # =====================================================
 @router.callback_query(F.data == "show_active_list")
-async def back_to_active_list(callback: types.CallbackQuery):
+async def back_to_active_list(callback: types.CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
-    logger.info(f"👤 Пользователь {callback.from_user.id} запросил отображение списка активных привычек.")
+
+    await clear_fsm_ui(
+        state=state,
+        bot=callback.bot,
+        chat_id=callback.message.chat.id
+    )
+
+    await state.clear()   # ✅ ВНУТРИ функции
+
+    logger.info(f"👤 Пользователь {callback.from_user.id} запросил список привычек.")
 
     text, kb, rows = await build_active_list(user_id)
 
     if not rows:
-        await callback.message.edit_text("😴 У тебя пока нет активных привычек или челленджей.")
+        await callback.message.edit_text("😴 У тебя пока нет активных привычек.")
     else:
         await callback.message.edit_text(text, parse_mode="Markdown", reply_markup=kb)
 
     await callback.answer()
-
 
 # ================================
 # 🔥 1) Запрос подтверждения удаления привычки

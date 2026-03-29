@@ -111,8 +111,17 @@ async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
     await callback.answer()
-    await callback.message.answer("📸 Отправь фото / видео / кружочек")
 
+    cancel_kb = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="❌ Отмена", callback_data="show_active_list")]
+        ]
+    )
+
+    await callback.message.answer(
+        "📸 Отправь фото / видео / кружочек",
+        reply_markup=cancel_kb
+    )
 
 # ================================
 # 🔹 Отмена
@@ -312,3 +321,4 @@ async def process_task_from_queue(task, bot):
             )
         except Exception:
             pass
+
