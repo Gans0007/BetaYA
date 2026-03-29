@@ -279,7 +279,7 @@ async def process_task_from_queue(task, bot):
             )
 
         # 🔥 Проверка возможности повышения лиги
-        await profile_stats_service.notify_if_can_level_up(bot, user_id)
+        await profile_stats_service.auto_level_up(bot, user_id)
 
     except Exception as e:
         logging.error(f"[QUEUE PROCESS ERROR] {e}", exc_info=True)

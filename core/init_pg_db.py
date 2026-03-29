@@ -140,6 +140,41 @@ async def create_users_table():
         """)
 
         # -------------------------------
+        # 🔹 Таблица событий пользователя (user_events)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_events (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                type TEXT NOT NULL, -- league_up / achievement / challenge_complete
+                entity_id TEXT,
+                value TEXT, 
+                meta JSONB,
+                created_at TIMESTAMP DEFAULT NOW(),
+                is_seen BOOLEAN DEFAULT FALSE,
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Индексы для событий
+        # -------------------------------
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_events_user_id 
+            ON user_events(user_id)
+        """)
+
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_events_user_seen 
+            ON user_events(user_id, is_seen)
+        """)
+
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_events_type 
+            ON user_events(type)
+        """)
+
+        # -------------------------------
         # 🔹 Индексы для ускорения запросов
         # -------------------------------
         await conn.execute("CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id)")

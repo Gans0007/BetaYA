@@ -4,6 +4,8 @@ from repositories.profile_stats_repository import (
     update_league,
     get_last_confirmations_for_week
 )
+
+
 from services.xp_service import LEAGUES, check_next_league
 from services.achievements.achievements_service import (
     get_total_achievement_progress,
@@ -12,8 +14,6 @@ from services.achievements.achievements_service import (
 from core.database import get_pool
 
 from services.xp_service import get_league_by_name
-
-
 
 class ProfileStatsService:
 
@@ -101,26 +101,69 @@ class ProfileStatsService:
         return result
 
     #-----------------------------------------
-    #Уведомление о переходе на следующую лигу
+    #переход на следующую лигу
     #-----------------------------------------
-    async def notify_if_can_level_up(self, bot, user_id: int):
-        result = await check_next_league(user_id)
+    async def auto_level_up(self, bot, user_id: int):
+        """
+        Автоматически повышает лигу, если выполнены условия.
+        Поддерживает несколько апов подряд.
+        """
 
-        if not result.get("next_league"):
-            return
+        from services.xp_service import check_next_league
+        from core.database import get_pool
+        import json
 
-        if not result.get("can_level_up"):
-            return
+        upgrades = []
 
-        next_l = result["next_league"]
+        pool = await get_pool()
 
-        await bot.send_message(
-            user_id,
-            f"🚀 Условия выполнены!\n\n"
-            f"Ты можешь повысить лигу:\n"
-            f"Профиль → Статистика → 🚀 Level Up"
+        while True:
+            result = await check_next_league(user_id)
 
-        )
+            # нет следующей лиги
+            if not result.get("next_league"):
+                break
+
+            # условия не выполнены
+            if not result.get("can_level_up"):
+                break
+
+            next_l = result["next_league"]
+  
+            # применяем ап
+            async with pool.acquire() as conn:
+                async with conn.transaction():
+
+                    # обновляем лигу
+                    await conn.execute("""
+                        INSERT INTO user_stats (user_id, league, league_emoji)
+                        VALUES ($1, $2, $3)
+                        ON CONFLICT (user_id) DO UPDATE
+                        SET league = EXCLUDED.league,
+                            league_emoji = EXCLUDED.league_emoji
+                    """, user_id, next_l["name"], next_l["emoji"])
+
+
+                    await conn.execute("""
+                        INSERT INTO user_events (user_id, type, value, meta)
+                        VALUES ($1, 'league_up', $2, $3)
+                    """, user_id, next_l["name"], json.dumps({
+                        "emoji": next_l["emoji"]
+                    }))
+
+            upgrades.append(next_l)
+
+
+        # 🔔 уведомление (если был хотя бы 1 ап)
+        if upgrades:
+            text = "🏆 <b>Повышение!</b>\n\n"
+
+            for u in upgrades:
+                text += f"{u['emoji']} {u['name']}\n"
+
+            text += "\nТы растёшь. Продолжай."
+
+            await bot.send_message(user_id, text, parse_mode="HTML")
 
     async def apply_level_up(self, user_id: int, league_name: str, emoji: str):
         await update_league(user_id, league_name, emoji)
