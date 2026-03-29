@@ -163,7 +163,11 @@ class ProfileStatsService:
 
             text += "\nТы растёшь. Продолжай."
 
-            await bot.send_message(user_id, text, parse_mode="HTML")
+            try:
+                await bot.send_message(user_id, text, parse_mode="HTML")
+                print("[LEVEL UP] message sent")
+            except Exception as e:
+                print(f"[LEVEL UP ERROR] {e}")
 
     async def apply_level_up(self, user_id: int, league_name: str, emoji: str):
         await update_league(user_id, league_name, emoji)
