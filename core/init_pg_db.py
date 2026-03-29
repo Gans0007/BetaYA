@@ -150,7 +150,7 @@ async def create_users_table():
                 entity_id TEXT,
                 value TEXT, 
                 meta JSONB,
-                created_at TIMESTAMP DEFAULT NOW(),
+                created_at TIMESTAMPTZ DEFAULT NOW(),
                 is_seen BOOLEAN DEFAULT FALSE,
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )

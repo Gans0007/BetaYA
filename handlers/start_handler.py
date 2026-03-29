@@ -112,10 +112,12 @@ async def start_command(message: types.Message, state: FSMContext):
 
         # 🔹 создаём запись статистики (если нет)
         await conn.execute("""
-            INSERT INTO user_stats (user_id)
-            VALUES ($1)
-            ON CONFLICT (user_id) DO NOTHING
-        """, user_id)
+            INSERT INTO user_stats (user_id, league, league_emoji)
+            VALUES ($1, 'Бронза I', '🥉')
+            ON CONFLICT (user_id) DO UPDATE
+            SET league = COALESCE(user_stats.league, 'Бронза I'),
+                league_emoji = COALESCE(user_stats.league_emoji, '🥉')
+    """, user_id)
 
     logging.info(f"💾 Пользователь сохранён/обновлён в БД: {user_id}")
 
