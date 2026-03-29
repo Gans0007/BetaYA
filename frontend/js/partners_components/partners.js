@@ -1,3 +1,5 @@
+import { openSettingsModal } from "./settingsModal.js"
+
 export function renderPartners(){
 
 const root = document.getElementById("partners-root")
@@ -39,6 +41,10 @@ showToast("Выполняй задания — получай достижени
 
 if(type === "partners"){
 showToast("Собирай свою банду и зарабатывай")
+}
+
+if(type === "settings"){
+    openSettings()
 }
 
 })

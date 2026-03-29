@@ -1,0 +1,129 @@
+/* =========================
+SETTINGS OVERLAY
+========================= */
+
+.settings-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.6);
+display:flex;
+align-items:flex-end;
+justify-content:center;
+z-index:2000;
+opacity:0;
+transition:0.25s;
+}
+
+.settings-overlay.active{
+opacity:1;
+}
+
+/* =========================
+MODAL
+========================= */
+
+.settings-modal{
+width:100%;
+max-width:420px;
+background:#111217;
+border-radius:20px 20px 0 0;
+padding:16px;
+transform:translateY(100%);
+transition:0.3s ease;
+}
+
+.settings-overlay.active .settings-modal{
+transform:translateY(0);
+}
+
+/* =========================
+HEADER
+========================= */
+
+.settings-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:16px;
+}
+
+.settings-title{
+font-size:18px;
+font-weight:700;
+color:#fff;
+}
+
+.settings-close{
+cursor:pointer;
+font-size:18px;
+color:#aaa;
+transition:0.2s;
+}
+
+.settings-close:hover{
+color:#fff;
+}
+
+/* =========================
+CONTENT
+========================= */
+
+.settings-content{
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+.settings-block{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.settings-label{
+font-size:13px;
+opacity:0.6;
+color:#ccc;
+}
+
+/* =========================
+BUTTONS
+========================= */
+
+.settings-buttons{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.settings-buttons button{
+background:#1a1a1d;
+border:none;
+padding:10px 12px;
+border-radius:10px;
+color:#fff;
+cursor:pointer;
+transition:0.2s;
+}
+
+.settings-buttons button:hover{
+background:#26262b;
+}
+
+/* =========================
+TOGGLE BUTTON
+========================= */
+
+#toggle-media{
+background:#1a1a1d;
+border:none;
+padding:12px;
+border-radius:12px;
+color:#fff;
+cursor:pointer;
+transition:0.2s;
+}
+
+#toggle-media:hover{
+background:#26262b;
+}
