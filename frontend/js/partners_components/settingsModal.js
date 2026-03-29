@@ -1,3 +1,5 @@
+const userId = window.Telegram.WebApp.initDataUnsafe.user.id
+
 export function openSettingsModal(){
 
 if(document.querySelector(".settings-overlay")){
@@ -89,21 +91,64 @@ function closeModal(){
 // =========================
 
 overlay.querySelectorAll("[data-tone]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        showToast("Тон обновлён")
+
+btn.addEventListener("click", async ()=>{
+
+const tone = btn.dataset.tone
+
+await fetch("/api/settings/tone", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+        user_id: userId,
+        tone: tone
     })
 })
+
+showToast("Тон обновлён")
+
+})
+
+})
+
+
 
 overlay.querySelectorAll("[data-tz]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-        showToast("Регион обновлён")
+
+btn.addEventListener("click", async ()=>{
+
+const tz = btn.dataset.tz
+
+await fetch("/api/settings/timezone", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+        user_id: userId,
+        timezone: tz
     })
 })
 
-const toggleBtn = overlay.querySelector("#toggle-media")
+showToast("Регион обновлён")
 
-toggleBtn.addEventListener("click", ()=>{
-    showToast("Настройка обновлена")
+})
+
+})
+
+
+
+
+toggleBtn.addEventListener("click", async ()=>{
+
+await fetch("/api/settings/toggle_media", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+        user_id: userId
+    })
+})
+
+showToast("Настройка обновлена")
+
 })
 
 }
