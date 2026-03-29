@@ -1,3 +1,5 @@
+import { renderPartners } from "./partners_components/partners.js"
+
 export function initNavigation(){
 
 const items = document.querySelectorAll(".nav-item")
@@ -34,6 +36,12 @@ activePage = pages[pageName]
 
 if(activePage){
 activePage.classList.add("active")
+}
+
+if(pageName === "partners"){
+    if(!document.querySelector(".partners-container")){
+        renderPartners()
+    }
 }
 
 })
