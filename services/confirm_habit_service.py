@@ -34,6 +34,9 @@ from handlers.tone.confirm_habit_service_tone import HABIT_CONFIRM_TONE
 from handlers.tone.confirm_caption_tone import HABIT_CAPTION_TONE
 
 
+DAILY_XP_LIMIT = 5
+
+
 class HabitService:
 
     # ================================
@@ -156,19 +159,21 @@ class HabitService:
                     WHERE id = $1
                 """, habit_id)
 
-            xp_gain = await add_xp_for_confirmation(conn, user_id, habit_id)
+            count_today = await get_confirmations_count_today(conn, user_id)
+
+            if count_today < DAILY_XP_LIMIT:
+                xp_gain = await add_xp_for_confirmation(conn, user_id, habit_id)
+            else:
+                xp_gain = 0
 
             await increment_done_days(conn, habit_id)
             await recalculate_total_confirmed_days(conn, user_id)
 
-            count_today = await get_confirmations_count_today(conn, user_id)
-
-            # выбираем тон сообщения
             tone = await conn.fetchval("SELECT notification_tone FROM users WHERE user_id=$1", user_id)
             if tone not in HABIT_CONFIRM_TONE:
                 tone = "friend"
 
-            if xp_gain > 0 and count_today <= 3:
+            if xp_gain > 0:
                 self_message = random.choice(HABIT_CONFIRM_TONE[tone]["with_xp"]).format(xp=xp_gain)
             else:
                 self_message = random.choice(HABIT_CONFIRM_TONE[tone]["no_xp"])
