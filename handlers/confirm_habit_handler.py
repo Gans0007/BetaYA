@@ -30,13 +30,11 @@ class ConfirmHabitFSM(StatesGroup):
 
 
 # ================================
-# 🔹 Старт подтверждения
+# 🔹 СТАРТ (теперь confirm_start_)
 # ================================
-@router.callback_query(
-    F.data.startswith("confirm_") & ~F.data.startswith("confirm_no_media_")
-)
+@router.callback_query(F.data.startswith("confirm_start_"))
 async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
-    habit_id = int(callback.data.split("_")[1])
+    habit_id = int(callback.data.split("_")[-1])
     user_id = callback.from_user.id
 
     result = await habit_service.start_confirmation(user_id, habit_id)
@@ -45,7 +43,6 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
         await callback.answer("❌ Привычка не найдена.", show_alert=True)
         return
 
-    # ❗ сохраняем данные, но НЕ включаем FSM
     await state.update_data(
         habit_id=habit_id,
         reverify=result["reverify"]
@@ -100,7 +97,6 @@ async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
     else:
         reverify = data["reverify"]
 
-    # 🔥 чистим старое UI
     await clear_fsm_ui(
         state=state,
         bot=callback.bot,
@@ -114,14 +110,12 @@ async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
 
     await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
-    # ❗ убираем loader
     await callback.answer()
-
-    # 🔥 показываем нормальное сообщение
     await callback.message.answer("📸 Отправь фото / видео / кружочек")
 
+
 # ================================
-# 🔹 Отмена подтверждения
+# 🔹 Отмена
 # ================================
 @router.callback_query(F.data.startswith("cancel_media_"))
 async def cancel_media(callback: types.CallbackQuery, state: FSMContext):
@@ -148,7 +142,6 @@ async def receive_media(message: types.Message, state: FSMContext):
     reverify = data["reverify"]
     user_id = message.from_user.id
 
-    # ---- тип медиа ----
     if message.photo:
         file_id = message.photo[-1].file_id
         file_type = "photo"
@@ -168,7 +161,6 @@ async def receive_media(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Нужно фото, видео или кружочек")
         return
 
-    # 🔥 закрываем FSM UI
     await clear_fsm_ui(
         state=state,
         bot=message.bot,
@@ -190,7 +182,7 @@ async def receive_media(message: types.Message, state: FSMContext):
 
 
 # ================================
-# 🔹 Подтверждение без фото
+# 🔹 Без медиа
 # ================================
 @router.callback_query(F.data.startswith("confirm_no_media_"))
 async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
@@ -224,7 +216,7 @@ async def confirm_no_media(callback: types.CallbackQuery, state: FSMContext):
 
 
 # ================================
-# 🔥 Обработчик очереди
+# 🔥 Очередь (НЕ ТРОГАЛ)
 # ================================
 async def process_task_from_queue(task, bot):
     try:
@@ -235,8 +227,6 @@ async def process_task_from_queue(task, bot):
         file_type = task["file_type"]
         chat_id = task["chat_id"]
         reply_to = task["reply_to"]
-
-        PUBLIC_CHAT_ID
 
         result = await habit_service.process_confirmation_media(
             user_id=user_id,
@@ -253,8 +243,6 @@ async def process_task_from_queue(task, bot):
                 reply_to_message_id=reply_to
             )
             return
-
-#--------
 
         if result.get("self_message"):
             await bot.send_message(
@@ -281,7 +269,6 @@ async def process_task_from_queue(task, bot):
                     caption=caption_text,
                     parse_mode="Markdown"
                 )
-
             elif file_type == "video":
                 await bot.send_video(
                     PUBLIC_CHAT_ID,
@@ -289,7 +276,6 @@ async def process_task_from_queue(task, bot):
                     caption=caption_text,
                     parse_mode="Markdown"
                 )
-
             elif file_type == "circle":
                 await bot.send_video_note(PUBLIC_CHAT_ID, file_id)
                 await bot.send_message(
@@ -306,9 +292,6 @@ async def process_task_from_queue(task, bot):
                 reply_to_message_id=reply_to
             )
 
-        # ================================
-        # 🏆 Централизованная проверка достижений
-        # ================================
         pool = await get_pool()
         async with pool.acquire() as conn:
             await process_achievements_and_notify(
@@ -318,7 +301,6 @@ async def process_task_from_queue(task, bot):
                 trigger_types=["streak", "total_confirms", "challenge_complete"]
             )
 
-        # 🔥 Проверка возможности повышения лиги
         await profile_stats_service.auto_level_up(bot, user_id)
 
     except Exception as e:

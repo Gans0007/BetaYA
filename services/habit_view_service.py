@@ -60,7 +60,7 @@ async def get_habit_buttons(habit_id: int, user_id: int) -> InlineKeyboardMarkup
                         btn = "♻️ Переподтвердить"
 
                 keyboard_rows.append([
-                    InlineKeyboardButton(text=btn, callback_data=f"confirm_{habit_id}"),
+                    InlineKeyboardButton(text=btn, callback_data=f"confirm_start_{habit_id}"),
                     InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
                 ])
 
@@ -90,7 +90,7 @@ async def get_habit_buttons(habit_id: int, user_id: int) -> InlineKeyboardMarkup
                         btn = "♻️ Переподтвердить"
 
                 keyboard_rows.append([
-                    InlineKeyboardButton(text=btn, callback_data=f"confirm_{habit_id}"),
+                    InlineKeyboardButton(text=btn, callback_data=f"confirm_start_{habit_id}"),
                     InlineKeyboardButton(text="🗑 Удалить", callback_data=f"ask_delete_{habit_id}")
                 ])
 
