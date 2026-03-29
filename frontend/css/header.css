@@ -324,3 +324,65 @@ color:rgba(255,255,255,0.95);
 opacity:1;
 
 }
+
+
+
+
+
+.league-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+
+.league-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+}
+
+.league-content {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+
+    background: #111;
+    border-radius: 20px;
+    padding: 24px 20px;
+    width: 85%;
+    max-width: 320px;
+
+    color: #fff;
+    text-align: center;
+
+    animation: leagueFade 0.2s ease forwards;
+}
+
+@keyframes leagueFade {
+    to {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.league-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.league-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #aaa;
+}
+
+.league-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #888;
+}

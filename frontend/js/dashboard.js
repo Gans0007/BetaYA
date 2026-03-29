@@ -75,6 +75,44 @@ console.error("Dashboard load error:", err)
 }
 
 // ==========================
+// ОБЬЯСНЕНИЕ К НАЖАТИЮ НА ЛИГУ
+// ==========================
+function openLeagueInfo(){
+
+    // если уже есть — не создаем второй раз
+    if(document.querySelector(".league-modal")) return
+
+    const modal = document.createElement("div")
+    modal.className = "league-modal"
+
+    modal.innerHTML = `
+        <div class="league-overlay"></div>
+
+        <div class="league-content">
+
+            <div class="league-close">✕</div>
+
+            <div class="league-title">
+                Как повышать ранг
+            </div>
+
+            <div class="league-text">
+                ⚡ Собирай XP — подтверждая привычки<br><br>
+                ⭐ Получай звезды — за завершение челленджей<br><br>
+                🚀 Повышай уровень и двигайся по лигам
+            </div>
+
+        </div>
+    `
+
+    document.body.appendChild(modal)
+
+    // закрытие
+    modal.querySelector(".league-close").onclick = () => modal.remove()
+    modal.querySelector(".league-overlay").onclick = () => modal.remove()
+}
+
+// ==========================
 // USER RENDER
 // ==========================
 
@@ -126,8 +164,8 @@ if(leagueText){
 
 if(leagueIcon){
     leagueIcon.src = user.league?.icon || ""
+    leagueIcon.onclick = openLeagueInfo
 }
-
 
 }
 
