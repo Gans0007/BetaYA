@@ -15,7 +15,7 @@ root.innerHTML = `
 
 <button class="partners-btn" data-type="achievements">Достижения</button>
 <button class="partners-btn" data-type="partners">Партнерка</button>
-<button class="partners-btn">Настройки</button>
+<button class="partners-btn" data-type="settings">Настройки</button>
 
 </div>
 
@@ -44,7 +44,7 @@ showToast("Собирай свою банду и зарабатывай")
 }
 
 if(type === "settings"){
-    openSettings()
+    openSettingsModal()
 }
 
 })
