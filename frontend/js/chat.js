@@ -123,3 +123,66 @@ document.addEventListener("click", (e)=>{
     }
 
 })
+
+// ==========================
+// КНОПКА "ПОКАЗАТЬ" (КЛАНЫ)
+// ==========================
+
+document.addEventListener("click", (e) => {
+
+    const btn = e.target.closest(".clan-btn")
+
+    if(btn){
+        showSoonModal()
+    }
+
+})
+
+
+let soonModal = null
+
+function showSoonModal(){
+
+    if(soonModal){
+        soonModal.style.display = "flex"
+        return
+    }
+
+    soonModal = document.createElement("div")
+    soonModal.className = "soon-modal"
+
+    soonModal.innerHTML = `
+
+    <div class="soon-overlay"></div>
+
+    <div class="soon-content">
+
+        <div class="soon-close">✕</div>
+
+        <div class="soon-title">
+            Скоро*
+        </div>
+
+        <div class="soon-text">
+            Объединяйтесь вместе с друзьями,<br>
+            соревнуйтесь за первенство с другими группами!<br>
+            Отслеживайте прогресс друг друга!<br>
+            Прокачивайтесь вместе!
+        </div>
+
+    </div>
+
+    `
+
+    document.body.appendChild(soonModal)
+
+    // закрытие
+    soonModal.querySelector(".soon-close").onclick = () => {
+        soonModal.style.display = "none"
+    }
+
+    soonModal.querySelector(".soon-overlay").onclick = () => {
+        soonModal.style.display = "none"
+    }
+
+}
