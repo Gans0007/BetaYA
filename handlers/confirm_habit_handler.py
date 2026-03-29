@@ -39,22 +39,26 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
     habit_id = int(callback.data.split("_")[1])
     user_id = callback.from_user.id
 
-    logging.info(f"[CONFIRM] user={user_id} habit={habit_id}")
-
     result = await habit_service.start_confirmation(user_id, habit_id)
 
     if result.get("error") == "HABIT_NOT_FOUND":
         await callback.answer("❌ Привычка не найдена.", show_alert=True)
         return
 
+    # ❗ сохраняем данные, но НЕ включаем FSM
     await state.update_data(
         habit_id=habit_id,
         reverify=result["reverify"]
     )
-    await state.set_state(ConfirmHabitFSM.waiting_for_media)
 
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="📸 Подтвердить с медиа",
+                    callback_data=f"confirm_with_media_{habit_id}"
+                )
+            ],
             [
                 InlineKeyboardButton(
                     text="✅ Подтвердить без фото",
@@ -79,6 +83,32 @@ async def confirm_habit_start(callback: types.CallbackQuery, state: FSMContext):
     await save_fsm_ui_message(state, sent.message_id)
     await callback.answer()
 
+
+# ================================
+# 🔹 ПОДТВЕРЖДЕНИЕ С МЕДИА
+# ================================
+@router.callback_query(F.data.startswith("confirm_with_media_"))
+async def confirm_with_media(callback: types.CallbackQuery, state: FSMContext):
+    habit_id = int(callback.data.split("_")[-1])
+    user_id = callback.from_user.id
+
+    data = await state.get_data()
+
+    # ❗ на всякий случай, если нет — перезапросим
+    if not data:
+        start = await habit_service.start_confirmation(user_id, habit_id)
+        reverify = start["reverify"]
+    else:
+        reverify = data["reverify"]
+
+    await state.update_data(
+        habit_id=habit_id,
+        reverify=reverify
+    )
+
+    await state.set_state(ConfirmHabitFSM.waiting_for_media)
+
+    await callback.answer("📸 Отправь фото / видео / кружочек")
 
 # ================================
 # 🔹 Отмена подтверждения

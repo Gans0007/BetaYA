@@ -16,7 +16,7 @@ async def create_users_table():
                 notification_tone TEXT DEFAULT 'friend',
                 share_confirmation_media BOOLEAN DEFAULT TRUE,
                 timezone TEXT DEFAULT 'Europe/Kyiv',
-                joined_at TIMESTAMP DEFAULT NOW(),
+                joined_at TIMESTAMPTZ DEFAULT NOW(),
                 referral_code TEXT,
                 paid_out DOUBLE PRECISION DEFAULT 0,    
                 has_access BOOLEAN DEFAULT FALSE,
