@@ -7,6 +7,7 @@ from services.xp_service import LEAGUES, get_league_by_name
 router = APIRouter()
 
 
+
 # =========================
 # USER
 # =========================
