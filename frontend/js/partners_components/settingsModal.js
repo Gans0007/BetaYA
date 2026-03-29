@@ -75,8 +75,13 @@ overlay.addEventListener("click", (e)=>{
 })
 
 function closeModal(){
+
     overlay.classList.remove("active")
-    setTimeout(()=> overlay.classList.add("hidden"), 250)
+
+    setTimeout(()=>{
+        overlay.remove()   // 💥 ВОТ ЭТО ГЛАВНОЕ
+    }, 250)
+
 }
 
 // =========================
