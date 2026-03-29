@@ -66,7 +66,7 @@ from api.routes.settings import router as settings_router
 
 app.include_router(dashboard_router)
 app.include_router(profile_router)
-app.include_router(settings_router, prefix="/api")
+app.include_router(settings_router)
 
 # ----------------------------
 # Test endpoint

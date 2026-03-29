@@ -98,7 +98,7 @@ btn.addEventListener("click", async ()=>{
 
 const tone = btn.dataset.tone
 
-await fetch("/api/settings/tone", {
+await fetch("/settings/tone", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -124,7 +124,7 @@ btn.addEventListener("click", async ()=>{
 
 const tz = btn.dataset.tz
 
-await fetch("/api/settings/timezone", {
+await fetch("/settings/timezone", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -147,7 +147,7 @@ showToast("Регион обновлён")
 
 toggleBtn.addEventListener("click", async ()=>{
 
-await fetch("/api/settings/toggle_media", {
+await fetch("/settings/toggle_media", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -184,7 +184,7 @@ async function loadSettings(overlay){
 
 try{
 
-const res = await fetch("/api/settings", {
+const res = await fetch("/settings", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
