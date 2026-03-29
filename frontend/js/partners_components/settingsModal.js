@@ -32,7 +32,7 @@ export function openSettingsModal() {
                 </div>
 
                 <div class="settings-block">
-                    <div class="settings-label">Регион</div>
+                    <div class="settings-label">Регион (для синхронизации процессов)</div>
                     <div class="settings-buttons">
                         <button data-tz="Europe/Kyiv">🇺🇦</button>
                         <button data-tz="Europe/Berlin">🇩🇪</button>
