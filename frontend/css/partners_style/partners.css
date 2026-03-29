@@ -41,3 +41,46 @@ cursor:pointer;
 .partners-btn:active{
 transform:scale(0.96);
 }
+
+
+
+
+
+
+
+
+
+/* =========================
+TOAST
+========================= */
+
+.custom-toast{
+
+position:fixed;
+bottom:90px;
+left:50%;
+transform:translateX(-50%) scale(0.9);
+
+background:rgba(20,20,25,0.95);
+color:#fff;
+
+padding:10px 16px;
+border-radius:12px;
+
+font-size:14px;
+font-weight:500;
+
+opacity:0;
+
+transition:all .25s ease;
+
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
+
+z-index:9999;
+
+}
+
+.custom-toast.show{
+opacity:1;
+transform:translateX(-50%) scale(1);
+}
