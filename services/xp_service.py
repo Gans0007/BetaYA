@@ -25,24 +25,24 @@ XP_DIFFICULTY = {
 LEAGUES = [
     # 🟤 БРОНЗА
     {"name": "Бронза I", "emoji": "🥉", "stars": 0, "xp": 0, "icon": "league_1.png", "quote": "Начало пути. Дисциплина только зарождается."},
-    {"name": "Бронза II", "emoji": "🥉", "stars": 1, "xp": 100, "icon": "league_2.png", "quote": "Ты уже не стоишь на месте."},
-    {"name": "Бронза III", "emoji": "🥉", "stars": 3, "xp": 300, "icon": "league_3.png", "quote": "Появляется ритм и первые результаты."},
-    {"name": "Бронза IV", "emoji": "🥉", "stars": 10, "xp": 700, "icon": "league_4.png", "quote": "Ты начинаешь контролировать себя."},
-    {"name": "Бронза V", "emoji": "🥉", "stars": 18, "xp": 1400, "icon": "league_5.png", "quote": "Ты уже не слабый игрок."},
+    {"name": "Бронза II", "emoji": "🥉", "stars": 1, "xp": 120, "icon": "league_2.png", "quote": "Ты уже не стоишь на месте."},
+    {"name": "Бронза III", "emoji": "🥉", "stars": 2, "xp": 300, "icon": "league_3.png", "quote": "Появляется ритм и первые результаты."},
+    {"name": "Бронза IV", "emoji": "🥉", "stars": 4, "xp": 600, "icon": "league_4.png", "quote": "Ты начинаешь контролировать себя."},
+    {"name": "Бронза V", "emoji": "🥉", "stars": 6, "xp": 1000, "icon": "league_5.png", "quote": "Ты уже не слабый игрок."},
 
     # ⚪ СЕРЕБРО
-    {"name": "Серебро I", "emoji": "🥈", "stars": 28, "xp": 2500, "icon": "league_1.png", "quote": "Дисциплина становится нормой."},
-    {"name": "Серебро II", "emoji": "🥈", "stars": 40, "xp": 4000, "icon": "league_1.png", "quote": "Ты уже отличаешься от большинства."},
-    {"name": "Серебро III", "emoji": "🥈", "stars": 50, "xp": 5200, "icon": "league_1.png", "quote": "Ты держишь систему."},
-    {"name": "Серебро IV", "emoji": "🥈", "stars": 60, "xp": 6000, "icon": "league_1.png", "quote": "Стабильность — твоя сила."},
-    {"name": "Серебро V", "emoji": "🥈", "stars": 70, "xp": 7000, "icon": "league_1.png", "quote": "Ты почти на другом уровне."},
+    {"name": "Серебро I", "emoji": "🥈", "stars": 10, "xp": 1600, "icon": "league_1.png", "quote": "Дисциплина становится нормой."},
+    {"name": "Серебро II", "emoji": "🥈", "stars": 14, "xp": 2300, "icon": "league_1.png", "quote": "Ты уже отличаешься от большинства."},
+    {"name": "Серебро III", "emoji": "🥈", "stars": 18, "xp": 3100, "icon": "league_1.png", "quote": "Ты держишь систему."},
+    {"name": "Серебро IV", "emoji": "🥈", "stars": 22, "xp": 4000, "icon": "league_1.png", "quote": "Стабильность — твоя сила."},
+    {"name": "Серебро V", "emoji": "🥈", "stars": 26, "xp": 5000, "icon": "league_1.png", "quote": "Ты почти на другом уровне."},
 
     # 🟡 ЗОЛОТО
-    {"name": "Золото I", "emoji": "🥇", "stars": 85, "xp": 8500, "icon": "league_1.png", "quote": "Ты уже элита."},
-    {"name": "Золото II", "emoji": "🥇", "stars": 100, "xp": 10000, "icon": "league_1.png", "quote": "Ты управляешь собой."},
-    {"name": "Золото III", "emoji": "🥇", "stars": 120, "xp": 12000, "icon": "league_1.png", "quote": "Ты создаёшь правила."},
-    {"name": "Золото IV", "emoji": "🥇", "stars": 140, "xp": 14000, "icon": "league_1.png", "quote": "Ты доминируешь."},
-    {"name": "Золото V", "emoji": "🥇", "stars": 160, "xp": 17000, "icon": "league_1.png", "quote": "Максимум. Ты система."},
+    {"name": "Золото I", "emoji": "🥇", "stars": 32, "xp": 6200, "icon": "league_1.png", "quote": "Ты уже элита."},
+    {"name": "Золото II", "emoji": "🥇", "stars": 40, "xp": 7600, "icon": "league_1.png", "quote": "Ты управляешь собой."},
+    {"name": "Золото III", "emoji": "🥇", "stars": 50, "xp": 9200, "icon": "league_1.png", "quote": "Ты создаёшь правила."},
+    {"name": "Золото IV", "emoji": "🥇", "stars": 65, "xp": 11000, "icon": "league_1.png", "quote": "Ты доминируешь."},
+    {"name": "Золото V", "emoji": "🥇", "stars": 80, "xp": 13000, "icon": "league_1.png", "quote": "Максимум. Ты система."},
 ]
 
 def get_league_by_name(name: str):
