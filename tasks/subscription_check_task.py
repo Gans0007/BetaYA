@@ -143,14 +143,21 @@ async def subscription_checker(bot):
                         await bot.send_message(
                             user_id,
                             "⛔ *Подписка закончилась!*\n\n"
-                            "Чтобы продолжить пользоваться преймуществами PRO версии — оплати доступ.\n\n"
+                            "Чтобы продолжить прокачку — оформи подписку:\n\n"
                             "Выбери действие ниже:",
                             parse_mode="Markdown",
                             reply_markup=types.InlineKeyboardMarkup(
                                 inline_keyboard=[
+
                                     [
                                         types.InlineKeyboardButton(
-                                            text="💳 Оплатить подписку",
+                                            text="⭐ Быстро через Telegram",
+                                            url="https://t.me/+fICEDjKbcRM1YTk6"  # ← твоя ссылка Stars
+                                        )
+                                    ],
+                                    [
+                                        types.InlineKeyboardButton(
+                                            text="💳 Оплатить картой",
                                             url="https://t.me/tribute/app?startapp=ssdz"
                                         )
                                     ],

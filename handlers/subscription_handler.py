@@ -124,12 +124,19 @@ async def check_subscription_callback(callback: types.CallbackQuery):
 
     await callback.message.answer(
         "⛔ Подписка не найдена.\n\n"
-        "Чтобы открыть безлимит — вступай в закрытое сообщество:",
+        "Чтобы начать прокачку на полную — оформи подписку:\n\n",
         reply_markup=types.InlineKeyboardMarkup(
             inline_keyboard=[
+
                 [
                     types.InlineKeyboardButton(
-                        text="💳 Перейти к оплате",
+                        text="⭐ Быстро через Telegram",
+                        url="https://t.me/+fICEDjKbcRM1YTk6"  # ← твоя ссылка Stars
+                    )
+                ],
+                [
+                    types.InlineKeyboardButton(
+                        text="💳 Оплатить картой",
                         url="https://t.me/tribute/app?startapp=ssdz"
                     )
                 ],
