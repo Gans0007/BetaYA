@@ -152,7 +152,7 @@ async def subscription_checker(bot):
                                     [
                                         types.InlineKeyboardButton(
                                             text="⭐ Быстро через Telegram",
-                                            url="https://t.me/+fICEDjKbcRM1YTk6"  # ← твоя ссылка Stars
+                                            url="https://t.me/+flCEdjKbcRM1YTk6"  # ← твоя ссылка Stars
                                         )
                                     ],
                                     [
