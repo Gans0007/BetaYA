@@ -7,8 +7,14 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_subscription_keyboard() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
+           InlineKeyboardButton(
+                text="⭐ Быстро через Telegram",
+                url="https://t.me/+flCEdjKbcRM1YTk6"
+                )
+            ],
+        [
             InlineKeyboardButton(
-                text="💳 Оформить подписку",
+                text="💳 Перейти к оплате",
                 url="https://t.me/tribute/app?startapp=ssdz"
             )
         ],
