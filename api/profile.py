@@ -98,38 +98,53 @@ async def get_profile(request: Request):
     GROUP BY DATE(datetime)
     """, user_id, start_date, end_date)
 
-    # 🔥 супер быстрый словарь
-    day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
+        # 🔥 супер быстрый словарь
+        day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
+ 
+        total_habits = len(habit_ids)
 
-    total_habits = len(habit_ids)
+        completed = 0
+        missed = 0
+        heatmap = []
+        graph = []
 
-    completed = 0
-    missed = 0
-    heatmap = []
-    graph = []
+        score = 0
+        d = start_date
 
-    score = 0
-    d = start_date
-    while d <= end_date:
-        done = day_counts.get(d, 0)
+        real_end_date = min(end_date, today)
 
-        completed += done
-        missed += (total_habits - done)
+        while d <= end_date:
+            done = day_counts.get(d, 0)
 
-        heatmap.append({
-            "date": d.isoformat(),
-            "value": done
-        })
+            # =========================
+            # ТОЛЬКО ПРОШЛОЕ → В АНАЛИТИКУ
+            # =========================
+            if d <= real_end_date:
+                completed += done
+                missed += (total_habits - done)
 
-        day_score = done - (total_habits - done)
-        score += day_score
+            # =========================
+            # ВСЁ → В ОТОБРАЖЕНИЕ
+            # =========================
+            heatmap.append({
+                "date": d.isoformat(),
+                "value": done
+            })
 
-        graph.append({
-            "date": d.isoformat(),
-            "score": score
-        })
+            if total_habits > 0:
+                day_score = done - (total_habits - done)
+            else:
+                day_score = 0
 
-        d += timedelta(days=1)
+            if d <= real_end_date:
+                score += day_score
+
+            graph.append({
+                "date": d.isoformat(),
+                "score": score
+            })
+
+            d += timedelta(days=1)
 
     index = 0
     total = completed + missed
@@ -315,38 +330,46 @@ async def view_profile(request: Request):
         GROUP BY DATE(datetime)
         """, target_user_id, start_date, end_date)
 
-    day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
+        day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
+ 
+        total_habits = len(habit_ids)
 
-    total_habits = len(habit_ids)
+        completed = 0
+        missed = 0
+        heatmap = []
+        graph = []
 
-    completed = 0
-    missed = 0
-    heatmap = []
-    graph = []
+        score = 0
+        d = start_date
 
-    score = 0
-    d = start_date
+        real_end_date = min(end_date, today)
+  
+        while d <= end_date:
+            done = day_counts.get(d, 0)
 
-    while d <= end_date:
-        done = day_counts.get(d, 0)
+            if d <= real_end_date:
+                completed += done
+                missed += (total_habits - done)
 
-        completed += done
-        missed += (total_habits - done)
+            heatmap.append({
+                "date": d.isoformat(),
+                "value": done
+            })
 
-        heatmap.append({
-            "date": d.isoformat(),
-            "value": done
-        })
+            if total_habits > 0:
+                day_score = done - (total_habits - done)
+            else:
+                day_score = 0
+   
+            if d <= real_end_date:
+                score += day_score
 
-        day_score = done - (total_habits - done)
-        score += day_score
+            graph.append({
+                "date": d.isoformat(),
+                "score": score
+            })
 
-        graph.append({
-            "date": d.isoformat(),
-            "score": score
-        })
-
-        d += timedelta(days=1)
+            d += timedelta(days=1)
 
     index = 0
     total = completed + missed
