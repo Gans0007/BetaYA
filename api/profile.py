@@ -35,14 +35,36 @@ async def get_profile(request: Request):
 
     today = datetime.now().date()
 
+    # =========================
+    # WEEK (ПН–ВС)
+    # =========================
     if range_type == "week":
-        start_date = today - timedelta(days=6)
+        start_date = today - timedelta(days=today.weekday())  # ПН
+        end_date = start_date + timedelta(days=6)             # ВС
+
+    # =========================
+    # MONTH (1–последний день)
+    # =========================
     elif range_type == "month":
         start_date = today.replace(day=1)
+
+        if today.month == 12:
+            next_month = today.replace(year=today.year+1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month+1, day=1)
+
+        end_date = next_month - timedelta(days=1)
+
+    # =========================
+    # YEAR (1 янв – 31 дек)
+    # =========================
     elif range_type == "year":
         start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+
     else:
         start_date = today - timedelta(days=6)
+        end_date = today
 
     async with pool.acquire() as conn:
 
@@ -68,12 +90,13 @@ async def get_profile(request: Request):
         habit_ids = [h["id"] for h in habits_rows]
 
         confirmations_rows = await conn.fetch("""
-        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
-        FROM confirmations
-        WHERE user_id = $1
-        AND datetime >= $2
-        GROUP BY DATE(datetime)
-        """, user_id, start_date)
+    SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
+    FROM confirmations
+    WHERE user_id = $1
+    AND datetime >= $2
+    AND datetime <= $3
+    GROUP BY DATE(datetime)
+    """, user_id, start_date, end_date)
 
     # 🔥 супер быстрый словарь
     day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
@@ -87,8 +110,7 @@ async def get_profile(request: Request):
 
     score = 0
     d = start_date
-
-    while d <= today:
+    while d <= end_date:
         done = day_counts.get(d, 0)
 
         completed += done
@@ -217,13 +239,26 @@ async def view_profile(request: Request):
     today = datetime.now().date()
 
     if range_type == "week":
-        start_date = today - timedelta(days=6)
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
+
     elif range_type == "month":
         start_date = today.replace(day=1)
+
+        if today.month == 12:
+            next_month = today.replace(year=today.year+1, month=1, day=1)
+        else:
+            next_month = today.replace(month=today.month+1, day=1)
+
+        end_date = next_month - timedelta(days=1)
+
     elif range_type == "year":
         start_date = today.replace(month=1, day=1)
+        end_date = today.replace(month=12, day=31)
+
     else:
         start_date = today - timedelta(days=6)
+        end_date = today 
 
     async with pool.acquire() as conn:
 
@@ -276,8 +311,9 @@ async def view_profile(request: Request):
         FROM confirmations
         WHERE user_id = $1
         AND datetime >= $2
+        AND datetime <= $3
         GROUP BY DATE(datetime)
-        """, target_user_id, start_date)
+        """, target_user_id, start_date, end_date)
 
     day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
 
@@ -291,7 +327,7 @@ async def view_profile(request: Request):
     score = 0
     d = start_date
 
-    while d <= today:
+    while d <= end_date:
         done = day_counts.get(d, 0)
 
         completed += done

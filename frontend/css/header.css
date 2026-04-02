@@ -325,64 +325,56 @@ opacity:1;
 
 }
 
+/* =========================
+STARS BAR (как XP)
+========================= */
 
+.resource-stars{
+position:relative;
+flex:1;
 
+display:flex;
+align-items:center;
+justify-content:center;
 
+padding:6px 8px;
 
-.league-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
+overflow:hidden;
+
+background:#171a20;
+border-radius:12px;
 }
 
-.league-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
+.resource-stars-fill{
+position:absolute;
+left:0;
+top:0;
+height:100%;
+width:0%;
+
+background:linear-gradient(
+90deg,
+#facc15,
+#fde047
+);
+
+opacity:0.9;
+
+box-shadow:
+0 0 10px rgba(255,215,0,0.6);
+
+transition:width .4s ease;
+
+border-radius:inherit;
 }
 
-.league-content {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
+.resource-stars .xp-top{
+position:relative;
+z-index:2;
 
-    background: #111;
-    border-radius: 20px;
-    padding: 24px 20px;
-    width: 85%;
-    max-width: 320px;
+font-weight:700;
+color:#fff;
 
-    color: #fff;
-    text-align: center;
-
-    animation: leagueFade 0.2s ease forwards;
-}
-
-@keyframes leagueFade {
-    to {
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
-
-.league-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
-
-.league-text {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #aaa;
-}
-
-.league-close {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #888;
+text-shadow:
+0 0 6px rgba(0,0,0,0.8);
 }
