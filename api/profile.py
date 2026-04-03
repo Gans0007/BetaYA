@@ -190,7 +190,9 @@ async def get_profile(request: Request):
             "index": index
         },
         "heatmap": heatmap,
-        "graph": graph
+        "graph": graph,
+
+        "period_label": period_label,
     }
 
 @router.post("/api/profile/avatar")

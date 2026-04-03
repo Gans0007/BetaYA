@@ -45,3 +45,10 @@ border-radius:12px;
 
 transition: transform 0.3s ease;
 }
+
+.period-label{
+    text-align:center;
+    font-size:13px;
+    color:#888;
+    margin-bottom:12px;
+}

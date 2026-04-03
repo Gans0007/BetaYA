@@ -66,6 +66,7 @@ export function initProfileModal(){
 
         <div class="profile-modal-content">
 
+            <div class="period-label">...</div>
             <div class="period-switcher">
                 <div class="switcher-bg"></div>
 
@@ -159,6 +160,7 @@ export function initProfileModal(){
     const graphCanvas = overlay.querySelector(".graph")
 
     const options = overlay.querySelectorAll(".period-option")
+    const periodLabelEl = overlay.querySelector(".period-label")
     const bg = overlay.querySelector(".switcher-bg")
 
     bg.style.transform = `translateX(100%)`
@@ -317,6 +319,12 @@ export function initProfileModal(){
         labelEl.innerText = label
 
         renderGraph(graphCanvas, profileData.graph)
+
+
+        if(profileData.period_label && periodLabelEl){
+            periodLabelEl.innerText = profileData.period_label
+    }
+
     }
 
     function renderLoadingState(){
