@@ -172,6 +172,22 @@ async def get_profile(request: Request):
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
+    # =========================
+    # LABEL ДЛЯ ПЕРИОДА
+    # =========================
+
+    if range_type == "week":
+        period_label = f"{start_date.strftime('%d.%m')} – {end_date.strftime('%d.%m')}"
+
+    elif range_type == "month":
+        period_label = start_date.strftime("%B")
+
+    elif range_type == "year":
+        period_label = start_date.strftime("%Y")
+
+    else:
+        period_label = ""
+
     return {
         "user": {
             "nickname": user_row["nickname"] if user_row else "Player",
