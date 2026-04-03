@@ -180,7 +180,23 @@ async def get_profile(request: Request):
         period_label = f"{start_date.strftime('%d.%m')} – {end_date.strftime('%d.%m')}"
 
     elif range_type == "month":
-        period_label = start_date.strftime("%B")
+
+        RU_MONTHS = {
+            1: "Январь",
+            2: "Февраль",
+            3: "Март",
+            4: "Апрель",
+            5: "Май",
+            6: "Июнь",
+            7: "Июль",
+            8: "Август",
+            9: "Сентябрь",
+            10: "Октябрь",
+            11: "Ноябрь",
+            12: "Декабрь",
+        }
+
+        period_label = RU_MONTHS[start_date.month] 
 
     elif range_type == "year":
         period_label = start_date.strftime("%Y")
