@@ -157,6 +157,41 @@ async def create_users_table():
         """)
 
         # -------------------------------
+        # 🔹 Таблица задач на день (daily_tasks)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS daily_tasks (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                text TEXT NOT NULL,
+                planned_for_date DATE NOT NULL,
+
+                status TEXT DEFAULT 'pending',
+                position INT DEFAULT 0,
+                is_deleted BOOLEAN DEFAULT FALSE,
+
+                created_at TIMESTAMPTZ DEFAULT NOW(),
+
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+
+                UNIQUE(user_id, planned_for_date, text)
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Индексы для daily_tasks
+        # -------------------------------
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_daily_tasks_user_date
+            ON daily_tasks(user_id, planned_for_date)
+        """)
+
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_daily_tasks_user_status
+            ON daily_tasks(user_id, status)
+        """)
+
+        # -------------------------------
         # 🔹 Индексы для событий
         # -------------------------------
         await conn.execute("""

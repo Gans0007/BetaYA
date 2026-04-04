@@ -43,6 +43,7 @@ def main_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="📋 Активные привычки")],
+            [KeyboardButton(text="📋 План на завтра")],
        #     [KeyboardButton(text="🏆 Рейтинг"), KeyboardButton(text="👤 Профиль")],
             [KeyboardButton(text="➕ Добавить привычку / челлендж")],
         ],
