@@ -12,9 +12,9 @@ router = Router()
 
 
 # ================================
-# 📋 РЕНДЕР ЗАДАЧ
+# 📋 РЕНДЕР ЗАДАЧ (INLINE)
 # ================================
-async def render_tasks(message: types.Message, user_id: int, date, is_evening: bool):
+async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool = False):
     pool = await get_pool()
 
     async with pool.acquire() as conn:
@@ -31,52 +31,62 @@ async def render_tasks(message: types.Message, user_id: int, date, is_evening: b
             date
         )
 
-    if not tasks:
-        await message.answer(
-            "📋 Нет задач\n\nДобавь первую задачу 🔥"
-        )
-        return
-
     text = "📋 <b>Твои задачи:</b>\n\n"
     keyboard = []
 
-    for i, task in enumerate(tasks, start=1):
-        status_icon = {
-            "pending": "⏳",
-            "done": "✅",
-            "failed": "❌"
-        }.get(task["status"], "⏳")
+    if not tasks:
+        text += "Нет задач\n\nДобавь первую задачу 🔥"
 
-        text += f"{i}. {task['text']} — {status_icon}\n"
+    else:
+        for i, task in enumerate(tasks, start=1):
+            status_icon = {
+                "pending": "⏳",
+                "done": "✅",
+                "failed": "❌"
+            }.get(task["status"], "⏳")
 
-        if is_evening:
-            row = [
-                InlineKeyboardButton(
-                    text="🗑",
-                    callback_data=f"task_delete_{task['id']}"
-                )
-            ]
-        else:
-            row = [
-                InlineKeyboardButton(
-                    text="✅",
-                    callback_data=f"task_done_{task['id']}"
-                ),
-                InlineKeyboardButton(
-                    text="❌",
-                    callback_data=f"task_fail_{task['id']}"
-                )
-            ]
+            text += f"{i}. {task['text']} — {status_icon}\n"
 
-        keyboard.append(row)
+            if is_evening:
+                row = [
+                    InlineKeyboardButton(
+                        text="🗑",
+                        callback_data=f"task_delete_{task['id']}"
+                    )
+                ]
+            else:
+                row = [
+                    InlineKeyboardButton(
+                        text="✅",
+                        callback_data=f"task_done_{task['id']}"
+                    ),
+                    InlineKeyboardButton(
+                        text="❌",
+                        callback_data=f"task_fail_{task['id']}"
+                    )
+                ]
+
+            keyboard.append(row)
+
+    # ➕ Добавить задачу (только вечером)
+    if is_evening:
+        keyboard.append([
+            InlineKeyboardButton(
+                text="➕ Добавить задачу",
+                callback_data="task_add"
+            )
+        ])
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
-    await message.answer(text, parse_mode="HTML", reply_markup=markup)
+    if edit:
+        await message.edit_text(text, parse_mode="HTML", reply_markup=markup)
+    else:
+        await message.answer(text, parse_mode="HTML", reply_markup=markup)
 
 
 # ================================
-# 📋 ОТКРЫТИЕ ПЛАНА (ГЛАВНОЕ)
+# 📋 ОТКРЫТИЕ ПЛАНА
 # ================================
 @router.message(lambda m: m.text and "План на завтра" in m.text)
 async def show_day_plan(message: types.Message):
@@ -98,84 +108,26 @@ async def show_day_plan(message: types.Message):
 
     hour = now.hour
 
-    # 🌙 ВЕЧЕР (создание задач)
+    # 🌙 ВЕЧЕР
     if 20 <= hour < 23:
         tomorrow = (now + timedelta(days=1)).date()
-
         await render_tasks(message, user_id, tomorrow, is_evening=True)
-
-        keyboard = types.ReplyKeyboardMarkup(
-            keyboard=[
-                [types.KeyboardButton(text="➕ Добавить задачу")],
-                [types.KeyboardButton(text="⬅ Назад")]
-            ],
-            resize_keyboard=True
-        )
-
-        await message.answer(
-            "➕ Добавь или удали задачи",
-            reply_markup=keyboard
-        )
         return
 
-    # 🌅 ДЕНЬ (выполнение)
+    # 🌅 ДЕНЬ
     today = now.date()
-
     await render_tasks(message, user_id, today, is_evening=False)
 
 
 # ================================
-# ➕ НАЧАТЬ ДОБАВЛЕНИЕ
+# ➕ INLINE ДОБАВЛЕНИЕ
 # ================================
-@router.message(lambda m: m.text and "Добавить задачу" in m.text)
-async def add_task_start(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        tz_name = await conn.fetchval(
-            "SELECT timezone FROM users WHERE user_id=$1",
-            user_id
-        )
-
-        access_until = await conn.fetchval(
-            "SELECT access_until FROM users WHERE user_id=$1",
-            user_id
-        )
-
-    tz_name = tz_name or "Europe/Kyiv"
-    now = datetime.now(ZoneInfo(tz_name))
-    hour = now.hour
-
-    if not (20 <= hour < 23):
-        await message.answer("⛔ Добавлять задачи можно только вечером")
-        return
-
-    tomorrow = (now + timedelta(days=1)).date()
-
-    async with pool.acquire() as conn:
-        count = await conn.fetchval(
-            """
-            SELECT COUNT(*) FROM daily_tasks
-            WHERE user_id=$1 
-            AND planned_for_date=$2 
-            AND is_deleted=FALSE
-            """,
-            user_id,
-            tomorrow
-        )
-
-    limit = 5 if access_until and access_until > now else 2
-
-    if count >= limit:
-        await message.answer(
-            "🚫 Лимит задач достигнут\n\n"
-            "🔓 Купи доступ для увеличения лимита"
-        )
-        return
+@router.callback_query(lambda c: c.data == "task_add")
+async def add_task_inline(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
 
     await state.set_state(AddTaskFSM.waiting_for_text)
-    await message.answer("✍️ Введи задачу:")
+    await callback.message.answer("✍️ Введи задачу:")
 
 
 # ================================
@@ -227,10 +179,10 @@ async def save_task(message: types.Message, state: FSMContext):
 
     await state.clear()
 
-    await message.answer(
-        f"✅ Задача добавлена:\n{text}\n\n"
-        "📋 Нажми 'План на завтра' чтобы увидеть список"
-    )
+    await message.answer("✅ Задача добавлена")
+
+    # 🔄 обновляем экран
+    await render_tasks(message, user_id, tomorrow, is_evening=True)
 
 
 # ================================
@@ -248,7 +200,17 @@ async def task_done(callback: types.CallbackQuery):
         )
 
     await callback.answer("✅ Выполнено")
-    await callback.message.delete()
+
+    user_id = callback.from_user.id
+    now = datetime.now(ZoneInfo("Europe/Kyiv"))
+
+    await render_tasks(
+        callback.message,
+        user_id,
+        now.date(),
+        is_evening=False,
+        edit=True
+    )
 
 
 # ================================
@@ -266,7 +228,17 @@ async def task_fail(callback: types.CallbackQuery):
         )
 
     await callback.answer("❌ Провалено")
-    await callback.message.delete()
+
+    user_id = callback.from_user.id
+    now = datetime.now(ZoneInfo("Europe/Kyiv"))
+
+    await render_tasks(
+        callback.message,
+        user_id,
+        now.date(),
+        is_evening=False,
+        edit=True
+    )
 
 
 # ================================
@@ -284,8 +256,23 @@ async def task_delete(callback: types.CallbackQuery):
         )
 
     await callback.answer("🗑 Удалено")
-    await callback.message.delete()
 
+    user_id = callback.from_user.id
+    now = datetime.now(ZoneInfo("Europe/Kyiv"))
+    tomorrow = (now + timedelta(days=1)).date()
+
+    await render_tasks(
+        callback.message,
+        user_id,
+        tomorrow,
+        is_evening=True,
+        edit=True
+    )
+
+
+# ================================
+# 🧪 DEBUG
+# ================================
 @router.message()
 async def debug_day_plan_all(message: types.Message):
     print("DAY_PLAN DEBUG:", repr(message.text))
