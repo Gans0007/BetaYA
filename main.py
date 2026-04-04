@@ -96,8 +96,8 @@ async def start_bot():
         types.BotCommand(command="start", description="Запустить бота"),
     ])
 
-    dp.message.middleware(SubscriptionMiddleware())
-    dp.callback_query.middleware(SubscriptionMiddleware())
+#    dp.message.middleware(SubscriptionMiddleware())
+ #   dp.callback_query.middleware(SubscriptionMiddleware())
 
     # Routers
     dp.include_router(start_router)
