@@ -22,6 +22,7 @@ from handlers.profile import setup as setup_profile
 from handlers.honor_handler import router as honor_router
 from handlers.subscription_handler import router as subscription_router
 from handlers.habit_reminder_handler import router as habit_reminder_router
+from handlers.day_plan import router as day_plan_router
 
 from tasks.habit_reminder_tasks import habit_reminder_task
 from tasks.habit_reset_task import check_habit_resets
@@ -95,6 +96,9 @@ async def main():
     dp.include_router(add_custom_habit_router)
     dp.include_router(confirm_habit_handler.router)
     dp.include_router(active_tasks_handler.router)
+
+    dp.include_router(day_plan_router)
+
     setup_profile(dp)
     dp.include_router(honor_router)
     dp.include_router(subscription_router)
