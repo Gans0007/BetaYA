@@ -76,9 +76,9 @@ async def render_tasks(message: types.Message, user_id: int, date, is_evening: b
 
 
 # ================================
-# 📋 ОТКРЫТИЕ ПЛАНА
+# 📋 ОТКРЫТИЕ ПЛАНА (ГЛАВНОЕ)
 # ================================
-@router.message(lambda m: m.text == "📋 План на завтра")
+@router.message(lambda m: m.text and "План на завтра" in m.text)
 async def show_day_plan(message: types.Message):
     user_id = message.from_user.id
 
@@ -93,8 +93,7 @@ async def show_day_plan(message: types.Message):
 
     try:
         now = datetime.now(ZoneInfo(tz_name))
-    except Exception as e:
-        print("Timezone error:", e)
+    except Exception:
         now = datetime.now(ZoneInfo("Europe/Kyiv"))
 
     hour = now.hour
@@ -128,7 +127,7 @@ async def show_day_plan(message: types.Message):
 # ================================
 # ➕ НАЧАТЬ ДОБАВЛЕНИЕ
 # ================================
-@router.message(lambda m: m.text == "➕ Добавить задачу")
+@router.message(lambda m: m.text and "Добавить задачу" in m.text)
 async def add_task_start(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
 
