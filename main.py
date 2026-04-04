@@ -110,12 +110,6 @@ async def start_bot():
     dp.include_router(subscription_router)
     dp.include_router(habit_reminder_router)
 
-# В САМЫЙ НИЗ main.py
-
-    @dp.message()
-    async def debug_all(message):
-        print("DEBUG TEXT:", repr(message.text))
-
     # --- STARTUP ---
     background_tasks = await startup(bot, start_background_tasks)
 
