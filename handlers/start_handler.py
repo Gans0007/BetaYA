@@ -42,7 +42,7 @@ class NicknameFSM(StatesGroup):
 def main_menu_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📋 Активные задания")],
+            [KeyboardButton(text="📋 Активные привычки")],
        #     [KeyboardButton(text="🏆 Рейтинг"), KeyboardButton(text="👤 Профиль")],
             [KeyboardButton(text="➕ Добавить привычку / челлендж")],
         ],

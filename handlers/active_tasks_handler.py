@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # =====================================================
 # 🔹 Показ активных привычек (message)
 # =====================================================
-@router.message(lambda m: m.text == "📋 Активные задания")
+@router.message(lambda m: m.text == "📋 Активные привычки")
 async def show_active_tasks(message: types.Message):
     user_id = message.from_user.id
     logger.info(f"👤 Пользователь {user_id} открыл список активных привычек.")
