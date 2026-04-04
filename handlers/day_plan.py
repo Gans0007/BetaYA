@@ -285,3 +285,7 @@ async def task_delete(callback: types.CallbackQuery):
 
     await callback.answer("🗑 Удалено")
     await callback.message.delete()
+
+@router.message()
+async def debug_day_plan_all(message: types.Message):
+    print("DAY_PLAN DEBUG:", repr(message.text))
