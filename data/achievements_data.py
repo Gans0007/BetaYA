@@ -181,25 +181,25 @@ DISCIPLINE_ACHIEVEMENTS = [
 BODY_ACHIEVEMENTS = [
 
     {
-        "code": "body_complete_0_running",
+        "code": "body_complete_0_morning_run",
         "category": "body",
         "title": "Прокачал сердце",
         "description": "Ты завершил челлендж «Прокачать сердце». Твоё тело стало сильнее.",
         "icon": "❤️",
         "condition_type": "challenge_complete",
-        "condition_value": "0_running",   # 🔥 ключ челленджа
+        "condition_value": "0_morning_run",   # 🔥 ключ челленджа
         "xp_reward": 50,
         "usdt_reward": 0,
     },
 
     {
-        "code": "body_complete_0_warmshower",
+        "code": "body_complete_0_cold_shower",
         "category": "body",
         "title": "Контраст закаляет",
-        "description": "Ты завершил челлендж «Контрастный душ». Дисциплина начинается с дискомфорта.",
+        "description": "Ты завершил челлендж «Холодный душ». Дисциплина начинается с дискомфорта.",
         "icon": "🚿",
         "condition_type": "challenge_complete",
-        "condition_value": "0_warmshower",   # 🔥 ключ челленджа
+        "condition_value": "0_cold_shower",   # 🔥 ключ челленджа
         "xp_reward": 50,
         "usdt_reward": 0,
     },
@@ -263,25 +263,25 @@ BODY_ACHIEVEMENTS = [
 MIND_ACHIEVEMENTS = [
 
     {
-        "code": "mind_complete_0_nosocial",
+        "code": "mind_complete_0_low_dopamine",
         "category": "mind",
         "title": "Контроль внимания",
         "description": "Ты завершил челлендж «Уменьшение экранного времени». Ты управляешь вниманием — а не алгоритмы.",
         "icon": "📵",
         "condition_type": "challenge_complete",
-        "condition_value": "0_nosocial",
+        "condition_value": "0_low_dopamine",
         "xp_reward": 60,
         "usdt_reward": 0,
     },
 
     {
-        "code": "mind_complete_0_meditation",
+        "code": "mind_complete_2_meditation",
         "category": "mind",
         "title": "Сам с собой",
         "description": "Ты завершил челлендж «Медитация». В тишине рождается сила.",
         "icon": "🧘",
         "condition_type": "challenge_complete",
-        "condition_value": "0_meditation",
+        "condition_value": "2_meditation",
         "xp_reward": 60,
         "usdt_reward": 0,
     },
@@ -379,13 +379,13 @@ STATUS_ACHIEVEMENTS = [
         "usdt_reward": 0,
     },
     {
-        "code": "status_complete_0_friends",
+        "code": "status_complete_2_friends",
         "category": "status",
         "title": "Расширение круга",
         "description": "Ты завершил челлендж «Новые знакомства». Связи — это капитал.",
         "icon": "🤝",
         "condition_type": "challenge_complete",
-        "condition_value": "0_friends",
+        "condition_value": "2_friends",
         "xp_reward": 60,
         "usdt_reward": 0,
     },
