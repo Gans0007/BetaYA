@@ -81,6 +81,8 @@ async def start_background_tasks(bot):
 # 🔹 Main
 # -------------------------------------------------
 async def start_bot():
+    print("MAIN FILE LOADED: /root/.../main.py")
+ 
     if not BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN не задан")
 
