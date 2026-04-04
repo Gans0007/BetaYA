@@ -103,13 +103,18 @@ async def start_bot():
     dp.include_router(challenges_router)
     dp.include_router(add_custom_habit_router)
     dp.include_router(confirm_habit_handler.router)
-    dp.include_router(day_plan_router)
     dp.include_router(active_tasks_handler.router)
+    dp.include_router(day_plan_router)
     setup_profile(dp)
     dp.include_router(honor_router)
     dp.include_router(subscription_router)
     dp.include_router(habit_reminder_router)
 
+# В САМЫЙ НИЗ main.py
+
+    @dp.message()
+    async def debug_all(message):
+        print("DEBUG TEXT:", repr(message.text))
 
     # --- STARTUP ---
     background_tasks = await startup(bot, start_background_tasks)
