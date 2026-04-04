@@ -45,30 +45,33 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
                 "failed": "❌"
             }.get(task["status"], "⏳")
 
-            text += f"{i}. {task['text']} — {status_icon}\n"
+            # 🧱 КАРТОЧКА ЗАДАЧИ
+            text += (
+                f"<b>{i}. {task['text']}</b>\n"
+                f"Статус: {status_icon}\n\n"
+            )
 
+            # 🎯 КНОПКИ ПОД КАЖДОЙ ЗАДАЧЕЙ
             if is_evening:
-                row = [
+                keyboard.append([
                     InlineKeyboardButton(
-                        text="🗑",
+                        text="🗑 Удалить",
                         callback_data=f"task_delete_{task['id']}"
                     )
-                ]
+                ])
             else:
-                row = [
+                keyboard.append([
                     InlineKeyboardButton(
-                        text="✅",
+                        text="✅ Выполнено",
                         callback_data=f"task_done_{task['id']}"
                     ),
                     InlineKeyboardButton(
-                        text="❌",
+                        text="❌ Провал",
                         callback_data=f"task_fail_{task['id']}"
                     )
-                ]
+                ])
 
-            keyboard.append(row)
-
-    # ➕ Добавить задачу (только вечером)
+    # ➕ ДОБАВИТЬ (внизу)
     if is_evening:
         keyboard.append([
             InlineKeyboardButton(
@@ -83,7 +86,6 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
         await message.edit_text(text, parse_mode="HTML", reply_markup=markup)
     else:
         await message.answer(text, parse_mode="HTML", reply_markup=markup)
-
 
 # ================================
 # 📋 ОТКРЫТИЕ ПЛАНА
