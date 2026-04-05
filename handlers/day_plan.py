@@ -12,7 +12,7 @@ router = Router()
 
 
 # ================================
-# 📋 РЕНДЕР ЗАДАЧ (INLINE)
+# 📋 РЕНДЕР ЗАДАЧ (NEW UI)
 # ================================
 async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool = False):
     pool = await get_pool()
@@ -31,51 +31,56 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
             date
         )
 
-    text = "📋 <b>Твои задачи:</b>\n\n"
+    text = "📋 <b>План</b>\n\n"
     keyboard = []
 
     if not tasks:
-        text += "Нет задач\n\nДобавь первую задачу 🔥"
+        text += "Нет задач\n\nДобавь первую 🔥"
 
     else:
         for i, task in enumerate(tasks, start=1):
+            status = task["status"]
+
             status_icon = {
                 "pending": "⏳",
                 "done": "✅",
                 "failed": "❌"
-            }.get(task["status"], "⏳")
+            }.get(status, "⏳")
 
-            # 🧱 КАРТОЧКА ЗАДАЧИ
-            text += (
-                f"<b>{i}. {task['text']}</b>\n"
-                f"Статус: {status_icon}\n\n"
-            )
+            task_text = task["text"]
 
-            # 🎯 КНОПКИ ПОД КАЖДОЙ ЗАДАЧЕЙ
+            # 🔥 зачёркивание выполненной
+            if status == "done":
+                task_text = f"<s>{task_text}</s>"
+
+            # 🧠 компактный UI
+            text += f"{i}. {task_text} {status_icon}\n\n"
+
+            # 🎯 кнопки
             if is_evening:
                 keyboard.append([
                     InlineKeyboardButton(
-                        text="🗑 Удалить",
+                        text="🗑",
                         callback_data=f"task_delete_{task['id']}"
                     )
                 ])
             else:
                 keyboard.append([
                     InlineKeyboardButton(
-                        text="✅ Выполнено",
+                        text="✅",
                         callback_data=f"task_done_{task['id']}"
                     ),
                     InlineKeyboardButton(
-                        text="❌ Провал",
+                        text="❌",
                         callback_data=f"task_fail_{task['id']}"
                     )
                 ])
 
-    # ➕ ДОБАВИТЬ (внизу)
+    # ➕ добавить
     if is_evening:
         keyboard.append([
             InlineKeyboardButton(
-                text="➕ Добавить задачу",
+                text="➕ Добавить",
                 callback_data="task_add"
             )
         ])
@@ -86,6 +91,7 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
         await message.edit_text(text, parse_mode="HTML", reply_markup=markup)
     else:
         await message.answer(text, parse_mode="HTML", reply_markup=markup)
+
 
 # ================================
 # 📋 ОТКРЫТИЕ ПЛАНА
@@ -110,19 +116,17 @@ async def show_day_plan(message: types.Message):
 
     hour = now.hour
 
-    # 🌙 ВЕЧЕР
     if 20 <= hour < 23:
         tomorrow = (now + timedelta(days=1)).date()
         await render_tasks(message, user_id, tomorrow, is_evening=True)
         return
 
-    # 🌅 ДЕНЬ
     today = now.date()
     await render_tasks(message, user_id, today, is_evening=False)
 
 
 # ================================
-# ➕ INLINE ДОБАВЛЕНИЕ
+# ➕ ДОБАВЛЕНИЕ
 # ================================
 @router.callback_query(lambda c: c.data == "task_add")
 async def add_task_inline(callback: types.CallbackQuery, state: FSMContext):
@@ -181,9 +185,8 @@ async def save_task(message: types.Message, state: FSMContext):
 
     await state.clear()
 
-    await message.answer("✅ Задача добавлена")
+    await message.answer("✅ Добавлено")
 
-    # 🔄 обновляем экран
     await render_tasks(message, user_id, tomorrow, is_evening=True)
 
 
@@ -201,7 +204,7 @@ async def task_done(callback: types.CallbackQuery):
             task_id
         )
 
-    await callback.answer("✅ Выполнено")
+    await callback.answer("✅")
 
     user_id = callback.from_user.id
     now = datetime.now(ZoneInfo("Europe/Kyiv"))
@@ -229,7 +232,7 @@ async def task_fail(callback: types.CallbackQuery):
             task_id
         )
 
-    await callback.answer("❌ Провалено")
+    await callback.answer("❌")
 
     user_id = callback.from_user.id
     now = datetime.now(ZoneInfo("Europe/Kyiv"))
@@ -257,7 +260,7 @@ async def task_delete(callback: types.CallbackQuery):
             task_id
         )
 
-    await callback.answer("🗑 Удалено")
+    await callback.answer("🗑")
 
     user_id = callback.from_user.id
     now = datetime.now(ZoneInfo("Europe/Kyiv"))
