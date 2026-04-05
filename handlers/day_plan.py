@@ -195,7 +195,7 @@ async def save_task(message: types.Message, state: FSMContext):
 # 🔥 DONE ПО ИНДЕКСУ
 # ================================
 @router.callback_query(lambda c: c.data.startswith("task_done_index_"))
-async def task_done_by_index(callback: types.CallbackQuery):
+async def task_toggle_by_index(callback: types.CallbackQuery):
     index = int(callback.data.split("_")[-1])
     user_id = callback.from_user.id
 
@@ -207,7 +207,7 @@ async def task_done_by_index(callback: types.CallbackQuery):
     async with pool.acquire() as conn:
         tasks = await conn.fetch(
             """
-            SELECT id
+            SELECT id, status
             FROM daily_tasks
             WHERE user_id=$1 
             AND planned_for_date=$2
@@ -219,14 +219,20 @@ async def task_done_by_index(callback: types.CallbackQuery):
         )
 
         if index <= len(tasks):
-            task_id = tasks[index - 1]["id"]
+            task = tasks[index - 1]
+            task_id = task["id"]
+            current_status = task["status"]
+
+            # 🔥 TOGGLE
+            new_status = "pending" if current_status == "done" else "done"
 
             await conn.execute(
-                "UPDATE daily_tasks SET status='done' WHERE id=$1",
+                "UPDATE daily_tasks SET status=$1 WHERE id=$2",
+                new_status,
                 task_id
             )
 
-    await callback.answer("✅ Выполнено")
+    await callback.answer("🔁 Обновлено")
 
     await render_tasks(
         callback.message,
