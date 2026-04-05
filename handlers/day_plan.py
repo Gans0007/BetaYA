@@ -12,78 +12,128 @@ router = Router()
 
 
 # ================================
-# 📋 РЕНДЕР ЗАДАЧ (NEW UI)
+# 📋 РЕНДЕР
 # ================================
-async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool = False):
+async def render_tasks(message, user_id: int, is_evening: bool, edit: bool = False):
     pool = await get_pool()
 
     async with pool.acquire() as conn:
-        tasks = await conn.fetch(
+        tz_name = await conn.fetchval(
+            "SELECT timezone FROM users WHERE user_id=$1",
+            user_id
+        )
+
+    tz_name = tz_name or "Europe/Kyiv"
+    now = datetime.now(ZoneInfo(tz_name))
+
+    today = now.date()
+    tomorrow = (now + timedelta(days=1)).date()
+
+    # ===== сегодня =====
+    async with pool.acquire() as conn:
+        today_tasks = await conn.fetch(
             """
-            SELECT id, text, status 
+            SELECT id, text, status
             FROM daily_tasks
-            WHERE user_id=$1 
-            AND planned_for_date=$2
-            AND is_deleted=FALSE
+            WHERE user_id=$1 AND planned_for_date=$2 AND is_deleted=FALSE
             ORDER BY position, id
             """,
             user_id,
-            date
+            today
         )
 
-    text = "📋 <b>План</b>\n\n"
+    # ===== завтра =====
+    async with pool.acquire() as conn:
+        tomorrow_tasks = await conn.fetch(
+            """
+            SELECT id, text, status
+            FROM daily_tasks
+            WHERE user_id=$1 AND planned_for_date=$2 AND is_deleted=FALSE
+            ORDER BY position, id
+            """,
+            user_id,
+            tomorrow
+        )
+
+    text = ""
     keyboard = []
 
-    if not tasks:
-        text += "Нет задач\n\nДобавь первую 🔥"
+    # ================================
+    # 🌙 ВЕЧЕР
+    # ================================
+    if is_evening:
 
-    else:
-        for i, task in enumerate(tasks, start=1):
-            status = task["status"]
+        # 📊 СЕГОДНЯ
+        text += "📊 <b>Сегодня</b>\n\n"
 
-            status_icon = {
-                "pending": "⏳",
-                "done": "✅",
-                "failed": "❌"
-            }.get(status, "⏳")
+        if not today_tasks:
+            text += "Нет задач\n\n"
+        else:
+            for i, task in enumerate(today_tasks, 1):
+                status_icon = "✅" if task["status"] == "done" else "❌"
+                text += f"{i}. {task['text']} {status_icon}\n"
 
-            task_text = task["text"]
+        text += "\n"
 
-            # 🔥 зачёркивание выполненной
-            if status == "done":
-                task_text = f"<s>{task_text}</s>"
+        # 📋 ЗАВТРА
+        text += "📋 <b>План на завтра</b>\n\n"
 
-            # 🧠 компактный UI
-            text += f"{i}. {task_text} {status_icon}\n\n"
+        if not tomorrow_tasks:
+            text += "Нет задач\n\nДобавь первую 🔥"
+        else:
+            for i, task in enumerate(tomorrow_tasks, 1):
+                text += f"{i}. {task['text']}\n\n"
 
-            # 🎯 кнопки
-            if is_evening:
                 keyboard.append([
                     InlineKeyboardButton(
                         text="🗑",
                         callback_data=f"task_delete_{task['id']}"
                     )
                 ])
-            else:
-                keyboard.append([
-                    InlineKeyboardButton(
-                        text="✅",
-                        callback_data=f"task_done_{task['id']}"
-                    ),
-                    InlineKeyboardButton(
-                        text="❌",
-                        callback_data=f"task_fail_{task['id']}"
-                    )
-                ])
 
-    # ➕ добавить
-    if is_evening:
         keyboard.append([
             InlineKeyboardButton(
                 text="➕ Добавить",
                 callback_data="task_add"
             )
         ])
+
+    # ================================
+    # 🌅 ДЕНЬ
+    # ================================
+    else:
+        text += "📋 <b>План на сегодня</b>\n\n"
+
+        done_count = sum(1 for t in today_tasks if t["status"] == "done")
+        total = len(today_tasks)
+
+        if total > 0:
+            text += f"🔥 {done_count}/{total} выполнено\n\n"
+
+        if not today_tasks:
+            text += "Нет задач"
+        else:
+            for i, task in enumerate(today_tasks, 1):
+                status = task["status"]
+
+                if status == "done":
+                    task_text = f"<s>{task['text']}</s>"
+                    icon = "✅"
+                elif status == "failed":
+                    task_text = task["text"]
+                    icon = "❌"
+                else:
+                    task_text = task["text"]
+                    icon = "⏳"
+
+                text += f"{i}. {task_text} {icon}\n\n"
+
+                keyboard.append([
+                    InlineKeyboardButton(
+                        text="✅",
+                        callback_data=f"task_done_{task['id']}"
+                    )
+                ])
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -94,7 +144,7 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
 
 
 # ================================
-# 📋 ОТКРЫТИЕ ПЛАНА
+# 📋 ОТКРЫТИЕ
 # ================================
 @router.message(lambda m: m.text and "План на завтра" in m.text)
 async def show_day_plan(message: types.Message):
@@ -108,30 +158,19 @@ async def show_day_plan(message: types.Message):
         )
 
     tz_name = tz_name or "Europe/Kyiv"
+    now = datetime.now(ZoneInfo(tz_name))
 
-    try:
-        now = datetime.now(ZoneInfo(tz_name))
-    except Exception:
-        now = datetime.now(ZoneInfo("Europe/Kyiv"))
+    is_evening = 20 <= now.hour < 23
 
-    hour = now.hour
-
-    if 20 <= hour < 23:
-        tomorrow = (now + timedelta(days=1)).date()
-        await render_tasks(message, user_id, tomorrow, is_evening=True)
-        return
-
-    today = now.date()
-    await render_tasks(message, user_id, today, is_evening=False)
+    await render_tasks(message, user_id, is_evening)
 
 
 # ================================
-# ➕ ДОБАВЛЕНИЕ
+# ➕ ДОБАВИТЬ
 # ================================
 @router.callback_query(lambda c: c.data == "task_add")
 async def add_task_inline(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
-
     await state.set_state(AddTaskFSM.waiting_for_text)
     await callback.message.answer("✍️ Введи задачу:")
 
@@ -143,18 +182,6 @@ async def add_task_inline(callback: types.CallbackQuery, state: FSMContext):
 async def save_task(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     text = message.text.strip()
-
-    if not text:
-        await message.answer("❗ Пустая задача")
-        return
-
-    if len(text) < 2:
-        await message.answer("❗ Слишком короткая задача")
-        return
-
-    if len(text) > 100:
-        await message.answer("❗ Слишком длинная задача")
-        return
 
     pool = await get_pool()
 
@@ -168,26 +195,20 @@ async def save_task(message: types.Message, state: FSMContext):
     now = datetime.now(ZoneInfo(tz_name))
     tomorrow = (now + timedelta(days=1)).date()
 
-    try:
-        async with pool.acquire() as conn:
-            await conn.execute(
-                """
-                INSERT INTO daily_tasks (user_id, text, planned_for_date)
-                VALUES ($1, $2, $3)
-                """,
-                user_id,
-                text,
-                tomorrow
-            )
-    except Exception:
-        await message.answer("❗ Такая задача уже есть")
-        return
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO daily_tasks (user_id, text, planned_for_date)
+            VALUES ($1, $2, $3)
+            """,
+            user_id,
+            text,
+            tomorrow
+        )
 
     await state.clear()
 
-    await message.answer("✅ Добавлено")
-
-    await render_tasks(message, user_id, tomorrow, is_evening=True)
+    await render_tasks(message, user_id, is_evening=True)
 
 
 # ================================
@@ -206,41 +227,9 @@ async def task_done(callback: types.CallbackQuery):
 
     await callback.answer("✅")
 
-    user_id = callback.from_user.id
-    now = datetime.now(ZoneInfo("Europe/Kyiv"))
-
     await render_tasks(
         callback.message,
-        user_id,
-        now.date(),
-        is_evening=False,
-        edit=True
-    )
-
-
-# ================================
-# ❌ FAILED
-# ================================
-@router.callback_query(lambda c: c.data.startswith("task_fail_"))
-async def task_fail(callback: types.CallbackQuery):
-    task_id = int(callback.data.split("_")[-1])
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE daily_tasks SET status='failed' WHERE id=$1",
-            task_id
-        )
-
-    await callback.answer("❌")
-
-    user_id = callback.from_user.id
-    now = datetime.now(ZoneInfo("Europe/Kyiv"))
-
-    await render_tasks(
-        callback.message,
-        user_id,
-        now.date(),
+        callback.from_user.id,
         is_evening=False,
         edit=True
     )
@@ -262,14 +251,9 @@ async def task_delete(callback: types.CallbackQuery):
 
     await callback.answer("🗑")
 
-    user_id = callback.from_user.id
-    now = datetime.now(ZoneInfo("Europe/Kyiv"))
-    tomorrow = (now + timedelta(days=1)).date()
-
     await render_tasks(
         callback.message,
-        user_id,
-        tomorrow,
+        callback.from_user.id,
         is_evening=True,
         edit=True
     )
