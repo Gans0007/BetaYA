@@ -129,13 +129,13 @@ async def render_tasks(message, user_id: int, is_evening: bool, edit: bool = Fal
                 text += f"{i}. {task_text} {icon}\n"
 
                 keyboard.append([
-                InlineKeyboardButton(
-                    text="✅",
-                    callback_data=f"task_done_{task['id']}"
-                )
-            ])
+                    InlineKeyboardButton(
+                        text="✅",
+                        callback_data=f"task_done_{task['id']}"
+                    )
+                ])
 
-text += "\n"
+                text += "\n"
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
