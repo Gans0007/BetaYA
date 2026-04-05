@@ -11,9 +11,8 @@ from handlers.day_plan_fsm import AddTaskFSM
 router = Router()
 
 
-
 # ================================
-# 📋 РЕНДЕР ЗАДАЧ (INLINE)
+# 📋 РЕНДЕР ЗАДАЧ
 # ================================
 async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool = False):
     pool = await get_pool()
@@ -46,33 +45,41 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
                 "failed": "❌"
             }.get(task["status"], "⏳")
 
-            # 🧱 КАРТОЧКА ЗАДАЧИ
+            # 🔥 ЗАЧЕРКИВАНИЕ
+            task_text = task["text"]
+            if task["status"] == "done":
+                task_text = f"<s>{task_text}</s>"
+
             text += (
-                f"<b>{i}. {task['text']}</b>\n"
+                f"<b>{i}. {task_text}</b>\n"
                 f"Статус: {status_icon}\n\n"
             )
 
-            # 🎯 КНОПКИ ПОД КАЖДОЙ ЗАДАЧЕЙ
-            if is_evening:
+        # 🔥 ОДНА СТРОКА КНОПОК
+        if not is_evening:
+            row = []
+
+            for i in range(1, len(tasks) + 1):
+                row.append(
+                    InlineKeyboardButton(
+                        text=f"{i}✅",
+                        callback_data=f"task_done_index_{i}"
+                    )
+                )
+
+            keyboard.append(row)
+
+        # 🌙 ВЕЧЕР (удаление)
+        if is_evening:
+            for task in tasks:
                 keyboard.append([
                     InlineKeyboardButton(
                         text="🗑 Удалить",
                         callback_data=f"task_delete_{task['id']}"
                     )
                 ])
-            else:
-                keyboard.append([
-                    InlineKeyboardButton(
-                        text="✅ Выполнено",
-                        callback_data=f"task_done_{task['id']}"
-                    ),
-                    InlineKeyboardButton(
-                        text="❌ Провал",
-                        callback_data=f"task_fail_{task['id']}"
-                    )
-                ])
 
-    # ➕ ДОБАВИТЬ (внизу)
+    # ➕ ДОБАВИТЬ
     if is_evening:
         keyboard.append([
             InlineKeyboardButton(
@@ -87,6 +94,7 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
         await message.edit_text(text, parse_mode="HTML", reply_markup=markup)
     else:
         await message.answer(text, parse_mode="HTML", reply_markup=markup)
+
 
 # ================================
 # 📋 ОТКРЫТИЕ ПЛАНА
@@ -111,24 +119,21 @@ async def show_day_plan(message: types.Message):
 
     hour = now.hour
 
-    # 🌙 ВЕЧЕР
     if 20 <= hour < 23:
         tomorrow = (now + timedelta(days=1)).date()
         await render_tasks(message, user_id, tomorrow, is_evening=True)
         return
 
-    # 🌅 ДЕНЬ
     today = now.date()
     await render_tasks(message, user_id, today, is_evening=False)
 
 
 # ================================
-# ➕ INLINE ДОБАВЛЕНИЕ
+# ➕ ДОБАВЛЕНИЕ
 # ================================
 @router.callback_query(lambda c: c.data == "task_add")
 async def add_task_inline(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
-
     await state.set_state(AddTaskFSM.waiting_for_text)
     await callback.message.answer("✍️ Введи задачу:")
 
@@ -181,64 +186,52 @@ async def save_task(message: types.Message, state: FSMContext):
         return
 
     await state.clear()
-
     await message.answer("✅ Задача добавлена")
 
-    # 🔄 обновляем экран
     await render_tasks(message, user_id, tomorrow, is_evening=True)
 
 
 # ================================
-# ✅ DONE
+# 🔥 DONE ПО ИНДЕКСУ
 # ================================
-@router.callback_query(lambda c: c.data.startswith("task_done_"))
-async def task_done(callback: types.CallbackQuery):
-    task_id = int(callback.data.split("_")[-1])
+@router.callback_query(lambda c: c.data.startswith("task_done_index_"))
+async def task_done_by_index(callback: types.CallbackQuery):
+    index = int(callback.data.split("_")[-1])
+    user_id = callback.from_user.id
 
     pool = await get_pool()
+
+    now = datetime.now(ZoneInfo("Europe/Kyiv"))
+    today = now.date()
+
     async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE daily_tasks SET status='done' WHERE id=$1",
-            task_id
+        tasks = await conn.fetch(
+            """
+            SELECT id
+            FROM daily_tasks
+            WHERE user_id=$1 
+            AND planned_for_date=$2
+            AND is_deleted=FALSE
+            ORDER BY position, id
+            """,
+            user_id,
+            today
         )
+
+        if index <= len(tasks):
+            task_id = tasks[index - 1]["id"]
+
+            await conn.execute(
+                "UPDATE daily_tasks SET status='done' WHERE id=$1",
+                task_id
+            )
 
     await callback.answer("✅ Выполнено")
 
-    user_id = callback.from_user.id
-    now = datetime.now(ZoneInfo("Europe/Kyiv"))
-
     await render_tasks(
         callback.message,
         user_id,
-        now.date(),
-        is_evening=False,
-        edit=True
-    )
-
-
-# ================================
-# ❌ FAILED
-# ================================
-@router.callback_query(lambda c: c.data.startswith("task_fail_"))
-async def task_fail(callback: types.CallbackQuery):
-    task_id = int(callback.data.split("_")[-1])
-
-    pool = await get_pool()
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE daily_tasks SET status='failed' WHERE id=$1",
-            task_id
-        )
-
-    await callback.answer("❌ Провалено")
-
-    user_id = callback.from_user.id
-    now = datetime.now(ZoneInfo("Europe/Kyiv"))
-
-    await render_tasks(
-        callback.message,
-        user_id,
-        now.date(),
+        today,
         is_evening=False,
         edit=True
     )
@@ -274,7 +267,7 @@ async def task_delete(callback: types.CallbackQuery):
 
 
 # ================================
-# 🧪 DEBUG
+# DEBUG
 # ================================
 @router.message()
 async def debug_day_plan_all(message: types.Message):
