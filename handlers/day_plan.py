@@ -35,8 +35,18 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
     keyboard = []
 
     if not tasks:
-        text += "Нет задач\n\nДобавь первую задачу 🔥"
-
+        if is_evening:
+            text += (
+                "У тебя пока нет задач на завтра\n\n"
+                "Самое время спланировать день 🔥"
+            )
+        else:
+            text += (
+                "Ты ещё не запланировал день ⚡\n\n"
+                "Планирование доступно вечером\n"
+                "🕗 с 20:00 до 23:00\n\n"
+                "Возвращайся позже и распланируй завтрашний день 💪"
+            ) 
     else:
         for i, task in enumerate(tasks, start=1):
             status_icon = {
