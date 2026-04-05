@@ -126,14 +126,16 @@ async def render_tasks(message, user_id: int, is_evening: bool, edit: bool = Fal
                     task_text = task["text"]
                     icon = "⏳"
 
-                text += f"{i}. {task_text} {icon}\n\n"
+                text += f"{i}. {task_text} {icon}\n"
 
                 keyboard.append([
-                    InlineKeyboardButton(
-                        text="✅",
-                        callback_data=f"task_done_{task['id']}"
-                    )
-                ])
+                InlineKeyboardButton(
+                    text="✅",
+                    callback_data=f"task_done_{task['id']}"
+                )
+            ])
+
+text += "\n"
 
     markup = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -220,11 +222,18 @@ async def task_done(callback: types.CallbackQuery):
 
     pool = await get_pool()
     async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE daily_tasks SET status='done' WHERE id=$1",
+        current_status = await conn.fetchval(
+            "SELECT status FROM daily_tasks WHERE id=$1",
             task_id
         )
 
+        new_status = "pending" if current_status == "done" else "done"
+
+        await conn.execute(
+            "UPDATE daily_tasks SET status=$1 WHERE id=$2",
+            new_status,
+            task_id
+        )
     await callback.answer("✅")
 
     await render_tasks(
