@@ -46,7 +46,14 @@ async def render_tasks(message, user_id: int, date, is_evening: bool, edit: bool
                 "Планирование доступно вечером\n"
                 "🕗 с 20:00 до 23:00\n\n"
                 "Возвращайся позже и распланируй завтрашний день 💪"
-            ) 
+            )
+
+            keyboard.append([
+                InlineKeyboardButton(
+                    text="📌 Напомнить вечером",
+                    callback_data="plan_reminder"
+                )
+            ])
     else:
         for i, task in enumerate(tasks, start=1):
             status_icon = {
@@ -281,6 +288,39 @@ async def task_delete(callback: types.CallbackQuery):
         edit=True
     )
 
+
+# ================================
+# 🗑НАПОМИНАНИЕ 
+# ================================
+@router.callback_query(lambda c: c.data == "plan_reminder")
+async def set_plan_reminder(callback: types.CallbackQuery):
+    user_id = callback.from_user.id
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+
+        existing = await conn.fetchval(
+            "SELECT user_id FROM plan_reminders WHERE user_id=$1",
+            user_id
+        )
+
+        if existing:
+            await callback.answer("⏳ Уже включено")
+            return
+
+        await conn.execute(
+            """
+            INSERT INTO plan_reminders (user_id)
+            VALUES ($1)
+            """,
+            user_id
+        )
+
+    await callback.answer("🔥 Напоминание включено")
+
+    await callback.message.answer(
+        "🔥 Отлично!\n\nЯ напомню тебе в 20:00 запланировать день"
+    )
 
 # ================================
 # DEBUG

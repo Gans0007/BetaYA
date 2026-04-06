@@ -31,6 +31,7 @@ from tasks.honor_global_task import honor_global_rank_daily
 
 from middlewares.subscription_middleware import SubscriptionMiddleware
 from services.message_queue import queue_consumer, QUEUE_CONFIRM
+from services.plan.reminder_plan_service import plan_reminder_loop
 
 
 logging.basicConfig(
@@ -103,6 +104,9 @@ async def main():
     dp.include_router(honor_router)
     dp.include_router(subscription_router)
     dp.include_router(habit_reminder_router)
+
+
+    asyncio.create_task(plan_reminder_loop(bot))
 
     # --- STARTUP ---
     background_tasks = await startup(bot, start_background_tasks)

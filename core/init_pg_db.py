@@ -179,6 +179,18 @@ async def create_users_table():
         """)
 
         # -------------------------------
+        # 🔹 Таблица напоминаний о планировании
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS plan_reminders (
+                user_id BIGINT PRIMARY KEY,
+                remind_at TIME DEFAULT '20:00',
+
+                FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
         # 🔹 Индексы для daily_tasks
         # -------------------------------
         await conn.execute("""
