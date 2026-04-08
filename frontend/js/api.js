@@ -1,19 +1,65 @@
-export async function getDashboard(initData){
+// ================================
+// 🌐 BASE REQUEST (общий fetch)
+// ================================
 
-const response = await fetch("/api/dashboard",{
+async function post(url, data = {}) {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
 
-method:"POST",
+    if (!response.ok) {
+        console.error("API ERROR:", url)
+        return null
+    }
 
-headers:{
-"Content-Type":"application/json"
-},
+    return await response.json()
+}
 
-body: JSON.stringify({
-initData:initData
-})
 
-})
+// ================================
+// 📊 DASHBOARD
+// ================================
 
-return await response.json()
+export async function getDashboard(initData) {
+    return await post("/api/dashboard", {
+        initData: initData
+    })
+}
 
+
+// ================================
+// 🎮 CHALLENGES
+// ================================
+
+export async function getChallenges(initData) {
+    return await post("/api/challenges", {
+        initData: initData
+    })
+}
+
+
+// ================================
+// 👤 USER (на будущее)
+// ================================
+
+export async function getUser(initData) {
+    return await post("/api/user", {
+        initData: initData
+    })
+}
+
+
+// ================================
+// 🧠 SETTINGS (на будущее)
+// ================================
+
+export async function updateSettings(initData, settings) {
+    return await post("/api/settings", {
+        initData: initData,
+        settings: settings
+    })
 }
