@@ -63,10 +63,12 @@ app.add_middleware(
 from api.dashboard import router as dashboard_router
 from api.profile import router as profile_router
 from api.settings import router as settings_router
+from api.challenges import router as challenges_router
 
 app.include_router(dashboard_router)
 app.include_router(profile_router)
 app.include_router(settings_router)
+app.include_router(challenges_router)
 
 # ----------------------------
 # Test endpoint
