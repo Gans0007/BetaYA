@@ -80,7 +80,7 @@ async def get_confirmations_count_today(conn, user_id: int) -> int:
         SELECT COUNT(DISTINCT habit_id)
         FROM confirmations
         WHERE user_id = $1
-          AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
+          AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = DATE(NOW() AT TIME ZONE 'Europe/Kyiv')
     """, user_id)
 
 
