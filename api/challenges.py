@@ -1,7 +1,7 @@
 # api/challenges.py
 
 from fastapi import APIRouter, Request
-from challenges_data import CHALLENGES, CHALLENGE_LEVELS
+from data.challenges_data import CHALLENGES, CHALLENGE_LEVELS
 
 router = APIRouter()
 
