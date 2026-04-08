@@ -1,4 +1,5 @@
 import { renderPartners } from "./partners_components/partners.js"
+import { renderChallenges } from "./challenges_components/challenges.js"
 
 export function initNavigation(){
 
@@ -56,6 +57,10 @@ if(gameRoot){
 
 if(pageName === "partners"){
     renderPartners()
+}
+
+if(pageName === "challenges"){
+    renderChallenges()
 }
 
 })
