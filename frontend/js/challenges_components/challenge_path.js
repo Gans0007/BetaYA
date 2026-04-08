@@ -11,14 +11,14 @@ export function renderChallengePath(data){
             "locked"
 
         const node = document.createElement("div")
-        node.className = "challenge-node"
+        node.className = `challenge-node node-${state}`
 
         const offset = (i % 2 === 0) ? 40 : 0
         node.style.marginLeft = offset + "px"
 
         node.innerHTML = `
-            <div class="node-circle node-${state}" data-day="${i}">
-                ${getIcon(i)}
+            <div class="node-circle">
+                <img src="frontend/img/challenges/node.png" class="node-img" />
             </div>
         `
 
