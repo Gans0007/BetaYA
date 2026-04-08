@@ -23,11 +23,14 @@
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <!-- ======================
-        GLOBAL HEADER
-        ====================== -->
+    <!-- ======================
+    GAME ROOT (header + игровые страницы)
+    ====================== -->
+    <div id="game-root">
+
+        <!-- HEADER -->
         <div class="header">
 
             <div class="profile-card">
@@ -72,9 +75,7 @@
 
         </div>
 
-        <!-- ======================
-        CHALLENGES PAGE
-        ====================== -->
+        <!-- CHALLENGES -->
         <div id="challenges-page" class="page">
 
             <div class="page-content">
@@ -89,9 +90,7 @@
 
         </div>
 
-        <!-- ======================
-        DASHBOARD PAGE
-        ====================== -->
+        <!-- DASHBOARD -->
         <div id="dashboard-page" class="page active">
 
             <div class="page-content">
@@ -112,82 +111,78 @@
 
         </div>
 
-        <!-- ======================
-        LEADERBOARD PAGE
-        ====================== -->
-        <div id="leaderboard-page" class="page">
+    </div>
 
-            <div class="page-content">
+    <!-- ======================
+    ДРУГИЕ СТРАНИЦЫ (без header)
+    ====================== -->
 
-                <div class="leaderboard-title">
-                    Лидерборд
-                </div>
+    <!-- LEADERBOARD -->
+    <div id="leaderboard-page" class="page">
 
-                <div id="leaderboard-list"></div>
+        <div class="page-content">
 
+            <div class="leaderboard-title">
+                Лидерборд
             </div>
+
+            <div id="leaderboard-list"></div>
 
         </div>
 
-        <!-- ======================
-        PARTNERS PAGE
-        ====================== -->
-        <div id="partners-page" class="page">
+    </div>
 
-            <div class="page-content">
-                <div id="partners-root"></div>
-            </div>
+    <!-- PARTNERS -->
+    <div id="partners-page" class="page">
 
+        <div class="page-content">
+            <div id="partners-root"></div>
         </div>
 
-        <!-- ======================
-        CHAT PAGE
-        ====================== -->
-        <div id="chat-page" class="page">
+    </div>
 
-            <div class="page-content">
+    <!-- CHAT -->
+    <div id="chat-page" class="page">
 
-                <div class="chat-container">
+        <div class="page-content">
 
-                    <div class="clan-block">
+            <div class="chat-container">
 
-                        <div class="clan-title">
-                            Вступи в группу или создай новую!
-                        </div>
+                <div class="clan-block">
 
-                        <div class="clan-row">
-                            <div class="clan-sub">
-                                Занимайтесь вместе с друзьями
-                            </div>
-
-                            <button class="clan-btn">
-                                Показать
-                            </button>
-                        </div>
-
+                    <div class="clan-title">
+                        Вступи в группу или создай новую!
                     </div>
 
-                    <div class="chat-main">
-
-                        <div class="chat-title">
-                            Общение
+                    <div class="clan-row">
+                        <div class="clan-sub">
+                            Занимайтесь вместе с друзьями
                         </div>
 
-                        <div class="chat-tabs">
-                            <div class="chat-tab active">В сети</div>
-                            <div class="chat-tab">Список лидеров</div>
-                        </div>
+                        <button class="clan-btn">
+                            Показать
+                        </button>
+                    </div>
 
-                        <div class="friends-list">
-                            <!-- карточки друзей -->
-                        </div>
+                </div>
 
-                        <div class="add-friend">
-                            <button class="add-friend-btn">
-                                + Добавляй друзей!
-                            </button>
-                        </div>
+                <div class="chat-main">
 
+                    <div class="chat-title">
+                        Общение
+                    </div>
+
+                    <div class="chat-tabs">
+                        <div class="chat-tab active">В сети</div>
+                        <div class="chat-tab">Список лидеров</div>
+                    </div>
+
+                    <div class="friends-list"></div>
+
+                    <div class="add-friend">
+                        <button class="add-friend-btn">
+                            + Добавляй друзей!
+                        </button>
                     </div>
 
                 </div>
@@ -198,59 +193,59 @@
 
     </div>
 
-    <!-- ======================
-    BOTTOM NAVIGATION
-    ====================== -->
-    <div class="bottom-nav">
+</div>
 
-        <div class="nav-item" data-page="challenges">
-            <div class="nav-icon" style="font-size:20px;">🗺️</div>
-            <span class="nav-label">Челленджи</span>
-        </div>
+<!-- ======================
+BOTTOM NAVIGATION
+====================== -->
+<div class="bottom-nav">
 
-        <div class="nav-item active" data-page="dashboard">
-            <img src="img/nav/habits.png" class="nav-icon">
-            <span class="nav-label">Привычки</span>
-        </div>
-
-        <div class="nav-item" data-page="chat">
-            <img src="img/nav/chat.png" class="nav-icon">
-            <span class="nav-label">Общение</span>
-        </div>
-
-        <div class="nav-item" data-page="leaderboard">
-            <img src="img/nav/leaderboard.png" class="nav-icon">
-            <span class="nav-label">Рейтинг</span>
-        </div>
-
-        <div class="nav-item" data-page="partners">
-            <img src="img/nav/partners.png" class="nav-icon">
-            <span class="nav-label">Партнерка</span>
-        </div>
-
+    <div class="nav-item" data-page="challenges">
+        <div class="nav-icon" style="font-size:20px;">🗺️</div>
+        <span class="nav-label">Челленджи</span>
     </div>
 
-    <!-- ======================
-    SCRIPTS
-    ====================== -->
-    <script>
-        const tg = window.Telegram.WebApp
-        tg.ready()
+    <div class="nav-item active" data-page="dashboard">
+        <img src="img/nav/habits.png" class="nav-icon">
+        <span class="nav-label">Привычки</span>
+    </div>
 
-        window.initData = tg.initData
-    </script>
+    <div class="nav-item" data-page="chat">
+        <img src="img/nav/chat.png" class="nav-icon">
+        <span class="nav-label">Общение</span>
+    </div>
 
-    <script type="module" src="js/dashboard.js"></script>
-    <script src="js/leaderboard.js"></script>
-    <script type="module" src="js/navigation.js"></script>
+    <div class="nav-item" data-page="leaderboard">
+        <img src="img/nav/leaderboard.png" class="nav-icon">
+        <span class="nav-label">Рейтинг</span>
+    </div>
 
-    <script type="module">
-        import { initNavigation } from "./js/navigation.js"
-        initNavigation()
-    </script>
+    <div class="nav-item" data-page="partners">
+        <img src="img/nav/partners.png" class="nav-icon">
+        <span class="nav-label">Партнерка</span>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</div>
+
+<!-- ======================
+SCRIPTS
+====================== -->
+<script>
+const tg = window.Telegram.WebApp
+tg.ready()
+window.initData = tg.initData
+</script>
+
+<script type="module" src="js/dashboard.js"></script>
+<script src="js/leaderboard.js"></script>
+<script type="module" src="js/navigation.js"></script>
+
+<script type="module">
+import { initNavigation } from "./js/navigation.js"
+initNavigation()
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 </body>
-
 </html>

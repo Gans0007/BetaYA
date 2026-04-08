@@ -8,10 +8,14 @@ const items = document.querySelectorAll(".nav-item")
 
 const pages = {
 dashboard: document.getElementById("dashboard-page"),
+challenges: document.getElementById("challenges-page"), // 🔥 ДОБАВИЛИ
 chat: document.getElementById("chat-page"),
 leaderboard: document.getElementById("leaderboard-page"),
 partners: document.getElementById("partners-page")
 }
+
+const gameRoot = document.getElementById("game-root") // 🔥 ДОБАВИЛИ
+const gamePages = ["dashboard", "challenges"] // 🔥 ДОБАВИЛИ
 
 let activePage = pages.dashboard
 
@@ -37,6 +41,18 @@ activePage = pages[pageName]
 if(activePage){
 activePage.classList.add("active")
 }
+
+/* 🔥 ПОКАЗ / СКРЫТИЕ HEADER */
+
+if(gameRoot){
+    if(gamePages.includes(pageName)){
+        gameRoot.style.display = "block"
+    }else{
+        gameRoot.style.display = "none"
+    }
+}
+
+/* старая логика НЕ трогаем */
 
 if(pageName === "partners"){
     renderPartners()
