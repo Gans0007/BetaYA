@@ -2,268 +2,255 @@
 <html lang="ru">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habits</title>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/header.css">
+    <link rel="stylesheet" href="css/habits.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+    <link rel="stylesheet" href="css/chat.css">
+    <link rel="stylesheet" href="css/profile/profile.css">
+    <link rel="stylesheet" href="css/chat_style/referral.css">
+    <link rel="stylesheet" href="css/partners_style/partners.css">
+    <link rel="stylesheet" href="/css/partners_style/settings.css">
 
-<title>Habits</title>
-
-<link rel="stylesheet" href="css/main.css">
-<link rel="stylesheet" href="css/header.css">
-<link rel="stylesheet" href="css/habits.css">
-<link rel="stylesheet" href="css/navigation.css">
-<link rel="stylesheet" href="css/leaderboard.css">
-<link rel="stylesheet" href="css/chat.css">
-<link rel="stylesheet" href="css/profile/profile.css">
-<link rel="stylesheet" href="css/chat_style/referral.css">
-<link rel="stylesheet" href="css/partners_style/partners.css">
-<link rel="stylesheet" href="/css/partners_style/settings.css">
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-<!-- ======================
-DASHBOARD PAGE
-====================== -->
+        <!-- ======================
+        GLOBAL HEADER
+        ====================== -->
+        <div class="header">
 
-<div id="dashboard-page" class="page active">
+            <div class="profile-card">
 
-<div class="page-content">
+                <div class="resources-bar">
 
-<div class="header">
+                    <div class="resource resource-xp">
+                        <div class="resource-xp-fill" id="xp-fill"></div>
+                        <div class="xp-top">
+                            XP <span id="xp-text">0 / 0</span>
+                        </div>
+                    </div>
 
-<div class="profile-card">
+                    <div class="resource resource-stars">
+                        <div class="resource-stars-fill" id="stars-fill"></div>
+                        <div class="xp-top">
+                            ⭐ <span id="stars-text">0 / 0</span>
+                        </div>
+                    </div>
 
-<div class="resources-bar">
+                </div>
 
-<div class="resource resource-xp">
+                <div class="profile-row">
 
-<div class="resource-xp-fill" id="xp-fill"></div>
+                    <div class="profile-left">
+                        <img id="player-avatar" class="profile-flag">
 
-<div class="xp-top">
-XP <span id="xp-text">0 / 0</span>
-</div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="player-name">PlayerName</div>
+                            <div class="profile-clan">Не в клане</div>
+                        </div>
+                    </div>
 
-</div>
+                    <div class="profile-league">
+                        <div id="league-text" class="league-text">...</div>
+                        <img id="league-icon" class="league-icon" src="">
+                    </div>
 
-<div class="resource resource-stars">
+                </div>
 
-    <div class="resource-stars-fill" id="stars-fill"></div>
+            </div>
 
-    <div class="xp-top">
-        ⭐ <span id="stars-text">0 / 0</span>
+        </div>
+
+        <!-- ======================
+        CHALLENGES PAGE
+        ====================== -->
+        <div id="challenges-page" class="page">
+
+            <div class="page-content">
+
+                <div style="padding: 8px 4px 16px; font-size: 22px; font-weight: 700;">
+                    Челленджи
+                </div>
+
+                <div id="challenges-root"></div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================
+        DASHBOARD PAGE
+        ====================== -->
+        <div id="dashboard-page" class="page active">
+
+            <div class="page-content">
+
+                <div class="header-calendar">
+
+                    <div class="header-month" id="month-name">
+                        Март
+                    </div>
+
+                    <div class="week-days" id="week-days"></div>
+
+                </div>
+
+                <div id="habits-list" class="habits"></div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================
+        LEADERBOARD PAGE
+        ====================== -->
+        <div id="leaderboard-page" class="page">
+
+            <div class="page-content">
+
+                <div class="leaderboard-title">
+                    Лидерборд
+                </div>
+
+                <div id="leaderboard-list"></div>
+
+            </div>
+
+        </div>
+
+        <!-- ======================
+        PARTNERS PAGE
+        ====================== -->
+        <div id="partners-page" class="page">
+
+            <div class="page-content">
+                <div id="partners-root"></div>
+            </div>
+
+        </div>
+
+        <!-- ======================
+        CHAT PAGE
+        ====================== -->
+        <div id="chat-page" class="page">
+
+            <div class="page-content">
+
+                <div class="chat-container">
+
+                    <div class="clan-block">
+
+                        <div class="clan-title">
+                            Вступи в группу или создай новую!
+                        </div>
+
+                        <div class="clan-row">
+                            <div class="clan-sub">
+                                Занимайтесь вместе с друзьями
+                            </div>
+
+                            <button class="clan-btn">
+                                Показать
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="chat-main">
+
+                        <div class="chat-title">
+                            Общение
+                        </div>
+
+                        <div class="chat-tabs">
+                            <div class="chat-tab active">В сети</div>
+                            <div class="chat-tab">Список лидеров</div>
+                        </div>
+
+                        <div class="friends-list">
+                            <!-- карточки друзей -->
+                        </div>
+
+                        <div class="add-friend">
+                            <button class="add-friend-btn">
+                                + Добавляй друзей!
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
-</div>
-
-</div>
-
-
-<div class="profile-row">
-
-<div class="profile-left">
-
-<img id="player-avatar" class="profile-flag">
-
-<div class="profile-info">
-
-<div class="profile-name" id="player-name">PlayerName</div>
-<div class="profile-clan">Не в клане</div>
-
-</div>
-
-</div>
-
-
-<div class="profile-league">
-
-    <div id="league-text" class="league-text">...</div>
-    <img id="league-icon" class="league-icon" src="">
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="header-calendar">
-
-<div class="header-month" id="month-name">
-Март
-</div>
-
-<div class="week-days" id="week-days"></div>
-
-</div>
-
-</div>
-
-<div id="habits-list" class="habits"></div>
-
-</div>
-
-</div>
-
-
-<!-- ======================
-LEADERBOARD PAGE
-====================== -->
-
-<div id="leaderboard-page" class="page">
-
-<div class="page-content">
-
-<div class="leaderboard-title">
-Лидерборд
-</div>
-
-<div id="leaderboard-list"></div>
-
-</div>
-
-</div>
-
-<!-- ======================
-PARTNERS PAGE
-====================== -->
-
-<div id="partners-page" class="page">
-
-<div class="page-content">
-
-<div id="partners-root"></div>
-
-</div>
-
-</div>
-
-<!-- ======================
-CHAT PAGE
-====================== -->
-
-<div id="chat-page" class="page">
-
-<div class="page-content">
-
-<div class="chat-container">
-
-<div class="clan-block">
-
-<div class="clan-title">
-Вступи в группу или создай новую!
-</div>
-
-<div class="clan-row">
-<div class="clan-sub">
-Занимайтесь вместе с друзьями
-</div>
-
-<button class="clan-btn">
-Показать
-</button>
-</div>
-
-</div>
-
-
-<div class="chat-main">
-
-<div class="chat-title">
-Общение
-</div>
-
-<div class="chat-tabs">
-<div class="chat-tab active">В сети</div>
-<div class="chat-tab">Список лидеров</div>
-</div>
-
-<div class="friends-list">
-<!-- карточки друзей -->
-</div>
-
-<div class="add-friend">
-<button class="add-friend-btn">
-+ Добавляй друзей!
-</button>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- ======================
-BOTTOM NAVIGATION
-====================== -->
-
-<div class="bottom-nav">
-
-<div class="nav-item" data-page="challenges">
-    <div class="nav-icon" style="font-size:20px;">🗺️</div>
-    <span class="nav-label">Челленджи</span>
-</div>
-
-<div class="nav-item active" data-page="dashboard">
-<img src="img/nav/habits.png" class="nav-icon">
-<span class="nav-label">Привычки</span>
-</div>
-
-<div class="nav-item" data-page="chat">
-<img src="img/nav/chat.png" class="nav-icon">
-<span class="nav-label">Общение</span>
-</div>
-
-<div class="nav-item" data-page="leaderboard">
-<img src="img/nav/leaderboard.png" class="nav-icon">
-<span class="nav-label">Рейтинг</span>
-</div>
-
-<div class="nav-item" data-page="partners">
-<img src="img/nav/partners.png" class="nav-icon">
-<span class="nav-label">Партнерка</span>
-</div>
-
-</div>
-
-
-<!-- ======================
-SCRIPTS
-====================== -->
-
-<script>
-
-const tg = window.Telegram.WebApp
-tg.ready()
-
-window.initData = tg.initData
-
-</script>
-
-<script type="module" src="js/dashboard.js"></script>
-<script src="js/leaderboard.js"></script>
-<script type="module" src="js/navigation.js"></script>
-
-<script type="module">
-
-import { initNavigation } from "./js/navigation.js"
-
-initNavigation()
-</script>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- ======================
+    BOTTOM NAVIGATION
+    ====================== -->
+    <div class="bottom-nav">
+
+        <div class="nav-item" data-page="challenges">
+            <div class="nav-icon" style="font-size:20px;">🗺️</div>
+            <span class="nav-label">Челленджи</span>
+        </div>
+
+        <div class="nav-item active" data-page="dashboard">
+            <img src="img/nav/habits.png" class="nav-icon">
+            <span class="nav-label">Привычки</span>
+        </div>
+
+        <div class="nav-item" data-page="chat">
+            <img src="img/nav/chat.png" class="nav-icon">
+            <span class="nav-label">Общение</span>
+        </div>
+
+        <div class="nav-item" data-page="leaderboard">
+            <img src="img/nav/leaderboard.png" class="nav-icon">
+            <span class="nav-label">Рейтинг</span>
+        </div>
+
+        <div class="nav-item" data-page="partners">
+            <img src="img/nav/partners.png" class="nav-icon">
+            <span class="nav-label">Партнерка</span>
+        </div>
+
+    </div>
+
+    <!-- ======================
+    SCRIPTS
+    ====================== -->
+    <script>
+        const tg = window.Telegram.WebApp
+        tg.ready()
+
+        window.initData = tg.initData
+    </script>
+
+    <script type="module" src="js/dashboard.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script type="module" src="js/navigation.js"></script>
+
+    <script type="module">
+        import { initNavigation } from "./js/navigation.js"
+        initNavigation()
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 </body>
+
 </html>
