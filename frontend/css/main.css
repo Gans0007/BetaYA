@@ -46,3 +46,7 @@ min-height:0;
 padding:14px;
 overflow-y:auto;
 }
+
+.page-content {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+}
