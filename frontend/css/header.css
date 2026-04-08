@@ -378,3 +378,14 @@ color:#fff;
 text-shadow:
 0 0 6px rgba(0,0,0,0.8);
 }
+
+#game-root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#game-root .page {
+    flex: 1;
+    overflow-y: auto;
+}
