@@ -18,7 +18,7 @@ export function renderChallengePath(data){
 
         node.innerHTML = `
             <div class="node-circle">
-                <img src="frontend/img/challenges/node.png" class="node-img" />
+                <img src="img/challenges/node.png" class="node-img" />
             </div>
         `
 
