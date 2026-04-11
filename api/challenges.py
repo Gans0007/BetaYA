@@ -5,6 +5,7 @@ from data.challenges_data import CHALLENGES, CHALLENGE_LEVELS
 
 router = APIRouter()
 
+
 @router.post("/api/challenges")
 async def get_challenges(request: Request):
 
