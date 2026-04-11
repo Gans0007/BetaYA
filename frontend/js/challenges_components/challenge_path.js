@@ -4,7 +4,7 @@ export function renderChallengePath(data){
     container.className = "challenge-path"
 
     // 🔥 красивая змейка (как в игре)
-    const offsets = [0, 80, 20, 100, 40, 120, 60]
+    const offsets = [20, 60, 30, 70, 40, 60, 30]
 
     for(let i = 1; i <= data.days; i++){
 
