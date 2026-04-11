@@ -1,0 +1,15 @@
+/* =========================
+🎮 STATES
+========================= */
+
+.node-locked{
+    opacity:0.3;
+}
+
+.node-done{
+    opacity:1;
+}
+
+.node-active{
+    opacity:1;
+}

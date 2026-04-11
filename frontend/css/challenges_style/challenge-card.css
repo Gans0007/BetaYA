@@ -1,0 +1,56 @@
+/* =========================
+🎴 CARD
+========================= */
+
+.challenge-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:linear-gradient(135deg,#5BE12C,#46C81F);
+
+    padding:14px 16px;
+    border-radius:16px;
+
+    box-shadow:
+        0 6px 0 #2f8f17,
+        0 10px 25px rgba(0,0,0,0.4);
+
+    margin-bottom:18px;
+}
+
+.challenge-card-left{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.challenge-module{
+    font-size:11px;
+    font-weight:600;
+    opacity:0.8;
+    color:#0f2a05;
+}
+
+.challenge-title{
+    font-size:15px;
+    font-weight:700;
+    color:#0f2a05;
+}
+
+.challenge-card-right{
+    display:flex;
+    align-items:center;
+}
+
+.challenge-btn{
+    width:42px;
+    height:42px;
+
+    background:rgba(255,255,255,0.2);
+    border-radius:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
