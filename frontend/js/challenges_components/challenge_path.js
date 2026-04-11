@@ -3,6 +3,8 @@ export function renderChallengePath(data){
     const container = document.createElement("div")
     container.className = "challenge-path"
 
+    const offsets = [0, 80, 20, 100, 40, 120, 60] // 🔥 красивая змейка
+
     for(let i = 1; i <= data.days; i++){
 
         const state =
@@ -13,7 +15,7 @@ export function renderChallengePath(data){
         const node = document.createElement("div")
         node.className = `challenge-node node-${state}`
 
-        const offset = (i % 2 === 0) ? 40 : 0
+        const offset = offsets[i % offsets.length]
         node.style.marginLeft = offset + "px"
 
         node.innerHTML = `
@@ -26,13 +28,4 @@ export function renderChallengePath(data){
     }
 
     return container
-}
-
-
-function getIcon(i){
-    if(i === 1) return "⭐"
-    if(i === 3) return "📖"
-    if(i === 5) return "🎧"
-    if(i === 7) return "🏁"
-    return ""
 }

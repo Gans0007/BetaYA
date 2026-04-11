@@ -103,10 +103,8 @@ margin:20px 0;
 }
 
 .node-circle{
-    width:10px;
-    height:10px;
-    min-width:10px;
-    min-height:10px;
+    width:72px;
+    height:72px;
 
     border-radius:50%;
 
@@ -114,20 +112,39 @@ margin:20px 0;
     align-items:center;
     justify-content:center;
 
-    overflow:hidden;       /* КЛЮЧ */
+    overflow:hidden;
     position:relative;
 
-    background:none;       /* если PNG сам круглый */
+    background:none;
+    transition:all .2s ease;
 }
+
+/* IMAGE */
 
 .node-img{
     width:100%;
     height:100%;
-
-    object-fit:cover;   /* ВАЖНО */
+    object-fit:contain;
     display:block;
+}
 
-    pointer-events:none;
+/* STATES */
+
+.node-locked{
+    opacity:0.3;
+    filter:grayscale(100%);
+}
+
+.node-done .node-img{
+    filter:hue-rotate(40deg) brightness(1.2);
+}
+
+.node-active .node-circle{
+    transform:scale(1.15);
+
+    box-shadow:
+        0 0 25px rgba(34,197,94,0.8),
+        0 0 60px rgba(34,197,94,0.4);
 }
 
 .challenge-node{
