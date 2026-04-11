@@ -5,6 +5,7 @@ export function renderChallengeCard(data){
 
     div.innerHTML = `
         <div class="challenge-card-left">
+
             <div class="challenge-module">
                 МОДУЛЬ ${data.module}, РАЗДЕЛ ${data.section}
             </div>
@@ -12,10 +13,13 @@ export function renderChallengeCard(data){
             <div class="challenge-title">
                 ${data.title}
             </div>
+
         </div>
 
         <div class="challenge-card-right">
-            📘
+            <div class="challenge-btn">
+                📘
+            </div>
         </div>
     `
 
