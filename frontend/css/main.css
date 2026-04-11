@@ -23,11 +23,13 @@ PAGES
 ========================= */
 
 .page{
-flex:1;
-display:none;
-flex-direction:column;
-height:100%;
-overflow:hidden;
+    flex:1;
+    display:none;
+    flex-direction:column;
+    height:100%;
+
+    /* 🔥 ВОТ ЭТО ФИКС */
+    overflow: visible;
 }
 
 .page.active{
