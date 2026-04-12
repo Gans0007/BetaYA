@@ -55,3 +55,7 @@ overscroll-behavior-y:contain;
 body:not(.game-mode) #game-root .header{
 display:none;
 }
+
+body:not(.game-mode) #game-root{
+    display:none;
+}
