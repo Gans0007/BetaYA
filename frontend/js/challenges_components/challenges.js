@@ -3,7 +3,6 @@ import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
 export async function renderChallenges(){
-
     const root = document.getElementById("challenges-root")
     if(!root) return
 
@@ -21,9 +20,7 @@ export async function renderChallenges(){
     const { challenges, progress } = data
 
     challenges.forEach((challenge, index) => {
-
         challenge.sections.forEach(section => {
-
             const card = renderChallengeCard({
                 module: 1,
                 section: section.section,
@@ -48,7 +45,6 @@ export async function renderChallenges(){
 
             root.appendChild(card)
             root.appendChild(path)
-
         })
 
         if(index < challenges.length - 1){
@@ -57,6 +53,5 @@ export async function renderChallenges(){
             sep.innerText = "— Давай дальше, не останавливайся —"
             root.appendChild(sep)
         }
-
     })
 }

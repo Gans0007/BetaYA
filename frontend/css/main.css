@@ -1,11 +1,3 @@
-html,
-body{
-height:100%;
-margin:0;
-overflow:hidden;
-overscroll-behavior:none;
-}
-
 body{
 background:#0b0b0c;
 color:#fff;
@@ -16,7 +8,6 @@ overflow:hidden;
 }
 
 /* главный контейнер */
-
 .container{
 max-width:420px;
 margin:auto;
@@ -28,17 +19,29 @@ overflow:hidden;
 padding-bottom:95px;
 }
 
+/* GAME ROOT: header + игровые страницы */
+#game-root{
+flex:1;
+min-height:0;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+}
+
+.header{
+flex-shrink:0;
+}
+
 /* =========================
 PAGES
 ========================= */
 
 .page{
-    flex:1;
-    display:none;
-    flex-direction:column;
-    height:100%;
-    min-height:0;
-    overflow:hidden;
+display:none;
+flex:1;
+min-height:0;
+flex-direction:column;
+overflow:hidden;
 }
 
 .page.active{
@@ -56,5 +59,5 @@ padding:14px;
 overflow-y:auto;
 overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
-overscroll-behavior:contain;
+overscroll-behavior-y:contain;
 }
