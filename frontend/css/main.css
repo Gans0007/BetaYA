@@ -7,7 +7,6 @@ height:100vh;
 overflow:hidden;
 }
 
-/* главный контейнер */
 .container{
 max-width:420px;
 margin:auto;
@@ -19,7 +18,6 @@ overflow:hidden;
 padding-bottom:95px;
 }
 
-/* GAME ROOT: header + игровые страницы */
 #game-root{
 flex:1;
 min-height:0;
@@ -31,10 +29,6 @@ overflow:hidden;
 .header{
 flex-shrink:0;
 }
-
-/* =========================
-PAGES
-========================= */
 
 .page{
 display:none;
@@ -48,10 +42,6 @@ overflow:hidden;
 display:flex;
 }
 
-/* =========================
-SCROLL CONTAINER
-========================= */
-
 .page-content{
 flex:1;
 min-height:0;
@@ -60,4 +50,8 @@ overflow-y:auto;
 overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
 overscroll-behavior-y:contain;
+}
+
+body:not(.game-mode) #game-root .header{
+display:none;
 }

@@ -1,0 +1,14 @@
+.challenge-path{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    margin:6px 0 22px;
+    width:100%;
+}
+
+.challenge-separator{
+    text-align:center;
+    opacity:0.55;
+    font-size:13px;
+    margin:8px 0 24px;
+}
