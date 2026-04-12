@@ -47,9 +47,13 @@ activePage.classList.add("active")
 
 if(gameRoot){
     if(gamePages.includes(pageName)){
-        gameRoot.style.display = "block"
+        gameRoot.style.visibility = "visible"
+        gameRoot.style.position = "relative"
+        gameRoot.style.height = "auto"
     }else{
-        gameRoot.style.display = "none"
+        gameRoot.style.visibility = "hidden"
+        gameRoot.style.position = "absolute"
+        gameRoot.style.height = "0"
     }
 }
 
