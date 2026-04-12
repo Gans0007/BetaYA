@@ -7,7 +7,7 @@ export function renderChallengeCard(data){
         <div class="challenge-card-left">
 
             <div class="challenge-module">
-                МОДУЛЬ ${data.module}, РАЗДЕЛ ${data.section}
+                Уровень ${data.module}, Раздел ${data.section}
             </div>
 
             <div class="challenge-title">

@@ -31,7 +31,7 @@ export async function renderChallenges(){
         // 🔥 заголовок уровня (модуля)
         const title = document.createElement("div")
         title.className = "challenge-module-title"
-        title.innerText = `Уровень — ${module.level_name}`
+        title.innerText = module.level_name
         root.appendChild(title)
 
         module.challenges.forEach((challenge, index) => {
