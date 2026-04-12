@@ -54,3 +54,10 @@
     align-items:center;
     justify-content:center;
 }
+
+.challenge-module-title{
+    font-size:20px;
+    font-weight:800;
+    margin:16px 4px 12px;
+    color:#fff;
+}
