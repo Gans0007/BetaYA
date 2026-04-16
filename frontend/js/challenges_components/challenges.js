@@ -19,7 +19,6 @@ export async function renderChallenges(){
     root.innerHTML = ""
 
     const modules = data.modules || []
-    const progress = data.progress || {}
 
     modules.forEach((module) => {
 
@@ -31,7 +30,6 @@ export async function renderChallenges(){
 
         module.challenges.forEach((challenge, index) => {
 
-            // 🔥 БЕРЕМ ТОЛЬКО ТЕКУЩИЙ УРОВЕНЬ
             const section = challenge.current_section
 
             const card = renderChallengeCard({
@@ -41,18 +39,14 @@ export async function renderChallenges(){
                 stars: section.stars
             })
 
+            // 🔥 РЕАЛЬНЫЙ ПРОГРЕСС
+            const doneDays = challenge.progress?.done_days || 0
+            const isActive = challenge.progress?.is_active
+
             let currentDay = 0
 
-            // 🔥 временная логика прогресса
-            if (challenge.id === progress.challenge_id) {
-
-                if (section.section < progress.section) {
-                    currentDay = section.days
-                } 
-                else if (section.section === progress.section) {
-                    currentDay = progress.day
-                }
-
+            if (isActive) {
+                currentDay = doneDays
             }
 
             const path = renderChallengePath({

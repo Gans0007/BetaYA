@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Request
 from data.challenges_data import CHALLENGES, CHALLENGE_LEVELS
 
-# 🔥 добавляем
-from repositories.challenge_repository import get_completed_challenges
+from repositories.challenge_repository import (
+    get_completed_challenges,
+    get_active_challenges
+)
 
 router = APIRouter()
 
@@ -13,16 +15,21 @@ async def get_challenges(request: Request):
     data = await request.json()
     init_data = data.get("initData")
 
-    # потом сделаем нормальную валидацию
+    # 🔥 пока без парсинга Telegram (упрощенно)
     user_id = 0
 
-    # 🔥 получаем завершенные челленджи
+    # 🔥 завершенные (звезды)
     completed_rows = await get_completed_challenges(user_id)
-
-    # {challenge_id: repeat_count}
     completed_map = {
         row["challenge_id"]: row["repeat_count"]
         for row in completed_rows
+    }
+
+    # 🔥 активные челленджи (прогресс)
+    active_rows = await get_active_challenges(user_id)
+    active_map = {
+        row["challenge_id"]: row
+        for row in active_rows
     }
 
     modules = []
@@ -38,7 +45,7 @@ async def get_challenges(request: Request):
         for ch in challenges:
             ch_id, title, texts, _ = ch
 
-            # 🔥 берем реальные звезды
+            # ⭐ звезды
             repeat_count = completed_map.get(ch_id, 0)
 
             current_section = repeat_count + 1
@@ -47,28 +54,32 @@ async def get_challenges(request: Request):
 
             days_map = {1: 7, 2: 10, 3: 13}
 
+            # 🔥 активный челлендж
+            active = active_map.get(ch_id)
+
+            done_days = active["done_days"] if active else 0
+            total_days = active["days"] if active else days_map[current_section]
+
             module["challenges"].append({
                 "id": ch_id,
                 "title": title,
 
                 "current_section": {
                     "section": current_section,
-                    "days": days_map[current_section],
+                    "days": total_days,
                     "stars": current_section,
                     "text": texts.get(current_section, "")
+                },
+
+                # 🔥 прогресс
+                "progress": {
+                    "done_days": done_days,
+                    "is_active": True if active else False
                 }
             })
 
         modules.append(module)
 
     return {
-        "modules": modules,
-
-        # 🔥 пока оставляем тестовый прогресс
-        "progress": {
-            "level": "level_0",
-            "challenge_id": "0_sleep_floor",
-            "section": 1,
-            "day": 3
-        }
+        "modules": modules
     }
