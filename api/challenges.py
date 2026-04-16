@@ -13,9 +13,8 @@ async def get_challenges(request: Request):
     data = await request.json()
     init_data = data.get("initData")
 
-    # ⚠️ ВАЖНО: пока просто берем user_id из initData (упрощенно)
     # потом сделаем нормальную валидацию
-    user_id = int(init_data.split("&")[0].split("=")[1]) if init_data else 0
+    user_id = 0
 
     # 🔥 получаем завершенные челленджи
     completed_rows = await get_completed_challenges(user_id)
