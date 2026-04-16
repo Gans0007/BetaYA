@@ -6,6 +6,9 @@ from repositories.challenge_repository import (
     get_active_challenges
 )
 
+import json
+from urllib.parse import parse_qs
+
 router = APIRouter()
 
 
@@ -15,7 +18,22 @@ async def get_challenges(request: Request):
     data = await request.json()
     init_data = data.get("initData")
 
-    user_id = 0  # пока упрощенно
+    # 🔥 ПРАВИЛЬНО ДОСТАЕМ user_id ИЗ TELEGRAM
+    user_id = 0
+
+    if init_data:
+        try:
+            parsed = parse_qs(init_data)
+
+            if "user" in parsed:
+                user_json = parsed["user"][0]
+                user_data = json.loads(user_json)
+                user_id = user_data.get("id", 0)
+
+        except Exception as e:
+            print("INIT DATA PARSE ERROR:", e)
+
+    print("🔥 USER ID:", user_id)
 
     # ⭐ completed (звезды)
     completed_rows = await get_completed_challenges(user_id)
@@ -53,7 +71,7 @@ async def get_challenges(request: Request):
 
             base_days_map = {1: 7, 2: 10, 3: 13}
 
-            # 🔥 проверяем активность
+            # 🔥 активный челлендж
             active = active_map.get(ch_id)
 
             if active:
