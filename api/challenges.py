@@ -15,17 +15,16 @@ async def get_challenges(request: Request):
     data = await request.json()
     init_data = data.get("initData")
 
-    # 🔥 пока без парсинга Telegram (упрощенно)
-    user_id = 0
+    user_id = 0  # пока упрощенно
 
-    # 🔥 завершенные (звезды)
+    # ⭐ completed (звезды)
     completed_rows = await get_completed_challenges(user_id)
     completed_map = {
         row["challenge_id"]: row["repeat_count"]
         for row in completed_rows
     }
 
-    # 🔥 активные челленджи (прогресс)
+    # 🔥 active (прогресс)
     active_rows = await get_active_challenges(user_id)
     active_map = {
         row["challenge_id"]: row
@@ -45,20 +44,26 @@ async def get_challenges(request: Request):
         for ch in challenges:
             ch_id, title, texts, _ = ch
 
-            # ⭐ звезды
+            # ⭐ уровень через repeat_count
             repeat_count = completed_map.get(ch_id, 0)
 
             current_section = repeat_count + 1
             if current_section > 3:
                 current_section = 3
 
-            days_map = {1: 7, 2: 10, 3: 13}
+            base_days_map = {1: 7, 2: 10, 3: 13}
 
-            # 🔥 активный челлендж
+            # 🔥 проверяем активность
             active = active_map.get(ch_id)
 
-            done_days = active["done_days"] if active else 0
-            total_days = active["days"] if active else days_map[current_section]
+            if active:
+                done_days = active.get("done_days", 0)
+                total_days = active.get("days", base_days_map[current_section])
+                is_active = True
+            else:
+                done_days = 0
+                total_days = base_days_map[current_section]
+                is_active = False
 
             module["challenges"].append({
                 "id": ch_id,
@@ -71,10 +76,9 @@ async def get_challenges(request: Request):
                     "text": texts.get(current_section, "")
                 },
 
-                # 🔥 прогресс
                 "progress": {
                     "done_days": done_days,
-                    "is_active": True if active else False
+                    "is_active": is_active
                 }
             })
 

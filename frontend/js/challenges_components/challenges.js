@@ -22,7 +22,6 @@ export async function renderChallenges(){
 
     modules.forEach((module) => {
 
-        // 🔥 Заголовок уровня
         const title = document.createElement("div")
         title.className = "challenge-module-title"
         title.innerText = module.level_name
@@ -39,7 +38,6 @@ export async function renderChallenges(){
                 stars: section.stars
             })
 
-            // 🔥 РЕАЛЬНЫЙ ПРОГРЕСС
             const doneDays = challenge.progress?.done_days || 0
             const isActive = challenge.progress?.is_active
 
@@ -57,7 +55,6 @@ export async function renderChallenges(){
             root.appendChild(card)
             root.appendChild(path)
 
-            // 🔥 разделитель
             if(index < module.challenges.length - 1){
                 const sep = document.createElement("div")
                 sep.className = "challenge-separator"
