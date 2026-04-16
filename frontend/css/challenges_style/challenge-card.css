@@ -61,3 +61,44 @@
     margin:16px 4px 12px;
     color:#fff;
 }
+
+/* =========================
+🔒 LOCKED LEVEL CARD
+========================= */
+
+.challenge-locked-card{
+    background:linear-gradient(180deg,#1a1f25,#12161b);
+    border-radius:18px;
+    padding:18px;
+    margin:12px 0 24px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,255,255,0.05);
+    opacity:0.85;
+}
+
+.locked-title{
+    font-size:12px;
+    opacity:0.5;
+}
+
+.locked-name{
+    font-size:18px;
+    font-weight:700;
+    margin-top:6px;
+    color:#ddd;
+}
+
+.locked-desc{
+    font-size:13px;
+    margin:12px 0;
+    line-height:1.4;
+    opacity:0.7;
+}
+
+.locked-stars{
+    font-size:14px;
+    margin-top:10px;
+    color:#4CAF50;
+}
