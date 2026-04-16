@@ -1,5 +1,3 @@
-# api/challenges.py
-
 from fastapi import APIRouter, Request
 from data.challenges_data import CHALLENGES, CHALLENGE_LEVELS
 
@@ -25,14 +23,26 @@ async def get_challenges(request: Request):
         for ch in challenges:
             ch_id, title, texts, _ = ch
 
+            # 🔥 ВРЕМЕННО: у всех repeat_count = 0 (потом подключим БД)
+            repeat_count = 0
+
+            current_section = repeat_count + 1
+            if current_section > 3:
+                current_section = 3
+
+            days_map = {1: 7, 2: 10, 3: 13}
+
             module["challenges"].append({
                 "id": ch_id,
                 "title": title,
-                "sections": [
-                    {"section":1,"days":7,"stars":1,"text":texts.get(1,"")},
-                    {"section":2,"days":10,"stars":2,"text":texts.get(2,"")},
-                    {"section":3,"days":13,"stars":3,"text":texts.get(3,"")}
-                ]
+
+                # 🔥 ТОЛЬКО ТЕКУЩИЙ УРОВЕНЬ
+                "current_section": {
+                    "section": current_section,
+                    "days": days_map[current_section],
+                    "stars": current_section,
+                    "text": texts.get(current_section, "")
+                }
             })
 
         modules.append(module)
@@ -40,7 +50,7 @@ async def get_challenges(request: Request):
     return {
         "modules": modules,
 
-        # тестовый прогресс
+        # 🔥 временный прогресс (для визуала)
         "progress": {
             "level": "level_0",
             "challenge_id": "0_sleep_floor",

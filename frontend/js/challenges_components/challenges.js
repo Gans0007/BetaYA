@@ -18,17 +18,12 @@ export async function renderChallenges(){
 
     root.innerHTML = ""
 
-    // 🔥 поддержка и нового API (modules) и старого (challenges)
-    const modules = data.modules || [{
-        level_name: "Челленджи",
-        challenges: data.challenges || []
-    }]
-
+    const modules = data.modules || []
     const progress = data.progress || {}
 
     modules.forEach((module) => {
 
-        // 🔥 заголовок уровня (модуля)
+        // 🔥 Заголовок уровня
         const title = document.createElement("div")
         title.className = "challenge-module-title"
         title.innerText = module.level_name
@@ -36,39 +31,39 @@ export async function renderChallenges(){
 
         module.challenges.forEach((challenge, index) => {
 
-            challenge.sections.forEach(section => {
+            // 🔥 БЕРЕМ ТОЛЬКО ТЕКУЩИЙ УРОВЕНЬ
+            const section = challenge.current_section
 
-                const card = renderChallengeCard({
-                    module: module.level_name,
-                    section: section.section,
-                    title: challenge.title,
-                    stars: section.stars
-                })
-
-                let currentDay = 0
-
-                // 🔥 определяем прогресс
-                if (challenge.id === progress.challenge_id) {
-
-                    if (section.section < progress.section) {
-                        currentDay = section.days
-                    } 
-                    else if (section.section === progress.section) {
-                        currentDay = progress.day
-                    }
-
-                }
-
-                const path = renderChallengePath({
-                    days: section.days,
-                    currentDay: currentDay
-                })
-
-                root.appendChild(card)
-                root.appendChild(path)
+            const card = renderChallengeCard({
+                module: module.level_name,
+                section: section.section,
+                title: challenge.title,
+                stars: section.stars
             })
 
-            // 🔥 разделитель между челленджами
+            let currentDay = 0
+
+            // 🔥 временная логика прогресса
+            if (challenge.id === progress.challenge_id) {
+
+                if (section.section < progress.section) {
+                    currentDay = section.days
+                } 
+                else if (section.section === progress.section) {
+                    currentDay = progress.day
+                }
+
+            }
+
+            const path = renderChallengePath({
+                days: section.days,
+                currentDay: currentDay
+            })
+
+            root.appendChild(card)
+            root.appendChild(path)
+
+            // 🔥 разделитель
             if(index < module.challenges.length - 1){
                 const sep = document.createElement("div")
                 sep.className = "challenge-separator"
