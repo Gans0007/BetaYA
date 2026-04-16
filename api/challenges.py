@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Request
 from data.challenges_data import CHALLENGES, CHALLENGE_LEVELS
 
+# 🔥 добавляем
+from repositories.challenge_repository import get_completed_challenges
+
 router = APIRouter()
 
 
@@ -8,7 +11,20 @@ router = APIRouter()
 async def get_challenges(request: Request):
 
     data = await request.json()
-    init_data = data.get("initData")  
+    init_data = data.get("initData")
+
+    # ⚠️ ВАЖНО: пока просто берем user_id из initData (упрощенно)
+    # потом сделаем нормальную валидацию
+    user_id = int(init_data.split("&")[0].split("=")[1]) if init_data else 0
+
+    # 🔥 получаем завершенные челленджи
+    completed_rows = await get_completed_challenges(user_id)
+
+    # {challenge_id: repeat_count}
+    completed_map = {
+        row["challenge_id"]: row["repeat_count"]
+        for row in completed_rows
+    }
 
     modules = []
 
@@ -23,8 +39,8 @@ async def get_challenges(request: Request):
         for ch in challenges:
             ch_id, title, texts, _ = ch
 
-            # 🔥 ВРЕМЕННО: у всех repeat_count = 0 (потом подключим БД)
-            repeat_count = 0
+            # 🔥 берем реальные звезды
+            repeat_count = completed_map.get(ch_id, 0)
 
             current_section = repeat_count + 1
             if current_section > 3:
@@ -36,7 +52,6 @@ async def get_challenges(request: Request):
                 "id": ch_id,
                 "title": title,
 
-                # 🔥 ТОЛЬКО ТЕКУЩИЙ УРОВЕНЬ
                 "current_section": {
                     "section": current_section,
                     "days": days_map[current_section],
@@ -50,7 +65,7 @@ async def get_challenges(request: Request):
     return {
         "modules": modules,
 
-        # 🔥 временный прогресс (для визуала)
+        # 🔥 пока оставляем тестовый прогресс
         "progress": {
             "level": "level_0",
             "challenge_id": "0_sleep_floor",
