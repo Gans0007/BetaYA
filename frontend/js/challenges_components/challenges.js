@@ -24,9 +24,6 @@ export async function renderChallenges(){
 
     modules.forEach((module) => {
 
-        // ❌ убрали вывод "Перепрошивка"
-        // (ты просил не показывать)
-
         // 🔒 закрытый уровень
         if (!module.is_unlocked) {
 
@@ -51,7 +48,7 @@ export async function renderChallenges(){
             return
         }
 
-        // ✅ челленджи
+        // ✅ открытые челленджи
         module.challenges.forEach((challenge, index) => {
 
             const section = challenge.current_section
@@ -59,7 +56,7 @@ export async function renderChallenges(){
             const doneDays = challenge.progress?.done_days || 0
             const isActive = challenge.progress?.is_active
 
-            let currentDay = isActive ? doneDays : 0
+            const currentDay = isActive ? doneDays : 0
 
             const wrapper = document.createElement("div")
             wrapper.className = "challenge-block"
@@ -72,7 +69,7 @@ export async function renderChallenges(){
             wrapper.appendChild(path)
             root.appendChild(wrapper)
 
-            // 🔥 сохраняем позицию
+            // сохраняем для sticky логики
             challengeMap.push({
                 element: wrapper,
                 data: {
@@ -82,8 +79,20 @@ export async function renderChallenges(){
                 }
             })
 
+            // ✅ возвращаем разделитель между челленджами
+            if(index < module.challenges.length - 1){
+                const sep = document.createElement("div")
+                sep.className = "challenge-separator"
+                sep.innerHTML = `
+                    <div class="challenge-sep-line"></div>
+                    <div class="challenge-sep-text">
+                        ${module.level_name}: ${challenge.title}
+                    </div>
+                    <div class="challenge-sep-line"></div>
+                `
+                root.appendChild(sep)
+            }
         })
-
     })
 
     // =========================
@@ -121,29 +130,26 @@ export async function renderChallenges(){
     const scrollContainer = document.querySelector("#challenges-page .page-content")
 
     function handleScroll(){
-
         if(!challengeMap.length) return
 
         let current = challengeMap[0]
 
         challengeMap.forEach(item => {
-
             const rect = item.element.getBoundingClientRect()
 
-            // 🔥 момент переключения (под карточкой)
             if(rect.top <= 140){
                 current = item
             }
-
         })
 
         updateStickyCard(current.data)
     }
 
-    // 🔥 ВАЖНО: слушаем НЕ window
-    scrollContainer.addEventListener("scroll", handleScroll)
+    if(scrollContainer){
+        scrollContainer.removeEventListener("scroll", handleScroll)
+        scrollContainer.addEventListener("scroll", handleScroll)
+    }
 
-    // старт
     if(challengeMap.length){
         updateStickyCard(challengeMap[0].data)
     }
