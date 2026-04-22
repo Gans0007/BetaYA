@@ -79,7 +79,13 @@ export async function renderChallenges(){
             if(index < module.challenges.length - 1){
                 const sep = document.createElement("div")
                 sep.className = "challenge-separator"
-                sep.innerText = "— Давай дальше —"
+                sep.innerHTML = `
+                <div class="challenge-sep-line"></div>
+                <div class="challenge-sep-text">
+                    ${module.level_name}: ${challenge.title}
+                </div>
+                <div class="challenge-sep-line"></div>
+            `
                 root.appendChild(sep)
             }
 
