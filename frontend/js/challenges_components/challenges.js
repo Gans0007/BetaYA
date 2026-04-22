@@ -1,4 +1,3 @@
-import { renderChallengeCard } from "./challenge_card.js"
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
@@ -21,16 +20,12 @@ export async function renderChallenges(){
     root.innerHTML = ""
 
     const modules = data.modules || []
-
-    // 🔥 карта для отслеживания скролла
     const challengeMap = []
 
     modules.forEach((module) => {
 
-        const title = document.createElement("div")
-        title.className = "challenge-module-title"
-        title.innerText = module.level_name
-        root.appendChild(title)
+        // ❌ убрали вывод "Перепрошивка"
+        // (ты просил не показывать)
 
         // 🔒 закрытый уровень
         if (!module.is_unlocked) {
@@ -56,7 +51,7 @@ export async function renderChallenges(){
             return
         }
 
-        // ✅ открытый уровень
+        // ✅ челленджи
         module.challenges.forEach((challenge, index) => {
 
             const section = challenge.current_section
@@ -77,7 +72,7 @@ export async function renderChallenges(){
             wrapper.appendChild(path)
             root.appendChild(wrapper)
 
-            // 🔥 сохраняем для sticky логики
+            // 🔥 сохраняем позицию
             challengeMap.push({
                 element: wrapper,
                 data: {
@@ -87,25 +82,12 @@ export async function renderChallenges(){
                 }
             })
 
-            if(index < module.challenges.length - 1){
-                const sep = document.createElement("div")
-                sep.className = "challenge-separator"
-                sep.innerHTML = `
-                    <div class="challenge-sep-line"></div>
-                    <div class="challenge-sep-text">
-                        ${module.level_name}: ${challenge.title}
-                    </div>
-                    <div class="challenge-sep-line"></div>
-                `
-                root.appendChild(sep)
-            }
-
         })
 
     })
 
     // =========================
-    // 📌 STICKY CARD UPDATE
+    // 📌 STICKY CARD
     // =========================
 
     function updateStickyCard(data){
@@ -133,31 +115,36 @@ export async function renderChallenges(){
     }
 
     // =========================
-    // 🧠 SCROLL LOGIC
+    // 🧠 SCROLL (FIXED)
     // =========================
 
+    const scrollContainer = document.querySelector("#challenges-page .page-content")
+
     function handleScroll(){
+
+        if(!challengeMap.length) return
 
         let current = challengeMap[0]
 
         challengeMap.forEach(item => {
+
             const rect = item.element.getBoundingClientRect()
 
-            if(rect.top <= 120){
+            // 🔥 момент переключения (под карточкой)
+            if(rect.top <= 140){
                 current = item
             }
+
         })
 
-        if(current){
-            updateStickyCard(current.data)
-        }
+        updateStickyCard(current.data)
     }
 
-    window.addEventListener("scroll", handleScroll)
+    // 🔥 ВАЖНО: слушаем НЕ window
+    scrollContainer.addEventListener("scroll", handleScroll)
 
-    // стартовое состояние
+    // старт
     if(challengeMap.length){
         updateStickyCard(challengeMap[0].data)
     }
-
 }

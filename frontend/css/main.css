@@ -52,6 +52,10 @@ overflow-x:hidden;
 overscroll-behavior-y:contain;
 }
 
+.page-content{
+    padding-top: 0 !important;
+}
+
 body:not(.game-mode) #game-root .header{
 display:none;
 }
