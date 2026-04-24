@@ -48,7 +48,7 @@ export async function renderChallenges(){
             return
         }
 
-        // ✅ открытые челленджи
+        // ✅ челленджи
         module.challenges.forEach((challenge, index) => {
 
             const section = challenge.current_section
@@ -69,7 +69,6 @@ export async function renderChallenges(){
             wrapper.appendChild(path)
             root.appendChild(wrapper)
 
-            // сохраняем для sticky логики
             challengeMap.push({
                 element: wrapper,
                 data: {
@@ -79,7 +78,7 @@ export async function renderChallenges(){
                 }
             })
 
-            // ✅ возвращаем разделитель между челленджами
+            // 🔥 разделитель
             if(index < module.challenges.length - 1){
                 const sep = document.createElement("div")
                 sep.className = "challenge-separator"
@@ -92,6 +91,7 @@ export async function renderChallenges(){
                 `
                 root.appendChild(sep)
             }
+
         })
     })
 
@@ -124,7 +124,7 @@ export async function renderChallenges(){
     }
 
     // =========================
-    // 🧠 SCROLL (FIXED)
+    // 🧠 SCROLL (ТОЧНЫЙ FIX)
     // =========================
 
     const scrollContainer = document.querySelector("#challenges-page .page-content")
@@ -142,15 +142,17 @@ export async function renderChallenges(){
 
             const rect = item.element.getBoundingClientRect()
 
-            // 🔥 КЛЮЧ:
-            // блок считается активным ТОЛЬКО когда
-            // он зашел под карточку
-            if(rect.top <= stickyBottom){
+            // 🔥 ВАЖНО:
+            // берём НЕ верх, а точку внутри блока
+            const triggerPoint = rect.top + rect.height * 0.5
+
+            // 👉 только когда реально "зашёл под карточку"
+            if(triggerPoint <= stickyBottom){
                 current = item
             }
 
         })
- 
+
         updateStickyCard(current.data)
     }
 
@@ -159,6 +161,7 @@ export async function renderChallenges(){
         scrollContainer.addEventListener("scroll", handleScroll)
     }
 
+    // старт
     if(challengeMap.length){
         updateStickyCard(challengeMap[0].data)
     }
