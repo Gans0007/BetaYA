@@ -45,7 +45,7 @@ display:flex;
 .page-content{
 flex:1;
 min-height:0;
-padding:14px;
+padding: 0 14px 14px;
 overflow-y:auto;
 overflow-x:hidden;
 -webkit-overflow-scrolling:touch;
