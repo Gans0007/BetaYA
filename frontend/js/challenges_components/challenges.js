@@ -48,7 +48,6 @@ export async function renderChallenges(){
             return
         }
 
-        // ✅ челленджи
         module.challenges.forEach((challenge, index) => {
 
             const section = challenge.current_section
@@ -58,6 +57,7 @@ export async function renderChallenges(){
 
             const currentDay = isActive ? doneDays : 0
 
+            // ===== PATH =====
             const wrapper = document.createElement("div")
             wrapper.className = "challenge-block"
 
@@ -69,19 +69,12 @@ export async function renderChallenges(){
             wrapper.appendChild(path)
             root.appendChild(wrapper)
 
-            challengeMap.push({
-                element: wrapper,
-                data: {
-                    level: module.level_name,
-                    title: challenge.title,
-                    section: section.section
-                }
-            })
-
-            // 🔥 разделитель
+            // ===== SEPARATOR (ключевой элемент) =====
             if(index < module.challenges.length - 1){
+
                 const sep = document.createElement("div")
                 sep.className = "challenge-separator"
+
                 sep.innerHTML = `
                     <div class="challenge-sep-line"></div>
                     <div class="challenge-sep-text">
@@ -89,7 +82,30 @@ export async function renderChallenges(){
                     </div>
                     <div class="challenge-sep-line"></div>
                 `
+
                 root.appendChild(sep)
+
+                // 🔥 ВАЖНО: логика теперь привязана к separator
+                challengeMap.push({
+                    element: sep,
+                    data: {
+                        level: module.level_name,
+                        title: challenge.title,
+                        section: section.section
+                    }
+                })
+            }
+
+            // 👉 добавляем последний челлендж (без separator)
+            if(index === module.challenges.length - 1){
+                challengeMap.push({
+                    element: wrapper,
+                    data: {
+                        level: module.level_name,
+                        title: challenge.title,
+                        section: section.section
+                    }
+                })
             }
 
         })
@@ -124,7 +140,7 @@ export async function renderChallenges(){
     }
 
     // =========================
-    // 🧠 SCROLL (ТОЧНЫЙ FIX)
+    // 🧠 SCROLL ЛОГИКА (ТОЧНАЯ)
     // =========================
 
     const scrollContainer = document.querySelector("#challenges-page .page-content")
@@ -142,12 +158,8 @@ export async function renderChallenges(){
 
             const rect = item.element.getBoundingClientRect()
 
-            // 🔥 ВАЖНО:
-            // берём НЕ верх, а точку внутри блока
-            const triggerPoint = rect.top + rect.height * 0.5
-
-            // 👉 только когда реально "зашёл под карточку"
-            if(triggerPoint <= stickyBottom){
+            // 🔥 ТОЛЬКО когда текст реально зашел под карточку
+            if(rect.top <= stickyBottom){
                 current = item
             }
 
@@ -161,7 +173,7 @@ export async function renderChallenges(){
         scrollContainer.addEventListener("scroll", handleScroll)
     }
 
-    // старт
+    // стартовое состояние
     if(challengeMap.length){
         updateStickyCard(challengeMap[0].data)
     }
