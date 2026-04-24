@@ -130,18 +130,27 @@ export async function renderChallenges(){
     const scrollContainer = document.querySelector("#challenges-page .page-content")
 
     function handleScroll(){
+
         if(!challengeMap.length) return
+
+        const stickyEl = document.getElementById("challenge-sticky-card")
+        const stickyBottom = stickyEl.getBoundingClientRect().bottom
 
         let current = challengeMap[0]
 
         challengeMap.forEach(item => {
+
             const rect = item.element.getBoundingClientRect()
 
-            if(rect.top <= 140){
+            // 🔥 КЛЮЧ:
+            // блок считается активным ТОЛЬКО когда
+            // он зашел под карточку
+            if(rect.top <= stickyBottom){
                 current = item
             }
-        })
 
+        })
+ 
         updateStickyCard(current.data)
     }
 
