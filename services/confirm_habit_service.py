@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 import random
 
@@ -280,7 +280,7 @@ class HabitService:
                 "challenge",
                 habit_row["challenge_id"],
                 habit_row["name"],
-                habit_row["created_at"],
+                habit_row["created_at"].replace(tzinfo=timezone.utc),
                 habit_row["days"],
                 habit_row["done_days"],
                 stars,
