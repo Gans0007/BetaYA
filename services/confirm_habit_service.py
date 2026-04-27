@@ -273,14 +273,14 @@ class HabitService:
                     result_stars,
                     difficulty
                 )
-                VALUES ($1,$2,$3,$4,$5,$6,NOW(),$7,$8,$9,$10)
+                VALUES ($1,$2,$3,$4,$5,$6::timestamptz,NOW(),$7,$8,$9,$10)
             """,
                 habit_row["user_id"],
                 habit_id,
                 "challenge",
                 habit_row["challenge_id"],
                 habit_row["name"],
-                habit_row["created_at"].replace(tzinfo=timezone.utc),
+                habit_row["created_at"],
                 habit_row["days"],
                 habit_row["done_days"],
                 stars,
