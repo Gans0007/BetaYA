@@ -63,6 +63,7 @@ async def create_users_table():
                 is_challenge BOOLEAN DEFAULT FALSE,
                 confirm_type TEXT DEFAULT 'media',
                 created_at TIMESTAMPTZ DEFAULT NOW(),
+                completed_at TIMESTAMPTZ,
                 is_active BOOLEAN DEFAULT TRUE,
                 challenge_id TEXT,
                 difficulty INTEGER DEFAULT 1,
@@ -70,6 +71,8 @@ async def create_users_table():
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
         """)
+
+
 
         # -------------------------------
         # 🔹 Таблица подтверждений (confirmations)
@@ -85,6 +88,27 @@ async def create_users_table():
                 confirmed BOOLEAN,
                 FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
                 FOREIGN KEY(habit_id) REFERENCES habits(id) ON DELETE CASCADE
+            )
+        """)
+
+        # -------------------------------
+        # 🔹 Таблица истории активности (activity_runs)
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS activity_runs (
+                id SERIAL PRIMARY KEY,
+                user_id BIGINT NOT NULL,
+                habit_id INT REFERENCES habits(id) ON DELETE SET NULL,
+                type TEXT NOT NULL CHECK (type IN ('habit', 'challenge')),
+                entity_id TEXT,
+                name TEXT,
+                started_at TIMESTAMPTZ NOT NULL,
+                completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                planned_days INT,
+                completed_days INT,
+                result_stars INT,
+                difficulty INT,
+                created_at TIMESTAMPTZ DEFAULT NOW()
             )
         """)
 
@@ -178,6 +202,7 @@ async def create_users_table():
             )
         """)
 
+
         # -------------------------------
         # 🔹 Таблица напоминаний о планировании
         # -------------------------------
@@ -220,6 +245,14 @@ async def create_users_table():
             CREATE INDEX IF NOT EXISTS idx_user_events_type 
             ON user_events(type)
         """)
+
+        # -------------------------------
+        # 🔹 Индексы для сохранения привычек и челленджей
+        # -------------------------------
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_user_id ON activity_runs(user_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_type ON activity_runs(type)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_entity_id ON activity_runs(entity_id)")
+        await conn.execute("CREATE INDEX IF NOT EXISTS idx_runs_completed_at ON activity_runs(completed_at)")
 
         # -------------------------------
         # 🔹 Индексы для ускорения запросов
