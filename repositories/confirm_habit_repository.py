@@ -108,8 +108,17 @@ async def get_habit_progress(conn, habit_id: int):
 
 async def get_challenge_habit(conn, habit_id: int):
     return await conn.fetchrow("""
-        SELECT user_id, name, days, done_days, is_challenge, challenge_id
-        FROM habits WHERE id=$1
+        SELECT 
+            user_id, 
+            name, 
+            days, 
+            done_days, 
+            is_challenge, 
+            challenge_id,
+            created_at,
+            difficulty
+        FROM habits 
+        WHERE id=$1
     """, habit_id)
 
 
