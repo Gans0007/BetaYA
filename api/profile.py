@@ -35,29 +35,20 @@ async def get_profile(request: Request):
 
     today = datetime.now().date()
 
-    # =========================
-    # WEEK (ПН–ВС)
-    # =========================
     if range_type == "week":
-        start_date = today - timedelta(days=today.weekday())  # ПН
-        end_date = start_date + timedelta(days=6)             # ВС
+        start_date = today - timedelta(days=today.weekday())
+        end_date = start_date + timedelta(days=6)
 
-    # =========================
-    # MONTH (1–последний день)
-    # =========================
     elif range_type == "month":
         start_date = today.replace(day=1)
 
         if today.month == 12:
-            next_month = today.replace(year=today.year+1, month=1, day=1)
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
         else:
-            next_month = today.replace(month=today.month+1, day=1)
+            next_month = today.replace(month=today.month + 1, day=1)
 
         end_date = next_month - timedelta(days=1)
 
-    # =========================
-    # YEAR (1 янв – 31 дек)
-    # =========================
     elif range_type == "year":
         start_date = today.replace(month=1, day=1)
         end_date = today.replace(month=12, day=31)
@@ -80,28 +71,22 @@ async def get_profile(request: Request):
         WHERE u.user_id = $1
         """, user_id)
 
-        habits_rows = await conn.fetch("""
-        SELECT id
+        habits = await conn.fetch("""
+        SELECT id, created_at, completed_at
         FROM habits
         WHERE user_id = $1
-        AND is_active = true
         """, user_id)
 
-        habit_ids = [h["id"] for h in habits_rows]
-
         confirmations_rows = await conn.fetch("""
-    SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
-    FROM confirmations
-    WHERE user_id = $1
-    AND datetime >= $2
-    AND datetime <= $3
-    GROUP BY DATE(datetime)
-    """, user_id, start_date, end_date)
+        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
+        FROM confirmations
+        WHERE user_id = $1
+        AND datetime >= $2
+        AND datetime <= $3
+        GROUP BY DATE(datetime)
+        """, user_id, start_date, end_date)
 
-        # 🔥 супер быстрый словарь
         day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
- 
-        total_habits = len(habit_ids)
 
         completed = 0
         missed = 0
@@ -110,29 +95,31 @@ async def get_profile(request: Request):
 
         score = 0
         d = start_date
-
         real_end_date = min(end_date, today)
+
+        def habit_exists_on_day(habit, day):
+            start = habit["created_at"].date()
+            end = habit["completed_at"].date() if habit["completed_at"] else today
+            return start <= day <= end
 
         while d <= end_date:
             done = day_counts.get(d, 0)
 
-            # =========================
-            # ТОЛЬКО ПРОШЛОЕ → В АНАЛИТИКУ
-            # =========================
+            active_today = sum(
+                1 for h in habits if habit_exists_on_day(h, d)
+            )
+
             if d <= real_end_date:
                 completed += done
-                missed += (total_habits - done)
+                missed += max(0, active_today - done)
 
-            # =========================
-            # ВСЁ → В ОТОБРАЖЕНИЕ
-            # =========================
             heatmap.append({
                 "date": d.isoformat(),
                 "value": done
             })
 
-            if total_habits > 0:
-                day_score = done - (total_habits - done)
+            if active_today > 0:
+                day_score = done - max(0, active_today - done)
             else:
                 day_score = 0
 
@@ -172,15 +159,10 @@ async def get_profile(request: Request):
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
-    # =========================
-    # LABEL ДЛЯ ПЕРИОДА
-    # =========================
-
     if range_type == "week":
         period_label = f"{start_date.strftime('%d.%m')} – {end_date.strftime('%d.%m')}"
 
     elif range_type == "month":
-
         RU_MONTHS = {
             1: "Январь",
             2: "Февраль",
@@ -196,7 +178,7 @@ async def get_profile(request: Request):
             12: "Декабрь",
         }
 
-        period_label = RU_MONTHS[start_date.month] 
+        period_label = RU_MONTHS[start_date.month]
 
     elif range_type == "year":
         period_label = start_date.strftime("%Y")
@@ -223,10 +205,8 @@ async def get_profile(request: Request):
         },
         "heatmap": heatmap,
         "graph": graph,
-
         "period_label": period_label,
     }
-
 @router.post("/api/profile/avatar")
 async def update_avatar(request: Request):
 
@@ -284,7 +264,6 @@ async def view_profile(request: Request):
         return {"status": "error", "message": "missing_user_id"}
 
     pool = await get_pool()
-
     today = datetime.now().date()
 
     if range_type == "week":
@@ -346,14 +325,12 @@ async def view_profile(request: Request):
                 "is_view_only": True
             }
 
-        habits_rows = await conn.fetch("""
-        SELECT id
+        # 🔥 НОВАЯ ЛОГИКА — ВСЕ ПРИВЫЧКИ
+        habits = await conn.fetch("""
+        SELECT id, created_at, completed_at
         FROM habits
         WHERE user_id = $1
-        AND is_active = true
         """, target_user_id)
-
-        habit_ids = [h["id"] for h in habits_rows]
 
         confirmations_rows = await conn.fetch("""
         SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
@@ -365,8 +342,6 @@ async def view_profile(request: Request):
         """, target_user_id, start_date, end_date)
 
         day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
- 
-        total_habits = len(habit_ids)
 
         completed = 0
         missed = 0
@@ -375,26 +350,35 @@ async def view_profile(request: Request):
 
         score = 0
         d = start_date
-
         real_end_date = min(end_date, today)
-  
+
+        def habit_exists_on_day(habit, day):
+            start = habit["created_at"].date()
+            end = habit["completed_at"].date() if habit["completed_at"] else today
+            return start <= day <= end
+
         while d <= end_date:
+
             done = day_counts.get(d, 0)
+
+            active_today = sum(
+                1 for h in habits if habit_exists_on_day(h, d)
+            )
 
             if d <= real_end_date:
                 completed += done
-                missed += (total_habits - done)
+                missed += max(0, active_today - done)
 
             heatmap.append({
                 "date": d.isoformat(),
                 "value": done
             })
 
-            if total_habits > 0:
-                day_score = done - (total_habits - done)
+            if active_today > 0:
+                day_score = done - max(0, active_today - done)
             else:
                 day_score = 0
-   
+
             if d <= real_end_date:
                 score += day_score
 

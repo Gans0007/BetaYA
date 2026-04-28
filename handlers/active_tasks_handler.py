@@ -476,7 +476,8 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
                 name,
                 created_at,
                 days,
-                done_days
+                done_days,
+                difficulty
             FROM habits
             WHERE id=$1 AND user_id=$2
         """, habit_id, user_id)
@@ -502,9 +503,10 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
                 started_at,
                 completed_at,
                 planned_days,
-                completed_days
+                completed_days,
+                difficulty
             )
-            VALUES ($1,$2,$3,$4,$5::timestamptz,NOW(),$6,$7)
+            VALUES ($1,$2,$3,$4,$5::timestamptz,NOW(),$6,$7,$8)
         """,
             habit["user_id"],
             habit_id,
@@ -512,7 +514,8 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
             habit["name"],
             habit["created_at"],
             habit["days"],
-            habit["done_days"]
+            habit["done_days"],
+            habit["difficulty"]
         )
 
         # =============================
