@@ -468,8 +468,15 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
 
     pool = await get_pool()
     async with pool.acquire() as conn:
+
+        # 🔹 Берём все нужные данные
         habit = await conn.fetchrow("""
-            SELECT name
+            SELECT 
+                user_id,
+                name,
+                created_at,
+                days,
+                done_days
             FROM habits
             WHERE id=$1 AND user_id=$2
         """, habit_id, user_id)
@@ -480,10 +487,43 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
 
         habit_name = habit["name"]
 
+        # 🔹 +1 завершённая привычка
         await increment_finished_habits(conn, user_id)
 
-        await conn.execute("DELETE FROM confirmations WHERE habit_id=$1", habit_id)
-        await conn.execute("DELETE FROM habits WHERE id=$1 AND user_id=$2", habit_id, user_id)
+        # =============================
+        # 🔥 СОХРАНЯЕМ В ИСТОРИЮ
+        # =============================
+        await conn.execute("""
+            INSERT INTO activity_runs (
+                user_id,
+                habit_id,
+                type,
+                name,
+                started_at,
+                completed_at,
+                planned_days,
+                completed_days
+            )
+            VALUES ($1,$2,$3,$4,$5::timestamptz,NOW(),$6,$7)
+        """,
+            habit["user_id"],
+            habit_id,
+            "habit",
+            habit["name"],
+            habit["created_at"],
+            habit["days"],
+            habit["done_days"]
+        )
+
+        # =============================
+        # 🔥 ЗАКРЫВАЕМ (НЕ УДАЛЯЕМ)
+        # =============================
+        await conn.execute("""
+            UPDATE habits
+            SET is_active = FALSE,
+                completed_at = NOW()
+            WHERE id = $1 AND user_id = $2
+        """, habit_id, user_id)
 
     await callback.answer(
         f"🎉 Привычка «{habit_name}» завершена!",
@@ -508,9 +548,6 @@ async def confirm_finish_habit(callback: types.CallbackQuery):
             parse_mode="Markdown",
             reply_markup=kb
         )
-
-
-
 # ================================
 # ✅ Отмена завершения привычки
 # ================================
