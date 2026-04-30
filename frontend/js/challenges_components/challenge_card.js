@@ -1,3 +1,5 @@
+import { openLevelsPage } from "../modules/challenges.js"
+
 export function renderChallengeCard(data){
 
     const div = document.createElement("div")
@@ -22,6 +24,12 @@ export function renderChallengeCard(data){
             </div>
         </div>
     `
+
+    // 🔥 КЛИК ПО КАРТОЧКЕ (НЕ ПО 📘)
+    div.addEventListener("click", (e) => {
+        if(e.target.closest(".challenge-btn")) return
+        openLevelsPage()
+    })
 
     return div
 }

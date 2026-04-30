@@ -1,6 +1,52 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
+// 🔥 ДОБАВИЛИ ЭТУ ФУНКЦИЮ
+export function openLevelsPage(){
+
+    const root = document.getElementById("challenges-root")
+
+    root.innerHTML = ""
+
+    const levels = [
+        { name: "⚡ Перепрошивка", stars: 0 },
+        { name: "Активность", stars: 10 },
+        { name: "Фокус и энергия", stars: 22 },
+        { name: "Самодисциплина", stars: 36 },
+        { name: "Преодоление", stars: 52 },
+        { name: "Для будущих предпринимателей", stars: 70 }
+    ]
+
+    const userStars = window.userStars || 0
+
+    levels.forEach(level => {
+
+        const locked = userStars < level.stars
+
+        const div = document.createElement("div")
+        div.className = "challenge-level-card"
+
+        div.innerHTML = `
+            <div class="level-left">
+                <div class="level-title">${level.name}</div>
+            </div>
+
+            <div class="level-right">
+                <div class="level-stars ${locked ? "locked" : ""}">
+                    ${locked ? "🔒 " : ""}${level.stars} ⭐
+                </div>
+            </div>
+        `
+
+        root.appendChild(div)
+    })
+}
+
+
+// =========================
+// 🔥 ТВОЙ ОРИГИНАЛЬНЫЙ КОД (НЕ ТРОНУТ)
+// =========================
+
 export async function renderChallenges(){
 
     const root = document.getElementById("challenges-root")
@@ -24,7 +70,6 @@ export async function renderChallenges(){
 
     modules.forEach((module) => {
 
-        // 🔒 закрытый уровень
         if (!module.is_unlocked) {
 
             const lockCard = document.createElement("div")
@@ -57,7 +102,6 @@ export async function renderChallenges(){
 
             const currentDay = isActive ? doneDays : 0
 
-            // ===== PATH =====
             const wrapper = document.createElement("div")
             wrapper.className = "challenge-block"
 
@@ -69,7 +113,6 @@ export async function renderChallenges(){
             wrapper.appendChild(path)
             root.appendChild(wrapper)
 
-            // ===== SEPARATOR (ключевой элемент) =====
             if(index < module.challenges.length - 1){
 
                 const sep = document.createElement("div")
@@ -85,7 +128,6 @@ export async function renderChallenges(){
 
                 root.appendChild(sep)
 
-                // 🔥 ВАЖНО: логика теперь привязана к separator
                 challengeMap.push({
                     element: sep,
                     data: {
@@ -96,7 +138,6 @@ export async function renderChallenges(){
                 })
             }
 
-            // 👉 добавляем последний челлендж (без separator)
             if(index === module.challenges.length - 1){
                 challengeMap.push({
                     element: wrapper,
@@ -110,10 +151,6 @@ export async function renderChallenges(){
 
         })
     })
-
-    // =========================
-    // 📌 STICKY CARD
-    // =========================
 
     function updateStickyCard(data){
         if(!sticky) return
@@ -139,10 +176,6 @@ export async function renderChallenges(){
         `
     }
 
-    // =========================
-    // 🧠 SCROLL ЛОГИКА (ТОЧНАЯ)
-    // =========================
-
     const scrollContainer = document.querySelector("#challenges-page .page-content")
 
     function handleScroll(){
@@ -158,7 +191,6 @@ export async function renderChallenges(){
 
             const rect = item.element.getBoundingClientRect()
 
-            // 🔥 ТОЛЬКО когда текст реально зашел под карточку
             if(rect.top <= stickyBottom){
                 current = item
             }
@@ -173,7 +205,6 @@ export async function renderChallenges(){
         scrollContainer.addEventListener("scroll", handleScroll)
     }
 
-    // стартовое состояние
     if(challengeMap.length){
         updateStickyCard(challengeMap[0].data)
     }

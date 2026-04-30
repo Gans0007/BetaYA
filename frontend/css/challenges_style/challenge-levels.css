@@ -1,0 +1,74 @@
+/* =========================
+🏆 LEVELS PAGE
+========================= */
+
+.challenge-level-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:linear-gradient(180deg,#1a1f25,#12161b);
+
+    padding:16px;
+    border-radius:16px;
+    margin-bottom:12px;
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    transition:0.2s;
+}
+
+.challenge-level-card:active{
+    transform:scale(0.98);
+}
+
+
+/* =========================
+📌 LEFT
+========================= */
+
+.level-left{
+    display:flex;
+    flex-direction:column;
+}
+
+.level-title{
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+}
+
+
+/* =========================
+⭐ RIGHT
+========================= */
+
+.level-right{
+    display:flex;
+    align-items:center;
+}
+
+.level-stars{
+    background:rgba(255,255,255,0.08);
+    padding:6px 10px;
+    border-radius:10px;
+
+    font-size:13px;
+    font-weight:600;
+
+    color:#4CAF50;
+}
+
+
+/* =========================
+🔒 LOCKED
+========================= */
+
+.level-stars.locked{
+    color:#888;
+    opacity:0.6;
+}
+
+.challenge-level-card.locked{
+    opacity:0.6;
+}
