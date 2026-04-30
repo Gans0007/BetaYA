@@ -1,12 +1,33 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
-// 🔥 ЭКРАН УРОВНЕЙ
 export function openLevelsPage(){
 
-    const root = document.getElementById("challenges-root")
+    // 🔥 если уже открыт — не создаём второй
+    if(document.getElementById("levels-overlay")) return
 
-    root.innerHTML = ""
+    // 🔥 блокируем скролл фона
+    document.body.style.overflow = "hidden"
+
+    const overlay = document.createElement("div")
+    overlay.id = "levels-overlay"
+
+    overlay.innerHTML = `
+        <div class="levels-modal">
+
+            <div class="levels-header">
+                <div class="levels-title">Уровни</div>
+                <div class="levels-close">✕</div>
+            </div>
+
+            <div class="levels-content"></div>
+
+        </div>
+    `
+
+    document.body.appendChild(overlay)
+
+    const content = overlay.querySelector(".levels-content")
 
     const levels = [
         { name: "⚡ Перепрошивка", stars: 0 },
@@ -26,6 +47,10 @@ export function openLevelsPage(){
         const div = document.createElement("div")
         div.className = "challenge-level-card"
 
+        if(locked){
+            div.classList.add("locked")
+        }
+
         div.innerHTML = `
             <div class="level-left">
                 <div class="level-title">${level.name}</div>
@@ -38,11 +63,28 @@ export function openLevelsPage(){
             </div>
         `
 
-        root.appendChild(div)
+        content.appendChild(div)
+    })
+
+    // =========================
+    // 🔥 ЗАКРЫТИЕ
+    // =========================
+
+    function closeOverlay(){
+        overlay.remove()
+        document.body.style.overflow = ""
+    }
+
+    // крестик
+    overlay.querySelector(".levels-close").onclick = closeOverlay
+
+    // клик по фону
+    overlay.addEventListener("click", (e) => {
+        if(e.target.id === "levels-overlay"){
+            closeOverlay()
+        }
     })
 }
-
-
 // =========================
 // 🔥 ОСНОВНАЯ ЛОГИКА
 // =========================

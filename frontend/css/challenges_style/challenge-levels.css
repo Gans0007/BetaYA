@@ -72,3 +72,85 @@
 .challenge-level-card.locked{
     opacity:0.6;
 }
+
+/* =========================
+🪟 LEVELS OVERLAY
+========================= */
+
+#levels-overlay{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(8px);
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+
+    z-index:9999;
+}
+
+
+/* =========================
+📦 MODAL
+========================= */
+
+.levels-modal{
+    width:100%;
+    max-width:480px;
+
+    background:#0f1318;
+    border-radius:20px 20px 0 0;
+
+    padding:16px;
+
+    animation:slideUp 0.25s ease;
+}
+
+@keyframes slideUp{
+    from{
+        transform:translateY(100%);
+        opacity:0;
+    }
+    to{
+        transform:translateY(0);
+        opacity:1;
+    }
+}
+
+
+/* =========================
+🔝 HEADER
+========================= */
+
+.levels-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:12px;
+}
+
+.levels-title{
+    font-size:18px;
+    font-weight:700;
+    color:#fff;
+}
+
+.levels-close{
+    font-size:20px;
+    color:#aaa;
+    cursor:pointer;
+}
+
+
+/* =========================
+📜 CONTENT
+========================= */
+
+.levels-content{
+    max-height:60vh;
+    overflow-y:auto;
+    padding-bottom:20px;
+}
