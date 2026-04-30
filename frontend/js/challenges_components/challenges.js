@@ -1,7 +1,7 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
-// 🔥 ДОБАВИЛИ ЭТУ ФУНКЦИЮ
+// 🔥 ЭКРАН УРОВНЕЙ
 export function openLevelsPage(){
 
     const root = document.getElementById("challenges-root")
@@ -44,7 +44,7 @@ export function openLevelsPage(){
 
 
 // =========================
-// 🔥 ТВОЙ ОРИГИНАЛЬНЫЙ КОД (НЕ ТРОНУТ)
+// 🔥 ОСНОВНАЯ ЛОГИКА
 // =========================
 
 export async function renderChallenges(){
@@ -152,6 +152,10 @@ export async function renderChallenges(){
         })
     })
 
+    // =========================
+    // 🔥 СТИКИ КАРТОЧКА
+    // =========================
+
     function updateStickyCard(data){
         if(!sticky) return
 
@@ -174,6 +178,19 @@ export async function renderChallenges(){
                 </div>
             </div>
         `
+
+        // 🔥 ВОТ ОНО — КЛИК ПО КАРТОЧКЕ
+        const card = sticky.querySelector(".challenge-card")
+
+        if(card){
+            card.addEventListener("click", (e) => {
+
+                // ❗ не трогаем кнопку 📘
+                if(e.target.closest(".challenge-btn")) return
+
+                openLevelsPage()
+            })
+        }
     }
 
     const scrollContainer = document.querySelector("#challenges-page .page-content")
