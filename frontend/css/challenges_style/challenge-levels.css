@@ -81,14 +81,28 @@
     position:fixed;
     inset:0;
 
-    background:rgba(0,0,0,0.6);
-    backdrop-filter:blur(8px);
+    background:rgba(0,0,0,0.75);
+    backdrop-filter:blur(6px);
 
     display:flex;
     justify-content:center;
-    align-items:flex-end;
+    align-items:center;
 
     z-index:9999;
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:opacity .25s ease;
+}
+
+#levels-overlay.active{
+    opacity:1;
+    pointer-events:auto;
+}
+
+#levels-overlay.hidden{
+    display:none;
 }
 
 
@@ -97,26 +111,25 @@
 ========================= */
 
 .levels-modal{
-    width:100%;
-    max-width:480px;
+    width:90%;
+    max-width:420px;
+    max-height:85%;
 
-    background:#0f1318;
-    border-radius:20px 20px 0 0;
+    background:#0f1116;
+    border-radius:22px;
 
     padding:16px;
 
-    animation:slideUp 0.25s ease;
+    transform:scale(0.92);
+    transition:transform .25s ease;
+
+    box-shadow:0 20px 60px rgba(0,0,0,0.7);
+
+    overflow:hidden;
 }
 
-@keyframes slideUp{
-    from{
-        transform:translateY(100%);
-        opacity:0;
-    }
-    to{
-        transform:translateY(0);
-        opacity:1;
-    }
+#levels-overlay.active .levels-modal{
+    transform:scale(1);
 }
 
 
