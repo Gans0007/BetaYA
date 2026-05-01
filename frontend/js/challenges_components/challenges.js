@@ -1,76 +1,94 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
-export async function openLevelsPage(){
+export function openLevelsPage(){
 
-    if(document.getElementById("levels-overlay")) return
+    if(document.querySelector(".levels-overlay")) return
 
     document.body.style.overflow = "hidden"
 
     const overlay = document.createElement("div")
-    overlay.id = "levels-overlay"
+    overlay.className = "levels-overlay hidden"
 
     overlay.innerHTML = `
-        <div class="levels-modal">
+    <div class="levels-modal">
 
-            <div class="levels-header">
-                <div class="levels-title">Уровни</div>
-                <div class="levels-close">✕</div>
-            </div>
-
-            <div class="levels-content"></div>
-
+        <div class="levels-header">
+            <div class="levels-title">Уровни</div>
+            <div class="levels-close">✕</div>
         </div>
+
+        <div class="levels-content"></div>
+
+    </div>
     `
 
     document.body.appendChild(overlay)
 
     const content = overlay.querySelector(".levels-content")
 
-    // 🔥 ВАЖНО — берём реальные данные
-    const data = await getChallenges(window.initData)
-    const modules = data.modules || []
+    // 🔥 берём реальные данные
+    getChallenges(window.initData).then(data => {
 
-    modules.forEach(module => {
+        const modules = data.modules || []
 
-        const locked = !module.is_unlocked
+        modules.forEach(module => {
 
-        const div = document.createElement("div")
-        div.className = "challenge-level-card"
+            const locked = !module.is_unlocked
 
-        if(locked){
-            div.classList.add("locked")
-        }
+            const div = document.createElement("div")
+            div.className = "challenge-level-card"
 
-        div.innerHTML = `
-            <div class="level-left">
-                <div class="level-title">${module.level_name}</div>
-            </div>
+            if(locked) div.classList.add("locked")
 
-            <div class="level-right">
-                <div class="level-stars ${locked ? "locked" : ""}">
-                    ${locked ? "🔒 " : ""}${module.required_stars} ⭐
+            div.innerHTML = `
+                <div class="level-left">
+                    <div class="level-title">${module.level_name}</div>
                 </div>
-            </div>
-        `
 
-        content.appendChild(div)
+                <div class="level-right">
+                    <div class="level-stars ${locked ? "locked" : ""}">
+                        ${locked ? "🔒 " : ""}${module.required_stars} ⭐
+                    </div>
+                </div>
+            `
+
+            content.appendChild(div)
+        })
+
     })
 
-    function closeOverlay(){
-        overlay.remove()
+    // 🔥 ОТКРЫТИЕ (как профиль)
+    setTimeout(() => {
+        overlay.classList.remove("hidden")
+        overlay.classList.add("active")
+    }, 10)
+
+    // 🔥 ЗАКРЫТИЕ
+    function close(){
+        overlay.classList.remove("active")
+
+        setTimeout(() => {
+            overlay.remove()
+        }, 250)
+
         document.body.style.overflow = ""
     }
 
-    overlay.querySelector(".levels-close").onclick = closeOverlay
+    overlay.querySelector(".levels-close").onclick = close
 
     overlay.addEventListener("click", (e) => {
-        if(e.target.id === "levels-overlay"){
-            closeOverlay()
+        if(e.target === overlay){
+            close()
+        }
+    })
+
+    document.addEventListener("keydown", (e) => {
+        if(e.key === "Escape"){
+            close()
         }
     })
 }
-
 
 // =========================
 // 🔥 ОСНОВНАЯ ЛОГИКА
