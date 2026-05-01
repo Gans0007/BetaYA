@@ -1,12 +1,10 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
-export function openLevelsPage(){
+export async function openLevelsPage(){
 
-    // 🔥 если уже открыт — не создаём второй
     if(document.getElementById("levels-overlay")) return
 
-    // 🔥 блокируем скролл фона
     document.body.style.overflow = "hidden"
 
     const overlay = document.createElement("div")
@@ -29,20 +27,13 @@ export function openLevelsPage(){
 
     const content = overlay.querySelector(".levels-content")
 
-    const levels = [
-        { name: "⚡ Перепрошивка", stars: 0 },
-        { name: "Активность", stars: 10 },
-        { name: "Фокус и энергия", stars: 22 },
-        { name: "Самодисциплина", stars: 36 },
-        { name: "Преодоление", stars: 52 },
-        { name: "Для будущих предпринимателей", stars: 70 }
-    ]
+    // 🔥 ВАЖНО — берём реальные данные
+    const data = await getChallenges(window.initData)
+    const modules = data.modules || []
 
-    const userStars = window.userStars || 0
+    modules.forEach(module => {
 
-    levels.forEach(level => {
-
-        const locked = userStars < level.stars
+        const locked = !module.is_unlocked
 
         const div = document.createElement("div")
         div.className = "challenge-level-card"
@@ -53,12 +44,12 @@ export function openLevelsPage(){
 
         div.innerHTML = `
             <div class="level-left">
-                <div class="level-title">${level.name}</div>
+                <div class="level-title">${module.level_name}</div>
             </div>
 
             <div class="level-right">
                 <div class="level-stars ${locked ? "locked" : ""}">
-                    ${locked ? "🔒 " : ""}${level.stars} ⭐
+                    ${locked ? "🔒 " : ""}${module.required_stars} ⭐
                 </div>
             </div>
         `
@@ -66,25 +57,21 @@ export function openLevelsPage(){
         content.appendChild(div)
     })
 
-    // =========================
-    // 🔥 ЗАКРЫТИЕ
-    // =========================
-
     function closeOverlay(){
         overlay.remove()
         document.body.style.overflow = ""
     }
 
-    // крестик
     overlay.querySelector(".levels-close").onclick = closeOverlay
 
-    // клик по фону
     overlay.addEventListener("click", (e) => {
         if(e.target.id === "levels-overlay"){
             closeOverlay()
         }
     })
 }
+
+
 // =========================
 // 🔥 ОСНОВНАЯ ЛОГИКА
 // =========================
