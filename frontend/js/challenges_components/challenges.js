@@ -3,34 +3,38 @@ import { getChallenges } from "../api.js"
 
 export function openLevelsPage(){
 
-    if(document.querySelector(".levels-overlay")) return
+    // 🔥 защита от повторного открытия
+    if(document.getElementById("levels-overlay")) return
 
+    // 🔥 блокируем скролл фона
     document.body.style.overflow = "hidden"
 
+    // 🔥 создаём overlay
     const overlay = document.createElement("div")
-    overlay.className = "levels-overlay hidden"
+    overlay.id = "levels-overlay"
+    overlay.className = "levels-overlay"
 
     overlay.innerHTML = `
-    <div class="levels-modal">
+        <div class="levels-modal">
 
-        <div class="levels-header">
-            <div class="levels-title">Уровни</div>
-            <div class="levels-close">✕</div>
+            <div class="levels-header">
+                <div class="levels-title">Уровни</div>
+                <div class="levels-close">✕</div>
+            </div>
+
+            <div class="levels-content"></div>
+
         </div>
-
-        <div class="levels-content"></div>
-
-    </div>
     `
 
     document.body.appendChild(overlay)
 
     const content = overlay.querySelector(".levels-content")
 
-    // 🔥 берём реальные данные
+    // 🔥 берём реальные данные с бэка
     getChallenges(window.initData).then(data => {
 
-        const modules = data.modules || []
+        const modules = data?.modules || []
 
         modules.forEach(module => {
 
@@ -39,7 +43,9 @@ export function openLevelsPage(){
             const div = document.createElement("div")
             div.className = "challenge-level-card"
 
-            if(locked) div.classList.add("locked")
+            if(locked){
+                div.classList.add("locked")
+            }
 
             div.innerHTML = `
                 <div class="level-left">
@@ -56,36 +62,35 @@ export function openLevelsPage(){
             content.appendChild(div)
         })
 
+    }).catch(err => {
+        console.error("Levels load error:", err)
     })
 
-    // 🔥 ОТКРЫТИЕ (как профиль)
-    setTimeout(() => {
-        overlay.classList.remove("hidden")
-        overlay.classList.add("active")
-    }, 10)
 
+    // =========================
     // 🔥 ЗАКРЫТИЕ
+    // =========================
+
     function close(){
-        overlay.classList.remove("active")
-
-        setTimeout(() => {
-            overlay.remove()
-        }, 250)
-
+        overlay.remove()
         document.body.style.overflow = ""
     }
 
+    // крестик
     overlay.querySelector(".levels-close").onclick = close
 
+    // клик по фону
     overlay.addEventListener("click", (e) => {
-        if(e.target === overlay){
+        if(e.target.id === "levels-overlay"){
             close()
         }
     })
 
-    document.addEventListener("keydown", (e) => {
+    // esc
+    document.addEventListener("keydown", function escHandler(e){
         if(e.key === "Escape"){
             close()
+            document.removeEventListener("keydown", escHandler)
         }
     })
 }
