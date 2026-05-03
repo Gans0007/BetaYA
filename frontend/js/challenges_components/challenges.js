@@ -1,16 +1,25 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 
-export function openLevelsPage(){
+export async function openLevelsPage(){
 
     if(document.getElementById("levels-overlay")) return
 
     document.body.style.overflow = "hidden"
 
+    // 🔥 1. СНАЧАЛА грузим данные
+    let modules = []
+
+    try{
+        const data = await getChallenges(window.initData)
+        modules = data?.modules || []
+    }catch(err){
+        console.error("Levels load error:", err)
+    }
+
+    // 🔥 2. ТОЛЬКО ПОТОМ создаём overlay
     const overlay = document.createElement("div")
     overlay.id = "levels-overlay"
-
-    // 🔥 ВАЖНО — как у профиля
     overlay.className = "levels-overlay hidden"
 
     overlay.innerHTML = `
@@ -30,53 +39,39 @@ export function openLevelsPage(){
 
     const content = overlay.querySelector(".levels-content")
 
-    // 🔥 данные с бэка
-    getChallenges(window.initData).then(data => {
+    // 🔥 3. сразу вставляем готовый контент
+    modules.forEach(module => {
 
-        const modules = data?.modules || []
+        const locked = !module.is_unlocked
 
-        modules.forEach(module => {
+        const div = document.createElement("div")
+        div.className = "challenge-level-card"
 
-            const locked = !module.is_unlocked
+        if(locked) div.classList.add("locked")
 
-            const div = document.createElement("div")
-            div.className = "challenge-level-card"
+        div.innerHTML = `
+            <div class="level-left">
+                <div class="level-title">${module.level_name}</div>
+            </div>
 
-            if(locked) div.classList.add("locked")
-
-            div.innerHTML = `
-                <div class="level-left">
-                    <div class="level-title">${module.level_name}</div>
+            <div class="level-right">
+                <div class="level-stars ${locked ? "locked" : ""}">
+                    ${locked ? "🔒 " : ""}${module.required_stars} ⭐
                 </div>
+            </div>
+        `
 
-                <div class="level-right">
-                    <div class="level-stars ${locked ? "locked" : ""}">
-                        ${locked ? "🔒 " : ""}${module.required_stars} ⭐
-                    </div>
-                </div>
-            `
-
-            content.appendChild(div)
-        })
-
+        content.appendChild(div)
     })
 
-
-    // =========================
-    // 🔥 ОТКРЫТИЕ КАК ПРОФИЛЬ
-    // =========================
-
+    // 🔥 4. открываем как профиль
     overlay.classList.remove("hidden")
 
     setTimeout(() => {
         overlay.classList.add("active")
     }, 10)
 
-
-    // =========================
-    // 🔥 ЗАКРЫТИЕ
-    // =========================
-
+    // 🔥 закрытие
     function close(){
         overlay.classList.remove("active")
 
