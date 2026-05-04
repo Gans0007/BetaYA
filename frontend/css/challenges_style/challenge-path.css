@@ -3,11 +3,9 @@
 ========================= */
 
 .challenge-path{
-    display:flex;          /* 🔥 ВАЖНО */
-    flex-direction:row;    /* 🔥 явно указываем */
+    display:flex;
     align-items:center;
-    gap:10px;
-    margin-top:12px;
+    width:100%;
 }
 
 /* =========================

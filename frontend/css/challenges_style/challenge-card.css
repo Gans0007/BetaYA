@@ -133,3 +133,10 @@
     opacity:0.6;
 }
 
+
+
+
+
+.challenge-card{
+    overflow:hidden;   /* 🔥 фикс выхода */
+}

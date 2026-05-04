@@ -5,6 +5,8 @@
 .challenge-node{
     display:flex;
     align-items:center;
+    flex:1;              /* 🔥 КЛЮЧЕВОЙ ФИКС */
+    min-width:0;         /* 🔥 чтобы не ломался на 13 */
 }
 
 /* =========================
@@ -12,8 +14,8 @@
 ========================= */
 
 .node-circle{
-    width:32px;
-    height:32px;
+    width:clamp(18px, 5vw, 32px);
+    height:clamp(18px, 5vw, 32px);
     border-radius:50%;
 
     background:#2a2f36;
@@ -30,9 +32,12 @@
 ========================= */
 
 .node-line{
-    width:28px;
+    flex:1;
+    min-width:6px;     /* 🔥 чтобы не схлопывалась */
+    max-width:40px;    /* 🔥 чтобы не растягивалась */
+ 
     height:3px;
-    margin:0 6px;   /* 🔥 выравнивает */
+    margin:0 4px;   /* 🔥 выравнивает */
 
     background:#2a2f36;
     border-radius:2px;
