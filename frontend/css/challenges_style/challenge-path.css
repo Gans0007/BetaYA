@@ -3,6 +3,8 @@
 ========================= */
 
 .challenge-path{
+    display:flex;          /* 🔥 ВАЖНО */
+    flex-direction:row;    /* 🔥 явно указываем */
     align-items:center;
     gap:10px;
     margin-top:12px;
