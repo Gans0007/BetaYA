@@ -9,8 +9,12 @@ from urllib.parse import parse_qs
 router = APIRouter()
 
 
+# =========================================
+# 📦 GET CHALLENGES
+# =========================================
 @router.post("/api/challenges")
 async def get_challenges(request: Request):
+
     data = await request.json()
     init_data = data.get("initData")
 
@@ -20,91 +24,87 @@ async def get_challenges(request: Request):
         try:
             parsed = parse_qs(init_data)
             if "user" in parsed:
-                user_json = parsed["user"][0]
-                user_data = json.loads(user_json)
+                user_data = json.loads(parsed["user"][0])
                 user_id = user_data.get("id", 0)
         except Exception as e:
-            print("INIT DATA PARSE ERROR:", e)
+            print("INIT DATA ERROR:", e)
 
-    print("🔥 USER ID:", user_id)
-
-    # ⭐ звезды
+    # ⭐ completed
     completed_rows = await get_completed_challenges(user_id)
     completed_map = {
         row["challenge_id"]: row["repeat_count"]
         for row in completed_rows
     }
 
-    # ⭐ total stars
+    # ⭐ stars
     user_stars = await get_user_total_stars(user_id) or 0
 
-    # 🔥 habits
+    # 🔥 active habits
     pool = await get_pool()
     async with pool.acquire() as conn:
-        habit_rows = await conn.fetch("""
+        rows = await conn.fetch("""
             SELECT challenge_id, done_days, days
             FROM habits
-            WHERE user_id = $1
-              AND is_challenge = TRUE
-              AND is_active = TRUE
+            WHERE user_id=$1
+            AND is_challenge=TRUE
+            AND is_active=TRUE
         """, user_id)
 
     habit_map = {
-        row["challenge_id"]: row
-        for row in habit_rows
-        if row["challenge_id"]
+        r["challenge_id"]: r for r in rows if r["challenge_id"]
     }
 
     modules = []
 
     for level_key, challenges in CHALLENGES.items():
 
-        required_stars = LEVEL_UNLOCKS.get(level_key, 0)
-        is_unlocked = user_stars >= required_stars
+        required = LEVEL_UNLOCKS.get(level_key, 0)
+        is_unlocked = user_stars >= required
 
         module = {
             "level": level_key,
             "level_name": CHALLENGE_LEVELS["ru"][level_key],
-            "required_stars": required_stars,
+            "required_stars": required,
             "is_unlocked": is_unlocked,
             "challenges": []
         }
 
-        # 🔒 если закрыт — не добавляем челленджи
         if not is_unlocked:
             modules.append(module)
             continue
 
         for ch in challenges:
-            ch_id, title, texts, _ = ch
+            cid, title, texts, _ = ch
 
-            repeat_count = completed_map.get(ch_id, 0)
+            repeat = completed_map.get(cid, 0)
+            difficulty = min(repeat + 1, 3)
 
-            current_section = min(repeat_count + 1, 3)
+            base_days = {1: 7, 2: 10, 3: 13}
 
-            base_days_map = {1: 7, 2: 10, 3: 13}
-
-            active = habit_map.get(ch_id)
+            active = habit_map.get(cid)
 
             if active:
-                done_days = active["done_days"] or 0
-                total_days = active["days"] or base_days_map[current_section]
+                done = active["done_days"] or 0
+                total = active["days"] or base_days[difficulty]
                 is_active = True
             else:
-                done_days = 0
-                total_days = base_days_map[current_section]
+                done = 0
+                total = base_days[difficulty]
                 is_active = False
 
             module["challenges"].append({
-                "id": ch_id,
+                "id": cid,
                 "title": title,
+                "description": texts,
+                "difficulty": difficulty,
+                "days": total,
                 "current_section": {
-                    "section": current_section,
-                    "days": total_days,
-                    "stars": current_section
+                    "section": difficulty,
+                    "days": total,
+                    "stars": difficulty
                 },
                 "progress": {
-                    "done_days": done_days,
+                    "done_days": done,
                     "is_active": is_active
                 }
             })
@@ -112,3 +112,83 @@ async def get_challenges(request: Request):
         modules.append(module)
 
     return {"modules": modules}
+
+
+# =========================================
+# 🚀 ACCEPT CHALLENGE
+# =========================================
+@router.post("/api/challenge/accept")
+async def accept_challenge(request: Request):
+
+    data = await request.json()
+    init_data = data.get("initData")
+    challenge_id = data.get("challenge_id")
+
+    if not init_data or not challenge_id:
+        return {"ok": False}
+
+    user_id = 0
+
+    try:
+        parsed = parse_qs(init_data)
+        if "user" in parsed:
+            user_data = json.loads(parsed["user"][0])
+            user_id = user_data.get("id", 0)
+    except:
+        return {"ok": False}
+
+    pool = await get_pool()
+
+    # ❌ уже активен
+    async with pool.acquire() as conn:
+        active = await conn.fetchrow("""
+            SELECT 1 FROM habits
+            WHERE user_id=$1
+            AND challenge_id=$2
+            AND is_active=TRUE
+        """, user_id, challenge_id)
+
+        if active:
+            return {"ok": False, "error": "already_active"}
+
+    completed_rows = await get_completed_challenges(user_id)
+    completed_map = {
+        r["challenge_id"]: r["repeat_count"]
+        for r in completed_rows
+    }
+
+    for _, challenges in CHALLENGES.items():
+        for ch in challenges:
+
+            cid, title, texts, ctype = ch
+
+            if cid != challenge_id:
+                continue
+
+            repeat = completed_map.get(cid, 0)
+            difficulty = min(repeat + 1, 3)
+
+            days_map = {1: 7, 2: 10, 3: 13}
+            days = days_map[difficulty]
+
+            description = texts.get(difficulty, "")
+
+            async with pool.acquire() as conn:
+                await conn.execute("""
+                    INSERT INTO habits
+                    (user_id, name, description, days,
+                     confirm_type, is_challenge,
+                     challenge_id, difficulty, is_active)
+                    VALUES ($1,$2,$3,$4,$5,TRUE,$6,$7,TRUE)
+                """,
+                    user_id, title, description,
+                    days, ctype, cid, difficulty
+                )
+
+            return {
+                "ok": True,
+                "difficulty": difficulty,
+                "days": days
+            }
+
+    return {"ok": False}

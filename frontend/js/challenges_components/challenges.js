@@ -1,5 +1,6 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
+import { openChallengeBook } from "./challenge_book.js"
 
 export async function openLevelsPage(){
 
@@ -105,8 +106,6 @@ export async function openLevelsPage(){
 export async function renderChallenges(){
 
     const root = document.getElementById("challenges-root")
-    const sticky = document.getElementById("challenge-sticky-card")
-
     if(!root) return
 
     root.innerHTML = "Загрузка..."
@@ -121,163 +120,98 @@ export async function renderChallenges(){
     root.innerHTML = ""
 
     const modules = data.modules || []
-    const challengeMap = []
 
-    modules.forEach((module) => {
+    modules.forEach(module => {
 
-        if (!module.is_unlocked) {
+        // =========================
+        // 🔒 LOCKED LEVEL
+        // =========================
+        if(!module.is_unlocked){
 
-            const lockCard = document.createElement("div")
-            lockCard.className = "challenge-locked-card"
+            const lock = document.createElement("div")
+            lock.className = "challenge-locked-card"
 
-            lockCard.innerHTML = `
+            lock.innerHTML = `
                 <div class="locked-title">🔒 Уровень</div>
                 <div class="locked-name">${module.level_name}</div>
-
-                <div class="locked-desc">
-                    Выполняй более сложные задания<br>
-                    получай большие награды
-                </div>
-
-                <div class="locked-stars">
-                    Нужно: ⭐ ${module.required_stars}
-                </div>
+                <div class="locked-stars">⭐ ${module.required_stars}</div>
             `
 
-            root.appendChild(lockCard)
+            root.appendChild(lock)
             return
         }
 
-        module.challenges.forEach((challenge, index) => {
+        // =========================
+        // 🏷️ ЗАГОЛОВОК УРОВНЯ
+        // =========================
+        const title = document.createElement("div")
+        title.className = "challenge-module-title"
+        title.innerText = module.level_name
+
+        root.appendChild(title)
+
+        // =========================
+        // 🎮 КАРТОЧКИ ЧЕЛЛЕНДЖЕЙ
+        // =========================
+        module.challenges.forEach(challenge => {
 
             const section = challenge.current_section
 
             const doneDays = challenge.progress?.done_days || 0
             const isActive = challenge.progress?.is_active
-
             const currentDay = isActive ? doneDays : 0
 
-            const wrapper = document.createElement("div")
-            wrapper.className = "challenge-block"
+            const card = document.createElement("div")
 
+            let stateClass = ""
+
+            if(isActive){
+                stateClass = "active"
+            } else if(doneDays >= section.days){
+                stateClass = "done"
+            }
+
+card.className = `challenge-card ${stateClass}`
+
+            // 🔥 ПУТЬ
             const path = renderChallengePath({
                 days: section.days,
                 currentDay: currentDay
             })
 
-            wrapper.appendChild(path)
-            root.appendChild(wrapper)
-
-            if(index < module.challenges.length - 1){
-
-                const sep = document.createElement("div")
-                sep.className = "challenge-separator"
-
-                sep.innerHTML = `
-                    <div class="challenge-sep-line"></div>
-                    <div class="challenge-sep-text">
-                        ${module.level_name}: ${challenge.title}
-                    </div>
-                    <div class="challenge-sep-line"></div>
-                `
-
-                root.appendChild(sep)
-
-                challengeMap.push({
-                    element: sep,
-                    data: {
-                        level: module.level_name,
-                        title: challenge.title,
-                        section: section.section
-                    }
-                })
+            const dataForBook = {
+                id: challenge.id,
+                title: challenge.title,
+                difficulty: challenge.difficulty,
+                days: challenge.days,
+                description: challenge.description,
+                isActive: isActive
             }
 
-            if(index === module.challenges.length - 1){
-                challengeMap.push({
-                    element: wrapper,
-                    data: {
-                        level: module.level_name,
-                        title: challenge.title,
-                        section: section.section
-                    }
-                })
-            }
-
-        })
-    })
-
-    // =========================
-    // 🔥 СТИКИ КАРТОЧКА
-    // =========================
-
-    function updateStickyCard(data){
-        if(!sticky) return
-
-        sticky.innerHTML = `
-            <div class="challenge-card">
-                <div class="challenge-card-left">
-
-                    <div class="challenge-module">
-                        ${data.level}, Раздел ${data.section}
+            card.innerHTML = `
+                <div class="challenge-card-header">
+                    <div>
+                        <div class="challenge-title">${challenge.title}</div>
+                        <div class="challenge-sub">
+                            ${section.days} дней • ⭐ ${section.section}
+                        </div>
                     </div>
 
-                    <div class="challenge-title">
-                        ${data.title}
-                    </div>
-
-                </div>
-
-                <div class="challenge-card-right">
                     <div class="challenge-btn">📘</div>
                 </div>
-            </div>
-        `
+            `
 
-        // 🔥 ВОТ ОНО — КЛИК ПО КАРТОЧКЕ
-        const card = sticky.querySelector(".challenge-card")
+            card.appendChild(path)
 
-        if(card){
-            card.addEventListener("click", (e) => {
-
-                // ❗ не трогаем кнопку 📘
-                if(e.target.closest(".challenge-btn")) return
-
-                openLevelsPage()
-            })
-        }
-    }
-
-    const scrollContainer = document.querySelector("#challenges-page .page-content")
-
-    function handleScroll(){
-
-        if(!challengeMap.length) return
-
-        const stickyEl = document.getElementById("challenge-sticky-card")
-        const stickyBottom = stickyEl.getBoundingClientRect().bottom
-
-        let current = challengeMap[0]
-
-        challengeMap.forEach(item => {
-
-            const rect = item.element.getBoundingClientRect()
-
-            if(rect.top <= stickyBottom){
-                current = item
+            // 📘
+            card.querySelector(".challenge-btn").onclick = (e)=>{
+                e.stopPropagation()
+                openChallengeBook(dataForBook)
             }
 
+            root.appendChild(card)
         })
-
-        updateStickyCard(current.data)
-    }
-
-    if(scrollContainer){
-        scrollContainer.removeEventListener("scroll", handleScroll)
-        scrollContainer.addEventListener("scroll", handleScroll)
-    }
-
-    if(challengeMap.length){
-        updateStickyCard(challengeMap[0].data)
-    }
+    })
 }
+
+window.renderChallenges = renderChallenges

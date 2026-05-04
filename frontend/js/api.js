@@ -63,3 +63,22 @@ export async function updateSettings(initData, settings) {
         settings: settings
     })
 }
+
+// ================================
+// 🧠 взять челлендж
+// ================================
+export async function acceptChallenge(initData, challengeId){
+
+    const res = await fetch("/api/challenge/accept", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            initData,
+            challenge_id: challengeId
+        })
+    })
+
+    return res.json()
+}

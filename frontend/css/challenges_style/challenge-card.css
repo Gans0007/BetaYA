@@ -2,23 +2,6 @@
 🎴 CARD
 ========================= */
 
-.challenge-card{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    background:linear-gradient(135deg,#5BE12C,#46C81F);
-
-    padding:14px 16px;
-    border-radius:16px;
-
-    box-shadow:
-        0 6px 0 #2f8f17,
-        0 10px 25px rgba(0,0,0,0.4);
-
-    margin-bottom:18px;
-}
-
 .challenge-card-left{
     display:flex;
     flex-direction:column;
@@ -103,23 +86,49 @@
     color:#4CAF50;
 }
 
-/* =========================
-📌 STICKY CARD
-========================= */
 
-#challenge-sticky-card{
-    position: sticky;
-    top: 0;
+.challenge-card{
+    background: linear-gradient(180deg,#1a1f25,#12161b);
+    border-radius:20px;
+    padding:16px;
+    margin-bottom:16px;
 
-    z-index: 999;
+    border:1px solid rgba(255,255,255,0.05);
+}
 
-    padding: 4px 6px 10px;
+.challenge-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
 
-    /* 🔥 блокирует ноды */
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,1),
-        rgba(0,0,0,0.95),
-        rgba(0,0,0,0.85)
-    );
+.challenge-title{
+    font-size:16px;
+    font-weight:700;
+    color:#fff;
+}
+
+.challenge-sub{
+    font-size:12px;
+    opacity:0.6;
+}
+
+
+
+
+
+
+
+
+
+/* 🟢 АКТИВНЫЙ */
+.challenge-card.active{
+    border:1px solid #4CAF50;
+    box-shadow:0 0 12px rgba(76,175,80,0.4);
+}
+
+/* 🏆 ЗАВЕРШЕН */
+.challenge-card.done{
+    opacity:0.6;
 }
