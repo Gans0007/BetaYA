@@ -1,47 +1,37 @@
-/* =========================
-🧭 PATH CONTAINER
-========================= */
-
 .challenge-path{
     display:flex;
     align-items:center;
-    width:100%;
-}
 
-/* =========================
-➖ SEPARATOR (DUOLINGO STYLE)
-========================= */
+    overflow-x:auto;
+    overflow-y:hidden;
 
-.challenge-separator{
-    display:flex;
-    align-items:center;
-    justify-content:center;
     gap:10px;
+    margin-top:12px;
 
-    margin:18px 0 28px;
-    padding:0 6px;
+    padding-bottom:6px;
+
+    scrollbar-width:none;
+    position:relative;
 }
 
-.challenge-sep-line{
-    flex:1;
-    height:2px;
+.challenge-path::-webkit-scrollbar{
+    display:none;
+}
+
+/* 🔥 лёгкий градиент справа (намёк на скролл) */
+.challenge-path::after{
+    content:"";
+    position:absolute;
+    right:0;
+    top:0;
+    bottom:0;
+    width:20px;
 
     background:linear-gradient(
         to right,
         transparent,
-        rgba(255,255,255,0.18),
-        transparent
+        rgba(18,22,27,1)
     );
 
-    border-radius:2px;
-}
-
-.challenge-sep-text{
-    font-size:13px;
-    font-weight:600;
-
-    color:rgba(255,255,255,0.75);
-
-    white-space:nowrap;
-    letter-spacing:0.2px;
+    pointer-events:none;
 }

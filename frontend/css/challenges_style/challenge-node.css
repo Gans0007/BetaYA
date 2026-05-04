@@ -5,8 +5,8 @@
 .challenge-node{
     display:flex;
     align-items:center;
-    flex:1;              /* 🔥 КЛЮЧЕВОЙ ФИКС */
-    min-width:0;         /* 🔥 чтобы не ломался на 13 */
+
+    flex:0 0 auto; /* 🔥 ключ для горизонтального скролла */
 }
 
 /* =========================
@@ -14,8 +14,15 @@
 ========================= */
 
 .node-circle{
-    width:clamp(18px, 5vw, 32px);
-    height:clamp(18px, 5vw, 32px);
+    width:calc((100vw - 80px) / 7);
+    height:calc((100vw - 80px) / 7);
+
+    max-width:40px;
+    max-height:40px;
+
+    min-width:16px;
+    min-height:16px;
+
     border-radius:50%;
 
     background:#2a2f36;
@@ -32,15 +39,17 @@
 ========================= */
 
 .node-line{
-    flex:1;
-    min-width:6px;     /* 🔥 чтобы не схлопывалась */
-    max-width:40px;    /* 🔥 чтобы не растягивалась */
- 
+    width:calc((100vw - 80px) / 7 * 0.6);
     height:3px;
-    margin:0 4px;   /* 🔥 выравнивает */
+
+    min-width:10px;
+
+    margin:0 4px;
 
     background:#2a2f36;
     border-radius:2px;
+
+    transition:0.25s;
 }
 
 /* =========================
@@ -49,7 +58,7 @@
 
 .node-done .node-circle{
     background:#4CAF50;
-    box-shadow:0 0 14px rgba(76,175,80,0.8);
+    box-shadow:0 0 12px rgba(76,175,80,0.7);
 }
 
 .node-done .node-line{
@@ -61,8 +70,8 @@
 ========================= */
 
 .node-active .node-circle{
-    background:#fff;
-    box-shadow:0 0 16px rgba(76,175,80,0.8);
+    background:#ffffff;
+    box-shadow:0 0 14px rgba(76,175,80,0.8);
     transform:scale(1.15);
 }
 
