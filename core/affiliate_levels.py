@@ -1,4 +1,5 @@
 
+
 AFFILIATE_LEVELS = [
     {"key": "bronze",   "title": "Bronze",   "emoji": "🥉", "min_active": 0,  "percent": 2},
     {"key": "silver",   "title": "Silver",   "emoji": "🥈", "min_active": 3,  "percent": 5},
