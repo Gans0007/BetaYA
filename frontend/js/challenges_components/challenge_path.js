@@ -13,11 +13,23 @@ export function renderChallengePath({ days, currentDay }) {
             state = "active"
         }
 
+        let imgSrc = ""
+
+        if(state === "done"){
+            imgSrc = "/img/nodes/node_done.png"
+        }else if(state === "active"){
+            imgSrc = "/img/nodes/node_wait.png"
+        }else{
+            imgSrc = "/img/nodes/node_lock.png"
+        }
+
         const node = document.createElement("div")
-        node.className = `challenge-node node-${state}`
+        node.className = "challenge-node"
 
         node.innerHTML = `
-            <div class="node-circle"></div>
+            <div class="node-circle">
+                <img src="${imgSrc}" class="node-img"/>
+            </div>
             ${i < days ? `<div class="node-line"></div>` : ""}
         `
 
