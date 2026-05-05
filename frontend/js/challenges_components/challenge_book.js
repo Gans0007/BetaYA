@@ -5,7 +5,7 @@ export function openChallengeBook(data){
     if(document.getElementById("challenge-book")) return
 
     const overlay = document.createElement("div")
-    overlay.id = "challenge-book"
+    overlay.id = "levels-overlay"
     overlay.className = "levels-overlay active"
 
     const desc =
