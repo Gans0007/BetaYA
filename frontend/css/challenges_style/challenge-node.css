@@ -1,35 +1,21 @@
-/* =========================
-🔘 NODE CONTAINER
-========================= */
-
 .challenge-node{
     display:flex;
     align-items:center;
     flex:0 0 auto;
 }
 
-/* =========================
-⭕ CIRCLE (контейнер)
-========================= */
-
+/* 🔥 6 НОД В ЭКРАН */
 .node-circle{
-    width:calc((100vw - 80px) / 7);
-    height:calc((100vw - 80px) / 7);
+    width:calc((100vw - 120px) / 6);
+    height:calc((100vw - 120px) / 6);
 
-    max-width:44px;
-    max-height:44px;
-
-    min-width:18px;
-    min-height:18px;
+    max-width:38px;
+    max-height:38px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 }
-
-/* =========================
-🖼 IMAGE
-========================= */
 
 .node-img{
     width:100%;
@@ -37,27 +23,18 @@
     object-fit:contain;
 }
 
-/* =========================
-➖ LINE
-========================= */
-
+/* 🔥 ЛИНИЯ */
 .node-line{
-    width:calc((100vw - 80px) / 7 * 0.6);
-    height:3px;
+    width:calc((100vw - 120px) / 6 * 0.5);
+    height:2px;
 
-    min-width:10px;
-
-    margin:0 4px;
+    margin:0 2px;
 
     background:#2a2f36;
     border-radius:2px;
 }
 
-
-
-
-
-
+/* ✨ актив */
 .node-img[src*="node_wait"]{
     filter: drop-shadow(0 0 6px rgba(255,165,0,0.6));
 }

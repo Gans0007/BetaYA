@@ -31,7 +31,6 @@ export async function renderChallenges(){
                 <div class="locked-name">${module.level_name}</div>
                 <div class="locked-stars">⭐ ${module.required_stars}</div>
             `
-
             root.appendChild(lock)
             return
         }
@@ -39,7 +38,6 @@ export async function renderChallenges(){
         const title = document.createElement("div")
         title.className = "challenge-module-title"
         title.innerText = module.level_name
-
         root.appendChild(title)
 
         module.challenges.forEach(challenge => {
@@ -74,9 +72,6 @@ export async function renderChallenges(){
 
             card.innerHTML = `
                 <div class="challenge-title">${challenge.title}</div>
-                <div class="challenge-sub">
-                    ${section.days} дней • ⭐ ${section.section}
-                </div>
 
                 <div class="challenge-row">
                     <div class="challenge-path-wrapper"></div>
@@ -85,12 +80,14 @@ export async function renderChallenges(){
                         <img src="/img/nodes/about_button.png"/>
                     </div>
                 </div>
+
+                <div class="challenge-sub-bottom">
+                    ${section.days} дней • ⭐ ${section.section}
+                </div>
             `
 
-            // вставляем путь внутрь
             card.querySelector(".challenge-path-wrapper").appendChild(path)
 
-            // 📘
             card.querySelector(".challenge-book-fixed").onclick = (e)=>{
                 e.stopPropagation()
                 openChallengeBook(dataForBook)
