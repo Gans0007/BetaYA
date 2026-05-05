@@ -267,3 +267,45 @@
     font-weight:600;
     font-size:15px;
 }
+
+/* =========================
+📊 META BLOCK
+========================= */
+
+.sheet-meta{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+    margin-bottom:12px;
+}
+
+/* строка */
+.meta-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    font-size:14px;
+}
+
+/* иконки */
+.meta-item img{
+    width:18px;
+    height:18px;
+    object-fit:contain;
+}
+
+/* 🎯 цвета */
+.meta-level{
+    color:#facc15; /* желто-оранжевый */
+}
+
+.meta-days{
+    color:#22c55e; /* зелёный */
+}
+
+/* выделение цифры */
+.meta-level b{
+    color:#f59e0b;
+}

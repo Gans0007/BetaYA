@@ -24,8 +24,17 @@ export function openChallengeBook(data){
                 <div class="sheet-title">${data.title}</div>
 
                 <div class="sheet-meta">
-                    <div>📊 Сложность: ${data.difficulty} / 3</div>
-                    <div>📅 ${data.days} дней</div>
+
+                    <div class="meta-item meta-level">
+                        <img src="/img/nodes/hard_level.png"/>
+                        <span>Сложность: <b>${data.difficulty} / 3</b></span>
+                    </div>
+
+                    <div class="meta-item meta-days">
+                        <img src="/img/nodes/level_days.png"/>
+                        <span>${data.days} дней</span>
+                    </div>
+
                 </div>
 
                 <div class="sheet-desc">
