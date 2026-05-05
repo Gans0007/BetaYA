@@ -32,7 +32,7 @@ export function openChallengeBook(data){
 
                     <div class="meta-item meta-days">
                         <img src="/img/nodes/level_days.png"/>
-                        <span>${data.days} дней</span>
+                        <span>Длительность: <b>${data.days} дней </b></span>
                     </div>
 
                 </div>

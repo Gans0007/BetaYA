@@ -296,16 +296,17 @@
     object-fit:contain;
 }
 
-/* 🎯 цвета */
-.meta-level{
-    color:#facc15; /* желто-оранжевый */
-}
-
+/* убираем цвет с текста */
+.meta-level,
 .meta-days{
-    color:#22c55e; /* зелёный */
+    color:#fff;
 }
 
-/* выделение цифры */
+/* красим только цифры */
 .meta-level b{
-    color:#f59e0b;
+    color:#f59e0b; /* оранжевый */
+}
+
+.meta-days b{
+    color:#22c55e; /* зеленый */
 }
