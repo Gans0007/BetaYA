@@ -22,6 +22,7 @@ export async function renderChallenges(){
 
     modules.forEach(module => {
 
+        // 🔒 LOCKED
         if(!module.is_unlocked){
             const lock = document.createElement("div")
             lock.className = "challenge-locked-card"
@@ -35,11 +36,13 @@ export async function renderChallenges(){
             return
         }
 
+        // 🏷️ TITLE
         const title = document.createElement("div")
         title.className = "challenge-module-title"
         title.innerText = module.level_name
         root.appendChild(title)
 
+        // 🎮 CHALLENGES
         module.challenges.forEach(challenge => {
 
             const section = challenge.current_section
@@ -77,7 +80,7 @@ export async function renderChallenges(){
                     <div class="challenge-path-wrapper"></div>
 
                     <div class="challenge-book-fixed">
-                        <img src="/img/nodes/about_button.png"/>
+                        <img class="challenge-book-img" src="/img/nodes/about_button.png"/>
                     </div>
                 </div>
 
@@ -86,12 +89,16 @@ export async function renderChallenges(){
                 </div>
             `
 
+            // вставляем путь
             card.querySelector(".challenge-path-wrapper").appendChild(path)
 
-            card.querySelector(".challenge-book-fixed").onclick = (e)=>{
+            // ✅ КЛИК ПО КНИГЕ (ПРАВИЛЬНЫЙ)
+            const book = card.querySelector(".challenge-book-img")
+
+            book.addEventListener("click", (e)=>{
                 e.stopPropagation()
                 openChallengeBook(dataForBook)
-            }
+            })
 
             root.appendChild(card)
         })

@@ -50,23 +50,28 @@
 ========================= */
 
 .challenge-book-fixed{
-    width:54px;
-    height:54px;
-    min-width:54px;
+    width:56px;
+    height:56px;
+    min-width:56px;
 
     display:flex;
     align-items:center;
     justify-content:center;
+
+    cursor:pointer;
+    z-index:2;
 }
 
-.challenge-book-fixed img{
+.challenge-book-img{
     width:100%;
     height:100%;
     object-fit:contain;
+
+    pointer-events:auto;
 }
 
 /* =========================
-📅 DAYS / STARS TEXT
+📅 DAYS / STARS
 ========================= */
 
 .challenge-sub-bottom{
@@ -76,7 +81,7 @@
 }
 
 /* =========================
-🟢 ACTIVE CARD
+🟢 ACTIVE
 ========================= */
 
 .challenge-card.active{
@@ -85,7 +90,7 @@
 }
 
 /* =========================
-🏆 DONE CARD
+🏆 DONE
 ========================= */
 
 .challenge-card.done{
@@ -93,7 +98,7 @@
 }
 
 /* =========================
-🔒 LOCKED LEVEL CARD
+🔒 LOCKED
 ========================= */
 
 .challenge-locked-card{
