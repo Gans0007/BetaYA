@@ -27,12 +27,12 @@ export function openChallengeBook(data){
 
                     <div class="meta-item meta-level">
                         <img src="/img/nodes/hard_level.png"/>
-                        <span>Сложность: ${data.difficulty} / 3</span>
+                        <span>Сложность: <span class="value">${data.difficulty} / 3</span></span>
                     </div>
 
                     <div class="meta-item meta-days">
                         <img src="/img/nodes/level_days.png"/>
-                        <span>Длительность: ${data.days} дней </span>
+                        <span>Длительность: <span class="value">${data.days} дней</span></span>
                     </div>
 
                 </div>

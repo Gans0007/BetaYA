@@ -303,10 +303,10 @@
 }
 
 /* красим только цифры */
-.meta-level b{
+.meta-level .value{
     color:#f59e0b; /* оранжевый */
 }
 
-.meta-days b{
+.meta-days .value{
     color:#22c55e; /* зеленый */
 }
