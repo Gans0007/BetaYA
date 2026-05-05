@@ -5,7 +5,8 @@
     overflow-x:auto;
     overflow-y:hidden;
 
-    gap:10px;
+    /* ❌ УБРАЛИ gap */
+    gap:0;
 
     padding-bottom:6px;
 
@@ -19,20 +20,3 @@
     display:none;
 }
 
-/* градиент справа */
-.challenge-path::after{
-    content:"";
-    position:absolute;
-    right:0;
-    top:0;
-    bottom:0;
-    width:20px;
-
-    background:linear-gradient(
-        to right,
-        transparent,
-        rgba(18,22,27,1)
-    );
-
-    pointer-events:none;
-}
