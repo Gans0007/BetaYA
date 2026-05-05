@@ -167,3 +167,103 @@
     overflow-y:auto;
     padding-bottom:20px;
 }
+
+/* =========================
+🌑 BACKDROP
+========================= */
+
+#challenge-book{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+}
+
+.sheet-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+
+    opacity:0;
+    transition:0.25s;
+}
+
+/* =========================
+📦 SHEET
+========================= */
+
+.sheet{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+
+    background:#0f1116;
+    border-radius:20px 20px 0 0;
+
+    padding:16px;
+
+    transform:translateY(100%);
+    transition:0.25s ease;
+
+    max-height:80%;
+}
+
+/* активное состояние */
+#challenge-book.active .sheet{
+    transform:translateY(0);
+}
+
+#challenge-book.active .sheet-backdrop{
+    opacity:1;
+}
+
+/* =========================
+🧲 HANDLE
+========================= */
+
+.sheet-handle{
+    width:40px;
+    height:4px;
+    background:#444;
+    border-radius:10px;
+    margin:0 auto 12px;
+}
+
+/* =========================
+📄 CONTENT
+========================= */
+
+.sheet-title{
+    font-size:18px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:10px;
+}
+
+.sheet-meta{
+    font-size:13px;
+    opacity:0.7;
+    margin-bottom:10px;
+}
+
+.sheet-desc{
+    font-size:14px;
+    line-height:1.4;
+    margin-bottom:16px;
+}
+
+/* =========================
+🚀 BUTTON
+========================= */
+
+.sheet-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+
+    background:#ff8c00;
+    color:#fff;
+    font-weight:600;
+    font-size:15px;
+}

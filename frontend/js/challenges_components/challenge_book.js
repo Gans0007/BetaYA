@@ -5,8 +5,7 @@ export function openChallengeBook(data){
     if(document.getElementById("challenge-book")) return
 
     const overlay = document.createElement("div")
-    overlay.id = "levels-overlay"
-    overlay.className = "levels-overlay active"
+    overlay.id = "challenge-book"
 
     const desc =
         data.description?.[data.difficulty] ||
@@ -15,36 +14,42 @@ export function openChallengeBook(data){
         "Описание скоро будет"
 
     overlay.innerHTML = `
-        <div class="levels-modal">
+        <div class="sheet-backdrop"></div>
 
-            <div class="levels-header">
-                <div class="levels-title">${data.title}</div>
-                <div class="levels-close">✕</div>
-            </div>
+        <div class="sheet">
+            <div class="sheet-handle"></div>
 
-            <div class="levels-content">
+            <div class="sheet-content">
 
-                <div class="book-meta">
+                <div class="sheet-title">${data.title}</div>
+
+                <div class="sheet-meta">
                     <div>📊 Сложность: ${data.difficulty} / 3</div>
                     <div>📅 ${data.days} дней</div>
                 </div>
 
-                <div class="book-desc">
+                <div class="sheet-desc">
                     ${desc}
                 </div>
 
-                <button class="take-btn">
+                <button class="sheet-btn">
                     ${data.isActive ? "✅ Уже активен" : "🚀 Взять челлендж"}
                 </button>
 
             </div>
-
         </div>
     `
 
     document.body.appendChild(overlay)
 
-    const btn = overlay.querySelector(".take-btn")
+    const sheet = overlay.querySelector(".sheet")
+
+    // 🔥 запуск анимации
+    setTimeout(()=>{
+        overlay.classList.add("active")
+    }, 10)
+
+    const btn = overlay.querySelector(".sheet-btn")
 
     if(data.isActive){
         btn.disabled = true
@@ -59,21 +64,16 @@ export function openChallengeBook(data){
             )
 
             if(res?.ok){
-
                 btn.innerText = "✅ Активирован"
 
                 setTimeout(()=>{
-                    overlay.remove()
-
+                    close()
                     window.renderChallenges()
-
                 }, 500)
 
             }else if(res?.error === "already_active"){
-
                 btn.innerText = "✅ Уже активен"
                 btn.disabled = true
-
             }else{
                 btn.innerText = "❌ Ошибка"
             }
@@ -81,12 +81,9 @@ export function openChallengeBook(data){
     }
 
     function close(){
-        overlay.remove()
+        overlay.classList.remove("active")
+        setTimeout(()=> overlay.remove(), 250)
     }
 
-    overlay.querySelector(".levels-close").onclick = close
-
-    overlay.addEventListener("click", (e)=>{
-        if(e.target === overlay) close()
-    })
+    overlay.querySelector(".sheet-backdrop").onclick = close
 }
