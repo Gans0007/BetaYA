@@ -1,8 +1,13 @@
+/* =========================
+🎴 CHALLENGE CARD
+========================= */
+
 .challenge-card{
-    background: linear-gradient(180deg,#1a1f25,#12161b);
+    background:linear-gradient(180deg,#1a1f25,#12161b);
     border-radius:20px;
     padding:16px;
     margin-bottom:16px;
+
     border:1px solid rgba(255,255,255,0.05);
     overflow:hidden;
 }
@@ -14,20 +19,36 @@
     margin-bottom:8px;
 }
 
-/* 🔥 ROW */
+/* =========================
+🏷️ MODULE TITLE
+========================= */
+
+.challenge-module-title{
+    font-size:20px;
+    font-weight:800;
+    margin:16px 4px 12px;
+    color:#fff;
+}
+
+/* =========================
+🧩 ROW: NODES + BOOK
+========================= */
+
 .challenge-row{
     display:flex;
     align-items:center;
     gap:10px;
 }
 
-/* 📜 PATH */
 .challenge-path-wrapper{
     flex:1;
     overflow:hidden;
 }
 
-/* 📘 BOOK */
+/* =========================
+📘 BOOK BUTTON
+========================= */
+
 .challenge-book-fixed{
     width:54px;
     height:54px;
@@ -44,20 +65,63 @@
     object-fit:contain;
 }
 
-/* 🔻 TEXT UNDER */
+/* =========================
+📅 DAYS / STARS TEXT
+========================= */
+
 .challenge-sub-bottom{
     margin-top:10px;
     font-size:12px;
-    opacity:0.6;
+    color:rgba(255,255,255,0.6);
 }
 
-/* ACTIVE */
+/* =========================
+🟢 ACTIVE CARD
+========================= */
+
 .challenge-card.active{
     border:1px solid #4CAF50;
     box-shadow:0 0 12px rgba(76,175,80,0.4);
 }
 
-/* DONE */
+/* =========================
+🏆 DONE CARD
+========================= */
+
 .challenge-card.done{
     opacity:0.6;
+}
+
+/* =========================
+🔒 LOCKED LEVEL CARD
+========================= */
+
+.challenge-locked-card{
+    background:linear-gradient(180deg,#1a1f25,#12161b);
+    border-radius:18px;
+    padding:18px;
+    margin:12px 0 24px;
+
+    text-align:center;
+
+    border:1px solid rgba(255,255,255,0.05);
+    opacity:0.85;
+}
+
+.locked-title{
+    font-size:12px;
+    color:rgba(255,255,255,0.45);
+}
+
+.locked-name{
+    font-size:18px;
+    font-weight:700;
+    margin-top:6px;
+    color:#ddd;
+}
+
+.locked-stars{
+    font-size:14px;
+    margin-top:10px;
+    color:#FFC247;
 }
