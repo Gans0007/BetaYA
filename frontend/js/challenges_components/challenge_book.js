@@ -68,7 +68,15 @@ export function openChallengeBook(data){
 
                 setTimeout(()=>{
                     close()
+
+                    // обновляем челленджи
                     window.renderChallenges()
+
+                    // 🔥 обновляем привычки
+                    if(window.renderDashboard){
+                        window.renderDashboard()
+                    }
+
                 }, 500)
 
             }else if(res?.error === "already_active"){
