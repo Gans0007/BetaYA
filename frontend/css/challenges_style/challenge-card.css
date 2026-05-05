@@ -2,105 +2,13 @@
 🎴 CARD
 ========================= */
 
-.challenge-card-left{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-}
-
-.challenge-module{
-    font-size:11px;
-    font-weight:600;
-    opacity:0.8;
-    color:#0f2a05;
-}
-
-.challenge-title{
-    font-size:15px;
-    font-weight:700;
-    color:#0f2a05;
-}
-
-.challenge-card-right{
-    display:flex;
-    align-items:center;
-}
-
-.challenge-btn{
-    width:42px;
-    height:42px;
-
-    background:rgba(255,255,255,0.2);
-    border-radius:12px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.challenge-module-title{
-    font-size:20px;
-    font-weight:800;
-    margin:16px 4px 12px;
-    color:#fff;
-}
-
-/* =========================
-🔒 LOCKED LEVEL CARD
-========================= */
-
-.challenge-locked-card{
-    background:linear-gradient(180deg,#1a1f25,#12161b);
-    border-radius:18px;
-    padding:18px;
-    margin:12px 0 24px;
-
-    text-align:center;
-
-    border:1px solid rgba(255,255,255,0.05);
-    opacity:0.85;
-}
-
-.locked-title{
-    font-size:12px;
-    opacity:0.5;
-}
-
-.locked-name{
-    font-size:18px;
-    font-weight:700;
-    margin-top:6px;
-    color:#ddd;
-}
-
-.locked-desc{
-    font-size:13px;
-    margin:12px 0;
-    line-height:1.4;
-    opacity:0.7;
-}
-
-.locked-stars{
-    font-size:14px;
-    margin-top:10px;
-    color:#4CAF50;
-}
-
-
 .challenge-card{
     background: linear-gradient(180deg,#1a1f25,#12161b);
     border-radius:20px;
     padding:16px;
     margin-bottom:16px;
-
     border:1px solid rgba(255,255,255,0.05);
-}
-
-.challenge-card-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
+    overflow:hidden;
 }
 
 .challenge-title{
@@ -114,29 +22,63 @@
     opacity:0.6;
 }
 
+/* =========================
+🚀 ROW
+========================= */
 
+.challenge-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:12px;
+}
 
+/* =========================
+📜 PATH WRAPPER
+========================= */
 
+.challenge-path-wrapper{
+    flex:1;
+    overflow:hidden;
+}
 
+/* =========================
+📘 BOOK FIXED
+========================= */
 
+.challenge-book-fixed{
+    width:48px;
+    height:48px;
+    min-width:48px;
 
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
+    background:rgba(255,165,0,0.1);
+    border-radius:14px;
 
-/* 🟢 АКТИВНЫЙ */
+    border:1px solid rgba(255,165,0,0.3);
+}
+
+.challenge-book-fixed img{
+    width:26px;
+    height:26px;
+}
+
+/* =========================
+🟢 ACTIVE
+========================= */
+
 .challenge-card.active{
     border:1px solid #4CAF50;
     box-shadow:0 0 12px rgba(76,175,80,0.4);
 }
 
-/* 🏆 ЗАВЕРШЕН */
+/* =========================
+🏆 DONE
+========================= */
+
 .challenge-card.done{
     opacity:0.6;
-}
-
-
-
-
-
-.challenge-card{
-    overflow:hidden;   /* 🔥 фикс выхода */
 }

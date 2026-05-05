@@ -6,19 +6,20 @@
     overflow-y:hidden;
 
     gap:10px;
-    margin-top:12px;
 
     padding-bottom:6px;
 
     scrollbar-width:none;
     position:relative;
+
+    flex-wrap:nowrap;
 }
 
 .challenge-path::-webkit-scrollbar{
     display:none;
 }
 
-/* 🔥 лёгкий градиент справа (намёк на скролл) */
+/* градиент справа */
 .challenge-path::after{
     content:"";
     position:absolute;

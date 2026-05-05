@@ -2,107 +2,6 @@ import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 import { openChallengeBook } from "./challenge_book.js"
 
-export async function openLevelsPage(){
-
-    if(document.getElementById("levels-overlay")) return
-
-    document.body.style.overflow = "hidden"
-
-    // 🔥 1. СНАЧАЛА грузим данные
-    let modules = []
-
-    try{
-        const data = await getChallenges(window.initData)
-        modules = data?.modules || []
-    }catch(err){
-        console.error("Levels load error:", err)
-    }
-
-    // 🔥 2. ТОЛЬКО ПОТОМ создаём overlay
-    const overlay = document.createElement("div")
-    overlay.id = "levels-overlay"
-    overlay.className = "levels-overlay hidden"
-
-    overlay.innerHTML = `
-        <div class="levels-modal">
-
-            <div class="levels-header">
-                <div class="levels-title">Уровни</div>
-                <div class="levels-close">✕</div>
-            </div>
-
-            <div class="levels-content"></div>
-
-        </div>
-    `
-
-    document.body.appendChild(overlay)
-
-    const content = overlay.querySelector(".levels-content")
-
-    // 🔥 3. сразу вставляем готовый контент
-    modules.forEach(module => {
-
-        const locked = !module.is_unlocked
-
-        const div = document.createElement("div")
-        div.className = "challenge-level-card"
-
-        if(locked) div.classList.add("locked")
-
-        div.innerHTML = `
-            <div class="level-left">
-                <div class="level-title">${module.level_name}</div>
-            </div>
-
-            <div class="level-right">
-                <div class="level-stars ${locked ? "locked" : ""}">
-                    ${locked ? "🔒 " : ""}${module.required_stars} ⭐
-                </div>
-            </div>
-        `
-
-        content.appendChild(div)
-    })
-
-    // 🔥 4. открываем как профиль
-    overlay.classList.remove("hidden")
-
-    setTimeout(() => {
-        overlay.classList.add("active")
-    }, 10)
-
-    // 🔥 закрытие
-    function close(){
-        overlay.classList.remove("active")
-
-        setTimeout(() => {
-            overlay.remove()
-        }, 250)
-
-        document.body.style.overflow = ""
-    }
-
-    overlay.querySelector(".levels-close").onclick = close
-
-    overlay.addEventListener("click", (e) => {
-        if(e.target === overlay){
-            close()
-        }
-    })
-
-    document.addEventListener("keydown", function escHandler(e){
-        if(e.key === "Escape"){
-            close()
-            document.removeEventListener("keydown", escHandler)
-        }
-    })
-}
-
-// =========================
-// 🔥 ОСНОВНАЯ ЛОГИКА
-// =========================
-
 export async function renderChallenges(){
 
     const root = document.getElementById("challenges-root")
@@ -123,11 +22,7 @@ export async function renderChallenges(){
 
     modules.forEach(module => {
 
-        // =========================
-        // 🔒 LOCKED LEVEL
-        // =========================
         if(!module.is_unlocked){
-
             const lock = document.createElement("div")
             lock.className = "challenge-locked-card"
 
@@ -141,18 +36,12 @@ export async function renderChallenges(){
             return
         }
 
-        // =========================
-        // 🏷️ ЗАГОЛОВОК УРОВНЯ
-        // =========================
         const title = document.createElement("div")
         title.className = "challenge-module-title"
         title.innerText = module.level_name
 
         root.appendChild(title)
 
-        // =========================
-        // 🎮 КАРТОЧКИ ЧЕЛЛЕНДЖЕЙ
-        // =========================
         module.challenges.forEach(challenge => {
 
             const section = challenge.current_section
@@ -164,16 +53,11 @@ export async function renderChallenges(){
             const card = document.createElement("div")
 
             let stateClass = ""
+            if(isActive) stateClass = "active"
+            else if(doneDays >= section.days) stateClass = "done"
 
-            if(isActive){
-                stateClass = "active"
-            } else if(doneDays >= section.days){
-                stateClass = "done"
-            }
+            card.className = `challenge-card ${stateClass}`
 
-card.className = `challenge-card ${stateClass}`
-
-            // 🔥 ПУТЬ
             const path = renderChallengePath({
                 days: section.days,
                 currentDay: currentDay
@@ -189,22 +73,25 @@ card.className = `challenge-card ${stateClass}`
             }
 
             card.innerHTML = `
-                <div class="challenge-card-header">
-                    <div>
-                        <div class="challenge-title">${challenge.title}</div>
-                        <div class="challenge-sub">
-                            ${section.days} дней • ⭐ ${section.section}
-                        </div>
-                    </div>
+                <div class="challenge-title">${challenge.title}</div>
+                <div class="challenge-sub">
+                    ${section.days} дней • ⭐ ${section.section}
+                </div>
 
-                    <div class="challenge-btn">📘</div>
+                <div class="challenge-row">
+                    <div class="challenge-path-wrapper"></div>
+
+                    <div class="challenge-book-fixed">
+                        <img src="/img/nodes/about_button.png"/>
+                    </div>
                 </div>
             `
 
-            card.appendChild(path)
+            // вставляем путь внутрь
+            card.querySelector(".challenge-path-wrapper").appendChild(path)
 
             // 📘
-            card.querySelector(".challenge-btn").onclick = (e)=>{
+            card.querySelector(".challenge-book-fixed").onclick = (e)=>{
                 e.stopPropagation()
                 openChallengeBook(dataForBook)
             }
