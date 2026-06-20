@@ -15,10 +15,10 @@ export function renderChallengePath({ days, currentDay, confirmedToday = false }
             state = "active"
         }
 
-        const isTodayCompleted =
-            confirmedToday &&
-            currentDay > 0 &&
-            i === currentDay
+        const isTodayNode =
+            confirmedToday
+                ? i === currentDay && currentDay > 0
+                : i === currentDay + 1
 
         let imgSrc = ""
 
@@ -35,7 +35,7 @@ export function renderChallengePath({ days, currentDay, confirmedToday = false }
         node.className = `
             challenge-node
             ${state === "active" ? "node-active" : ""}
-            ${isTodayCompleted ? "node-today-completed" : ""}
+            ${isTodayNode ? "node-today-completed" : ""}
         `
 
         node.innerHTML = `
