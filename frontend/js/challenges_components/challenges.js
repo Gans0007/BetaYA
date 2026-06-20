@@ -63,7 +63,8 @@ export async function renderChallenges(){
             const path = renderChallengePath({
                 days: section.days,
                 currentDay: currentDay,
-                confirmedToday: confirmedToday
+                confirmedToday: confirmedToday,
+                isActive: isActive
             })
 
             const dataForBook = {

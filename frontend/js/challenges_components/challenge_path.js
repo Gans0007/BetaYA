@@ -1,4 +1,9 @@
-export function renderChallengePath({ days, currentDay, confirmedToday = false }) {
+export function renderChallengePath({
+    days,
+    currentDay,
+    confirmedToday = false,
+    isActive = false
+}) {
 
     const container = document.createElement("div")
     container.className = "challenge-path"
@@ -16,9 +21,12 @@ export function renderChallengePath({ days, currentDay, confirmedToday = false }
         }
 
         const isTodayNode =
-            confirmedToday
-                ? i === currentDay && currentDay > 0
-                : i === currentDay + 1
+            isActive &&
+            (
+                confirmedToday
+                    ? i === currentDay && currentDay > 0
+                    : i === currentDay + 1
+            )
 
         let imgSrc = ""
 
