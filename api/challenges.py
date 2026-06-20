@@ -39,16 +39,45 @@ async def get_challenges(request: Request):
     # ⭐ stars
     user_stars = await get_user_total_stars(user_id) or 0
 
-    # 🔥 active habits
     pool = await get_pool()
+
     async with pool.acquire() as conn:
+
+        # 🌍 timezone пользователя
+        user_row = await conn.fetchrow("""
+            SELECT COALESCE(timezone, 'Europe/Kyiv') AS timezone
+            FROM users
+            WHERE user_id=$1
+        """, user_id)
+
+        user_timezone = user_row["timezone"] if user_row else "Europe/Kyiv"
+
+        # 🔥 active challenge habits
         rows = await conn.fetch("""
-            SELECT challenge_id, done_days, days
+            SELECT id, challenge_id, done_days, days
             FROM habits
             WHERE user_id=$1
             AND is_challenge=TRUE
             AND is_active=TRUE
         """, user_id)
+
+        habit_ids = [r["id"] for r in rows]
+
+        confirmed_today_ids = set()
+
+        if habit_ids:
+            confirm_rows = await conn.fetch("""
+                SELECT DISTINCT habit_id
+                FROM confirmations
+                WHERE user_id=$1
+                AND habit_id = ANY($2::int[])
+                AND DATE(datetime AT TIME ZONE $3) =
+                    DATE(NOW() AT TIME ZONE $3)
+            """, user_id, habit_ids, user_timezone)
+
+            confirmed_today_ids = {
+                r["habit_id"] for r in confirm_rows
+            }
 
     habit_map = {
         r["challenge_id"]: r for r in rows if r["challenge_id"]
@@ -87,10 +116,12 @@ async def get_challenges(request: Request):
                 done = active["done_days"] or 0
                 total = active["days"] or base_days[difficulty]
                 is_active = True
+                confirmed_today = active["id"] in confirmed_today_ids
             else:
                 done = 0
                 total = base_days[difficulty]
                 is_active = False
+                confirmed_today = False
 
             module["challenges"].append({
                 "id": cid,
@@ -105,7 +136,8 @@ async def get_challenges(request: Request):
                 },
                 "progress": {
                     "done_days": done,
-                    "is_active": is_active
+                    "is_active": is_active,
+                    "confirmed_today": confirmed_today
                 }
             })
 

@@ -1,4 +1,4 @@
-export function renderChallengePath({ days, currentDay }) {
+export function renderChallengePath({ days, currentDay, confirmedToday = false }) {
 
     const container = document.createElement("div")
     container.className = "challenge-path"
@@ -9,9 +9,16 @@ export function renderChallengePath({ days, currentDay }) {
 
         if(i <= currentDay){
             state = "done"
-        } else if(i === currentDay + 1){
+        }
+
+        if(!confirmedToday && i === currentDay + 1){
             state = "active"
         }
+
+        const isTodayCompleted =
+            confirmedToday &&
+            currentDay > 0 &&
+            i === currentDay
 
         let imgSrc = ""
 
@@ -24,7 +31,12 @@ export function renderChallengePath({ days, currentDay }) {
         }
 
         const node = document.createElement("div")
-        node.className = "challenge-node"
+
+        node.className = `
+            challenge-node
+            ${state === "active" ? "node-active" : ""}
+            ${isTodayCompleted ? "node-today-completed" : ""}
+        `
 
         node.innerHTML = `
             <div class="node-circle">

@@ -49,6 +49,7 @@ export async function renderChallenges(){
 
             const doneDays = challenge.progress?.done_days || 0
             const isActive = challenge.progress?.is_active
+            const confirmedToday = challenge.progress?.confirmed_today || false
             const currentDay = isActive ? doneDays : 0
 
             const card = document.createElement("div")
@@ -61,7 +62,8 @@ export async function renderChallenges(){
 
             const path = renderChallengePath({
                 days: section.days,
-                currentDay: currentDay
+                currentDay: currentDay,
+                confirmedToday: confirmedToday
             })
 
             const dataForBook = {
