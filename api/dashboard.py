@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
@@ -143,6 +144,15 @@ async def get_habits(request: Request):
 
     async with pool.acquire() as conn:
 
+        # 🌍 timezone пользователя
+        user_row = await conn.fetchrow("""
+        SELECT COALESCE(timezone, 'Europe/Kyiv') as timezone
+        FROM users
+        WHERE user_id=$1
+        """, user_id)
+
+        user_timezone = user_row["timezone"] if user_row else "Europe/Kyiv"
+
         habits_rows = await conn.fetch("""
         SELECT id, name
         FROM habits
@@ -152,11 +162,11 @@ async def get_habits(request: Request):
         """, user_id)
 
         confirmations_rows = await conn.fetch("""
-        SELECT habit_id, DATE(datetime) as day
+        SELECT habit_id, DATE(datetime AT TIME ZONE $2) as day
         FROM confirmations
         WHERE user_id=$1
         AND datetime >= NOW() - INTERVAL '365 days'
-        """, user_id)
+        """, user_id, user_timezone)
 
     # =========================
     # ГРУППИРУЕМ CONFIRMATIONS
@@ -175,7 +185,13 @@ async def get_habits(request: Request):
 
     habits = []
 
-    today = datetime.now().date()
+    from zoneinfo import ZoneInfo
+
+    today = datetime.now(
+        ZoneInfo(user_timezone)
+    ).date()
+
+    today_str = today.isoformat()
 
     for h in habits_rows:
 
@@ -228,12 +244,13 @@ async def get_habits(request: Request):
             "name": name,
             "series": series,
             "streak": streak,
-            "days": [d.isoformat() for d in days]
+            "days": [d.isoformat() for d in days],
+            "today": today_str,
+            "confirmed_today": today in days
 
         })
 
     return {"habits": habits}
-
 
 # =========================
 # REFERRALS

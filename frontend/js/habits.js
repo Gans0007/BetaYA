@@ -19,10 +19,8 @@ habits.forEach((habit,i)=>{
 
 const chartId="chart-"+i
 const confirmedDays = new Set(habit.days || [])
-
-/* =========================
-СТРИК
-========================= */
+const todayStr = habit.today
+const confirmedToday = habit.confirmed_today
 
 let streakHTML=""
 
@@ -37,10 +35,6 @@ streakHTML =
 `<div class="habit-streak">🔥 Стрик: ${habit.streak} ${word}</div>`
 
 }
-
-/* =========================
-МЕСЯЦ
-========================= */
 
 let monthCells=""
 let completedMonth=0
@@ -72,8 +66,22 @@ if(
 d.getMonth()===month &&
 confirmedDays.has(dateStr)
 ){
+
+if(dateStr === todayStr){
+cellClass="cell today-done"
+}else{
 cellClass="cell active"
+}
+
 completedMonth++
+}
+
+if(
+d.getMonth()===month &&
+dateStr === todayStr &&
+!confirmedToday
+){
+cellClass="cell today"
 }
 
 const dayRow=(d.getDay()+6)%7 + 1
@@ -91,10 +99,6 @@ let percentMonth = Math.floor(
 )
 
 percentMonth = Math.max(0,Math.min(100,percentMonth))
-
-/* =========================
-ГОД
-========================= */
 
 let yearCells=""
 let completedYear=0
@@ -122,8 +126,18 @@ d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate(
 if(d.getFullYear()===year){
 
 if(confirmedDays.has(dateStr)){
+
+if(dateStr === todayStr){
+cellClass="cell today-done"
+}else{
 cellClass="cell active"
+}
+
 completedYear++
+}
+
+if(dateStr === todayStr && !confirmedToday){
+cellClass="cell today"
 }
 
 }
@@ -139,10 +153,6 @@ yearCells+=`
 const percentYear = Math.floor(
 (completedYear / 365) * 100
 )
-
-/* =========================
-КАРТОЧКА
-========================= */
 
 const wrap=document.createElement("div")
 wrap.className="habit-wrap"
@@ -210,19 +220,11 @@ ${percentMonth}% выполнено
 
 `
 
-/* =========================
-ОТКРЫТИЕ КАРТОЧКИ
-========================= */
-
 const main = wrap.querySelector(".habit-main")
 
 main.addEventListener("click",()=>{
 wrap.classList.toggle("active")
 })
-
-/* =========================
-ПЕРЕКЛЮЧАТЕЛЬ
-========================= */
 
 const grid = wrap.querySelector(".grid")
 const progress = wrap.querySelector(".progress")
@@ -255,10 +257,6 @@ progress.innerHTML = percentYear + "% выполнено"
 }
 
 list.appendChild(wrap)
-
-/* =========================
-ГРАФИК
-========================= */
 
 const series = (habit.series || []).slice(-7)
 
