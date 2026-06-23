@@ -33,6 +33,21 @@ GRID
 .heatmap-grid {
     display: flex;
     gap: 4px;
+
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 6px;
+}
+
+.heatmap-wrapper {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .heatmap-col {
