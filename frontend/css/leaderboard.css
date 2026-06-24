@@ -1,11 +1,13 @@
-body {
+body:has(#leaderboard-list) {
     background: url("/img/background/leaderboard_bg.png") center center / cover no-repeat fixed;
 }
 
 .leaderboard-title {
+    position: relative;
+    z-index: 5;
     font-size: 34px;
     font-weight: 900;
-    margin: 16px 0 22px;
+    margin: 16px 0 64px;
     text-align: center;
     color: #070707;
     letter-spacing: -1px;
@@ -29,9 +31,9 @@ body {
 .top-card {
     position: relative;
     width: 31%;
-    min-height: 185px;
+    min-height: 175px;
     border-radius: 22px 22px 0 0;
-    padding: 40px 8px 14px;
+    padding: 36px 8px 14px;
 
     display: flex;
     flex-direction: column;
@@ -42,7 +44,7 @@ body {
 }
 
 .top-1 {
-    min-height: 220px;
+    min-height: 205px;
     background: linear-gradient(180deg, #ffe7a6, #fff6d9);
 }
 
@@ -60,8 +62,8 @@ body {
 
 .top-crown {
     position: absolute;
-    top: -38px;
-    font-size: 32px;
+    top: -34px;
+    font-size: 30px;
 }
 
 .top-rank {
@@ -112,8 +114,8 @@ body {
 
 .top-name {
     width: 100%;
-    font-size: 19px;
-    line-height: 22px;
+    font-size: 18px;
+    line-height: 21px;
     font-weight: 900;
     text-align: center;
     color: #050505;
@@ -125,8 +127,8 @@ body {
 
 .top-league {
     margin-top: 4px;
-    font-size: 15px;
-    line-height: 18px;
+    font-size: 14px;
+    line-height: 17px;
     font-weight: 800;
     text-align: center;
     color: #e49400;
@@ -141,12 +143,12 @@ body {
 }
 
 .top-score {
-    margin-top: 14px;
+    margin-top: 12px;
     display: flex;
     align-items: center;
     gap: 6px;
 
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 900;
     color: #050505;
 }
@@ -154,7 +156,7 @@ body {
 /* LIST */
 
 .leaderboard-rows {
-    margin-top: 8px;
+    margin-top: 14px;
     background: rgba(255,255,255,.88);
     backdrop-filter: blur(12px);
     border-radius: 24px;
@@ -192,79 +194,84 @@ body {
     border-radius: 12px;
 
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items:center;
+    justify-content:center;
 
-    background: #f0f1f4;
-    color: #555b66;
+    background:#f0f1f4;
+    color:#555b66;
 
-    font-size: 20px;
-    font-weight: 800;
+    font-size:20px;
+    font-weight:800;
 }
 
 .leader-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #eef0f4;
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#eef0f4;
 }
 
 .leader-info {
-    min-width: 0;
-    overflow: hidden;
+    min-width:0;
+    overflow:hidden;
 }
 
 .leader-name {
-    font-size: 20px;
-    line-height: 23px;
-    font-weight: 900;
-    color: #050505;
+    font-size:20px;
+    line-height:23px;
+    font-weight:900;
+    color:#050505;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .leader-league {
-    margin-top: 3px;
-    font-size: 16px;
-    line-height: 18px;
-    font-weight: 800;
-    color: #e49400;
+    margin-top:3px;
+    font-size:16px;
+    line-height:18px;
+    font-weight:800;
+    color:#e49400;
 
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .leader-score {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
 
-    font-size: 22px;
-    font-weight: 900;
-    color: #050505;
+    font-size:22px;
+    font-weight:900;
+    color:#050505;
 }
 
 .leader-cup {
-    font-size: 22px;
-    line-height: 1;
+    font-size:22px;
+    line-height:1;
 }
 
 .leader-divider {
-    text-align: center;
-    padding: 10px 0;
-    color: #999;
-    font-size: 22px;
-    font-weight: 900;
+    text-align:center;
+    padding:10px 0;
+    color:#999;
+    font-size:22px;
+    font-weight:900;
 }
 
 /* MOBILE */
 
 @media (max-width: 390px) {
+    .leaderboard-title {
+        margin-bottom: 58px;
+        font-size: 32px;
+    }
+
     .top-avatar {
         width: 82px;
         height: 82px;
@@ -272,16 +279,16 @@ body {
     }
 
     .top-card {
-        min-height: 175px;
-        padding-top: 36px;
+        min-height: 165px;
+        padding-top: 34px;
     }
 
     .top-1 {
-        min-height: 205px;
+        min-height: 195px;
     }
 
     .top-name {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .top-league {
@@ -290,7 +297,7 @@ body {
 
     .top-score {
         font-size: 17px;
-        margin-top: 12px;
+        margin-top: 10px;
     }
 
     .leader-row {
