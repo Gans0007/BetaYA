@@ -1,0 +1,105 @@
+
+/* =========================================
+CALENDAR BLOCK
+========================================= */
+
+.header-calendar{
+
+margin-top:0;
+
+display:flex;
+align-items:flex-end;
+justify-content:space-between;
+
+gap:18px;
+
+}
+
+
+/* месяц */
+
+.header-month{
+
+font-size:21px;
+font-weight:700;
+
+line-height:1;
+
+white-space:nowrap;
+
+}
+
+
+/* дни */
+
+.week-days{
+
+display:flex;
+align-items:flex-end;
+
+gap:2px;
+
+margin-right:10px;
+
+}
+
+.day{
+
+width:32px;
+
+text-align:center;
+
+opacity:0.55;
+
+}
+
+.day-number{
+
+width:32px;
+height:32px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:18px;
+font-weight:700;
+
+border-radius:50%;
+
+margin-bottom:6px;
+
+}
+
+.day-name{
+
+font-size:12px;
+
+opacity:0.65;
+
+}
+
+
+/* =========================================
+TODAY
+========================================= */
+
+.day.today{
+opacity:1;
+}
+
+.day.today .day-number{
+
+background:rgba(255,255,255,0.12);
+
+color:#fff;
+
+}
+
+.day.today .day-name{
+
+color:rgba(255,255,255,0.95);
+
+opacity:1;
+
+}
