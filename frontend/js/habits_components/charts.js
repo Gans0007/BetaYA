@@ -2,28 +2,6 @@ export function drawChart(id, series, color = "#22c55e") {
   const canvas = document.getElementById(id)
   const ctx = canvas.getContext("2d")
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, 90)
-  gradient.addColorStop(0, color)
-  gradient.addColorStop(1, color)
-
-  const glowPlugin = {
-    id: "glow",
-
-    beforeDatasetsDraw(chart) {
-      const { ctx } = chart
-
-      ctx.save()
-      ctx.shadowColor = color
-      ctx.shadowBlur = 12
-      ctx.shadowOffsetX = 0
-      ctx.shadowOffsetY = 0
-    },
-
-    afterDatasetsDraw(chart) {
-      chart.ctx.restore()
-    }
-  }
-
   new Chart(ctx, {
     type: "line",
 
@@ -33,18 +11,18 @@ export function drawChart(id, series, color = "#22c55e") {
       datasets: [{
         data: series,
 
-        borderColor: gradient,
-        borderWidth: 3,
+        borderColor: color,
+        borderWidth: 2,
 
-        pointRadius: 5,
-        pointHoverRadius: 5,
+        pointRadius: 4,
+        pointHoverRadius: 4,
 
         pointBackgroundColor: (ctx) => {
           return ctx.raw > 0 ? color : "#ffffff"
         },
 
         pointBorderColor: color,
-        pointBorderWidth: 3,
+        pointBorderWidth: 2,
 
         tension: 0.45
       }]
@@ -62,16 +40,7 @@ export function drawChart(id, series, color = "#22c55e") {
       scales: {
         x: { display: false },
         y: { display: false }
-      },
-
-      elements: {
-        line: {
-          borderJoinStyle: "round",
-          capBezierPoints: true
-        }
       }
-    },
-
-    plugins: [glowPlugin]
+    }
   })
 }
