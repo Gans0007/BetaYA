@@ -25,11 +25,16 @@
 
 /* ➖ ЛИНИЯ */
 .node-line{
-    width:40%;
+    width:24%;
     height:2px;
 
-    background:#2a2f36;
-    border-radius:2px;
+    margin:0 8%;
+
+    background:rgba(120,120,120,0.25);
+
+    border-radius:999px;
+
+    flex-shrink:0;
 }
 
 .node-active .node-img{
