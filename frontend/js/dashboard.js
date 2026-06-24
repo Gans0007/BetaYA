@@ -1,5 +1,5 @@
-import { renderHabits } from "./habits.js"
-import { renderWeek } from "./calendar.js"
+import { renderHabits } from "./habits_components/habits.js"
+import { renderWeek } from "./habits_components/calendar.js"
 import { initNavigation } from "./navigation.js"
 import { renderChatUser, renderReferrals } from "./chat.js"
 import { initProfileModal } from "./components/profileModal.js"
