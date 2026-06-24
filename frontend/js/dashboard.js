@@ -1,7 +1,7 @@
 import { renderHabits } from "./habits.js"
 import { renderWeek } from "./calendar.js"
 import { initNavigation } from "./navigation.js"
-import { renderChatUser, renderReferrals } from ".chat_components/chat.js"
+import { renderChatUser, renderReferrals } from "./chat.js"
 import { initProfileModal } from "./components/profileModal.js"
 import { initUserProfileModal, openUserProfile } from "./components/userProfileModal.js"
 
