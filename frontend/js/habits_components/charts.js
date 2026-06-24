@@ -1,126 +1,77 @@
-export function drawChart(id,series){
+export function drawChart(id, series, color = "#22c55e") {
+  const canvas = document.getElementById(id)
+  const ctx = canvas.getContext("2d")
 
-const canvas = document.getElementById(id)
-const ctx = canvas.getContext("2d")
+  const gradient = ctx.createLinearGradient(0, 0, 0, 90)
+  gradient.addColorStop(0, color)
+  gradient.addColorStop(1, color)
 
-/* ===== ЗОЛОТОЙ ГРАДИЕНТ ===== */
+  const glowPlugin = {
+    id: "glow",
 
-const gradient = ctx.createLinearGradient(0,0,0,70)
+    beforeDatasetsDraw(chart) {
+      const { ctx } = chart
 
-gradient.addColorStop(0,"#ffd86b")
-gradient.addColorStop(1,"#e8c66a")
+      ctx.save()
+      ctx.shadowColor = color
+      ctx.shadowBlur = 12
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+    },
 
-/* ===== ПЛАГИН ВЕРТИКАЛЬНЫХ ЛИНИЙ ===== */
+    afterDatasetsDraw(chart) {
+      chart.ctx.restore()
+    }
+  }
 
-const verticalLinesPlugin = {
+  new Chart(ctx, {
+    type: "line",
 
-id:"verticalLines",
+    data: {
+      labels: series.map(() => ""),
 
-afterDatasetsDraw(chart,args,pluginOptions){
+      datasets: [{
+        data: series,
 
-const {ctx, chartArea:{bottom}} = chart
-const meta = chart.getDatasetMeta(0)
+        borderColor: gradient,
+        borderWidth: 3,
 
-ctx.save()
+        pointRadius: 5,
+        pointHoverRadius: 5,
 
-ctx.setLineDash([3,3])
-ctx.strokeStyle="rgba(232,198,106,0.35)"
-ctx.lineWidth=1
+        pointBackgroundColor: (ctx) => {
+          return ctx.raw > 0 ? color : "#ffffff"
+        },
 
-meta.data.forEach(point=>{
+        pointBorderColor: color,
+        pointBorderWidth: 3,
 
-ctx.beginPath()
-ctx.moveTo(point.x,point.y)
-ctx.lineTo(point.x,bottom)
-ctx.stroke()
+        tension: 0.45
+      }]
+    },
 
-})
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
 
-ctx.restore()
+      plugins: {
+        legend: false,
+        tooltip: { enabled: false }
+      },
 
-}
+      scales: {
+        x: { display: false },
+        y: { display: false }
+      },
 
-}
+      elements: {
+        line: {
+          borderJoinStyle: "round",
+          capBezierPoints: true
+        }
+      }
+    },
 
-/* ===== ГЛОУ ===== */
-
-const glowPlugin = {
-
-id:"glow",
-
-beforeDatasetsDraw(chart,args,pluginOptions){
-
-const {ctx} = chart
-
-ctx.save()
-
-ctx.shadowColor = "rgba(255,215,120,0.9)"
-ctx.shadowBlur = 14
-ctx.shadowOffsetX = 0
-ctx.shadowOffsetY = 0
-
-}
-
-}
-
-/* ===== ЧАРТ ===== */
-
-new Chart(ctx,{
-
-type:"line",
-
-data:{
-
-labels:series.map(()=>""), 
-
-datasets:[{
-
-data:series,
-
-borderColor:gradient,
-borderWidth:3,
-
-pointRadius:5,
-pointHoverRadius:5,
-
-pointBackgroundColor:"#ffd86b",
-pointBorderWidth:0,
-
-tension:0.45
-
-}]
-
-},
-
-options:{
-
-responsive:true,
-maintainAspectRatio:false,
-
-plugins:{
-legend:false,
-tooltip:{enabled:false}
-},
-
-scales:{
-
-x:{display:false},
-
-y:{display:false}
-
-},
-
-elements:{
-line:{
-borderJoinStyle:"round",
-capBezierPoints:true
-}
-}
-
-},
-
-plugins:[verticalLinesPlugin,glowPlugin]
-
-})
-
+    plugins: [glowPlugin]
+  })
 }

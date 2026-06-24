@@ -3,327 +3,261 @@ import { getDashboard } from "../api.js"
 import { renderChatUser } from "../chat.js"
 import { renderReferrals } from "../chat.js"
 
-export function renderHabits(habits){
+export function renderHabits(habits) {
+  const list = document.getElementById("habits-list")
+  list.innerHTML = ""
 
-const list=document.getElementById("habits-list")
-list.innerHTML=""
+  if (!habits || habits.length === 0) {
+    list.innerHTML = "<p>Нет привычек</p>"
+    return
+  }
 
-if(!habits || habits.length===0){
-list.innerHTML="<p>Нет привычек</p>"
-return
+  const now = new Date()
+
+  habits.forEach((habit, i) => {
+    const chartId = "chart-" + i
+
+    const confirmedDays = new Set(habit.days || [])
+    const todayStr = habit.today
+    const confirmedToday = habit.confirmed_today
+
+    const chartColor = confirmedToday ? "#22c55e" : "#f4a300"
+    const cardClass = confirmedToday ? "habit-card completed" : "habit-card pending"
+
+    let streakHTML = ""
+
+    if (habit.streak >= 1) {
+      const word =
+        habit.streak === 1 ? "день" :
+        habit.streak <= 4 ? "дня" :
+        "дней"
+
+      streakHTML = `
+        <div class="habit-streak">
+          🔥 Стрик: <span>${habit.streak} ${word}</span>
+        </div>
+      `
+    }
+
+    let monthCells = ""
+    let completedMonth = 0
+
+    const year = now.getFullYear()
+    const month = now.getMonth()
+
+    const monthStart = new Date(year, month, 1)
+    const monthEnd = new Date(year, month + 1, 0)
+
+    const monthGridStart = new Date(monthStart)
+    monthGridStart.setDate(
+      monthStart.getDate() - ((monthStart.getDay() + 6) % 7)
+    )
+
+    const monthGridEnd = new Date(monthEnd)
+    monthGridEnd.setDate(
+      monthEnd.getDate() + (6 - ((monthEnd.getDay() + 6) % 7))
+    )
+
+    for (let d = new Date(monthGridStart); d <= monthGridEnd; d.setDate(d.getDate() + 1)) {
+      let cellClass = "cell"
+
+      const dateStr =
+        d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0")
+
+      if (d.getMonth() === month && confirmedDays.has(dateStr)) {
+        cellClass = dateStr === todayStr ? "cell today-done" : "cell active"
+        completedMonth++
+      }
+
+      if (d.getMonth() === month && dateStr === todayStr && !confirmedToday) {
+        cellClass = "cell today"
+      }
+
+      const dayRow = (d.getDay() + 6) % 7 + 1
+
+      monthCells += `
+        <div class="${cellClass}" style="grid-row:${dayRow}"></div>
+      `
+    }
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+    let percentMonth = Math.floor((completedMonth / daysInMonth) * 100)
+    percentMonth = Math.max(0, Math.min(100, percentMonth))
+
+    let yearCells = ""
+    let completedYear = 0
+
+    const yearStart = new Date(year, 0, 1)
+    const yearEnd = new Date(year, 11, 31)
+
+    const yearGridStart = new Date(yearStart)
+    yearGridStart.setDate(
+      yearStart.getDate() - ((yearStart.getDay() + 6) % 7)
+    )
+
+    const yearGridEnd = new Date(yearEnd)
+    yearGridEnd.setDate(
+      yearEnd.getDate() + (6 - ((yearEnd.getDay() + 6) % 7))
+    )
+
+    for (let d = new Date(yearGridStart); d <= yearGridEnd; d.setDate(d.getDate() + 1)) {
+      let cellClass = "cell"
+
+      const dateStr =
+        d.getFullYear() + "-" +
+        String(d.getMonth() + 1).padStart(2, "0") + "-" +
+        String(d.getDate()).padStart(2, "0")
+
+      if (d.getFullYear() === year) {
+        if (confirmedDays.has(dateStr)) {
+          cellClass = dateStr === todayStr ? "cell today-done" : "cell active"
+          completedYear++
+        }
+
+        if (dateStr === todayStr && !confirmedToday) {
+          cellClass = "cell today"
+        }
+      }
+
+      const dayRow = (d.getDay() + 6) % 7 + 1
+
+      yearCells += `
+        <div class="${cellClass}" style="grid-row:${dayRow}"></div>
+      `
+    }
+
+    const percentYear = Math.floor((completedYear / 365) * 100)
+
+    const wrap = document.createElement("div")
+    wrap.className = "habit-wrap"
+
+    wrap.innerHTML = `
+      <div class="${cardClass}">
+        <div class="habit-main">
+          <div class="habit-info">
+            <div class="habit-name">${habit.name}</div>
+            ${streakHTML}
+          </div>
+
+          <div class="habit-chart">
+            <canvas id="${chartId}"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="habit-overlay">
+        <div class="calendar">
+          <div class="calendar-weekdays">
+            <div>Пн</div>
+            <div>Вт</div>
+            <div>Ср</div>
+            <div>Чт</div>
+            <div>Пт</div>
+            <div>Сб</div>
+            <div>Вс</div>
+          </div>
+
+          <div class="grid">
+            ${monthCells}
+          </div>
+        </div>
+
+        <div class="habit-footer">
+          <div class="switch">
+            <button class="switch-btn active">Месяц</button>
+            <button class="switch-btn">Год</button>
+          </div>
+
+          <div class="progress">
+            ${percentMonth}% выполнено
+          </div>
+        </div>
+      </div>
+    `
+
+    const main = wrap.querySelector(".habit-main")
+
+    main.addEventListener("click", () => {
+      wrap.classList.toggle("active")
+    })
+
+    const grid = wrap.querySelector(".grid")
+    const progress = wrap.querySelector(".progress")
+
+    const monthBtn = wrap.querySelector(".switch-btn:nth-child(1)")
+    const yearBtn = wrap.querySelector(".switch-btn:nth-child(2)")
+
+    monthBtn.onclick = () => {
+      monthBtn.classList.add("active")
+      yearBtn.classList.remove("active")
+
+      grid.classList.remove("year")
+      grid.innerHTML = monthCells
+
+      progress.innerHTML = percentMonth + "% выполнено"
+    }
+
+    yearBtn.onclick = () => {
+      yearBtn.classList.add("active")
+      monthBtn.classList.remove("active")
+
+      grid.classList.add("year")
+      grid.innerHTML = yearCells
+
+      progress.innerHTML = percentYear + "% выполнено"
+    }
+
+    list.appendChild(wrap)
+
+    const series = (habit.series || []).slice(-7)
+
+    while (series.length < 7) {
+      series.unshift(0)
+    }
+
+    drawChart(chartId, series, chartColor)
+  })
 }
 
-const now = new Date()
+export async function loadHabitsDashboard(initData) {
+  const data = await getDashboard(initData)
 
-habits.forEach((habit,i)=>{
+  console.log("API DATA:", data)
 
-const chartId="chart-"+i
-const confirmedDays = new Set(habit.days || [])
-const todayStr = habit.today
-const confirmedToday = habit.confirmed_today
+  renderChatUser(data.xp_current)
 
-let streakHTML=""
+  if (data.referrals) {
+    renderReferrals(data.referrals)
+  }
 
-if(habit.streak >= 1){
+  const xpText = document.getElementById("xp-text")
+  const xpFill = document.getElementById("xp-fill")
 
-const word =
-habit.streak === 1 ? "день" :
-habit.streak <= 4 ? "дня" :
-"дней"
+  if (xpText && xpFill) {
+    xpText.innerText = data.xp_current + " / " + data.xp_next
+    xpFill.style.width = data.xp_percent + "%"
+  }
 
-streakHTML =
-`<div class="habit-streak">🔥 Стрик: ${habit.streak} ${word}</div>`
+  const playerName = document.getElementById("player-name")
 
-}
+  if (playerName) {
+    playerName.innerText = data.nickname
+  }
 
-let monthCells=""
-let completedMonth=0
+  const avatar = document.getElementById("player-avatar")
 
-const year = now.getFullYear()
-const month = now.getMonth()
+  if (avatar) {
+    avatar.src = "img/avatar/avatar_1.png"
+  }
 
-const monthStart = new Date(year,month,1)
-const monthEnd = new Date(year,month+1,0)
+  const leagueText = document.getElementById("league-text")
 
-const monthGridStart = new Date(monthStart)
-monthGridStart.setDate(
-monthStart.getDate()-((monthStart.getDay()+6)%7)
-)
+  if (leagueText) {
+    leagueText.innerText = data.league
+  }
 
-const monthGridEnd = new Date(monthEnd)
-monthGridEnd.setDate(
-monthEnd.getDate()+(6-((monthEnd.getDay()+6)%7))
-)
-
-for(let d=new Date(monthGridStart); d<=monthGridEnd; d.setDate(d.getDate()+1)){
-
-let cellClass="cell"
-
-const dateStr =
-d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-
-if(
-d.getMonth()===month &&
-confirmedDays.has(dateStr)
-){
-
-if(dateStr === todayStr){
-cellClass="cell today-done"
-}else{
-cellClass="cell active"
-}
-
-completedMonth++
-}
-
-if(
-d.getMonth()===month &&
-dateStr === todayStr &&
-!confirmedToday
-){
-cellClass="cell today"
-}
-
-const dayRow=(d.getDay()+6)%7 + 1
-
-monthCells+=`
-<div class="${cellClass}" style="grid-row:${dayRow}"></div>
-`
-
-}
-
-const daysInMonth = new Date(year,month+1,0).getDate()
-
-let percentMonth = Math.floor(
-(completedMonth / daysInMonth) * 100
-)
-
-percentMonth = Math.max(0,Math.min(100,percentMonth))
-
-let yearCells=""
-let completedYear=0
-
-const yearStart = new Date(year,0,1)
-const yearEnd = new Date(year,11,31)
-
-const yearGridStart = new Date(yearStart)
-yearGridStart.setDate(
-yearStart.getDate() - ((yearStart.getDay()+6)%7)
-)
-
-const yearGridEnd = new Date(yearEnd)
-yearGridEnd.setDate(
-yearEnd.getDate() + (6 - ((yearEnd.getDay()+6)%7))
-)
-
-for(let d=new Date(yearGridStart); d<=yearGridEnd; d.setDate(d.getDate()+1)){
-
-let cellClass="cell"
-
-const dateStr =
-d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")
-
-if(d.getFullYear()===year){
-
-if(confirmedDays.has(dateStr)){
-
-if(dateStr === todayStr){
-cellClass="cell today-done"
-}else{
-cellClass="cell active"
-}
-
-completedYear++
-}
-
-if(dateStr === todayStr && !confirmedToday){
-cellClass="cell today"
-}
-
-}
-
-const dayRow = (d.getDay()+6)%7 + 1
-
-yearCells+=`
-<div class="${cellClass}" style="grid-row:${dayRow}"></div>
-`
-
-}
-
-const percentYear = Math.floor(
-(completedYear / 365) * 100
-)
-
-const wrap=document.createElement("div")
-wrap.className="habit-wrap"
-
-wrap.innerHTML=`
-
-<div class="habit-card">
-
-<div class="habit-main">
-
-<div class="habit-info">
-
-<div class="habit-name">${habit.name}</div>
-
-${streakHTML}
-
-</div>
-
-<div class="habit-chart">
-<canvas id="${chartId}"></canvas>
-</div>
-
-</div>
-
-</div>
-
-<div class="habit-overlay">
-
-<div class="calendar">
-
-<div class="calendar-weekdays">
-
-<div>Пн</div>
-<div>Вт</div>
-<div>Ср</div>
-<div>Чт</div>
-<div>Пт</div>
-<div>Сб</div>
-<div>Вс</div>
-
-</div>
-
-<div class="grid">
-${monthCells}
-</div>
-
-</div>
-
-<div class="habit-footer">
-
-<div class="switch">
-
-<button class="switch-btn active">Месяц</button>
-<button class="switch-btn">Год</button>
-
-</div>
-
-<div class="progress">
-${percentMonth}% выполнено
-</div>
-
-</div>
-
-</div>
-
-`
-
-const main = wrap.querySelector(".habit-main")
-
-main.addEventListener("click",()=>{
-wrap.classList.toggle("active")
-})
-
-const grid = wrap.querySelector(".grid")
-const progress = wrap.querySelector(".progress")
-
-const monthBtn = wrap.querySelector(".switch-btn:nth-child(1)")
-const yearBtn = wrap.querySelector(".switch-btn:nth-child(2)")
-
-monthBtn.onclick=()=>{
-
-monthBtn.classList.add("active")
-yearBtn.classList.remove("active")
-
-grid.classList.remove("year")
-grid.innerHTML=monthCells
-
-progress.innerHTML = percentMonth + "% выполнено"
-
-}
-
-yearBtn.onclick=()=>{
-
-yearBtn.classList.add("active")
-monthBtn.classList.remove("active")
-
-grid.classList.add("year")
-grid.innerHTML=yearCells
-
-progress.innerHTML = percentYear + "% выполнено"
-
-}
-
-list.appendChild(wrap)
-
-const series = (habit.series || []).slice(-7)
-
-while(series.length < 7){
-series.unshift(0)
-}
-
-drawChart(chartId,series)
-
-})
-
-}
-
-/* =========================
-LOAD DASHBOARD
-========================= */
-
-export async function loadHabitsDashboard(initData){
-
-const data = await getDashboard(initData)
-
-console.log("API DATA:", data)
-
-renderChatUser(data.xp_current)
-
-if(data.referrals){
-renderReferrals(data.referrals)
-}
-
-/* XP */
-
-const xpText = document.getElementById("xp-text")
-const xpFill = document.getElementById("xp-fill")
-
-if(xpText && xpFill){
-
-xpText.innerText = data.xp_current + " / " + data.xp_next
-xpFill.style.width = data.xp_percent + "%"
-
-}
-
-/* NAME */
-
-const playerName = document.getElementById("player-name")
-
-if(playerName){
-playerName.innerText = data.nickname
-}
-
-/* AVATAR */
-
-const avatar = document.getElementById("player-avatar")
-
-if(avatar){
-avatar.src = "img/avatar/avatar_1.png"
-}
-
-/* LEAGUE */
-
-const leagueText = document.getElementById("league-text")
-
-if(leagueText){
-leagueText.innerText = data.league
-}
-
-/* HABITS */
-
-renderHabits(data.habits)
-
+  renderHabits(data.habits)
 }

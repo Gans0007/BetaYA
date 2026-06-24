@@ -1,287 +1,244 @@
-/* =========================
-СПИСОК
-========================= */
-
-.habits{
-display:flex;
-flex-direction:column;
-gap:18px;
+.habits {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-/* =========================
-КАРТОЧКА
-========================= */
-
-.habit-card{
-
-background:#1a1a1d;
-border-radius:18px;
-padding:16px;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
-
+.habit-wrap {
+  position: relative;
+  margin-bottom: 12px;
 }
 
-/* =========================
-ВЕРХ
-========================= */
-
-.habit-main{
-display:flex;
-justify-content:space-between;
-align-items:center;
-cursor:pointer;
+.habit-card {
+  border-radius: 28px;
+  padding: 22px;
+  min-height: 150px;
+  overflow: hidden;
 }
 
-.habit-info{
-display:flex;
-flex-direction:column;
-gap:6px;
+.habit-card.completed {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f2fff8 55%,
+    #e7fff1 100%
+  );
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, .06),
+    0 0 26px rgba(34, 197, 94, .16);
 }
 
-.habit-name{
-font-size:17px;
-font-weight:600;
+.habit-card.pending {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #fff8ec 55%,
+    #fff0d3 100%
+  );
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, .06),
+    0 0 26px rgba(244, 163, 0, .18);
 }
 
-.habit-streak{
-font-size:13px;
-opacity:0.7;
+.habit-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
-/* =========================
-ГРАФИК
-========================= */
-
-.habit-chart{
-width:140px;
-height:70px;
+.habit-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  z-index: 2;
 }
 
-canvas{
-width:100%!important;
-height:100%!important;
+.habit-name {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #050505;
 }
 
-/* =========================
-OVERLAY БЛОК
-========================= */
-
-.habit-overlay{
-
-max-height:0;
-overflow:hidden;
-
-opacity:0;
-transform:translateY(-10px);
-
-transition:
-
-max-height .45s ease,
-opacity .25s ease,
-transform .35s ease;
-
+.habit-streak {
+  font-size: 18px;
+  font-weight: 500;
+  color: #171717;
 }
 
-/* активное состояние */
-
-.habit-wrap.active .habit-overlay{
-
-max-height:500px;
-
-opacity:1;
-transform:translateY(0);
-
-margin-top:10px;
-
+.habit-streak span {
+  font-weight: 700;
+  color: #22c55e;
 }
 
-.habit-wrap{
-position:relative;
-margin-bottom:12px;
+.habit-chart {
+  width: 54%;
+  height: 95px;
+  margin-top: 28px;
 }
 
-
-/* =========================
-CALENDAR GRID
-========================= */
-
-.calendar{
-
-display:grid;
-
-grid-template-columns:auto 1fr;
-
-gap:6px;
-
-align-items:start;
-
-padding:12px;
-
-background:rgba(255,255,255,0.02);
-border-radius:14px;
-
+canvas {
+  width: 100% !important;
+  height: 100% !important;
 }
 
-/* дни недели */
+.habit-overlay {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
 
-.calendar-weekdays{
-display:grid;
-grid-template-rows:repeat(7,9px);
-row-gap:2px;
-font-size:9px;
-color:#888;
+  transition:
+    max-height .45s ease,
+    opacity .25s ease,
+    transform .35s ease;
 }
 
-.calendar-weekdays div{
-
-display:flex;
-align-items:center;
-justify-content:flex-end;
-
+.habit-wrap.active .habit-overlay {
+  max-height: 520px;
+  opacity: 1;
+  transform: translateY(0);
+  margin-top: 10px;
 }
 
-/* сетка */
+.calendar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px;
+  align-items: start;
 
-.grid{
+  padding: 14px;
+  background: #ffffff;
 
-display:grid;
+  border-radius: 18px;
 
-grid-template-rows:repeat(7,9px);
-
-grid-auto-flow:column;
-grid-auto-columns:9px;
-
-gap:2px;
-
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, .06);
 }
 
-/* год */
+.calendar-weekdays {
+  display: grid;
+  grid-template-rows: repeat(7, 9px);
+  row-gap: 2px;
 
-.grid.year{
-
-grid-template-rows:repeat(7,9px);
-grid-auto-columns:9px;
-
-overflow-x:auto;
-overflow-y:hidden;
-
-padding-bottom:14px;
-
+  font-size: 9px;
+  color: #8b8f9c;
 }
 
-/* клетки */
-
-.cell{
-
-background:#2b1d16;
-border-radius:3px;
-
-width:9px;
-height:9px;
-
-transition:background .2s;
-
+.calendar-weekdays div {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
-.cell.active{
-background:#22c55e;
+.grid {
+  display: grid;
+  grid-template-rows: repeat(7, 9px);
+  grid-auto-flow: column;
+  grid-auto-columns: 9px;
+  gap: 2px;
 }
 
+.grid.year {
+  grid-template-rows: repeat(7, 9px);
+  grid-auto-columns: 9px;
 
+  overflow-x: auto;
+  overflow-y: hidden;
 
-/* ===== ТОНКИЙ ПРЕМИУМ СКРОЛЛ ===== */
-
-.grid.year::-webkit-scrollbar{
-height:3px;
+  padding-bottom: 14px;
 }
 
-.grid.year::-webkit-scrollbar-track{
-background:transparent;
+.cell {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 3px;
+  background: #eef0f5;
+
+  transition: background .2s;
 }
 
-.grid.year::-webkit-scrollbar-thumb{
-background:#ffffff;
-border-radius:10px;
+.cell.active {
+  background: #22c55e;
 }
 
-
-/* =========================
-НИЗ
-========================= */
-
-.habit-footer{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-margin-top:12px;
-
+.cell.today {
+  border: 1px solid #f4a300;
+  background: #fff;
+  animation: todayPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(244, 163, 0, .45);
 }
 
-/* переключатель */
-
-.switch{
-
-display:flex;
-
-background:#1a1a1d;
-border-radius:12px;
-overflow:hidden;
-
+.cell.today-done {
+  background: #22c55e;
+  animation: todayPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(34, 197, 94, .65);
 }
 
-.switch-btn{
-
-border:none;
-background:none;
-
-padding:8px 14px;
-color:#aaa;
-
+.grid.year::-webkit-scrollbar {
+  height: 3px;
 }
 
-.switch-btn.active{
-
-background:#e8c66a;
-color:#000;
-
+.grid.year::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.progress{
-opacity:0.8;
+.grid.year::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, .25);
+  border-radius: 10px;
 }
 
-canvas{
+.habit-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-filter: drop-shadow(0 0 6px rgba(255,215,120,0.6))
-drop-shadow(0 0 12px rgba(255,200,80,0.4));
-
+  margin-top: 12px;
 }
 
-.cell.today{
-border:1px solid #e8c66a;
-animation:todayPulse 2s ease-in-out infinite;
-box-shadow:0 0 6px rgba(232,198,106,.45);
+.switch {
+  display: flex;
+
+  background: #f2f0ff;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.cell.today-done{
-background:#22c55e;
-animation:todayPulse 2s ease-in-out infinite;
-box-shadow:0 0 8px rgba(34,197,94,.65);
+.switch-btn {
+  border: none;
+  background: none;
+
+  padding: 8px 14px;
+
+  color: #6b7280;
+  font-weight: 600;
 }
 
-@keyframes todayPulse{
-0%{
-transform:scale(1);
+.switch-btn.active {
+  background: #5b35e6;
+  color: #fff;
 }
 
-50%{
-transform:scale(1.15);
+.progress {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-100%{
-transform:scale(1);
-}
+@keyframes todayPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
