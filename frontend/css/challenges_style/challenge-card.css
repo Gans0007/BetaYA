@@ -3,20 +3,28 @@
 ========================= */
 
 .challenge-card{
-    background:linear-gradient(180deg,#1a1f25,#12161b);
-    border-radius:20px;
-    padding:16px;
-    margin-bottom:16px;
+    background:#ffffff;
 
-    border:1px solid rgba(255,255,255,0.05);
+    border-radius:24px;
+    padding:18px;
+
+    border:1px solid #eeeeee;
+
+    box-shadow:
+    0 2px 10px rgba(0,0,0,.04);
+
     overflow:hidden;
+
+    margin-bottom:14px;
 }
 
 .challenge-title{
-    font-size:16px;
+    font-size:17px;
     font-weight:700;
-    color:#fff;
-    margin-bottom:8px;
+
+    color:#111;
+
+    margin-bottom:14px;
 }
 
 /* =========================
@@ -24,10 +32,12 @@
 ========================= */
 
 .challenge-module-title{
-    font-size:20px;
+    font-size:15px;
     font-weight:800;
-    margin:16px 4px 12px;
-    color:#fff;
+
+    margin:20px 6px 12px;
+
+    color:#111;
 }
 
 /* =========================
@@ -50,16 +60,14 @@
 ========================= */
 
 .challenge-book-fixed{
-    width:56px;
-    height:56px;
-    min-width:56px;
+    width:48px;
+    height:48px;
+
+    min-width:48px;
 
     display:flex;
     align-items:center;
     justify-content:center;
-
-    cursor:pointer;
-    z-index:2;
 }
 
 .challenge-book-img{
@@ -76,8 +84,12 @@
 
 .challenge-sub-bottom{
     margin-top:10px;
-    font-size:12px;
-    color:rgba(255,255,255,0.6);
+
+    font-size:13px;
+
+    color:#888;
+
+    font-weight:500;
 }
 
 /* =========================
@@ -85,8 +97,9 @@
 ========================= */
 
 .challenge-card.active{
-    border:1px solid #4CAF50;
-    box-shadow:0 0 12px rgba(76,175,80,0.4);
+    border:1px solid #f0f0f0;
+    box-shadow:
+    0 2px 10px rgba(0,0,0,.04);
 }
 
 /* =========================
@@ -102,15 +115,17 @@
 ========================= */
 
 .challenge-locked-card{
-    background:linear-gradient(180deg,#1a1f25,#12161b);
-    border-radius:18px;
+    background:#fff;
+
+    border-radius:24px;
+
     padding:18px;
-    margin:12px 0 24px;
+
+    border:1px solid #eeeeee;
 
     text-align:center;
 
-    border:1px solid rgba(255,255,255,0.05);
-    opacity:0.85;
+    margin-bottom:14px;
 }
 
 .locked-title{
