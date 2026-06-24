@@ -39,7 +39,7 @@
 
   margin: 0 auto 7px;
 
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
 
   border-radius: 50%;
@@ -48,7 +48,7 @@
 }
 
 .day-name {
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 500;
 
   color: #656b7a;
