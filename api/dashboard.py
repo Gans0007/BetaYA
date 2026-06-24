@@ -335,7 +335,7 @@ async def get_leaderboard(request: Request):
         SELECT
             u.user_id,
             u.last_global_rank,
-            COALESCE(u.username, u.first_name, 'Unknown') as username,
+            COALESCE(u.nickname, u.username, u.first_name, 'Unknown') as username,
             COALESCE(u.avatar, 'avatar_1.png') as avatar,
             s.xp
 
@@ -353,7 +353,7 @@ async def get_leaderboard(request: Request):
 
         SELECT
             u.last_global_rank,
-            COALESCE(u.username, u.first_name, 'You') as username,
+            COALESCE(u.nickname, u.username, u.first_name, 'You') as username,
             COALESCE(u.avatar, 'avatar_1.png') as avatar,
             s.xp
 
