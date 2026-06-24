@@ -15,7 +15,7 @@
   padding: 16px 20px;
   min-height: 96px;
   overflow: hidden;
-  border: 1px solid rgba(120,120,120,0.08);
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 .habit-card.completed {
