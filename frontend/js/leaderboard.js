@@ -30,19 +30,17 @@ if(user.rank === data.me?.rank){
     item.classList.add("my-row")
 }
 
-let rankClass="rank"
+let rankClass = ""
 
-if(user.rank===1) rankClass+=" gold"
-if(user.rank===2) rankClass+=" silver"
-if(user.rank===3) rankClass+=" bronze"
+if(user.rank === 1) rankClass = "gold"
+if(user.rank === 2) rankClass = "silver"
+if(user.rank === 3) rankClass = "bronze"
 
-item.innerHTML=`
+item.innerHTML = `
 
-<div class="${rankClass}">
-${user.rank}
+<div class="leader-rank ${rankClass}">
+    ${user.rank}
 </div>
-
-<div class="leader-left">
 
 <img 
     src="img/avatar/${user.avatar || "avatar_1.png"}" 
@@ -50,18 +48,19 @@ ${user.rank}
     data-user-id="${user.user_id}"
 >
 
-<div class="leader-name">
-${user.username || "Unknown"}
+<div class="leader-info">
+    <div class="leader-name">
+        ${user.username || "Unknown"}
+    </div>
+
+    <div class="leader-league">
+        Соклановец
+    </div>
 </div>
 
-</div>
-
-<div class="leader-xp">
-${user.xp.toLocaleString()}
-</div>
-
-<div class="leader-cup">
-🏆
+<div class="leader-score">
+    <span class="leader-cup">🏆</span>
+    <span>${user.xp.toLocaleString()}</span>
 </div>
 
 `
@@ -85,28 +84,30 @@ const myRow=document.createElement("div")
 
 myRow.className="leader-row my-row"
 
-myRow.innerHTML=`
+myRow.innerHTML = `
 
-<div class="rank">
-${data.me.rank}
+<div class="leader-rank">
+    ${data.me.rank}
 </div>
 
-<div class="leader-left">
+<img 
+    src="img/avatar/${data.me.avatar || "avatar_1.png"}" 
+    class="leader-avatar"
+>
 
-<img src="img/avatar/${data.me.avatar || "avatar_1.png"}" class="leader-avatar">
+<div class="leader-info">
+    <div class="leader-name">
+        ${data.me.username || "You"}
+    </div>
 
-<div class="leader-name">
-${data.me.username || "You"}
+    <div class="leader-league">
+        Соклановец
+    </div>
 </div>
 
-</div>
-
-<div class="leader-xp">
-${(data.me.xp || 0).toLocaleString()}
-</div>
-
-<div class="leader-cup">
-🏆
+<div class="leader-score">
+    <span class="leader-cup">🏆</span>
+    <span>${(data.me.xp || 0).toLocaleString()}</span>
 </div>
 
 `
