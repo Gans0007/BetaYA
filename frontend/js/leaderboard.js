@@ -54,7 +54,7 @@ item.innerHTML = `
     </div>
 
     <div class="leader-league">
-        Соклановец
+            ${user.league || "Бронза I"}
     </div>
 </div>
 
@@ -101,7 +101,7 @@ myRow.innerHTML = `
     </div>
 
     <div class="leader-league">
-        Соклановец
+        ${data.me.league || "Бронза I"}
     </div>
 </div>
 

@@ -337,6 +337,7 @@ async def get_leaderboard(request: Request):
             u.last_global_rank,
             COALESCE(u.nickname, u.username, u.first_name, 'Unknown') as username,
             COALESCE(u.avatar, 'avatar_1.png') as avatar,
+            COALESCE(s.league, 'Бронза I') as league,
             s.xp
 
         FROM users u
@@ -355,6 +356,7 @@ async def get_leaderboard(request: Request):
             u.last_global_rank,
             COALESCE(u.nickname, u.username, u.first_name, 'You') as username,
             COALESCE(u.avatar, 'avatar_1.png') as avatar,
+            COALESCE(s.league, 'Бронза I') as league,
             s.xp
 
         FROM users u
@@ -373,6 +375,7 @@ async def get_leaderboard(request: Request):
             "rank": r["last_global_rank"],
             "avatar": r["avatar"],
             "username": r["username"],
+            "league": r["league"],
             "xp": int(r["xp"])
         })
 
@@ -382,6 +385,7 @@ async def get_leaderboard(request: Request):
             "rank": my["last_global_rank"] if my else None,
             "avatar": my["avatar"] if my else "avatar_1.png",
             "username": my["username"] if my else "You",
+            "league": my["league"] if my else "Бронза I",
             "xp": int(my["xp"]) if my else 0
         }
     }
