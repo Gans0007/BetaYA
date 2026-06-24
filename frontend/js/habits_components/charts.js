@@ -12,17 +12,17 @@ export function drawChart(id, series, color = "#22c55e") {
         data: series,
 
         borderColor: color,
-        borderWidth: 2,
+        borderWidth: 1.6,
 
-        pointRadius: 4,
-        pointHoverRadius: 4,
+        pointRadius: 3.5,
+        pointHoverRadius: 3.5,
 
         pointBackgroundColor: (ctx) => {
           return ctx.raw > 0 ? color : "#ffffff"
         },
 
         pointBorderColor: color,
-        pointBorderWidth: 2,
+        pointBorderWidth: 1.8,
 
         tension: 0.45
       }]

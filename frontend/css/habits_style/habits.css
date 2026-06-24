@@ -1,19 +1,19 @@
 .habits {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 0 14px 90px;
+  gap: 12px;
+  padding: 0 30px 90px;
 }
 
 .habit-wrap {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .habit-card {
-  border-radius: 24px;
-  padding: 18px;
-  min-height: 120px;
+  border-radius: 22px;
+  padding: 16px 20px;
+  min-height: 96px;
   overflow: hidden;
 }
 
@@ -51,39 +51,32 @@
 }
 
 .habit-info {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  z-index: 2;
+  gap: 10px;
   max-width: 48%;
 }
 
 .habit-name {
-  font-size: 21px;
-  line-height: 1.12;
+  font-size: 17px;
+  line-height: 1.15;
   font-weight: 800;
   color: #050505;
 }
 
 .habit-streak {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 500;
   color: #050505;
 }
 
 .habit-streak span {
-  color: #050505;
+  color: #050505 !important;
   font-weight: 500;
-}
-.habit-streak span {
-  font-weight: 700;
-  color: #22c55e;
 }
 
 .habit-chart {
-  width: 52%;
-  height: 82px;
-  margin-top: 18px;
+  width: 50%;
+  height: 68px;
+  margin-top: 8px;
 }
 
 canvas {
