@@ -1,220 +1,307 @@
-.leaderboard-title{
-    font-size:28px;
-    font-weight:900;
-    margin-bottom:14px;
-    text-align:center;
-    color:white;
+.leaderboard-title {
+    font-size: 34px;
+    font-weight: 900;
+    margin: 16px 0 24px;
+    text-align: center;
+    color: #070707;
+    letter-spacing: -1px;
 }
 
-#leaderboard-list{
-    background:linear-gradient(180deg,#4b2bb5,#2b176f);
-    border:3px solid #1b103f;
-    border-radius:24px;
-    padding:12px;
+#leaderboard-list {
+    padding: 0 16px 100px;
+    background: transparent;
 }
 
 /* ===================== */
-/* КАРТОЧКА ИГРОКА */
+/* TOP 3 */
 /* ===================== */
 
-.leader-row{
-    display:grid;
-    grid-template-columns:36px 42px 1fr 82px;
-    align-items:center;
-    column-gap:10px;
+.leaderboard-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+}
 
-    min-height:58px;
+.top-card {
+    position: relative;
+    width: 31%;
+    min-height: 230px;
+    border-radius: 22px 22px 0 0;
+    padding: 54px 8px 18px;
 
-    background:linear-gradient(
-        180deg,
-        #edf4ff,
-        #c9d6e8
-    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
 
-    border:2px solid #6d7890;
-    border-radius:18px;
+    background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(245,245,245,.6));
+}
 
-    padding:7px 10px;
-    margin-bottom:10px;
+.top-1 {
+    min-height: 270px;
+    background: linear-gradient(180deg, #ffe7a6, #fff6d9);
+}
+
+.top-2 {
+    background: linear-gradient(180deg, #f3f4f6, #ffffff);
+}
+
+.top-3 {
+    background: linear-gradient(180deg, #fff1e5, #ffffff);
+}
+
+.my-top-card {
+    box-shadow: 0 0 0 3px rgba(245, 166, 35, .35);
+}
+
+.top-crown {
+    position: absolute;
+    top: -44px;
+    font-size: 36px;
+}
+
+.top-rank {
+    position: absolute;
+    top: -22px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f5a623;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.top-2 .top-rank {
+    background: #d8dbe2;
+    color: #555;
+}
+
+.top-3 .top-rank {
+    background: #e59a5a;
+    color: #fff;
+}
+
+.top-avatar {
+    position: absolute;
+    top: -70px;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    border: 3px solid #f5a623;
+}
+
+.top-2 .top-avatar {
+    border-color: #cfd3dc;
+}
+
+.top-3 .top-avatar {
+    border-color: #e59a5a;
+}
+
+.top-name {
+    width: 100%;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 900;
+    text-align: center;
+    color: #050505;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-league {
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 18px;
+    font-weight: 800;
+    text-align: center;
+    color: #e49400;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-2 .top-league {
+    color: #7b7f89;
+}
+
+.top-score {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 18px;
+    font-weight: 900;
+    color: #050505;
+}
+
+/* ===================== */
+/* LIST */
+/* ===================== */
+
+.leaderboard-rows {
+    background: rgba(255,255,255,.86);
+    border-radius: 24px;
+    overflow: hidden;
 
     box-shadow:
-        inset 0 2px 0 rgba(255,255,255,.8),
-        0 3px 0 rgba(0,0,0,.35);
-
-    transition:.2s;
+        0 12px 35px rgba(0,0,0,.08),
+        inset 0 0 0 1px rgba(255,255,255,.7);
 }
 
-.leader-row.my-row,
-.my-row{
-    border:3px solid #ffd21f;
+.leader-row {
+    display: grid;
+    grid-template-columns: 46px 54px 1fr 88px;
+    align-items: center;
+    column-gap: 12px;
+
+    min-height: 74px;
+    padding: 10px 16px;
+
+    background: rgba(255,255,255,.65);
+    border-bottom: 1px solid rgba(0,0,0,.06);
 }
 
-/* ===================== */
-/* МЕСТО */
-/* ===================== */
-
-.leader-rank,
-.rank{
-    width:36px;
-    height:36px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    border-radius:10px;
-
-    font-size:18px;
-    font-weight:900;
-
-    background:linear-gradient(
-        180deg,
-        #b8c2d4,
-        #6e7b93
-    );
-
-    color:white;
-
-    text-shadow:
-        0 2px 0 rgba(0,0,0,.35);
+.leader-row:last-child {
+    border-bottom: none;
 }
 
-.leader-rank.gold,
-.rank.gold{
-    background:linear-gradient(
-        180deg,
-        #ffe76a,
-        #d8a900
-    );
-
-    color:#111;
-    text-shadow:none;
+.leader-row.my-row {
+    background: linear-gradient(90deg, rgba(255,214,91,.22), rgba(255,255,255,.8));
 }
 
-.leader-rank.silver,
-.rank.silver{
-    background:linear-gradient(
-        180deg,
-        #ffffff,
-        #b6b6b6
-    );
+.leader-rank {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
 
-    color:#111;
-    text-shadow:none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f0f1f4;
+    color: #555b66;
+
+    font-size: 20px;
+    font-weight: 800;
 }
 
-.leader-rank.bronze,
-.rank.bronze{
-    background:linear-gradient(
-        180deg,
-        #f0ad59,
-        #a65a20
-    );
-
-    color:#111;
-    text-shadow:none;
+.leader-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #eef0f4;
 }
 
-/* ===================== */
-/* АВАТАР */
-/* ===================== */
-
-.leader-avatar{
-    width:42px;
-    height:42px;
-
-    border-radius:50%;
-    object-fit:cover;
-
-    border:3px solid #8795ad;
-    background:#d8e1ee;
+.leader-info {
+    min-width: 0;
+    overflow: hidden;
 }
 
-/* ===================== */
-/* ИНФО */
-/* ===================== */
+.leader-name {
+    font-size: 20px;
+    line-height: 23px;
+    font-weight: 900;
+    color: #050505;
 
-.leader-info{
-    min-width:0;
-    overflow:hidden;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.leader-name{
-    font-size:16px;
-    font-weight:900;
-    line-height:18px;
+.leader-league {
+    margin-top: 3px;
+    font-size: 16px;
+    line-height: 18px;
+    font-weight: 800;
+    color: #e49400;
 
-    color:#20242c;
-
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-
-    text-shadow:
-        1px 1px 0 white,
-        -1px 1px 0 white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.leader-league{
-    margin-top:1px;
+.leader-score {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
 
-    font-size:11px;
-    line-height:13px;
-    font-weight:900;
+    font-size: 22px;
+    font-weight: 900;
+    color: #050505;
+}
 
-    color:#e3a928;
+.leader-cup {
+    font-size: 22px;
+    line-height: 1;
+}
 
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-
-    text-shadow:
-        1px 1px 0 #2b1b00;
+.leader-divider {
+    text-align: center;
+    padding: 10px 0;
+    color: #999;
+    font-size: 22px;
+    font-weight: 900;
 }
 
 /* ===================== */
-/* XP */
+/* MOBILE */
 /* ===================== */
 
-.leader-score,
-.leader-xp{
-    width:82px;
-    height:38px;
+@media (max-width: 390px) {
+    .top-avatar {
+        width: 92px;
+        height: 92px;
+        top: -60px;
+    }
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:4px;
+    .top-card {
+        min-height: 210px;
+        padding-top: 48px;
+    }
 
-    background:#9aa9bf;
+    .top-1 {
+        min-height: 250px;
+    }
 
-    border-radius:10px;
+    .top-name {
+        font-size: 18px;
+    }
 
-    font-size:16px;
-    font-weight:900;
+    .top-league {
+        font-size: 14px;
+    }
 
-    color:white;
+    .leader-row {
+        grid-template-columns: 42px 48px 1fr 78px;
+        padding: 10px 12px;
+    }
 
-    text-shadow:
-        0 2px 0 rgba(0,0,0,.5);
-}
+    .leader-name {
+        font-size: 18px;
+    }
 
-.leader-cup{
-    font-size:18px;
-    line-height:1;
-}
+    .leader-league {
+        font-size: 15px;
+    }
 
-/* ===================== */
-/* РАЗДЕЛИТЕЛЬ */
-/* ===================== */
-
-.leader-divider{
-    text-align:center;
-    margin:10px 0;
-
-    color:white;
-    font-size:20px;
-    font-weight:900;
-
-    opacity:.8;
+    .leader-score {
+        font-size: 20px;
+    }
 }
