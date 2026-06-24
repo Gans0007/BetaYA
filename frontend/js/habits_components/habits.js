@@ -1,7 +1,7 @@
-import {drawChart} from "./charts.js"
-import {getDashboard} from "./api.js"
-import {renderChatUser} from "./chat.js"
-import {renderReferrals} from "./chat.js"
+import { drawChart } from "./charts.js"
+import { getDashboard } from "../api.js"
+import { renderChatUser } from "../chat.js"
+import { renderReferrals } from "../chat.js"
 
 export function renderHabits(habits){
 
