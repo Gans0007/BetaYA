@@ -130,32 +130,33 @@ PROFILE ROW
 .profile-left {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 
   min-width: 0;
   flex: 1;
 }
 
 .profile-flag {
-  width: 68px;
-  height: 68px;
+  width: 76px;
+  height: 76px;
 
   flex-shrink: 0;
 
-  border-radius: 13px;
+  border-radius: 14px;
   object-fit: cover;
 }
 
 .profile-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
 
   min-width: 0;
+  flex: 1;
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: 25px;
   line-height: 1.05;
   font-weight: 800;
   color: #050505;
@@ -166,7 +167,7 @@ PROFILE ROW
 }
 
 .profile-clan {
-  font-size: 20px;
+  font-size: 21px;
   line-height: 1.1;
   font-weight: 500;
   color: #777;
@@ -190,7 +191,7 @@ LEAGUE
 }
 
 .league-text {
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
   font-weight: 800;
   color: #f0a51c;
@@ -198,17 +199,13 @@ LEAGUE
 }
 
 .profile-league img {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
 
   flex-shrink: 0;
   object-fit: contain;
 
   filter: drop-shadow(0 5px 9px rgba(198, 111, 16, 0.28));
-}
-
-.profile-league img:hover {
-  transform: scale(1.04);
 }
 
 /* =========================================
@@ -256,30 +253,39 @@ MOBILE FIX
     font-size: 22px;
   }
 
+  .profile-row {
+    gap: 12px;
+  }
+
   .profile-left {
-    gap: 18px;
+    gap: 14px;
   }
 
   .profile-flag {
-    width: 68px;
-    height: 68px;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
   }
 
   .profile-name {
-    font-size: 24px;
+    font-size: 23px;
   }
 
   .profile-clan {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .league-text {
-    font-size: 18px;
+    font-size: 17px;
+  }
+
+  .profile-league {
+    gap: 6px;
   }
 
   .profile-league img {
-    width: 58px;
-    height: 58px;
+    width: 52px;
+    height: 52px;
   }
 }
 
