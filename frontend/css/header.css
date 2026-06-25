@@ -38,31 +38,32 @@ RESOURCES
 .resource,
 .resource-xp,
 .resource-stars {
-  position: relative;
-  height: 40px;
+    position: relative;
+    height: 34px;          /* было 40 */
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  overflow: hidden;
-  border-radius: 999px;
+    overflow: hidden;
+    border-radius: 999px;
 }
 
 .resource-xp {
-  flex: 1 1 auto;
-  max-width: 270px;
-  background: #e9f8ef;
+    flex: 1 1 auto;
+    max-width: none;       /* убрать ограничение */
+    min-width: 0;
+    background: #e9f8ef;
 }
 
 .resource-stars {
-  width: 104px;
-  flex: 0 0 104px;
+    width: 112px;          /* было 104 */
+    flex: 0 0 112px;
 
-  background: #ffffff;
+    background: #fff;
 
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.045);
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.04);
 }
 
 .resource-xp-fill {
@@ -83,32 +84,32 @@ RESOURCES
 }
 
 .xp-top {
-  position: relative;
-  z-index: 2;
+    position: relative;
+    z-index: 2;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 
-  font-size: 17px;
-  line-height: 1;
-  font-weight: 700;
-  color: #ffffff;
+    font-size: 15px;       /* было 17 */
+    line-height: 1;
+    font-weight: 700;
+    color: #fff;
 
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
+    text-shadow: 0 1px 4px rgba(0,0,0,.12);
 }
 
 .resource-stars .xp-top {
-  font-size: 17px;
-  font-weight: 800;
-  color: #111;
-  text-shadow: none;
+    font-size: 15px;       /* было 17 */
+    font-weight: 800;
+    color: #111;
+    text-shadow: none;
 }
 
 .res-icon {
-  font-size: 22px;
-  line-height: 1;
+    font-size: 18px;       /* было 22 */
+    line-height: 1;
 }
 
 .res-value {
