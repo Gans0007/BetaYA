@@ -27,44 +27,48 @@ PROFILE CARD
 RESOURCES
 ========================================= */
 
+/* =========================================
+RESOURCES
+========================================= */
+
 .resources-bar {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .resource,
 .resource-xp,
 .resource-stars {
   position: relative;
-  height: 54px;
+  height: 30px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: 20px;
 }
 
 .resource {
   flex: 1;
   background: #ffffff;
-  gap: 6px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  gap: 5px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 .resource-xp {
-  flex: 1.2;
+  flex: 1.45;
   background: #e9f7ef;
 }
 
 .resource-stars {
-  flex: 0.9;
+  flex: 0.85;
   background: #ffffff;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
 .resource-xp-fill {
@@ -91,23 +95,24 @@ RESOURCES
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
 
-  font-size: 17px;
+  font-size: 14px;
   line-height: 1.05;
   font-weight: 800;
   color: #ffffff;
 
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.14);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.12);
 }
 
 .resource-stars .xp-top {
+  font-size: 14px;
   color: #111;
   text-shadow: none;
 }
 
 .res-icon {
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
 }
 
