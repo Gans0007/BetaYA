@@ -2,273 +2,264 @@
 HEADER
 ========================================= */
 
-.header{
-padding-top:6px;
-margin-bottom:0px;
+.header {
+  padding: 10px 14px 0;
+  margin-bottom: 14px;
 }
-
 
 /* =========================================
-PROFILE CARD (ресурсы + профиль)
+PROFILE CARD
 ========================================= */
 
-.profile-card{
+.profile-card {
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 18px 18px 22px;
+  margin-bottom: 14px;
 
-background:#0f1116;
-
-border-radius:20px;
-
-padding:16px;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.45);
-
-margin-bottom:14px;
-
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
-
 
 /* =========================================
 RESOURCES
 ========================================= */
 
-.resources-bar{
-
-display:flex;
-width:100%;
-
-gap:8px;
-
-margin-bottom:14px;
-
+.resources-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 14px;
+  margin-bottom: 34px;
 }
 
-.resource{
+.resource {
+  flex: 1;
+  min-height: 44px;
 
-flex:1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
-display:flex;
-justify-content:center;
-align-items:center;
+  background: #ffffff;
+  border-radius: 999px;
 
-gap:6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
 
-background:#171a20;
-
-padding:6px 0;
-
-border-radius:12px;
-
-font-size:14px;
-font-weight:600;
-
-box-shadow:
-inset 0 0 6px rgba(255,255,255,0.03);
-
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
-.res-icon{
-font-size:15px;
+.res-icon {
+  font-size: 24px;
 }
 
-.res-value{
-color:#e8c66a;
-font-weight:600;
+.res-value {
+  color: #111;
+  font-weight: 700;
 }
 
-/* первый блок хр */
-.resource-xp{
-position:relative;
-flex:2;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:6px 8px;
-overflow:hidden;
-background:#171a20;
-border-radius:12px;
+/* XP */
+
+.resource-xp {
+  position: relative;
+  flex: 2.4;
+
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #e9f7ef;
+  border-radius: 999px;
 }
 
-.resource-xp-fill{
-position:absolute;
-left:0;
-top:0;
-height:100%;
-width:0%;
+.resource-xp-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
 
-background:linear-gradient(
-90deg,
-#2dd4bf,
-#22c55e
-);
+  height: 100%;
+  width: 0%;
 
-opacity:0.6;
-transition:width .4s ease;
-border-radius:inherit;
+  background: linear-gradient(90deg, #b8efd0, #55cf80);
+  border-radius: inherit;
+
+  transition: width .4s ease;
 }
 
-.xp-top{
-position:relative;
-z-index:2;
-display:flex;
-justify-content:center;
-gap:6px;
-font-size:14px;
-font-weight:600;
-text-shadow:0 0 6px rgba(0,0,0,0.6);
+.xp-top {
+  position: relative;
+  z-index: 2;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Stars */
+
+.resource-stars {
+  position: relative;
+  flex: 1.1;
+
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background: #ffffff;
+  border-radius: 999px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.resource-stars-fill {
+  display: none;
+}
+
+.resource-stars .xp-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+
+  text-shadow: none;
+}
 
 /* =========================================
 PROFILE ROW
 ========================================= */
 
-.profile-row{
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-
-/* левая часть */
-
-.profile-left{
-
-display:flex;
-align-items:center;
-
-gap:12px;
-
+.profile-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
 
+.profile-flag {
+  width: 74px;
+  height: 74px;
 
-/* аватар */
-
-.profile-flag{
-
-width:64px;
-height:64px;
-
-border-radius:14px;
-
-object-fit:cover;
-
+  border-radius: 16px;
+  object-fit: cover;
 }
 
-
-/* текст профиля */
-
-.profile-info{
-
-display:flex;
-flex-direction:column;
-
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.profile-name{
-
-font-size:16px;
-font-weight:700;
-
+.profile-name {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #050505;
 }
 
-.profile-clan{
-
-font-size:13px;
-opacity:0.6;
-
+.profile-clan {
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #7a7a7a;
+  opacity: 1;
 }
-
 
 /* =========================================
 LEAGUE
 ========================================= */
 
-.profile-league{
-
-display:flex;
-align-items:center;
-
-
-gap:8px;
-
+.profile-league {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.profile-league img:hover{
-transform:scale(1.08);
+.league-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f0a51c;
+  white-space: nowrap;
 }
 
-.league-text{
+.profile-league img {
+  width: 66px;
+  height: 66px;
+  object-fit: contain;
 
-font-size:14px;
-font-weight:600;
-
-color:#e8c66a;
-
+  filter: drop-shadow(0 6px 10px rgba(198, 111, 16, 0.35));
 }
 
-.profile-league img{
-
-width:48px;
-height:48px;
-
-object-fit:contain;
-
-filter:drop-shadow(0 0 6px rgba(232,198,106,0.5));
-
+.profile-league img:hover {
+  transform: scale(1.05);
 }
 
-/* =========================
-STARS BAR (как XP)
-========================= */
+/* =========================================
+MOBILE FIX
+========================================= */
 
-.resource-stars{
-position:relative;
-flex:1;
+@media (max-width: 380px) {
+  .profile-card {
+    padding: 16px;
+    border-radius: 24px;
+  }
 
-display:flex;
-align-items:center;
-justify-content:center;
+  .resources-bar {
+    gap: 10px;
+    margin-bottom: 28px;
+  }
 
-padding:6px 8px;
+  .xp-top,
+  .resource-stars .xp-top {
+    font-size: 16px;
+  }
 
-overflow:hidden;
+  .profile-flag {
+    width: 66px;
+    height: 66px;
+  }
 
-background:#171a20;
-border-radius:12px;
-}
+  .profile-left {
+    gap: 14px;
+  }
 
-.resource-stars-fill{
-position:absolute;
-left:0;
-top:0;
-height:100%;
-width:0%;
+  .profile-name {
+    font-size: 21px;
+  }
 
-background:linear-gradient(
-90deg,
-#facc15,
-#fde047
-);
+  .profile-clan {
+    font-size: 17px;
+  }
 
-opacity:0.9;
+  .league-text {
+    font-size: 16px;
+  }
 
-box-shadow:
-0 0 10px rgba(255,215,0,0.6);
-
-transition:width .4s ease;
-
-border-radius:inherit;
-}
-
-.resource-stars .xp-top{
-position:relative;
-z-index:2;
-
-font-weight:700;
-color:#fff;
-
-text-shadow:
-0 0 6px rgba(0,0,0,0.8);
+  .profile-league img {
+    width: 58px;
+    height: 58px;
+  }
 }
