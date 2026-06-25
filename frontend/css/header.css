@@ -3,8 +3,8 @@ HEADER
 ========================================= */
 
 .header {
-  padding: 8px 14px 0;
-  margin-bottom: 12px;
+  padding: 10px 14px 0;
+  margin-bottom: 14px;
 }
 
 /* =========================================
@@ -13,13 +13,12 @@ PROFILE CARD
 
 .profile-card {
   background: #ffffff;
-  border-radius: 24px;
-  padding: 18px;
-  margin-bottom: 12px;
-  overflow: hidden;
+  border-radius: 28px;
+  padding: 18px 18px 22px;
+  margin-bottom: 14px;
 
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.08),
+    0 14px 35px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
@@ -31,40 +30,54 @@ RESOURCES
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 10px;
-  margin-bottom: 28px;
+  gap: 14px;
+  margin-bottom: 34px;
 }
 
-.resource,
-.resource-xp,
-.resource-stars {
+.resource {
+  flex: 1;
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  background: #ffffff;
+  border-radius: 999px;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.res-icon {
+  font-size: 24px;
+}
+
+.res-value {
+  color: #111;
+  font-weight: 700;
+}
+
+/* XP */
+
+.resource-xp {
   position: relative;
-  height: 54px;
+  flex: 2.4;
+
+  height: 44px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
   overflow: hidden;
-  border-radius: 999px;
-}
 
-.resource {
-  flex: 1;
-  background: #ffffff;
-  gap: 6px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
-}
-
-.resource-xp {
-  flex: 1.8;
   background: #e9f7ef;
-}
-
-.resource-stars {
-  flex: 0.9;
-  background: #ffffff;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
 }
 
 .resource-xp-fill {
@@ -77,43 +90,55 @@ RESOURCES
 
   background: linear-gradient(90deg, #b8efd0, #55cf80);
   border-radius: inherit;
-  transition: width .4s ease;
-}
 
-.resource-stars-fill {
-  display: none;
+  transition: width .4s ease;
 }
 
 .xp-top {
   position: relative;
   z-index: 2;
 
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Stars */
+
+.resource-stars {
+  position: relative;
+  flex: 1.1;
+
+  height: 44px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
 
-  font-size: 17px;
-  line-height: 1.05;
-  font-weight: 800;
-  color: #ffffff;
+  overflow: hidden;
 
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.14);
+  background: #ffffff;
+  border-radius: 999px;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.resource-stars-fill {
+  display: none;
 }
 
 .resource-stars .xp-top {
-  color: #111;
-  text-shadow: none;
-}
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-.res-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.res-value {
-  color: #111;
+  font-size: 18px;
   font-weight: 800;
+  color: #111;
+
+  text-shadow: none;
 }
 
 /* =========================================
@@ -124,24 +149,20 @@ PROFILE ROW
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 14px;
 }
 
 .profile-left {
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-width: 0;
-  flex: 1;
+  gap: 18px;
 }
 
 .profile-flag {
-  width: 68px;
-  height: 68px;
+  width: 74px;
+  height: 74px;
 
-  flex-shrink: 0;
-
-  border-radius: 14px;
+  border-radius: 16px;
   object-fit: cover;
 }
 
@@ -149,30 +170,21 @@ PROFILE ROW
   display: flex;
   flex-direction: column;
   gap: 4px;
-
-  min-width: 0;
 }
 
 .profile-name {
   font-size: 24px;
-  line-height: 1.05;
+  line-height: 1.1;
   font-weight: 800;
   color: #050505;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .profile-clan {
   font-size: 19px;
-  line-height: 1.1;
+  line-height: 1.2;
   font-weight: 500;
-  color: #777;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #7a7a7a;
+  opacity: 1;
 }
 
 /* =========================================
@@ -182,46 +194,36 @@ LEAGUE
 .profile-league {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-
+  gap: 10px;
   flex-shrink: 0;
-  max-width: 128px;
 }
 
 .league-text {
-  font-size: 17px;
-  line-height: 1;
+  font-size: 18px;
   font-weight: 800;
   color: #f0a51c;
   white-space: nowrap;
 }
 
 .profile-league img {
-  width: 54px;
-  height: 54px;
-
-  flex-shrink: 0;
+  width: 66px;
+  height: 66px;
   object-fit: contain;
 
-  filter: drop-shadow(0 5px 9px rgba(198, 111, 16, 0.28));
+  filter: drop-shadow(0 6px 10px rgba(198, 111, 16, 0.35));
 }
 
 .profile-league img:hover {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 /* =========================================
 MOBILE FIX
 ========================================= */
 
-@media (max-width: 420px) {
-  .header {
-    padding: 8px 16px 0;
-  }
-
+@media (max-width: 380px) {
   .profile-card {
-    padding: 18px;
+    padding: 16px;
     border-radius: 24px;
   }
 
@@ -230,75 +232,18 @@ MOBILE FIX
     margin-bottom: 28px;
   }
 
-  .resource,
-  .resource-xp,
-  .resource-stars {
-    height: 54px;
-  }
-
-  .resource-xp {
-    flex: 1.85;
-  }
-
-  .resource-stars {
-    flex: 0.95;
-  }
-
   .xp-top,
   .resource-stars .xp-top {
-    font-size: 17px;
+    font-size: 16px;
+  }
+
+  .profile-flag {
+    width: 66px;
+    height: 66px;
   }
 
   .profile-left {
     gap: 14px;
-  }
-
-  .profile-flag {
-    width: 68px;
-    height: 68px;
-  }
-
-  .profile-name {
-    font-size: 24px;
-  }
-
-  .profile-clan {
-    font-size: 19px;
-  }
-
-  .league-text {
-    font-size: 16px;
-  }
-
-  .profile-league {
-    max-width: 116px;
-  }
-
-  .profile-league img {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-@media (max-width: 360px) {
-  .profile-card {
-    padding: 16px;
-  }
-
-  .resource,
-  .resource-xp,
-  .resource-stars {
-    height: 50px;
-  }
-
-  .xp-top,
-  .resource-stars .xp-top {
-    font-size: 15px;
-  }
-
-  .profile-flag {
-    width: 62px;
-    height: 62px;
   }
 
   .profile-name {
@@ -310,15 +255,11 @@ MOBILE FIX
   }
 
   .league-text {
-    font-size: 14px;
-  }
-
-  .profile-league {
-    max-width: 102px;
+    font-size: 16px;
   }
 
   .profile-league img {
-    width: 46px;
-    height: 46px;
+    width: 58px;
+    height: 58px;
   }
 }
