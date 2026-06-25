@@ -32,7 +32,7 @@ RESOURCES
   align-items: center;
   width: 100%;
   gap: 22px;
-  margin-bottom: 42px;
+  margin-bottom: 24px;
 }
 
 .resource,
@@ -124,13 +124,13 @@ PROFILE ROW
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
 }
 
 .profile-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 
   min-width: 0;
   flex: 1;
@@ -149,14 +149,15 @@ PROFILE ROW
 .profile-info {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  gap: 3px;
 
   min-width: 0;
   flex: 1;
 }
 
 .profile-name {
-  font-size: 25px;
+  font-size: 20px;
   line-height: 1.05;
   font-weight: 800;
   color: #050505;
@@ -167,7 +168,7 @@ PROFILE ROW
 }
 
 .profile-clan {
-  font-size: 21px;
+  font-size: 16px;
   line-height: 1.1;
   font-weight: 500;
   color: #777;
@@ -183,25 +184,29 @@ LEAGUE
 
 .profile-league {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
+  justify-content: center;
 
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .league-text {
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1;
   font-weight: 800;
   color: #f0a51c;
   white-space: nowrap;
+  text-align: center;
+  order: 2;
 }
 
 .profile-league img {
-  width: 62px;
-  height: 62px;
+  width: 60px;
+  height: 60px;
 
+  order: 1;
   flex-shrink: 0;
   object-fit: contain;
 
@@ -213,79 +218,43 @@ MOBILE FIX
 ========================================= */
 
 @media (max-width: 420px) {
-  .header {
-    padding: 10px 16px 0;
-  }
-
-  .profile-card {
-    padding: 20px 20px 22px;
-    border-radius: 24px;
-  }
 
   .resources-bar {
-    gap: 22px;
-    margin-bottom: 42px;
-  }
-
-  .resource,
-  .resource-xp,
-  .resource-stars {
-    height: 40px;
-    border-radius: 999px;
-  }
-
-  .resource-xp {
-    flex: 1 1 auto;
-    max-width: none;
-  }
-
-  .resource-stars {
-    width: 104px;
-    flex: 0 0 104px;
-  }
-
-  .xp-top,
-  .resource-stars .xp-top {
-    font-size: 17px;
-  }
-
-  .res-icon {
-    font-size: 22px;
+    gap: 18px;
+    margin-bottom: 22px;
   }
 
   .profile-row {
-    gap: 12px;
+    gap: 8px;
   }
 
   .profile-left {
-    gap: 14px;
+    gap: 12px;
   }
 
-  .profile-flag {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
+  .profile-info {
+    gap: 2px;
   }
 
   .profile-name {
-    font-size: 23px;
+    font-size: 18px;
   }
 
   .profile-clan {
-    font-size: 19px;
-  }
-
-  .league-text {
-    font-size: 17px;
+    font-size: 14px;
   }
 
   .profile-league {
-    gap: 6px;
+    gap: 3px;
+  }
+
+  .league-text {
+    font-size: 12px;
   }
 
   .profile-league img {
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
   }
 }
 
