@@ -13,12 +13,14 @@ PROFILE CARD
 
 .profile-card {
   background: #ffffff;
-  border-radius: 28px;
-  padding: 18px 18px 22px;
+  border-radius: 24px;
+  padding: 18px 18px 20px;
   margin-bottom: 14px;
 
+  overflow: hidden;
+
   box-shadow:
-    0 14px 35px rgba(0, 0, 0, 0.08),
+    0 12px 30px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
@@ -30,8 +32,8 @@ RESOURCES
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 14px;
-  margin-bottom: 34px;
+  gap: 12px;
+  margin-bottom: 28px;
 }
 
 .resource {
@@ -65,18 +67,8 @@ RESOURCES
 /* XP */
 
 .resource-xp {
-  position: relative;
-  flex: 2.4;
-
-  height: 44px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-
-  background: #e9f7ef;
+  flex: 1.9;
+  height: 54px;
   border-radius: 999px;
 }
 
@@ -95,50 +87,27 @@ RESOURCES
 }
 
 .xp-top {
-  position: relative;
-  z-index: 2;
-
-  font-size: 18px;
-  font-weight: 700;
-  color: #ffffff;
-
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+  font-size: 17px;
+  font-weight: 800;
 }
 
 /* Stars */
 
 .resource-stars {
-  position: relative;
-  flex: 1.1;
-
-  height: 44px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-
-  background: #ffffff;
+  flex: 0.85;
+  height: 54px;
   border-radius: 999px;
-
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
+
 
 .resource-stars-fill {
   display: none;
 }
 
 .resource-stars .xp-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 17px;
+  line-height: 1.05;
   color: #111;
-
-  text-shadow: none;
 }
 
 /* =========================================
@@ -149,27 +118,25 @@ PROFILE ROW
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
 }
 
 .profile-left {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
+  min-width: 0;
 }
 
 .profile-flag {
-  width: 74px;
-  height: 74px;
-
-  border-radius: 16px;
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
   object-fit: cover;
 }
 
 .profile-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  min-width: 0;
 }
 
 .profile-name {
@@ -181,10 +148,9 @@ PROFILE ROW
 
 .profile-clan {
   font-size: 19px;
-  line-height: 1.2;
+  line-height: 1.1;
   font-weight: 500;
-  color: #7a7a7a;
-  opacity: 1;
+  color: #777;
 }
 
 /* =========================================
@@ -194,23 +160,22 @@ LEAGUE
 .profile-league {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
+  gap: 6px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .league-text {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
   color: #f0a51c;
   white-space: nowrap;
 }
 
 .profile-league img {
-  width: 66px;
-  height: 66px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
-
-  filter: drop-shadow(0 6px 10px rgba(198, 111, 16, 0.35));
 }
 
 .profile-league img:hover {
@@ -221,9 +186,13 @@ LEAGUE
 MOBILE FIX
 ========================================= */
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
+  .header {
+    padding: 8px 16px 0;
+  }
+
   .profile-card {
-    padding: 16px;
+    padding: 18px 18px 20px;
     border-radius: 24px;
   }
 
@@ -232,34 +201,40 @@ MOBILE FIX
     margin-bottom: 28px;
   }
 
+  .resource-xp {
+    flex: 1.8;
+    height: 54px;
+  }
+
+  .resource-stars {
+    flex: 0.9;
+    height: 54px;
+  }
+
   .xp-top,
   .resource-stars .xp-top {
-    font-size: 16px;
-  }
-
-  .profile-flag {
-    width: 66px;
-    height: 66px;
-  }
-
-  .profile-left {
-    gap: 14px;
-  }
-
-  .profile-name {
-    font-size: 21px;
-  }
-
-  .profile-clan {
     font-size: 17px;
   }
 
+  .profile-flag {
+    width: 68px;
+    height: 68px;
+  }
+
+  .profile-name {
+    font-size: 24px;
+  }
+
+  .profile-clan {
+    font-size: 19px;
+  }
+
   .league-text {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .profile-league img {
-    width: 58px;
-    height: 58px;
+    width: 54px;
+    height: 54px;
   }
 }
