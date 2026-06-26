@@ -14,7 +14,6 @@
     margin-bottom:12px;
 
     border:1px solid #eeeeee;
-
     box-shadow:0 4px 14px rgba(0,0,0,.04);
 
     transition:0.2s;
@@ -69,8 +68,9 @@
     position:fixed;
     inset:0;
 
-    background:rgba(0,0,0,0.55);
-    backdrop-filter:blur(6px);
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
 
     display:flex;
     justify-content:center;
@@ -155,11 +155,16 @@
     position:absolute;
     inset:0;
 
-    background:rgba(0,0,0,0.55);
-    backdrop-filter:blur(4px);
+    background:rgba(0,0,0,0.38);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
 
     opacity:0;
-    transition:0.25s;
+    transition:0.25s ease;
+}
+
+#challenge-book.active .sheet-backdrop{
+    opacity:1;
 }
 
 /* =========================
@@ -173,14 +178,14 @@
     bottom:0;
 
     background:#ffffff;
-    border-radius:28px 28px 0 0;
+    border-radius:24px 24px 0 0;
 
-    padding:12px 18px 24px;
+    padding:10px 16px 20px;
 
     transform:translateY(100%);
     transition:0.25s ease;
 
-    max-height:78%;
+    max-height:74%;
     overflow-y:auto;
 
     box-shadow:0 -10px 35px rgba(0,0,0,.14);
@@ -190,40 +195,63 @@
     transform:translateY(0);
 }
 
+/* =========================
+🧲 HANDLE
+========================= */
+
 .sheet-handle{
-    width:42px;
-    height:5px;
-    background:#d1d1d1;
+    width:36px;
+    height:4px;
+
+    background:#cfcfcf;
     border-radius:999px;
-    margin:0 auto 34px;
+
+    margin:0 auto 26px;
+}
+
+/* =========================
+📄 CONTENT
+========================= */
+
+.sheet-content{
+    width:100%;
 }
 
 .sheet-title{
-    font-size:24px;
+    font-size:19px;
     line-height:1.15;
-    font-weight:900;
+    font-weight:800;
+
     color:#050505;
-    margin-bottom:30px;
+
+    margin-bottom:22px;
 }
+
+/* =========================
+📊 META BLOCK
+========================= */
 
 .sheet-meta{
     display:flex;
     flex-direction:column;
-    gap:24px;
-    margin-bottom:28px;
+
+    gap:18px;
+    margin-bottom:30px;
 }
 
 .meta-item{
     display:flex;
     align-items:center;
-    gap:18px;
+    gap:14px;
 }
 
 .meta-icon{
-    width:56px;
-    height:56px;
-    min-width:56px;
-    border-radius:16px;
+    width:46px;
+    height:46px;
+
+    min-width:46px;
+
+    border-radius:14px;
 
     display:flex;
     align-items:center;
@@ -231,8 +259,8 @@
 }
 
 .meta-icon img{
-    width:30px;
-    height:30px;
+    width:24px;
+    height:24px;
     object-fit:contain;
 }
 
@@ -247,14 +275,16 @@
 .meta-text{
     display:flex;
     flex-direction:column;
-    gap:4px;
+    gap:3px;
 }
 
 .meta-main{
-    font-size:18px;
+    font-size:15px;
     line-height:1.2;
+
     color:#111;
-    font-weight:500;
+
+    font-weight:600;
 }
 
 .meta-main .value{
@@ -263,34 +293,50 @@
 }
 
 .meta-sub{
-    font-size:15px;
+    font-size:12px;
     line-height:1.25;
+
     color:#8a8a8a;
-    font-weight:500;
+
+    font-weight:600;
 }
 
+/* =========================
+📝 DESCRIPTION
+========================= */
+
 .sheet-desc{
-    font-size:18px;
-    line-height:1.38;
+    font-size:14px;
+    line-height:1.45;
+
     color:#050505;
+
     font-weight:400;
-    margin-bottom:30px;
+
+    margin-bottom:32px;
 }
+
+/* =========================
+🚀 BUTTON
+========================= */
 
 .sheet-btn{
     width:100%;
-    padding:16px 18px;
+
+    padding:14px 16px;
 
     border:none;
-    border-radius:15px;
+    border-radius:14px;
 
     background:linear-gradient(180deg,#ffa000,#ff8a00);
+
     color:#ffffff;
 
     font-weight:800;
-    font-size:19px;
+    font-size:17px;
 
     box-shadow:0 8px 20px rgba(255,138,0,.22);
+
     cursor:pointer;
 }
 
@@ -303,54 +349,65 @@
     cursor:default;
 }
 
+/* =========================
+📱 SMALL SCREENS
+========================= */
+
 @media(max-width:380px){
 
     .sheet{
-        padding:12px 16px 22px;
-        border-radius:26px 26px 0 0;
+        padding:10px 14px 18px;
+        border-radius:22px 22px 0 0;
+        max-height:72%;
     }
 
     .sheet-handle{
-        margin-bottom:28px;
+        width:34px;
+        height:4px;
+        margin-bottom:24px;
     }
 
     .sheet-title{
-        font-size:22px;
-        margin-bottom:26px;
+        font-size:18px;
+        margin-bottom:20px;
     }
 
     .sheet-meta{
-        gap:22px;
-        margin-bottom:26px;
-    }
-
-    .meta-icon{
-        width:52px;
-        height:52px;
-        min-width:52px;
-        border-radius:15px;
-    }
-
-    .meta-icon img{
-        width:28px;
-        height:28px;
-    }
-
-    .meta-main{
-        font-size:17px;
-    }
-
-    .meta-sub{
-        font-size:14px;
-    }
-
-    .sheet-desc{
-        font-size:17px;
+        gap:16px;
         margin-bottom:28px;
     }
 
+    .meta-item{
+        gap:12px;
+    }
+
+    .meta-icon{
+        width:44px;
+        height:44px;
+        min-width:44px;
+        border-radius:13px;
+    }
+
+    .meta-icon img{
+        width:23px;
+        height:23px;
+    }
+
+    .meta-main{
+        font-size:14px;
+    }
+
+    .meta-sub{
+        font-size:11.5px;
+    }
+
+    .sheet-desc{
+        font-size:13.5px;
+        margin-bottom:30px;
+    }
+
     .sheet-btn{
-        font-size:18px;
-        padding:15px 16px;
+        font-size:16px;
+        padding:13px 14px;
     }
 }
