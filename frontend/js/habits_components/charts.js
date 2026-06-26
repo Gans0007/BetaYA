@@ -4,18 +4,17 @@ export function drawChart(id, series, color = "#22c55e") {
 
   const ctx = canvas.getContext("2d")
 
+  const values = series.map(item => item.value)
+  const statuses = series.map(item => item.done)
+
   new Chart(ctx, {
     type: "line",
 
     data: {
-      labels: series.map(() => ""),
+      labels: values.map(() => ""),
 
       datasets: [{
-        data: series,
-
-        parsing: {
-          yAxisKey: "value"
-        },
+        data: values,
 
         borderColor: color,
         borderWidth: 1.6,
@@ -24,7 +23,7 @@ export function drawChart(id, series, color = "#22c55e") {
         pointHoverRadius: 3.5,
 
         pointBackgroundColor: (ctx) => {
-          return ctx.raw.done ? color : "#ffffff"
+          return statuses[ctx.dataIndex] ? color : "#ffffff"
         },
 
         pointBorderColor: color,
