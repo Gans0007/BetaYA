@@ -5,9 +5,9 @@ body:has(#leaderboard-list) {
 .leaderboard-title {
     position: relative;
     z-index: 5;
-    font-size: 34px;
+    font-size: 22px;
     font-weight: 900;
-    margin: 16px 0 64px;
+    margin: 12px 0 54px;
     text-align: center;
     color: #070707;
     letter-spacing: -1px;
@@ -114,8 +114,8 @@ body:has(#leaderboard-list) {
 
 .top-name {
     width: 100%;
-    font-size: 18px;
-    line-height: 21px;
+    font-size: 12px;
+    line-height: 15px;
     font-weight: 900;
     text-align: center;
     color: #050505;
@@ -127,8 +127,8 @@ body:has(#leaderboard-list) {
 
 .top-league {
     margin-top: 4px;
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 12px;
+    line-height: 15px;
     font-weight: 800;
     text-align: center;
     color: #e49400;
@@ -148,7 +148,7 @@ body:has(#leaderboard-list) {
     align-items: center;
     gap: 6px;
 
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 900;
     color: #050505;
 }
@@ -200,7 +200,7 @@ body:has(#leaderboard-list) {
     background:#f0f1f4;
     color:#555b66;
 
-    font-size:20px;
+    font-size:14px;
     font-weight:800;
 }
 
@@ -218,7 +218,7 @@ body:has(#leaderboard-list) {
 }
 
 .leader-name {
-    font-size:20px;
+    font-size:14px;
     line-height:23px;
     font-weight:900;
     color:#050505;
@@ -230,7 +230,7 @@ body:has(#leaderboard-list) {
 
 .leader-league {
     margin-top:3px;
-    font-size:16px;
+    font-size:12px;
     line-height:18px;
     font-weight:800;
     color:#e49400;
@@ -246,13 +246,13 @@ body:has(#leaderboard-list) {
     justify-content:flex-end;
     gap:8px;
 
-    font-size:22px;
+    font-size:14px;
     font-weight:900;
     color:#050505;
 }
 
 .leader-cup {
-    font-size:22px;
+    font-size:14px;
     line-height:1;
 }
 
@@ -260,7 +260,7 @@ body:has(#leaderboard-list) {
     text-align:center;
     padding:10px 0;
     color:#999;
-    font-size:22px;
+    font-size:14px;
     font-weight:900;
 }
 
@@ -269,7 +269,7 @@ body:has(#leaderboard-list) {
 @media (max-width: 390px) {
     .leaderboard-title {
         margin-bottom: 58px;
-        font-size: 32px;
+        font-size: 22px;
     }
 
     .top-avatar {
@@ -288,15 +288,15 @@ body:has(#leaderboard-list) {
     }
 
     .top-name {
-        font-size: 17px;
-    }
-
-    .top-league {
         font-size: 14px;
     }
 
+    .top-league {
+        font-size: 12px;
+    }
+
     .top-score {
-        font-size: 17px;
+        font-size: 14px;
         margin-top: 10px;
     }
 
@@ -306,14 +306,14 @@ body:has(#leaderboard-list) {
     }
 
     .leader-name {
-        font-size: 18px;
+        font-size: 12px;
     }
 
     .leader-league {
-        font-size: 15px;
+        font-size: 12px;
     }
 
     .leader-score {
-        font-size: 20px;
+        font-size: 14px;
     }
 }
