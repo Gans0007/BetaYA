@@ -1,336 +1,312 @@
 body{
-margin:0;
+    margin:0;
 }
 
-/* ======================================
-CONTAINER
-====================================== */
+/* =========================
+CHAT CONTAINER
+========================= */
 
 .chat-container{
-
-flex:1;
-
-display:flex;
-flex-direction:column;
-
-padding:14px;
-gap:12px;
-
-height:100%;
-
-overflow:hidden;
-
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:10px 14px 8px;
+    gap:10px;
+    height:100%;
+    overflow:hidden;
 }
 
-/* ======================================
+/* =========================
 CLAN BLOCK
-====================================== */
+========================= */
 
 .clan-block{
-background:#1a1a1d;
-border-radius:18px;
-padding:16px;
-flex-shrink:0;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-
-
-.clan-title{
-font-size:17px;
-font-weight:600;
-margin-bottom:6px;
-}
-
-.clan-sub{
-color:#9aa0b5;
-font-size:12px;
+    background:linear-gradient(180deg,#ffffff,#f6f6fb);
+    border-radius:14px;
+    padding:10px 12px;
+    flex-shrink:0;
+    box-shadow:0 4px 16px rgba(76,70,180,0.16);
 }
 
 .clan-row{
-display:flex;
-justify-content:space-between;
-align-items:center;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+
+.clan-title{
+    font-size:12px;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:3px;
+    line-height:1.2;
 }
 
 .clan-sub{
-color:#9aa0b5;
-font-size:14px;
+    color:#7b8190;
+    font-size:10px;
+    line-height:1.2;
 }
 
 .clan-btn{
-
-background:linear-gradient(180deg,#f7b64d,#c27a1a);
-
-border:none;
-
-padding:10px 18px;
-
-border-radius:10px;
-
-color:white;
-
-font-weight:600;
-
-cursor:pointer;
-
+    background:linear-gradient(180deg,#7c6cff,#5a4be8);
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    color:white;
+    font-weight:700;
+    font-size:10px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(91,75,232,0.25);
 }
 
-/* ======================================
+/* =========================
 MAIN BLOCK
-====================================== */
+========================= */
 
 .chat-main{
-background:#1a1a1d;
-border-radius:18px;
-padding:16px;
-
-flex:1;
-display:flex;
-flex-direction:column;
-min-height:0;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
+    background:transparent;
+    border-radius:0;
+    padding:0;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    box-shadow:none;
 }
-
-/* ======================================
-TITLE
-====================================== */
 
 .chat-title{
-text-align:center;
-font-size:22px;
-margin-bottom:10px;
+    font-size:18px;
+    font-weight:700;
+    color:#111827;
+    margin:0 0 8px;
+    text-align:left;
 }
 
-/* ======================================
+/* =========================
 TABS
-====================================== */
+========================= */
 
 .chat-tabs{
-display:flex;
-justify-content:center;
-gap:30px;
-margin-bottom:10px;
+    display:flex;
+    justify-content:flex-start;
+    gap:0;
+    margin-bottom:10px;
+    background:#f4f4fa;
+    border-radius:12px;
+    padding:3px;
 }
 
 .chat-tab{
-opacity:0.5;
-font-size:16px;
+    flex:1;
+    text-align:center;
+    font-size:10px;
+    font-weight:700;
+    color:#8b90a0;
+    padding:7px 0;
+    border-radius:9px;
+    opacity:1;
 }
 
 .chat-tab.active{
-opacity:1;
-font-weight:600;
+    background:#ffffff;
+    color:#6b5cff;
+    box-shadow:0 3px 10px rgba(0,0,0,0.06);
 }
 
-/* ======================================
+/* =========================
 FRIENDS LIST
-====================================== */
+========================= */
 
 .friends-list{
-
-flex:1;
-
-overflow-y:auto;
-
-display:flex;
-flex-direction:column;
-
-gap:12px;
-
-padding-right:4px;
-
+    flex:1;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding-right:2px;
 }
 
-/* если друзей нет */
-
-.friends-list:empty::after{
-content:"";
-flex:1;
+.friend-card{
+    background:#ffffff;
+    padding:9px 11px;
+    border-radius:13px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    min-height:54px;
+    box-shadow:0 4px 14px rgba(17,24,39,0.08);
+    transition:0.15s;
 }
 
 .friend-card.me{
-border:2px solid #f7b64d;
-}
-
-/* ======================================
-FRIEND CARD
-====================================== */
-
-.friend-card{
-background:#1a1a1d;
-
-padding:14px;
-border-radius:14px;
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-transition:0.15s;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    border:none;
 }
 
 .friend-card:active{
-transform:scale(0.97);
+    transform:scale(0.98);
 }
 
 .friend-card:hover{
-transform:translateY(-2px);
+    transform:translateY(-1px);
 }
 
 .friend-left{
-display:flex;
-align-items:center;
-gap:12px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
 }
 
 .friend-avatar{
-
-width:48px;
-height:48px;
-border-radius:12px;
-object-fit:cover;
+    width:42px;
+    height:42px;
+    border-radius:10px;
+    object-fit:cover;
+    flex-shrink:0;
 }
 
 .friend-name{
-font-weight:600;
+    font-size:12px;
+    font-weight:800;
+    color:#111827;
+    line-height:1.15;
+    max-width:140px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 .friend-status{
-font-size:13px;
-color:#9aa0b5;
+    font-size:10px;
+    font-weight:600;
+    color:#22c55e;
+    margin-top:3px;
 }
 
-/* ======================================
+.friend-card.ref .friend-status{
+    color:#7b8190;
+}
+
+/* =========================
 RIGHT SIDE
-====================================== */
+========================= */
 
 .friend-right{
-display:flex;
-align-items:center;
-gap:6px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-shrink:0;
 }
 
-.cup-icon{
-width:22px;
+.friend-cups{
+    font-size:11px;
+    font-weight:800;
+    color:#111827;
+    white-space:nowrap;
 }
 
-/* ======================================
+/* =========================
 ADD FRIEND
-====================================== */
+========================= */
 
 .add-friend{
-
-flex-shrink:0;
-
-text-align:center;
-
-padding-top:12px;
-
+    flex-shrink:0;
+    text-align:center;
+    padding-top:8px;
 }
 
 .add-friend-btn{
-
-background:linear-gradient(180deg,#f7b64d,#c27a1a);
-
-border:none;
-
-padding:14px 26px;
-
-border-radius:14px;
-
-font-weight:600;
-
-color:white;
-
-font-size:16px;
-
-cursor:pointer;
-
+    width:100%;
+    background:linear-gradient(180deg,#7c6cff,#5a4be8);
+    border:none;
+    padding:10px 20px;
+    border-radius:11px;
+    font-weight:800;
+    color:white;
+    font-size:12px;
+    cursor:pointer;
+    box-shadow:0 5px 14px rgba(91,75,232,0.25);
 }
 
-/* ======================================
+/* =========================
 SCROLLBAR
-====================================== */
+========================= */
 
 .friends-list::-webkit-scrollbar{
-width:4px;
+    width:3px;
 }
 
 .friends-list::-webkit-scrollbar-track{
-background:transparent;
+    background:transparent;
 }
 
 .friends-list::-webkit-scrollbar-thumb{
-background:#2c2c3a;
-border-radius:10px;
+    background:#d6d8e3;
+    border-radius:10px;
 }
 
-.friends-list::-webkit-scrollbar-thumb:hover{
-background:#3b3b52;
-}
-
-/* ======================================
-CHAT PAGE FIXED SCREEN
-====================================== */
+/* =========================
+PAGE FIX
+========================= */
 
 #chat-page .page-content{
-overflow:hidden;
-display:flex;
-flex-direction:column;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
 }
 
+/* =========================
+SOON MODAL
+========================= */
 
-
-.soon-modal {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
+.soon-modal{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
 }
 
-.soon-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
+.soon-overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.45);
+    backdrop-filter:blur(5px);
 }
 
-.soon-content {
-    position: relative;
-    background: #111;
-    border-radius: 20px;
-    padding: 25px 20px;
-    width: 85%;
-    max-width: 320px;
-    text-align: center;
-    color: #fff;
-    z-index: 2;
+.soon-content{
+    position:relative;
+    background:#ffffff;
+    border-radius:18px;
+    padding:24px 18px;
+    width:85%;
+    max-width:320px;
+    text-align:center;
+    color:#111827;
+    z-index:2;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
 
-.soon-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 15px;
+.soon-title{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:12px;
 }
 
-.soon-text {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #aaa;
+.soon-text{
+    font-size:13px;
+    line-height:1.45;
+    color:#6b7280;
 }
 
-.soon-close {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    cursor: pointer;
-    font-size: 18px;
-    color: #888;
+.soon-close{
+    position:absolute;
+    top:10px;
+    right:12px;
+    cursor:pointer;
+    font-size:16px;
+    color:#8b90a0;
 }
