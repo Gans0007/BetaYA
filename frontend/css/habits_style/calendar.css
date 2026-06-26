@@ -30,8 +30,8 @@
 }
 
 .day-number {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -39,7 +39,7 @@
 
   margin: 0 auto 7px;
 
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
 
   border-radius: 50%;
@@ -48,7 +48,7 @@
 }
 
 .day-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
 
   color: #656b7a;

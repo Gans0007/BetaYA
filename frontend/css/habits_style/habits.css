@@ -1,19 +1,19 @@
 .habits {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   padding: 0 18px 90px;
 }
 
 .habit-wrap {
   position: relative;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .habit-card {
-  border-radius: 22px;
-  padding: 16px 20px;
-  min-height: 96px;
+  border-radius: 18px;
+  padding: 13px 18px;
+  min-height: 84px;
   overflow: hidden;
   border: 1px solid rgba(0,0,0,0.06);
 }
@@ -57,14 +57,14 @@
 }
 
 .habit-name {
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.15;
   font-weight: 800;
   color: #050505;
 }
 
 .habit-streak {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #050505;
 }
@@ -76,8 +76,8 @@
 
 .habit-chart {
   width: 50%;
-  height: 68px;
-  margin-top: 8px;
+  height: 60px;
+  margin-top: 6px;
 }
 
 canvas {
@@ -111,10 +111,10 @@ canvas {
   gap: 7px;
   align-items: start;
 
-  padding: 14px;
+  padding: 12px;
   background: #ffffff;
 
-  border-radius: 18px;
+  border-radius: 16px;
 
   box-shadow:
     0 10px 28px rgba(0, 0, 0, .06);
@@ -213,9 +213,10 @@ canvas {
   border: none;
   background: none;
 
-  padding: 8px 14px;
+  padding: 7px 12px;
 
   color: #6b7280;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -226,7 +227,7 @@ canvas {
 
 .progress {
   color: #6b7280;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
 }
 
