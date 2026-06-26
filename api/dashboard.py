@@ -215,28 +215,24 @@ async def get_habits(request: Request):
         # SERIES ДЛЯ ГРАФИКА
         # =========================
 
-        value = 0
+        level = 3
         series = []
 
-        for i in range(4, -1, -1):
-
+        for i in range(6, -1, -1):
             day = today - timedelta(days=i)
+            done = day in days
 
-            if day == today:
-
-                if day in days:
-                    series.append(value + 1)
-                else:
-                    series.append(value)
-
+            if done:
+                level += 1
             else:
+                level -= 1
 
-                if day in days:
-                    value += 1
-                else:
-                    value -= 1
+            level = max(1, min(7, level))
 
-                series.append(value)
+            series.append({
+                "value": level,
+                "done": done
+            })
 
         habits.append({
 
