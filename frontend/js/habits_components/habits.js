@@ -212,17 +212,32 @@ export function renderHabits(habits) {
 
     list.appendChild(wrap)
 
-    let series = (habit.series || [])
+    const rawSeries = (habit.series || [])
       .filter(v => v !== null && v !== undefined)
       .slice(-7)
 
-    if (series.length > 0) {
-      while (series.length < 7) {
-        series.unshift(series[0])
-      }
+    while (rawSeries.length < 7) {
+      rawSeries.unshift(0)
     }
 
-    drawChart(chartId, series, chartColor)
+    let level = 3
+
+    const chartSeries = rawSeries.map(done => {
+      if (done > 0) {
+        level += 1
+      } else {
+        level -= 1
+      }
+
+      level = Math.max(1, Math.min(7, level))
+
+      return {
+        value: level,
+        done: done > 0
+      }
+    })
+
+    drawChart(chartId, chartSeries, chartColor)
   })
 }
 
@@ -231,7 +246,7 @@ export async function loadHabitsDashboard(initData) {
 
   console.log("API DATA:", data)
 
-  renderChatUser(data.xp_current)
+renderChatUser(data.xp_current)
 
   if (data.referrals) {
     renderReferrals(data.referrals)
