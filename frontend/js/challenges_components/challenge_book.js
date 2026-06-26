@@ -42,7 +42,7 @@ export function openChallengeBook(data){
                 </div>
 
                 <button class="sheet-btn">
-                    ${data.isActive ? "✅ Уже активен" : "🚀 Взять челлендж"}
+                    ${data.isActive ? "✅ Уже активен" : "🚀 Принять вызов"}
                 </button>
 
             </div>
