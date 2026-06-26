@@ -10,8 +10,8 @@ CHAT CONTAINER
     flex:1;
     display:flex;
     flex-direction:column;
-    padding:12px 16px 8px;
-    gap:12px;
+    padding:10px 14px 8px;
+    gap:10px;
     height:100%;
     overflow:hidden;
 }
@@ -23,8 +23,8 @@ CLAN BLOCK
 
 .clan-block{
     background:linear-gradient(180deg,#7c6cff,#5a4be8);
-    border-radius:18px;
-    padding:14px 15px;
+    border-radius:14px;
+    padding:10px 12px;
     flex-shrink:0;
     box-shadow:0 8px 22px rgba(91,75,232,0.28);
 }
@@ -54,8 +54,8 @@ CLAN BLOCK
 .clan-btn{
     background:#ffffff;
     border:none;
-    padding:9px 16px;
-    border-radius:11px;
+    padding:8px 14px;
+    border-radius:8px;
     color:#5a4be8;
     font-weight:800;
     font-size:12px;
@@ -96,8 +96,8 @@ TABS
     gap:0;
     margin-bottom:10px;
     background:#f4f4fa;
-    border-radius:14px;
-    padding:4px;
+    border-radius:12px;
+    padding:3px;
 }
 
 .chat-tab{
@@ -106,8 +106,8 @@ TABS
     font-size:12px;
     font-weight:800;
     color:#8b90a0;
-    padding:9px 0;
-    border-radius:11px;
+    padding:7px 0;
+    border-radius:9px;
     opacity:1;
 }
 
@@ -128,11 +128,9 @@ FRIENDS LIST
 
     display:flex;
     flex-direction:column;
-    align-items:center;
-    gap:9px;
+    gap:8px;
 
     padding-right:14px;
-    padding-left:2px;
     margin-right:-10px;
 }
 
@@ -146,18 +144,18 @@ FRIEND CARD
 ========================= */
 
 .friend-card{
-    width:calc(100% - 14px);
+    width:100%;
     box-sizing:border-box;
 
     background:#ffffff;
-    padding:11px 13px;
-    border-radius:15px;
+    padding:9px 11px;
+    border-radius:13px;
 
     display:flex;
     justify-content:space-between;
     align-items:center;
 
-    min-height:60px;
+    min-height:54px;
 
     box-shadow:0 5px 16px rgba(17,24,39,0.08);
     transition:0.15s;
@@ -178,14 +176,14 @@ FRIEND CARD
 .friend-left{
     display:flex;
     align-items:center;
-    gap:11px;
+    gap:10px;
     min-width:0;
 }
 
 .friend-avatar{
-    width:46px;
-    height:46px;
-    border-radius:12px;
+    width:42px;
+    height:42px;
+    border-radius:10px;
     object-fit:cover;
     flex-shrink:0;
 }
@@ -241,11 +239,11 @@ ADD FRIEND
 }
 
 .add-friend-btn{
-    width:calc(100% - 14px);
+    width:100%;
     background:linear-gradient(180deg,#7c6cff,#5a4be8);
     border:none;
-    padding:12px 20px;
-    border-radius:13px;
+    padding:10px 20px;
+    border-radius:11px;
     font-weight:800;
     color:white;
     font-size:14px;
