@@ -212,9 +212,15 @@ export function renderHabits(habits) {
 
     list.appendChild(wrap)
 
-    const series = (habit.series || [])
+    let series = (habit.series || [])
       .filter(v => v !== null && v !== undefined)
       .slice(-7)
+
+    if (series.length > 0) {
+      while (series.length < 7) {
+        series.unshift(series[0])
+      }
+    }
 
     drawChart(chartId, series, chartColor)
   })
