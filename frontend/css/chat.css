@@ -36,7 +36,7 @@ CLAN BLOCK
 }
 
 .clan-title{
-    font-size:12px;
+    font-size:13px;
     font-weight:800;
     color:#111827;
     margin-bottom:3px;
@@ -45,7 +45,7 @@ CLAN BLOCK
 
 .clan-sub{
     color:#7b8190;
-    font-size:10px;
+    font-size:11px;
     line-height:1.2;
 }
 
@@ -56,7 +56,7 @@ CLAN BLOCK
     border-radius:8px;
     color:white;
     font-weight:700;
-    font-size:10px;
+    font-size:11px;
     cursor:pointer;
     box-shadow:0 4px 12px rgba(91,75,232,0.25);
 }
@@ -77,7 +77,7 @@ MAIN BLOCK
 }
 
 .chat-title{
-    font-size:18px;
+    font-size:20px;
     font-weight:700;
     color:#111827;
     margin:0 0 8px;
@@ -101,7 +101,7 @@ TABS
 .chat-tab{
     flex:1;
     text-align:center;
-    font-size:10px;
+    font-size:11px;
     font-weight:700;
     color:#8b90a0;
     padding:7px 0;
@@ -122,20 +122,35 @@ FRIENDS LIST
 .friends-list{
     flex:1;
     overflow-y:auto;
+
     display:flex;
     flex-direction:column;
     gap:8px;
-    padding-right:2px;
+
+    padding-right:14px;
+    margin-right:-10px;
 }
+
+.friends-list:empty::after{
+    content:"";
+    flex:1;
+}
+
+/* =========================
+FRIEND CARD
+========================= */
 
 .friend-card{
     background:#ffffff;
     padding:9px 11px;
     border-radius:13px;
+
     display:flex;
     justify-content:space-between;
     align-items:center;
+
     min-height:54px;
+
     box-shadow:0 4px 14px rgba(17,24,39,0.08);
     transition:0.15s;
 }
@@ -168,7 +183,7 @@ FRIENDS LIST
 }
 
 .friend-name{
-    font-size:12px;
+    font-size:13px;
     font-weight:800;
     color:#111827;
     line-height:1.15;
@@ -179,7 +194,7 @@ FRIENDS LIST
 }
 
 .friend-status{
-    font-size:10px;
+    font-size:11px;
     font-weight:600;
     color:#22c55e;
     margin-top:3px;
@@ -201,7 +216,7 @@ RIGHT SIDE
 }
 
 .friend-cups{
-    font-size:11px;
+    font-size:13px;
     font-weight:800;
     color:#111827;
     white-space:nowrap;
@@ -225,7 +240,7 @@ ADD FRIEND
     border-radius:11px;
     font-weight:800;
     color:white;
-    font-size:12px;
+    font-size:13px;
     cursor:pointer;
     box-shadow:0 5px 14px rgba(91,75,232,0.25);
 }
@@ -235,7 +250,7 @@ SCROLLBAR
 ========================= */
 
 .friends-list::-webkit-scrollbar{
-    width:3px;
+    width:4px;
 }
 
 .friends-list::-webkit-scrollbar-track{
@@ -243,8 +258,12 @@ SCROLLBAR
 }
 
 .friends-list::-webkit-scrollbar-thumb{
-    background:#d6d8e3;
-    border-radius:10px;
+    background:#d7d7df;
+    border-radius:20px;
+}
+
+.friends-list::-webkit-scrollbar-thumb:hover{
+    background:#b6b6cf;
 }
 
 /* =========================
