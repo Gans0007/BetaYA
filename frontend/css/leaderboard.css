@@ -173,8 +173,8 @@ body:has(#leaderboard-list) {
     align-items: center;
     column-gap: 12px;
 
-    min-height: 74px;
-    padding: 10px 16px;
+    min-height: 66px;
+    padding: 7px 16px;
 
     background: rgba(255,255,255,.65);
     border-bottom: 1px solid rgba(0,0,0,.06);
