@@ -7,13 +7,15 @@
     justify-content:space-between;
     align-items:center;
 
-    background:linear-gradient(180deg,#1a1f25,#12161b);
+    background:#ffffff;
 
     padding:16px;
-    border-radius:16px;
+    border-radius:18px;
     margin-bottom:12px;
 
-    border:1px solid rgba(255,255,255,0.05);
+    border:1px solid #eeeeee;
+
+    box-shadow:0 4px 14px rgba(0,0,0,.04);
 
     transition:0.2s;
 }
@@ -21,11 +23,6 @@
 .challenge-level-card:active{
     transform:scale(0.98);
 }
-
-
-/* =========================
-📌 LEFT
-========================= */
 
 .level-left{
     display:flex;
@@ -35,13 +32,8 @@
 .level-title{
     font-size:16px;
     font-weight:700;
-    color:#fff;
+    color:#111;
 }
-
-
-/* =========================
-⭐ RIGHT
-========================= */
 
 .level-right{
     display:flex;
@@ -49,28 +41,24 @@
 }
 
 .level-stars{
-    background:rgba(255,255,255,0.08);
+    background:rgba(34,197,94,.12);
     padding:6px 10px;
     border-radius:10px;
 
     font-size:13px;
-    font-weight:600;
+    font-weight:700;
 
-    color:#4CAF50;
+    color:#22c55e;
 }
 
-
-/* =========================
-🔒 LOCKED
-========================= */
-
 .level-stars.locked{
-    color:#888;
-    opacity:0.6;
+    color:#999;
+    background:#f1f1f1;
+    opacity:0.8;
 }
 
 .challenge-level-card.locked{
-    opacity:0.6;
+    opacity:0.65;
 }
 
 /* =========================
@@ -81,7 +69,7 @@
     position:fixed;
     inset:0;
 
-    background:rgba(0,0,0,0.75);
+    background:rgba(0,0,0,0.55);
     backdrop-filter:blur(6px);
 
     display:flex;
@@ -105,25 +93,20 @@
     display:none;
 }
 
-
-/* =========================
-📦 MODAL
-========================= */
-
 .levels-modal{
     width:90%;
     max-width:420px;
     max-height:85%;
 
-    background:#0f1116;
-    border-radius:22px;
+    background:#ffffff;
+    border-radius:24px;
 
     padding:16px;
 
     transform:scale(0.92);
     transition:transform .25s ease;
 
-    box-shadow:0 20px 60px rgba(0,0,0,0.7);
+    box-shadow:0 20px 60px rgba(0,0,0,0.25);
 
     overflow:hidden;
 }
@@ -131,11 +114,6 @@
 #levels-overlay.active .levels-modal{
     transform:scale(1);
 }
-
-
-/* =========================
-🔝 HEADER
-========================= */
 
 .levels-header{
     display:flex;
@@ -147,20 +125,15 @@
 
 .levels-title{
     font-size:18px;
-    font-weight:700;
-    color:#fff;
+    font-weight:800;
+    color:#111;
 }
 
 .levels-close{
-    font-size:20px;
-    color:#aaa;
+    font-size:22px;
+    color:#888;
     cursor:pointer;
 }
-
-
-/* =========================
-📜 CONTENT
-========================= */
 
 .levels-content{
     max-height:60vh;
@@ -169,7 +142,7 @@
 }
 
 /* =========================
-🌑 BACKDROP
+🌑 CHALLENGE BOOK OVERLAY
 ========================= */
 
 #challenge-book{
@@ -181,7 +154,9 @@
 .sheet-backdrop{
     position:absolute;
     inset:0;
-    background:rgba(0,0,0,0.5);
+
+    background:rgba(0,0,0,0.55);
+    backdrop-filter:blur(4px);
 
     opacity:0;
     transition:0.25s;
@@ -197,18 +172,21 @@
     right:0;
     bottom:0;
 
-    background:#0f1116;
-    border-radius:20px 20px 0 0;
+    background:#ffffff;
 
-    padding:16px;
+    border-radius:34px 34px 0 0;
+
+    padding:14px 24px 28px;
 
     transform:translateY(100%);
     transition:0.25s ease;
 
-    max-height:80%;
+    max-height:86%;
+    overflow-y:auto;
+
+    box-shadow:0 -12px 40px rgba(0,0,0,.16);
 }
 
-/* активное состояние */
 #challenge-book.active .sheet{
     transform:translateY(0);
 }
@@ -222,50 +200,32 @@
 ========================= */
 
 .sheet-handle{
-    width:40px;
-    height:4px;
-    background:#444;
-    border-radius:10px;
-    margin:0 auto 12px;
+    width:48px;
+    height:6px;
+
+    background:#d1d1d1;
+
+    border-radius:999px;
+
+    margin:0 auto 44px;
 }
 
 /* =========================
 📄 CONTENT
 ========================= */
 
-.sheet-title{
-    font-size:18px;
-    font-weight:700;
-    color:#fff;
-    margin-bottom:10px;
-}
-
-.sheet-meta{
-    font-size:13px;
-    opacity:0.7;
-    margin-bottom:10px;
-}
-
-.sheet-desc{
-    font-size:14px;
-    line-height:1.4;
-    margin-bottom:16px;
-}
-
-/* =========================
-🚀 BUTTON
-========================= */
-
-.sheet-btn{
+.sheet-content{
     width:100%;
-    padding:14px;
-    border:none;
-    border-radius:12px;
+}
 
-    background:#ff8c00;
-    color:#fff;
-    font-weight:600;
-    font-size:15px;
+.sheet-title{
+    font-size:28px;
+    line-height:1.15;
+    font-weight:900;
+
+    color:#050505;
+
+    margin-bottom:34px;
 }
 
 /* =========================
@@ -275,38 +235,167 @@
 .sheet-meta{
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:26px;
 
-    margin-bottom:12px;
+    margin-bottom:34px;
 }
 
-/* строка */
 .meta-item{
     display:flex;
     align-items:center;
-    gap:8px;
-
-    font-size:14px;
+    gap:22px;
 }
 
-/* иконки */
-.meta-item img{
-    width:18px;
-    height:18px;
+.meta-icon{
+    width:64px;
+    height:64px;
+
+    min-width:64px;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.meta-icon img{
+    width:34px;
+    height:34px;
     object-fit:contain;
 }
 
-/* убираем цвет с текста */
-.meta-level,
-.meta-days{
-    color:#fff;
+.meta-icon-level{
+    background:linear-gradient(180deg,#f1efff,#ebe9ff);
 }
 
-/* красим только цифры */
-.meta-level .value{
-    color:#f59e0b; /* оранжевый */
+.meta-icon-days{
+    background:linear-gradient(180deg,#eaf8ed,#ddf3e3);
 }
 
-.meta-days .value{
-    color:#22c55e; /* зеленый */
+.meta-text{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.meta-main{
+    font-size:21px;
+    line-height:1.2;
+
+    color:#111;
+
+    font-weight:500;
+}
+
+.meta-main .value{
+    font-weight:600;
+    color:#111;
+}
+
+.meta-sub{
+    font-size:17px;
+    line-height:1.25;
+
+    color:#8a8a8a;
+
+    font-weight:500;
+}
+
+/* =========================
+📝 DESCRIPTION
+========================= */
+
+.sheet-desc{
+    font-size:21px;
+    line-height:1.38;
+
+    color:#050505;
+
+    font-weight:400;
+
+    margin-bottom:34px;
+}
+
+/* =========================
+🚀 BUTTON
+========================= */
+
+.sheet-btn{
+    width:100%;
+
+    padding:18px 20px;
+
+    border:none;
+    border-radius:16px;
+
+    background:linear-gradient(180deg,#ffa000,#ff8a00);
+
+    color:#ffffff;
+
+    font-weight:800;
+    font-size:22px;
+
+    box-shadow:0 8px 20px rgba(255,138,0,.25);
+
+    cursor:pointer;
+}
+
+.sheet-btn:active{
+    transform:scale(0.98);
+}
+
+.sheet-btn:disabled{
+    opacity:0.65;
+    cursor:default;
+}
+
+/* =========================
+📱 SMALL SCREENS
+========================= */
+
+@media(max-width:380px){
+
+    .sheet{
+        padding:14px 18px 24px;
+        border-radius:30px 30px 0 0;
+    }
+
+    .sheet-handle{
+        margin-bottom:34px;
+    }
+
+    .sheet-title{
+        font-size:25px;
+        margin-bottom:28px;
+    }
+
+    .meta-icon{
+        width:58px;
+        height:58px;
+        min-width:58px;
+        border-radius:16px;
+    }
+
+    .meta-icon img{
+        width:30px;
+        height:30px;
+    }
+
+    .meta-main{
+        font-size:19px;
+    }
+
+    .meta-sub{
+        font-size:15px;
+    }
+
+    .sheet-desc{
+        font-size:19px;
+    }
+
+    .sheet-btn{
+        font-size:20px;
+        padding:16px 18px;
+    }
 }

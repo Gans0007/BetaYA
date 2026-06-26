@@ -1,11 +1,28 @@
 import { acceptChallenge } from "../api.js"
 
+const difficultyTexts = {
+    1: "Подходит для новичков",
+    2: "Для тех, кто готов к дисциплине",
+    3: "Только для самых дисциплинированных"
+}
+
+const conditionTexts = {
+    1: "Формируй привычку постепенно",
+    2: "При 2 пропущенных днях челлендж аннулируется",
+    3: "Любой пропущенный день аннулирует челлендж"
+}
+
 export function openChallengeBook(data){
 
     if(document.getElementById("challenge-book")) return
 
     const overlay = document.createElement("div")
     overlay.id = "challenge-book"
+
+    const difficulty = Number(data.difficulty) || 1
+
+    const difficultyText = difficultyTexts[difficulty] || difficultyTexts[1]
+    const conditionText = conditionTexts[difficulty] || conditionTexts[1]
 
     const desc =
         data.description?.[data.difficulty] ||
@@ -26,13 +43,29 @@ export function openChallengeBook(data){
                 <div class="sheet-meta">
 
                     <div class="meta-item meta-level">
-                        <img src="/img/nodes/hard_level.png"/>
-                        <span>Сложность: <span class="value">${data.difficulty} / 3</span></span>
+                        <div class="meta-icon meta-icon-level">
+                            <img src="/img/nodes/hard_level.png"/>
+                        </div>
+
+                        <div class="meta-text">
+                            <div class="meta-main">
+                                Сложность: <span class="value">${difficulty} / 3</span>
+                            </div>
+                            <div class="meta-sub">${difficultyText}</div>
+                        </div>
                     </div>
 
                     <div class="meta-item meta-days">
-                        <img src="/img/nodes/level_days.png"/>
-                        <span>Длительность: <span class="value">${data.days} дней</span></span>
+                        <div class="meta-icon meta-icon-days">
+                            <img src="/img/nodes/level_days.png"/>
+                        </div>
+
+                        <div class="meta-text">
+                            <div class="meta-main">
+                                Длительность: <span class="value">${data.days} дней</span>
+                            </div>
+                            <div class="meta-sub">${conditionText}</div>
+                        </div>
                     </div>
 
                 </div>
@@ -51,9 +84,6 @@ export function openChallengeBook(data){
 
     document.body.appendChild(overlay)
 
-    const sheet = overlay.querySelector(".sheet")
-
-    // 🔥 запуск анимации
     setTimeout(()=>{
         overlay.classList.add("active")
     }, 10)
@@ -78,10 +108,8 @@ export function openChallengeBook(data){
                 setTimeout(()=>{
                     close()
 
-                    // обновляем челленджи
                     window.renderChallenges()
 
-                    // 🔥 обновляем привычки
                     if(window.renderDashboard){
                         window.renderDashboard()
                     }
