@@ -215,24 +215,45 @@ async def get_habits(request: Request):
         # SERIES ДЛЯ ГРАФИКА
         # =========================
 
-        level = 3
-        series = []
+        raw_series = []
 
+        # 1 = подтверждение, 0 = пропуск
         for i in range(6, -1, -1):
             day = today - timedelta(days=i)
             done = day in days
+            raw_series.append(done)
 
+        # стартовая точка
+        level = 4
+        series = []
+
+        for done in raw_series:
             if done:
                 level += 1
             else:
                 level -= 1
 
-            level = max(1, min(7, level))
-
             series.append({
                 "value": level,
                 "done": done
             })
+
+# мягко сдвигаем график внутрь диапазона 1–7,
+# но не ломаем направление вверх/вниз
+        values = [p["value"] for p in series]
+
+        min_value = min(values)
+        max_value = max(values)
+
+        if min_value < 1:
+            shift = 1 - min_value
+            for p in series:
+                p["value"] += shift
+
+        if max_value > 7:
+            shift = max_value - 7
+            for p in series:
+                p["value"] -= shift
 
         habits.append({
 
