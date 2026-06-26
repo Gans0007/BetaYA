@@ -1,5 +1,7 @@
 export function drawChart(id, series, color = "#22c55e") {
   const canvas = document.getElementById(id)
+  if (!canvas) return
+
   const ctx = canvas.getContext("2d")
 
   new Chart(ctx, {
@@ -11,6 +13,10 @@ export function drawChart(id, series, color = "#22c55e") {
       datasets: [{
         data: series,
 
+        parsing: {
+          yAxisKey: "value"
+        },
+
         borderColor: color,
         borderWidth: 1.6,
 
@@ -18,7 +24,7 @@ export function drawChart(id, series, color = "#22c55e") {
         pointHoverRadius: 3.5,
 
         pointBackgroundColor: (ctx) => {
-          return ctx.raw > 0 ? color : "#ffffff"
+          return ctx.raw.done ? color : "#ffffff"
         },
 
         pointBorderColor: color,
@@ -39,7 +45,11 @@ export function drawChart(id, series, color = "#22c55e") {
 
       scales: {
         x: { display: false },
-        y: { display: false }
+        y: {
+          display: false,
+          min: 0,
+          max: 8
+        }
       }
     }
   })
