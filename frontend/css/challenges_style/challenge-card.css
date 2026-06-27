@@ -4,45 +4,29 @@
 
 .challenge-card{
     background:#ffffff;
-
     border-radius:24px;
-    padding:18px;
-
+    padding:16px;
     border:1px solid #eeeeee;
-
-    box-shadow:
-    0 2px 10px rgba(0,0,0,.04);
-
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
     overflow:hidden;
-
     margin-bottom:14px;
 }
 
 .challenge-title{
-    font-size:17px;
-    font-weight:700;
-
+    font-size:16px;
+    line-height:1.2;
+    font-weight:800;
     color:#111;
-
-    margin-bottom:14px;
+    margin-bottom:10px;
 }
-
-/* =========================
-🏷️ MODULE TITLE
-========================= */
 
 .challenge-module-title{
-    font-size:15px;
+    font-size:14px;
+    line-height:1.2;
     font-weight:800;
-
-    margin:20px 6px 12px;
-
+    margin:18px 6px 10px;
     color:#111;
 }
-
-/* =========================
-🧩 ROW: NODES + BOOK
-========================= */
 
 .challenge-row{
     display:flex;
@@ -55,16 +39,10 @@
     overflow:hidden;
 }
 
-/* =========================
-📘 BOOK BUTTON
-========================= */
-
 .challenge-book-fixed{
     width:48px;
     height:48px;
-
     min-width:48px;
-
     display:flex;
     align-items:center;
     justify-content:center;
@@ -74,61 +52,35 @@
     width:100%;
     height:100%;
     object-fit:contain;
-
     pointer-events:auto;
 }
 
-/* =========================
-📅 DAYS / STARS
-========================= */
-
 .challenge-sub-bottom{
-    margin-top:10px;
-
-    font-size:13px;
-
-    color:#888;
-
-    font-weight:500;
+    margin-top:9px;
+    font-size:12px;
+    line-height:1.2;
+    color:#777;
+    font-weight:600;
 }
-
-/* =========================
-🟢 ACTIVE
-========================= */
 
 .challenge-card.active{
     border:2px solid #22c55e;
-
     box-shadow:
-    0 0 0 1px rgba(34,197,94,.15),
-    0 4px 12px rgba(34,197,94,.12);
-
+        0 0 0 1px rgba(34,197,94,.15),
+        0 4px 12px rgba(34,197,94,.12);
     background:#fff;
 }
-
-/* =========================
-🏆 DONE
-========================= */
 
 .challenge-card.done{
     opacity:0.6;
 }
 
-/* =========================
-🔒 LOCKED
-========================= */
-
 .challenge-locked-card{
     background:#fff;
-
     border-radius:24px;
-
-    padding:18px;
-
+    padding:16px;
     border:1px solid #eeeeee;
-
     text-align:center;
-
     margin-bottom:14px;
 }
 
@@ -138,14 +90,14 @@
 }
 
 .locked-name{
-    font-size:18px;
-    font-weight:700;
+    font-size:16px;
+    font-weight:800;
     margin-top:6px;
     color:#ddd;
 }
 
 .locked-stars{
-    font-size:14px;
+    font-size:13px;
     margin-top:10px;
     color:#FFC247;
 }
