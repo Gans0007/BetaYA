@@ -235,7 +235,8 @@ ADD FRIEND
 .add-friend{
     flex-shrink:0;
     text-align:center;
-    padding-top:8px;
+    padding-top:2px;
+    margin-bottom:0;
 }
 
 .add-friend-btn{
