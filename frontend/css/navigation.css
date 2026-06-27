@@ -75,6 +75,12 @@ LABEL — НАЗВАНИЯ УБРАНЫ
 
     display: none;
 
+    color: #8a8a8a;
+
+    font-size: 11px;
+
+    font-weight: 500;
+
 }
 
 
@@ -85,6 +91,16 @@ ACTIVE ITEM
 .nav-item.active{
 
     flex: 1.45;
+
+}
+
+.nav-item.active .nav-label{
+
+    display: block;
+
+    color: #000;
+
+    font-weight: 600;
 
 }
 
