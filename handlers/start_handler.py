@@ -251,12 +251,7 @@ async def process_nickname(message: types.Message, state: FSMContext):
             )]
         ]
     )
- 
-    await message.answer(
-        welcome_text(nickname) + "<b>Добавь первую привычку или выбери челлендж:👇</b>",
-        reply_markup=main_menu_kb(),
-        parse_mode="HTML"
-    )
+
 
 
     logging.info("🧼 FSM cleared")
