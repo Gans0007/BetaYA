@@ -31,7 +31,7 @@ body:has(#leaderboard-list) {
 .top-card {
     position: relative;
     width: 31%;
-    min-height: 175px;
+    min-height: 145px;
     border-radius: 22px 22px 0 0;
     padding: 36px 8px 14px;
 
@@ -44,7 +44,7 @@ body:has(#leaderboard-list) {
 }
 
 .top-1 {
-    min-height: 205px;
+    min-height: 170px;
     background: linear-gradient(180deg, #ffe7a6, #fff6d9);
 }
 
