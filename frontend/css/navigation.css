@@ -11,7 +11,7 @@ BOTTOM NAVIGATION
 
     height: 74px;
 
-    background: #fff;
+    background: #ffffff;
 
     display: flex;
     align-items: center;
@@ -34,20 +34,16 @@ NAV ITEM
 
 .nav-item{
 
-    flex:1;
+    flex: 1;
 
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    gap:4px;
+    cursor: pointer;
 
-    cursor:pointer;
+    transition: all .25s ease;
 
-    transition:.25s;
-
-    color:#444;
 }
 
 
@@ -57,45 +53,49 @@ ICON
 
 .nav-icon{
 
-    width:28px;
-    height:28px;
+    width: 36px;
+    height: 36px;
 
-    object-fit:contain;
+    object-fit: contain;
 
-    transition:.25s;
+    opacity: .75;
+
+    transition: all .25s ease;
+
 }
 
 
 /* ======================
-LABEL
+LABEL — УБИРАЕМ НАЗВАНИЯ
 ====================== */
 
 .nav-label{
 
-    font-size:11px;
+    display: none;
 
-    font-weight:500;
-
-    color:#555;
-
-    transition:.25s;
 }
 
 
 /* ======================
-ACTIVE
+ACTIVE ITEM — КАК В СТАРОМ МЕНЮ
 ====================== */
 
-.nav-item.active .nav-label{
+.nav-item.active{
 
-    color:#111;
-    font-weight:600;
+    flex: 1.35;
 
 }
 
 .nav-item.active .nav-icon{
 
-    transform:translateY(-2px);
+    width: 48px;
+    height: 48px;
+
+    opacity: 1;
+
+    transform: translateY(-4px) scale(1.12);
+
+    filter: drop-shadow(0 0 8px rgba(255, 150, 0, .65));
 
 }
 
@@ -106,6 +106,6 @@ SAFE SPACE
 
 .container{
 
-    padding-bottom:100px;
+    padding-bottom: 100px;
 
 }
