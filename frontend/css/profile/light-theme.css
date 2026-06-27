@@ -136,7 +136,29 @@ LIGHT THEME — PROFILE
     background:#e5e7eb;
 }
 
+.lvl-0{
+    background:#ebedf0;
+}
 
+.lvl-1{
+    background:#9be9a8;
+}
+
+.lvl-2{
+    background:#40c463;
+}
+
+.lvl-3{
+    background:#30a14e;
+}
+
+.lvl-4{
+    background:#216e39;
+}
+
+.heatmap-cell.empty{
+    opacity:0.35;
+}
 
 /* avatar */
 
@@ -196,42 +218,4 @@ LIGHT THEME — PROFILE
 .legend-item{
     color:var(--text-muted);
     opacity:1;
-}
-
-/* Пустые дни текущего месяца */
-.heatmap-cell.lvl-0,
-.heatmap-cell.empty {
-    background: transparent !important;
-    border: 1px solid rgba(0,0,0,.08);
-    opacity: 1;
-}
-
-/* Дни вне текущего месяца */
-.heatmap-cell.out-month,
-.heatmap-cell.other-month,
-.heatmap-cell.muted {
-    background: transparent !important;
-    border: 1px solid rgba(0,0,0,.05);
-    opacity: .35;
-}
-
-/* Подтверждения — оставить как в тёмной теме */
-.heatmap-cell.lvl-1 {
-    background: #0e4429 !important;
-    border: none;
-}
-
-.heatmap-cell.lvl-2 {
-    background: #006d32 !important;
-    border: none;
-}
-
-.heatmap-cell.lvl-3 {
-    background: #26a641 !important;
-    border: none;
-}
-
-.heatmap-cell.lvl-4 {
-    background: #39d353 !important;
-    border: none;
 }
