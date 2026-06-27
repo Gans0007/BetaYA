@@ -11,7 +11,9 @@ BOTTOM NAVIGATION
 
     height: 74px;
 
-    background: #ffffff;
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
 
     display: flex;
     align-items: center;

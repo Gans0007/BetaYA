@@ -63,3 +63,21 @@ display:none;
 body:not(.game-mode) #game-root{
     display:none;
 }
+
+.page-content{
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 28px,
+        #000 calc(100% - 90px),
+        transparent 100%
+    );
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 28px,
+        #000 calc(100% - 90px),
+        transparent 100%
+    );
+}
