@@ -1,0 +1,207 @@
+/* =========================
+LIGHT THEME — PROFILE
+========================= */
+
+:root{
+    --bg-main:#f6f6f7;
+    --bg-card:#ffffff;
+    --bg-soft:#f1f2f4;
+
+    --text-main:#111111;
+    --text-muted:#6f6f6f;
+
+    --border-light:rgba(0,0,0,0.08);
+    --shadow-soft:0 16px 40px rgba(0,0,0,0.10);
+
+    --accent:#ffb22e;
+    --accent-soft:#fff3dc;
+}
+
+/* overlay */
+
+.profile-overlay{
+    background:rgba(245,245,245,0.65);
+    backdrop-filter:blur(10px);
+}
+
+/* modal */
+
+.profile-modal{
+    background:var(--bg-main);
+    color:var(--text-main);
+    box-shadow:var(--shadow-soft);
+}
+
+/* header */
+
+.profile-modal-header{
+    border-bottom:1px solid var(--border-light);
+    color:var(--text-main);
+}
+
+.profile-close{
+    color:#777;
+}
+
+.profile-close:hover{
+    color:#111;
+}
+
+/* profile info */
+
+.profile-name{
+    color:var(--text-main);
+}
+
+.profile-sub{
+    color:var(--text-muted);
+    opacity:1;
+}
+
+/* sections */
+
+.profile-section,
+.behavior-card{
+    background:var(--bg-card);
+    border:1px solid var(--border-light);
+    box-shadow:0 10px 26px rgba(0,0,0,0.05);
+}
+
+.section-title{
+    color:var(--text-muted);
+    opacity:1;
+}
+
+/* placeholders */
+
+.heatmap-placeholder,
+.graph-placeholder{
+    background:var(--bg-soft);
+    color:var(--text-muted);
+    opacity:1;
+}
+
+/* period switcher */
+
+.period-switcher{
+    background:var(--bg-soft);
+}
+
+.period-option{
+    color:var(--text-muted);
+}
+
+.period-option.active{
+    color:var(--text-main);
+}
+
+.switcher-bg{
+    background:#ffffff;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+/* info button */
+
+.info-btn{
+    background:var(--bg-soft);
+    color:var(--text-main);
+    opacity:1;
+}
+
+.info-btn:hover{
+    background:#e7e8eb;
+}
+
+/* tooltip */
+
+.info-tooltip{
+    background:#ffffff;
+    color:#111;
+    border:1px solid var(--border-light);
+    box-shadow:0 12px 30px rgba(0,0,0,0.14);
+}
+
+.info-tooltip::after{
+    border-color:transparent transparent #ffffff transparent;
+}
+
+/* heatmap */
+
+.heatmap-day-label{
+    color:var(--text-muted);
+    opacity:1;
+}
+
+.heatmap-cell{
+    background:#e5e7eb;
+}
+
+.lvl-0{ background:#e5e7eb; }
+.lvl-1{ background:#ffe2a8; }
+.lvl-2{ background:#ffc95c; }
+.lvl-3{ background:#ffad22; }
+.lvl-4{ background:#f28c00; }
+
+.heatmap-cell.empty{
+    opacity:0.35;
+}
+
+/* avatar */
+
+.profile-avatar{
+    border:2px solid var(--border-light);
+    background:#fff;
+}
+
+.profile-avatar-wrap:hover .profile-avatar{
+    border-color:rgba(255,178,46,0.8);
+}
+
+.profile-avatar-edit{
+    color:var(--text-muted);
+}
+
+.avatar-picker{
+    background:#ffffff;
+    border:1px solid var(--border-light);
+    box-shadow:0 10px 26px rgba(0,0,0,0.06);
+}
+
+.avatar-picker-title{
+    color:var(--text-main);
+}
+
+.avatar-option{
+    background:#f7f7f8;
+    border:1px solid var(--border-light);
+}
+
+.avatar-option:hover{
+    border-color:rgba(255,178,46,0.8);
+}
+
+.avatar-option.active{
+    border:2px solid var(--accent);
+}
+
+/* gauge */
+
+.gauge-pointer{
+    background:linear-gradient(#111,#777);
+    box-shadow:none;
+}
+
+.gauge-pointer::after{
+    background:#111;
+}
+
+.gauge-value{
+    color:var(--text-main);
+}
+
+.gauge-label,
+.period-label,
+.legend-item{
+    color:var(--text-muted);
+    opacity:1;
+}
