@@ -68,7 +68,32 @@ GRID
     transform: scale(1.2);
 }
 
-/* уровни */
+/* =========================
+LIGHT THEME — HEATMAP FIX
+========================= */
+
+.heatmap-cell {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    opacity: 1;
+}
+
+/* пустые / неподтверждённые дни */
+.heatmap-cell.empty,
+.heatmap-cell.lvl-0 {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    opacity: 1;
+}
+
+/* дни не из текущего месяца */
+.heatmap-cell.out-month,
+.heatmap-cell.other-month,
+.heatmap-cell.muted {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    opacity: 0.35;
+}
 
 .lvl-0 { background: #2a2d35; }
 .lvl-1 { background: #0e4429; }
@@ -77,4 +102,25 @@ GRID
 .lvl-4 { background: #39d353; }
 .heatmap-cell.empty {
     opacity: 0.2;
+}
+
+/* подтверждения */
+.heatmap-cell.lvl-1 {
+    background: #d8f5df !important;
+    border-color: transparent;
+}
+
+.heatmap-cell.lvl-2 {
+    background: #8ee8a3 !important;
+    border-color: transparent;
+}
+
+.heatmap-cell.lvl-3 {
+    background: #34c759 !important;
+    border-color: transparent;
+}
+
+.heatmap-cell.lvl-4 {
+    background: #128a36 !important;
+    border-color: transparent;
 }
