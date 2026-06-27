@@ -279,12 +279,12 @@ body:has(#leaderboard-list) {
     }
 
     .top-card {
-        min-height: 165px;
-        padding-top: 34px;
+        min-height: 130px;
+        padding-top: 28px;
     }
 
     .top-1 {
-        min-height: 195px;
+        min-height: 155px;
     }
 
     .top-name {
