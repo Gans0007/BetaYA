@@ -136,14 +136,13 @@ LIGHT THEME — PROFILE
     background:#e5e7eb;
 }
 
-.lvl-0{ background:#e5e7eb; }
-.lvl-1{ background:#ffe2a8; }
-.lvl-2{ background:#ffc95c; }
-.lvl-3{ background:#ffad22; }
-.lvl-4{ background:#f28c00; }
-
-.heatmap-cell.empty{
-    opacity:0.35;
+.lvl-0 { background: #2a2d35; }
+.lvl-1 { background: #0e4429; }
+.lvl-2 { background: #006d32; }
+.lvl-3 { background: #26a641; }
+.lvl-4 { background: #39d353; }
+.heatmap-cell.empty {
+    opacity: 0.2;
 }
 
 /* avatar */

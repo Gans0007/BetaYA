@@ -190,6 +190,12 @@ async def start_command(message: types.Message, state: FSMContext):
         logging.info("⏳ FSM: waiting_for_nickname")
         return
 
+    await message.answer(
+        welcome_text(nickname) + "<b>Добавь первую привычку или выбери челлендж:👇</b>",
+        reply_markup=main_menu_kb(),
+        parse_mode="HTML"
+    )
+
 
 
 @router.message(NicknameFSM.waiting_for_nickname)
