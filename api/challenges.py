@@ -224,3 +224,13 @@ async def accept_challenge(request: Request):
             }
 
     return {"ok": False}
+
+@router.get("/api/sources")
+async def get_sources():
+    return {
+        "books": 12,
+        "audios": 8,
+        "videos": 15,
+        "documents": 9,
+        "links": 7
+    }

@@ -1,6 +1,7 @@
 import { renderChallengePath } from "./challenge_path.js"
 import { getChallenges } from "../api.js"
 import { openChallengeBook } from "./challenge_book.js"
+import { renderSourcesBlock } from "../challenges_components/sources_block.js"
 
 export async function renderChallenges(){
 
@@ -32,6 +33,7 @@ export async function renderChallenges(){
                 <div class="locked-name">${module.level_name}</div>
                 <div class="locked-stars">⭐ ${module.required_stars}</div>
             `
+
             root.appendChild(lock)
             return
         }
@@ -92,10 +94,8 @@ export async function renderChallenges(){
                 </div>
             `
 
-            // вставляем путь
             card.querySelector(".challenge-path-wrapper").appendChild(path)
 
-            // ✅ КЛИК ПО КНИГЕ (ПРАВИЛЬНЫЙ)
             const book = card.querySelector(".challenge-book-img")
 
             book.addEventListener("click", (e)=>{
@@ -106,6 +106,24 @@ export async function renderChallenges(){
             root.appendChild(card)
         })
     })
+
+    // 📚 Ресурсы для роста
+    try{
+        const sourcesResponse = await fetch("/api/sources")
+        const sourcesData = await sourcesResponse.json()
+
+        root.appendChild(renderSourcesBlock(sourcesData))
+    }catch(e){
+        root.appendChild(
+            renderSourcesBlock({
+                books: 12,
+                audios: 8,
+                videos: 15,
+                documents: 9,
+                links: 7
+            })
+        )
+    }
 }
 
 window.renderChallenges = renderChallenges
