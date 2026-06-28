@@ -108,22 +108,15 @@ export async function renderChallenges(){
     })
 
     // 📚 Ресурсы для роста
-    try{
-        const sourcesResponse = await fetch("/api/sources")
-        const sourcesData = await sourcesResponse.json()
-
-        root.appendChild(renderSourcesBlock(sourcesData))
-    }catch(e){
-        root.appendChild(
-            renderSourcesBlock({
-                books: 12,
-                audios: 8,
-                videos: 15,
-                documents: 9,
-                links: 7
-            })
-        )
-    }
+    root.appendChild(
+        renderSourcesBlock({
+            books: 12,
+            audios: 8,
+            videos: 15,
+            documents: 9,
+            links: 7
+        })
+    )
 }
 
 window.renderChallenges = renderChallenges
