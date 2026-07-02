@@ -3,6 +3,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
+import asyncio
+from collections import defaultdict
 
 from services.confirm_habit_service import habit_service
 from services.message_queue import QUEUE_CONFIRM
@@ -13,13 +15,20 @@ from core.database import get_pool
 from services.achievements.achievements_service import process_achievements_and_notify
 from services.profile_stats_service import profile_stats_service
 
-
 router = Router()
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
+
+
+# ================================
+# 🔹 Буфер альбомов Telegram
+# ================================
+MEDIA_GROUP_BUFFER = {}
+MEDIA_GROUP_LOCKS = defaultdict(asyncio.Lock)
+MEDIA_GROUP_DELAY = 1.2
 
 
 # ================================
@@ -147,6 +156,11 @@ async def cancel_media(callback: types.CallbackQuery, state: FSMContext):
 @router.message(ConfirmHabitFSM.waiting_for_media)
 async def receive_media(message: types.Message, state: FSMContext):
     data = await state.get_data()
+
+    if not data:
+        await message.answer("⚠️ Подтверждение уже обработано или отменено.")
+        return
+
     habit_id = data["habit_id"]
     reverify = data["reverify"]
     user_id = message.from_user.id
@@ -170,24 +184,92 @@ async def receive_media(message: types.Message, state: FSMContext):
         await message.answer("⚠️ Нужно фото, видео или кружочек")
         return
 
+    media_group_id = message.media_group_id
+
+    # ✅ Обычное одиночное медиа
+    if not media_group_id:
+        await clear_fsm_ui(
+            state=state,
+            bot=message.bot,
+            chat_id=message.chat.id
+        )
+
+        await QUEUE_CONFIRM.put({
+            "user_id": user_id,
+            "habit_id": habit_id,
+            "reverify": reverify,
+            "file_id": file_id,
+            "file_type": file_type,
+            "chat_id": message.chat.id,
+            "reply_to": message.message_id
+        })
+
+        await message.answer("⏳ Подтверждение принято в обработку...")
+        await state.clear()
+        return
+
+    # ✅ Альбом Telegram: несколько файлов = одно подтверждение
+    media_group_key = f"{message.chat.id}:{media_group_id}"
+
+    async with MEDIA_GROUP_LOCKS[media_group_key]:
+        if media_group_key in MEDIA_GROUP_BUFFER:
+            return
+
+        MEDIA_GROUP_BUFFER[media_group_key] = {
+            "user_id": user_id,
+            "habit_id": habit_id,
+            "reverify": reverify,
+            "file_id": file_id,
+            "file_type": file_type,
+            "chat_id": message.chat.id,
+            "reply_to": message.message_id,
+            "state": state,
+            "bot": message.bot,
+            "processed": False,
+        }
+
+        asyncio.create_task(process_media_group_confirmation(media_group_key))
+
+
+async def process_media_group_confirmation(media_group_key: str):
+    await asyncio.sleep(MEDIA_GROUP_DELAY)
+
+    data = MEDIA_GROUP_BUFFER.get(media_group_key)
+
+    if not data or data["processed"]:
+        return
+
+    data["processed"] = True
+
+    state = data["state"]
+    bot = data["bot"]
+    chat_id = data["chat_id"]
+
     await clear_fsm_ui(
         state=state,
-        bot=message.bot,
-        chat_id=message.chat.id
+        bot=bot,
+        chat_id=chat_id
     )
 
     await QUEUE_CONFIRM.put({
-        "user_id": user_id,
-        "habit_id": habit_id,
-        "reverify": reverify,
-        "file_id": file_id,
-        "file_type": file_type,
-        "chat_id": message.chat.id,
-        "reply_to": message.message_id
+        "user_id": data["user_id"],
+        "habit_id": data["habit_id"],
+        "reverify": data["reverify"],
+        "file_id": data["file_id"],
+        "file_type": data["file_type"],
+        "chat_id": chat_id,
+        "reply_to": data["reply_to"]
     })
 
-    await message.answer("⏳ Подтверждение принято в обработку...")
+    await bot.send_message(
+        chat_id,
+        "⏳ Подтверждение принято в обработку..."
+    )
+
     await state.clear()
+
+    MEDIA_GROUP_BUFFER.pop(media_group_key, None)
+    MEDIA_GROUP_LOCKS.pop(media_group_key, None)
 
 
 # ================================
