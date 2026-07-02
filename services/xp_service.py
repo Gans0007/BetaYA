@@ -64,7 +64,7 @@ async def add_xp_for_confirmation(conn, user_id: int, habit_id: int):
           AND DATE(datetime AT TIME ZONE 'Europe/Kyiv') = CURRENT_DATE
     """, user_id)
 
-    if count_today >= 3:
+    if count_today >= 5:
         return 0
 
     # ------------------------------------------
