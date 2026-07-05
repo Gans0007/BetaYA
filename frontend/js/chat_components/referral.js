@@ -10,6 +10,8 @@ export function openReferral(){
     }
 
 
+
+
     // если уже создана — просто показываем
     if(modal){
         modal.style.display = "flex"
