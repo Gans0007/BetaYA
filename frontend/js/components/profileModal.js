@@ -65,6 +65,21 @@ export function initProfileModal(){
         </div>
 
         <div class="profile-modal-content">
+<div class="profile-tabs">
+    <div class="profile-tab-bg"></div>
+
+    <div class="profile-tab active" data-tab="analytics">
+        <span>📊</span>
+        <span>Аналитика</span>
+    </div>
+
+    <div class="profile-tab" data-tab="data">
+        <span>📋</span>
+        <span>Данные</span>
+    </div>
+</div>
+
+<div class="profile-page analytics-page active">
 
             <div class="period-label">...</div>
             <div class="period-switcher">
@@ -132,10 +147,16 @@ export function initProfileModal(){
     <canvas class="graph"></canvas>
 </div>
 
+</div> <!-- Закрыли analytics-page -->
+
+<div class="profile-page data-page">
+
+</div>
+
         </div>
 
     </div>
-    `
+`
 
     document.body.appendChild(overlay)
     initInfoTooltip(PROFILE_INFO)
@@ -162,8 +183,30 @@ export function initProfileModal(){
     const options = overlay.querySelectorAll(".period-option")
     const periodLabelEl = overlay.querySelector(".period-label")
     const bg = overlay.querySelector(".switcher-bg")
+const tabs = overlay.querySelectorAll(".profile-tab")
+const tabBg = overlay.querySelector(".profile-tab-bg")
+
+const analyticsPage = overlay.querySelector(".analytics-page")
+const dataPage = overlay.querySelector(".data-page")
 
     bg.style.transform = `translateX(100%)`
+tabBg.style.transform = `translateX(0%)`
+
+tabs.forEach((tab,index)=>{
+
+    tab.addEventListener("click",()=>{
+
+        tabs.forEach(t=>t.classList.remove("active"))
+        tab.classList.add("active")
+
+        tabBg.style.transform = `translateX(${index*100}%)`
+
+        analyticsPage.classList.toggle("active", tab.dataset.tab==="analytics")
+        dataPage.classList.toggle("active", tab.dataset.tab==="data")
+
+    })
+
+})
 
     options.forEach((opt, index) => {
         opt.addEventListener("click", () => {
@@ -408,6 +451,13 @@ export function initProfileModal(){
         renderLoadingState()
 
         overlay.classList.remove("hidden")
+tabs.forEach(t=>t.classList.remove("active"))
+tabs[0].classList.add("active")
+
+tabBg.style.transform = `translateX(0%)`
+
+analyticsPage.classList.add("active")
+dataPage.classList.remove("active")
 
         setTimeout(() => {
             overlay.classList.add("active")
