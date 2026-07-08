@@ -1,6 +1,7 @@
 import { renderHeatmap } from "../components/heatmap.js"
 import { renderGraph } from "../components/graph.js"
 import { initInfoTooltip } from "../components/infoTooltip.js"
+import { getProfileDataPage } from "../components/profileDataPage.js"
 
 const AVAILABLE_AVATARS = [
     "avatar_1.png",
@@ -152,7 +153,7 @@ export function initProfileModal(){
 </div> <!-- Закрыли analytics-page -->
 
 <div class="profile-page data-page">
-
+    ${getProfileDataPage()}
 </div>
 
         </div>
