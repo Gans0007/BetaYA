@@ -1,49 +1,144 @@
-/* ---------- PROFILE TABS ---------- */
+/* =========================================
+   PROFILE TABS
+========================================= */
 
 .profile-tabs{
-    position: relative;
-    display: flex;
-    margin: 20px 24px 0;
-    padding: 6px;
-    border-radius: 18px;
-    background: var(--bg-soft);
+    position:relative;
+
+    display:flex;
+
+    margin:16px 16px 0;
+
+    padding:4px;
+
+    border-radius:18px;
+
+    background:#eef2f7;
+
+    border:1px solid #dde5f0;
+
+    flex-shrink:0;
 }
 
 .profile-tab{
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-    cursor: pointer;
-    z-index: 2;
-    font-weight: 600;
-    user-select: none;
-    transition: .25s;
-    color: var(--text-muted);
+
+    flex:1;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+
+    padding:12px 10px;
+
+    cursor:pointer;
+
+    user-select:none;
+
+    position:relative;
+    z-index:2;
+
+    font-size:15px;
+    font-weight:600;
+
+    color:#7b8699;
+
+    transition:.25s;
 }
 
 .profile-tab.active{
-    color: var(--text-main);
+
+    color:#1d2433;
 }
 
 .profile-tab-bg{
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    width: calc(50% - 6px);
-    height: calc(100% - 12px);
-    border-radius: 14px;
-    background: var(--bg-card);
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    transition: .25s;
+
+    position:absolute;
+
+    top:4px;
+    left:4px;
+
+    width:calc(50% - 4px);
+    height:calc(100% - 8px);
+
+    border-radius:14px;
+
+    background:#ffffff;
+
+    box-shadow:
+        0 3px 12px rgba(30,41,59,.08);
+
+    transition:.25s;
 }
 
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.profile-modal-content{
+
+    flex:1;
+
+    min-height:0;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+
+/* =========================================
+   PAGES
+========================================= */
+
 .profile-page{
-    display: none;
+
+    display:none;
+
+    flex:1;
+
+    width:100%;
+
+    min-height:0;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    box-sizing:border-box;
+
+    -webkit-overflow-scrolling:touch;
+
+    padding-bottom:24px;
 }
 
 .profile-page.active{
-    display: block;
+
+    display:block;
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.profile-page::-webkit-scrollbar{
+
+    width:6px;
+}
+
+.profile-page::-webkit-scrollbar-thumb{
+
+    background:#d9e0ea;
+
+    border-radius:20px;
+}
+
+.profile-page::-webkit-scrollbar-track{
+
+    background:transparent;
 }
