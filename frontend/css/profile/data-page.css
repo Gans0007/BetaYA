@@ -1,18 +1,18 @@
 /* =========================
-   DATA PAGE
+   DATA PAGE — LIGHT REFERENCE
 ========================= */
 
 .data-page{
     display:none;
     flex-direction:column;
-    gap:18px;
-    padding-bottom:20px;
+    gap:14px;
+    padding-bottom:16px;
+    background:#f8fafc;
 }
 
 .data-page.active{
     display:flex;
 }
-
 
 /* =========================
    STATS
@@ -20,234 +20,254 @@
 
 .stats-grid{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:12px;
 }
 
 .stat-card{
-    background:#20242c;
-    border:1px solid #2d333d;
-    border-radius:16px;
-    padding:14px;
-
+    min-width:0;
+    min-height:92px;
+    background:#fff;
+    border:1px solid rgba(226,232,240,.75);
+    border-radius:18px;
+    padding:14px 12px;
     display:flex;
     align-items:center;
     gap:12px;
+    box-shadow:0 10px 24px rgba(15,23,42,.06);
 }
 
 .stat-icon{
-    width:44px;
-    height:44px;
-
-    border-radius:12px;
-    background:#2b313b;
-
+    width:54px;
+    height:54px;
+    border-radius:50%;
     display:flex;
     justify-content:center;
     align-items:center;
-
-    font-size:22px;
-
-    flex-shrink:0;
+    font-size:28px;
+    flex:0 0 54px;
 }
 
+.stat-icon.green{background:#e9f8ef;color:#16a34a;}
+.stat-icon.blue{background:#e8f2ff;color:#3b82f6;}
+.stat-icon.gold{background:#fff6dc;color:#f2a900;}
+.stat-icon.orange{background:#fff0e8;color:#f97316;}
+.stat-icon.gray{background:#eef1f5;color:#9ca3af;}
+.stat-icon.purple{background:#f3e8ff;color:#9333ea;}
+
 .stat-info{
+    min-width:0;
     display:flex;
     flex-direction:column;
     gap:4px;
 }
 
 .stat-title{
-    color:#8b93a4;
-    font-size:13px;
+    color:#5f6775;
+    font-size:14px;
+    font-weight:500;
+    line-height:1.2;
 }
 
 .stat-value{
-    color:#fff;
-    font-size:16px;
-    font-weight:700;
+    color:#1f2937;
+    font-size:21px;
+    line-height:1.05;
+    font-weight:800;
+    letter-spacing:-.02em;
+    word-break:break-word;
 }
 
-.stat-value.active{
-    color:#22c55e;
+.stat-value.active,
+.stat-value.success{
+    color:#18b957;
 }
-
 
 /* =========================
    LEAGUE
 ========================= */
 
 .league-card{
-
-    background:linear-gradient(
-        135deg,
-        #262b35,
-        #1e222a
-    );
-
+    min-height:72px;
+    background:#fff;
+    border:1px solid rgba(226,232,240,.75);
     border-radius:18px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
 
-    padding:18px;
+.league-icon{
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    background:#eef1f5;
+    color:#9ca3af;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    flex-shrink:0;
+}
 
-    border:1px solid #303744;
+.league-label{
+    color:#5f6775;
+    font-size:14px;
+    font-weight:500;
+    margin-bottom:3px;
 }
 
 .league-name{
-
-    font-size:22px;
-
-    font-weight:700;
-
-    color:#fff;
-
-    margin-bottom:8px;
+    font-size:21px;
+    font-weight:800;
+    color:#1f2937;
+    line-height:1.05;
 }
 
-.league-description{
-
-    color:#9aa4b3;
-
-    line-height:1.5;
-
-    font-size:14px;
-}
-
+.league-description{display:none;}
 
 /* =========================
    ACHIEVEMENTS
 ========================= */
 
 .section-header{
-
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
+    margin:0 0 10px;
+}
 
-    margin-bottom:12px;
+.section-title{
+    color:#1f2937;
+    font-size:20px;
+    line-height:1.1;
+    font-weight:700;
 }
 
 .section-link{
-
-    color:#4ea1ff;
-
+    color:#1677d8;
     font-size:14px;
-
+    font-weight:600;
     cursor:pointer;
+    white-space:nowrap;
 }
 
 .achievements-scroll{
-
     display:flex;
-
-    gap:12px;
-
+    gap:10px;
     overflow-x:auto;
-
-    padding-bottom:6px;
-
+    padding-bottom:4px;
     scrollbar-width:none;
 }
 
-.achievements-scroll::-webkit-scrollbar{
-    display:none;
-}
+.achievements-scroll::-webkit-scrollbar{display:none;}
 
 .achievement-card{
-
-    min-width:95px;
-
-    background:#20242c;
-
-    border-radius:18px;
-
-    border:1px solid #2d333d;
-
-    padding:14px;
-
+    width:86px;
+    min-width:86px;
+    min-height:122px;
+    background:#fff;
+    border-radius:16px;
+    border:1px solid rgba(226,232,240,.9);
+    padding:12px 8px 10px;
     text-align:center;
-
     flex-shrink:0;
+    box-shadow:0 8px 18px rgba(15,23,42,.06);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
 }
 
 .achievement-icon{
-
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     font-size:34px;
-
-    margin-bottom:10px;
+    margin-bottom:8px;
 }
 
 .achievement-name{
-
-    color:white;
-
-    font-size:13px;
-
-    line-height:1.35;
+    color:#111827;
+    font-size:12px;
+    line-height:1.15;
+    font-weight:800;
+    min-height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
+.achievement-status{
+    margin-top:auto;
+    color:#16a34a;
+    font-size:12px;
+    font-weight:800;
+}
+
+.achievement-status.locked{
+    color:#8b95a3;
+}
 
 /* =========================
    PROGRESS
 ========================= */
 
 .achievement-progress{
+    background:#fff;
+    border:1px solid rgba(226,232,240,.75);
+    border-radius:18px;
+    padding:14px 16px 16px;
+    box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
 
+.progress-top{
     display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    color:#4b5563;
+    font-size:15px;
+    font-weight:600;
+}
 
-    flex-direction:column;
-
-    gap:10px;
+.progress-count{
+    color:#374151;
+    font-weight:700;
 }
 
 .progress-bar{
-
     width:100%;
-
-    height:10px;
-
-    background:#2c323d;
-
+    height:8px;
+    background:#e5e7eb;
     border-radius:999px;
-
     overflow:hidden;
 }
 
 .progress-fill{
-
     height:100%;
-
-    background:linear-gradient(
-        90deg,
-        #22c55e,
-        #5eead4
-    );
-
+    background:#18b957;
     border-radius:999px;
 }
 
-.progress-text{
-
-    color:#9aa4b3;
-
-    text-align:right;
-
-    font-size:13px;
+.profile-footer{
+    text-align:center;
+    color:#6b7280;
+    font-size:12px;
+    padding:0 0 2px;
 }
 
-
-/* =========================
-   FOOTER
-========================= */
-
-.profile-footer{
-
-    text-align:center;
-
-    color:#6d7686;
-
-    font-size:13px;
-
-    padding:8px 0 14px;
+@media (max-width:380px){
+    .data-page{gap:12px;}
+    .stats-grid{gap:10px;}
+    .stat-card{min-height:84px;padding:12px 10px;gap:10px;border-radius:16px;}
+    .stat-icon{width:48px;height:48px;flex-basis:48px;font-size:25px;}
+    .stat-title{font-size:13px;}
+    .stat-value{font-size:18px;}
+    .league-card{padding:12px 14px;}
+    .achievement-card{width:78px;min-width:78px;min-height:114px;}
+    .achievement-icon{font-size:30px;height:38px;}
+    .achievement-name,.achievement-status{font-size:11px;}
 }
