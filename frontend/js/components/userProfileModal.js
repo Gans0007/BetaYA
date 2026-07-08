@@ -26,6 +26,20 @@ export function initUserProfileModal(){
 
         <div class="profile-modal-content">
 
+<div class="profile-tabs">
+    <div class="profile-tab-bg"></div>
+
+    <div class="profile-tab active" data-tab="analytics">
+        📊 Аналитика
+    </div>
+
+    <div class="profile-tab" data-tab="data">
+        📋 Данные
+    </div>
+</div>
+
+<div class="profile-page analytics-page active">
+
             <div class="period-switcher">
                 <div class="switcher-bg"></div>
 
@@ -71,13 +85,19 @@ export function initUserProfileModal(){
             </div>
 
             <div class="profile-section">
-                <div class="section-title">Прогресс</div>
-                <canvas class="graph"></canvas>
-            </div>
+    <div class="section-title">Прогресс</div>
+    <canvas class="graph"></canvas>
+</div>
 
-        </div>
+</div>
 
-    </div>
+<div class="profile-page data-page">
+
+</div>
+
+</div>
+
+</div>
     `
 
     document.body.appendChild(userProfileOverlay)
@@ -85,6 +105,11 @@ export function initUserProfileModal(){
     const closeBtn = userProfileOverlay.querySelector(".profile-close")
     const options = userProfileOverlay.querySelectorAll(".period-option")
     const bg = userProfileOverlay.querySelector(".switcher-bg")
+const tabs = userProfileOverlay.querySelectorAll(".profile-tab")
+const tabBg = userProfileOverlay.querySelector(".profile-tab-bg")
+
+const analyticsPage = userProfileOverlay.querySelector(".analytics-page")
+const dataPage = userProfileOverlay.querySelector(".data-page")
 
     const state = {
         isOpen: false,
@@ -96,6 +121,7 @@ export function initUserProfileModal(){
     }
 
     bg.style.transform = `translateX(100%)`
+    tabBg.style.transform = `translateX(0%)`
 
     options.forEach((opt, index) => {
         opt.addEventListener("click", () => {
@@ -112,6 +138,29 @@ export function initUserProfileModal(){
             loadUserProfile()
         })
     })
+
+tabs.forEach((tab,index)=>{
+
+    tab.addEventListener("click",()=>{
+
+        tabs.forEach(t=>t.classList.remove("active"))
+        tab.classList.add("active")
+
+        tabBg.style.transform =
+            `translateX(${index*100}%)`
+
+        analyticsPage.classList.remove("active")
+        dataPage.classList.remove("active")
+
+        if(tab.dataset.tab==="analytics"){
+            analyticsPage.classList.add("active")
+        }else{
+            dataPage.classList.add("active")
+        }
+
+    })
+
+})
 
     closeBtn.addEventListener("click", closeModal)
 
@@ -333,6 +382,14 @@ export function initUserProfileModal(){
         const monthOption = userProfileOverlay.querySelector('.period-option[data-period="month"]')
         if(monthOption) monthOption.classList.add("active")
         bg.style.transform = `translateX(100%)`
+tabs.forEach(t=>t.classList.remove("active"))
+
+tabs[0].classList.add("active")
+
+tabBg.style.transform = `translateX(0%)`
+
+analyticsPage.classList.add("active")
+dataPage.classList.remove("active")
 
         userProfileOverlay.classList.remove("hidden")
 
