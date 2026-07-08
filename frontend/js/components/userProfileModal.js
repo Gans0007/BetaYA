@@ -13,6 +13,19 @@ export function initUserProfileModal(){
     userProfileOverlay.innerHTML = `
     <div class="profile-modal">
 
+<div class="profile-tabs">
+    <div class="profile-tab-bg"></div>
+
+    <div class="profile-tab active" data-tab="analytics">
+        📊 Аналитика
+    </div>
+
+    <div class="profile-tab" data-tab="data">
+        📋 Данные
+    </div>
+</div>
+
+
         <div class="profile-modal-header">
             <div class="profile-header-left">
                 <img id="external-avatar" class="profile-avatar" src="img/avatar/avatar_1.png">
@@ -25,18 +38,6 @@ export function initUserProfileModal(){
         </div>
 
         <div class="profile-modal-content">
-
-<div class="profile-tabs">
-    <div class="profile-tab-bg"></div>
-
-    <div class="profile-tab active" data-tab="analytics">
-        📊 Аналитика
-    </div>
-
-    <div class="profile-tab" data-tab="data">
-        📋 Данные
-    </div>
-</div>
 
 <div class="profile-page analytics-page active">
 
