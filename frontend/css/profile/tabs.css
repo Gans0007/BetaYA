@@ -3,7 +3,7 @@
 .profile-tabs{
     position:relative;
     display:flex;
-    margin:12px 24px 14px;
+    margin:10px 12px 12px;
     padding:5px;
     border-radius:18px;
     background:#f1f3f6;
@@ -15,12 +15,12 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:7px;
-    padding:9px 8px;
+    gap:6px;
+    padding:8px 6px;
     cursor:pointer;
     z-index:2;
-    font-size:14px;
-    font-weight:500;
+    font-size:13px;
+    font-weight:600;
     line-height:1;
     user-select:none;
     transition:.25s;
@@ -45,6 +45,9 @@
 
 .profile-page{
     display:none;
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
 }
 
 .profile-page.active{
