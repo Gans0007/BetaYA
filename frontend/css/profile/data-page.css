@@ -8,7 +8,14 @@
     gap:8px;
     padding:0 0 12px;
     color:#111827;
+
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+
     overflow-x:hidden;
+    touch-action:pan-y;
+    overscroll-behavior-x:none;
 }
 
 .data-page.active{
@@ -299,7 +306,7 @@
 @media (max-width:420px){
     .data-page{
         gap:9px;
-        padding:0 20px 14px;
+        padding:0 0 14px;
     }
 
     .stats-grid{
@@ -359,7 +366,7 @@
 
 @media (max-width:360px){
     .data-page{
-        padding:0 16px 12px;
+        padding:0 0 12px;
     }
 
     .stat-card{
