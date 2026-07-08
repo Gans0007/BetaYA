@@ -1,0 +1,253 @@
+/* =========================
+   DATA PAGE
+========================= */
+
+.data-page{
+    display:none;
+    flex-direction:column;
+    gap:18px;
+    padding-bottom:20px;
+}
+
+.data-page.active{
+    display:flex;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.stat-card{
+    background:#20242c;
+    border:1px solid #2d333d;
+    border-radius:16px;
+    padding:14px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.stat-icon{
+    width:44px;
+    height:44px;
+
+    border-radius:12px;
+    background:#2b313b;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:22px;
+
+    flex-shrink:0;
+}
+
+.stat-info{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.stat-title{
+    color:#8b93a4;
+    font-size:13px;
+}
+
+.stat-value{
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+}
+
+.stat-value.active{
+    color:#22c55e;
+}
+
+
+/* =========================
+   LEAGUE
+========================= */
+
+.league-card{
+
+    background:linear-gradient(
+        135deg,
+        #262b35,
+        #1e222a
+    );
+
+    border-radius:18px;
+
+    padding:18px;
+
+    border:1px solid #303744;
+}
+
+.league-name{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#fff;
+
+    margin-bottom:8px;
+}
+
+.league-description{
+
+    color:#9aa4b3;
+
+    line-height:1.5;
+
+    font-size:14px;
+}
+
+
+/* =========================
+   ACHIEVEMENTS
+========================= */
+
+.section-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:12px;
+}
+
+.section-link{
+
+    color:#4ea1ff;
+
+    font-size:14px;
+
+    cursor:pointer;
+}
+
+.achievements-scroll{
+
+    display:flex;
+
+    gap:12px;
+
+    overflow-x:auto;
+
+    padding-bottom:6px;
+
+    scrollbar-width:none;
+}
+
+.achievements-scroll::-webkit-scrollbar{
+    display:none;
+}
+
+.achievement-card{
+
+    min-width:95px;
+
+    background:#20242c;
+
+    border-radius:18px;
+
+    border:1px solid #2d333d;
+
+    padding:14px;
+
+    text-align:center;
+
+    flex-shrink:0;
+}
+
+.achievement-icon{
+
+    font-size:34px;
+
+    margin-bottom:10px;
+}
+
+.achievement-name{
+
+    color:white;
+
+    font-size:13px;
+
+    line-height:1.35;
+}
+
+
+/* =========================
+   PROGRESS
+========================= */
+
+.achievement-progress{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+}
+
+.progress-bar{
+
+    width:100%;
+
+    height:10px;
+
+    background:#2c323d;
+
+    border-radius:999px;
+
+    overflow:hidden;
+}
+
+.progress-fill{
+
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        #22c55e,
+        #5eead4
+    );
+
+    border-radius:999px;
+}
+
+.progress-text{
+
+    color:#9aa4b3;
+
+    text-align:right;
+
+    font-size:13px;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.profile-footer{
+
+    text-align:center;
+
+    color:#6d7686;
+
+    font-size:13px;
+
+    padding:8px 0 14px;
+}
