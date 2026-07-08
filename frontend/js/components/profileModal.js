@@ -39,6 +39,20 @@ export function initProfileModal(){
     overlay.innerHTML = `
     <div class="profile-modal">
 
+<div class="profile-tabs">
+    <div class="profile-tab-bg"></div>
+
+    <div class="profile-tab active" data-tab="analytics">
+        <span>📊</span>
+        <span>Аналитика</span>
+    </div>
+
+    <div class="profile-tab" data-tab="data">
+        <span>📋</span>
+        <span>Данные</span>
+    </div>
+</div>
+
         <div class="profile-modal-header">
             <div class="profile-header-left">
                 <div class="profile-avatar-wrap">
@@ -64,20 +78,8 @@ export function initProfileModal(){
             </div>
         </div>
 
+
         <div class="profile-modal-content">
-<div class="profile-tabs">
-    <div class="profile-tab-bg"></div>
-
-    <div class="profile-tab active" data-tab="analytics">
-        <span>📊</span>
-        <span>Аналитика</span>
-    </div>
-
-    <div class="profile-tab" data-tab="data">
-        <span>📋</span>
-        <span>Данные</span>
-    </div>
-</div>
 
 <div class="profile-page analytics-page active">
 
