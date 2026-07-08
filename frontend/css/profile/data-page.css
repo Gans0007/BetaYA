@@ -5,15 +5,9 @@
 .data-page{
     display:none;
     flex-direction:column;
-    gap:10px;
-
-    width:100%;
-    max-width:100%;
-    box-sizing:border-box;
-
-    padding:0 22px 18px;
+    gap:8px;
+    padding:0 0 12px;
     color:#111827;
-
     overflow-x:hidden;
 }
 
