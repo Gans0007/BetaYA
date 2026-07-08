@@ -1,0 +1,138 @@
+/* =======================================
+   DATA PAGE LAYOUT
+======================================= */
+
+.profile-data-page{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:24px;
+
+    padding:20px;
+
+    min-height:100%;
+
+    box-sizing:border-box;
+}
+
+
+/* =======================================
+   SECTIONS
+======================================= */
+
+.data-section{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:16px;
+}
+
+
+.data-section-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+
+.data-section-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    color:#1e293b;
+}
+
+
+/* =======================================
+   GRID
+======================================= */
+
+.data-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(0,1fr));
+
+    gap:14px;
+}
+
+
+/* =======================================
+   SCROLL
+======================================= */
+
+.achievement-scroll{
+
+    display:flex;
+
+    gap:14px;
+
+    overflow-x:auto;
+
+    overflow-y:hidden;
+
+    padding-bottom:6px;
+
+    scrollbar-width:none;
+}
+
+.achievement-scroll::-webkit-scrollbar{
+
+    display:none;
+}
+
+
+/* =======================================
+   PROGRESS
+======================================= */
+
+.achievement-progress{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+}
+
+
+/* =======================================
+   FOOTER
+======================================= */
+
+.profile-data-footer{
+
+    text-align:center;
+
+    font-size:13px;
+
+    color:#94a3b8;
+
+    padding:20px 0 40px;
+}
+
+
+/* =======================================
+   RESPONSIVE
+======================================= */
+
+@media(max-width:420px){
+
+    .profile-data-page{
+
+        padding:16px;
+    }
+
+    .data-grid{
+
+        gap:12px;
+    }
+
+}

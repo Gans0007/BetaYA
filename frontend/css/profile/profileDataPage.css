@@ -1,0 +1,248 @@
+/* =======================================
+   DATA PAGE
+======================================= */
+
+.data-page{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+
+    padding:20px;
+
+    width:100%;
+    box-sizing:border-box;
+
+    overflow-y:auto;
+}
+
+
+/* =======================================
+   STATS
+======================================= */
+
+.stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+}
+
+.stat-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+    padding:16px;
+
+    border-radius:18px;
+
+    background:#ffffff;
+
+    border:1px solid #e8ebf2;
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.05);
+}
+
+.stat-icon{
+    width:48px;
+    height:48px;
+
+    border-radius:14px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:22px;
+
+    background:#f3f6fb;
+}
+
+.stat-info{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+
+    min-width:0;
+}
+
+.stat-title{
+    font-size:13px;
+    color:#8b95a7;
+}
+
+.stat-value{
+    font-size:16px;
+    font-weight:700;
+    color:#202533;
+}
+
+.stat-value.active{
+    color:#34c759;
+}
+
+
+/* =======================================
+   SECTIONS
+======================================= */
+
+.profile-section{
+    background:#ffffff;
+
+    border-radius:20px;
+
+    padding:18px;
+
+    border:1px solid #e8ebf2;
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.05);
+}
+
+.section-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:14px;
+}
+
+.section-title{
+    font-size:18px;
+    font-weight:700;
+    color:#202533;
+}
+
+.section-link{
+    font-size:14px;
+    color:#5b84ff;
+    cursor:pointer;
+}
+
+
+/* =======================================
+   LEAGUE
+======================================= */
+
+.league-card{
+    background:#f7f9fd;
+
+    border-radius:18px;
+
+    padding:18px;
+}
+
+.league-name{
+    font-size:20px;
+    font-weight:700;
+
+    color:#202533;
+}
+
+.league-description{
+    margin-top:8px;
+
+    color:#6d7486;
+
+    line-height:1.5;
+}
+
+
+/* =======================================
+   ACHIEVEMENTS
+======================================= */
+
+.achievements-scroll{
+    display:flex;
+    gap:14px;
+
+    overflow-x:auto;
+
+    padding-bottom:4px;
+}
+
+.achievements-scroll::-webkit-scrollbar{
+    display:none;
+}
+
+.achievement-card{
+    flex:0 0 120px;
+
+    background:#f7f9fd;
+
+    border-radius:18px;
+
+    padding:16px;
+
+    text-align:center;
+}
+
+.achievement-icon{
+    font-size:34px;
+
+    margin-bottom:10px;
+}
+
+.achievement-name{
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#202533;
+
+    line-height:1.4;
+}
+
+
+/* =======================================
+   PROGRESS
+======================================= */
+
+.achievement-progress{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.progress-bar{
+    height:10px;
+
+    border-radius:999px;
+
+    background:#edf1f7;
+
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+
+    border-radius:999px;
+
+    background:#4f8cff;
+}
+
+.progress-text{
+    text-align:right;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#6d7486;
+}
+
+
+/* =======================================
+   FOOTER
+======================================= */
+
+.profile-footer{
+    text-align:center;
+
+    font-size:13px;
+
+    color:#9ba3b5;
+
+    padding:6px 0 18px;
+}

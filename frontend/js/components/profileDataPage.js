@@ -1,168 +1,342 @@
 export function getProfileDataPage() {
-
     return `
+<div class="profile-data-page">
 
-    <!-- Статистика -->
-    <div class="stats-grid">
+    <!-- ===================== -->
+    <!-- ОБЩАЯ СТАТИСТИКА -->
+    <!-- ===================== -->
 
-        <div class="stat-card">
-            <div class="stat-icon">📅</div>
-            <div class="stat-info">
-                <div class="stat-title">Регистрация</div>
-                <div class="stat-value">14 июля 2026</div>
+    <div class="data-section">
+
+        <div class="data-grid">
+
+            <div class="data-card">
+                <div class="data-card-icon">📅</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Регистрация
+                    </div>
+
+                    <div class="data-card-value registration-date">
+                        14 июля 2026
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon">💎</div>
-            <div class="stat-info">
-                <div class="stat-title">Premium</div>
-                <div class="stat-value active">Активен</div>
-            </div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-info">
-                <div class="stat-title">Привычек</div>
-                <div class="stat-value">423</div>
-            </div>
-        </div>
+            <div class="data-card">
+                <div class="data-card-icon">💎</div>
 
-        <div class="stat-card">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-info">
-                <div class="stat-title">Челленджей</div>
-                <div class="stat-value">27</div>
-            </div>
-        </div>
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Premium
+                    </div>
 
-        <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-info">
-                <div class="stat-title">Звёзд</div>
-                <div class="stat-value">1860</div>
+                    <div class="data-card-value premium-status active">
+                        Активен
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon">✔</div>
-            <div class="stat-info">
-                <div class="stat-title">Подтверждено</div>
-                <div class="stat-value">542</div>
-            </div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-info">
-                <div class="stat-title">Текущий стрик</div>
-                <div class="stat-value">18 дней</div>
-            </div>
-        </div>
+            <div class="data-card">
+                <div class="data-card-icon">✅</div>
 
-        <div class="stat-card">
-            <div class="stat-icon">👑</div>
-            <div class="stat-info">
-                <div class="stat-title">Максимальный</div>
-                <div class="stat-value">43 дня</div>
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Выполнено привычек
+                    </div>
+
+                    <div class="data-card-value habits-count">
+                        423
+                    </div>
+                </div>
             </div>
+
+
+            <div class="data-card">
+                <div class="data-card-icon">🏆</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Челленджей
+                    </div>
+
+                    <div class="data-card-value challenges-count">
+                        27
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="data-card">
+                <div class="data-card-icon">⭐</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Получено звёзд
+                    </div>
+
+                    <div class="data-card-value stars-count">
+                        1860
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="data-card">
+                <div class="data-card-icon">✔</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Подтверждений
+                    </div>
+
+                    <div class="data-card-value confirmations-count">
+                        542
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="data-card">
+                <div class="data-card-icon">🔥</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Текущий стрик
+                    </div>
+
+                    <div class="data-card-value current-streak">
+                        18 дней
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="data-card">
+                <div class="data-card-icon">👑</div>
+
+                <div class="data-card-content">
+                    <div class="data-card-title">
+                        Лучший стрик
+                    </div>
+
+                    <div class="data-card-value best-streak">
+                        43 дня
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
 
-    <div class="profile-section">
 
-        <div class="section-title">
+
+    <!-- ===================== -->
+    <!-- ЛИГА -->
+    <!-- ===================== -->
+
+    <div class="data-section">
+
+        <div class="data-section-title">
+
             🏅 Лига
+
         </div>
 
         <div class="league-card">
 
-            <div class="league-name">
-                Серебро I
+            <div class="league-header">
+
+                <div class="league-name">
+
+                    Серебро I
+
+                </div>
+
+                <div class="league-level">
+
+                    520 XP
+
+                </div>
+
+            </div>
+
+            <div class="league-progress">
+
+                <div class="league-progress-fill"></div>
+
             </div>
 
             <div class="league-description">
-                Продолжай выполнять привычки для перехода в следующую лигу.
+
+                До следующей лиги осталось совсем немного.
+                Продолжай выполнять привычки каждый день.
+
             </div>
 
         </div>
 
     </div>
 
-    <div class="profile-section">
 
-        <div class="section-header">
 
-            <div class="section-title">
+    <!-- ===================== -->
+    <!-- ДОСТИЖЕНИЯ -->
+    <!-- ===================== -->
+
+    <div class="data-section">
+
+        <div class="data-section-header">
+
+            <div class="data-section-title">
+
                 🏆 Достижения
+
             </div>
 
-            <div class="section-link">
+            <button class="view-all-button">
+
                 Все →
-            </div>
+
+            </button>
 
         </div>
 
-        <div class="achievements-scroll">
 
-            <div class="achievement-card">
-                <div class="achievement-icon">🥇</div>
-                <div class="achievement-name">
+        <div class="achievement-scroll">
+
+            <div class="achievement-item">
+
+                <div class="achievement-icon">
+
+                    🥇
+
+                </div>
+
+                <div class="achievement-title">
+
                     Первая победа
+
                 </div>
+
             </div>
 
-            <div class="achievement-card">
-                <div class="achievement-icon">🔥</div>
-                <div class="achievement-name">
+            <div class="achievement-item">
+
+                <div class="achievement-icon">
+
+                    🔥
+
+                </div>
+
+                <div class="achievement-title">
+
                     100 дней
+
                 </div>
+
             </div>
 
-            <div class="achievement-card">
-                <div class="achievement-icon">⭐</div>
-                <div class="achievement-name">
+            <div class="achievement-item">
+
+                <div class="achievement-icon">
+
+                    ⭐
+
+                </div>
+
+                <div class="achievement-title">
+
                     500 звёзд
+
                 </div>
+
             </div>
 
-            <div class="achievement-card">
-                <div class="achievement-icon">💎</div>
-                <div class="achievement-name">
-                    Мастер привычек
+            <div class="achievement-item">
+
+                <div class="achievement-icon">
+
+                    💎
+
                 </div>
+
+                <div class="achievement-title">
+
+                    Мастер
+
+                </div>
+
+            </div>
+
+            <div class="achievement-item">
+
+                <div class="achievement-icon">
+
+                    ⚡
+
+                </div>
+
+                <div class="achievement-title">
+
+                    Скорость
+
+                </div>
+
             </div>
 
         </div>
 
     </div>
 
-    <div class="profile-section">
 
-        <div class="section-title">
+
+    <!-- ===================== -->
+    <!-- ПРОГРЕСС -->
+    <!-- ===================== -->
+
+    <div class="data-section">
+
+        <div class="data-section-title">
+
             📈 Получено достижений
+
         </div>
 
         <div class="achievement-progress">
 
-            <div class="progress-bar">
-                <div class="progress-fill" style="width:20%"></div>
+            <div class="achievement-progress-bar">
+
+                <div class="achievement-progress-fill"></div>
+
             </div>
 
-            <div class="progress-text">
-                23 / 114
+            <div class="achievement-progress-text">
+
+                23 из 114
+
             </div>
 
         </div>
 
     </div>
 
-    <div class="profile-footer">
-        @LiteVAmbitionBot
+
+
+    <!-- ===================== -->
+    <!-- FOOTER -->
+    <!-- ===================== -->
+
+    <div class="profile-data-footer">
+
+        Lite Version • TrackerYA
+
     </div>
 
-    `
-
+</div>
+`;
 }
