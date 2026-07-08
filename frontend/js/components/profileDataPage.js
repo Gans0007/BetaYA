@@ -13,7 +13,6 @@ export function getProfileDataPage() {
             </div>
         </div>
 
-
         <div class="stat-card">
             <div class="stat-icon">💎</div>
             <div class="stat-info">
