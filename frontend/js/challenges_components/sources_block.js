@@ -28,15 +28,15 @@ export function renderSourcesBlock(data){
             </div>
 
             <div class="source-card purple">
-                <img src="/img/sources/documents.png">
+                <img src="/img/sources/trainings.png">
                 <div>Статьи</div>
-                <b>${data.documents}</b>
+                <b>${data.trainings}</b>
             </div>
 
             <div class="source-card orange">
-                <img src="/img/sources/links.png">
+                <img src="/img/sources/mylife.png">
                 <div>Ссылки</div>
-                <b>${data.links}</b>
+                <b>${data.mylife}</b>
             </div>
         </div>
     `
