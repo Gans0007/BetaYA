@@ -44,12 +44,12 @@ export function initProfileModal(){
     <div class="profile-tab-bg"></div>
 
     <div class="profile-tab active" data-tab="analytics">
-        <span>📊</span>
+        <span>▮▮▮</span>
         <span>Аналитика</span>
     </div>
 
     <div class="profile-tab" data-tab="data">
-        <span>📋</span>
+        <span>☰</span>
         <span>Данные</span>
     </div>
 </div>
