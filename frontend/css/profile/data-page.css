@@ -262,6 +262,18 @@ ACHIEVEMENTS
     font-weight:500;
 }
 
+.achievement-img{
+    width:58px;
+    height:58px;
+    object-fit:contain;
+    display:block;
+}
+
+.achievement-card.locked{
+    opacity:.45;
+    filter:grayscale(1);
+}
+
 /* =========================
 PROGRESS
 ========================= */

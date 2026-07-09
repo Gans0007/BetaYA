@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
 from services.xp_service import LEAGUES, get_league_by_name
+from data.achievements_data import ALL_ACHIEVEMENTS
 
 router = APIRouter()
 
@@ -515,6 +516,39 @@ async def get_profile_data(request: Request):
     else:
         joined_at = "—"
 
+    current_streak = row["current_streak"] or 0
+
+    all_achievements = []
+
+    for category_items in ALL_ACHIEVEMENTS.values():
+        for achievement in category_items:
+
+            unlocked = False
+
+            if achievement["condition_type"] == "streak":
+                unlocked = current_streak >= achievement["condition_value"]
+
+            all_achievements.append({
+                "code": achievement["code"],
+                "category": achievement["category"],
+                "title": achievement["title"],
+                "description": achievement["description"],
+                "icon": achievement.get("icon"),
+                "image": achievement.get("image"),
+                "condition_type": achievement["condition_type"],
+                "condition_value": achievement["condition_value"],
+                "xp_reward": achievement.get("xp_reward", 0),
+                "usdt_reward": achievement.get("usdt_reward", 0),
+                "unlocked": unlocked
+            })
+
+    achievements_received = sum(
+        1 for achievement in all_achievements
+        if achievement["unlocked"]
+    )
+
+    achievements_total = len(all_achievements)
+
     return {
         "status": "ok",
         "data": {
@@ -527,6 +561,10 @@ async def get_profile_data(request: Request):
             "total_confirmed_days": row["total_confirmed_days"],
             "current_streak": row["current_streak"],
             "max_streak": row["max_streak"],
-            "league": row["league"]
+            "league": row["league"],
+
+            "achievements": all_achievements,
+            "achievements_received": achievements_received,
+            "achievements_total": achievements_total
         }
     }
