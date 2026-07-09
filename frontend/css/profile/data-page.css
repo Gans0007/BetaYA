@@ -1,18 +1,16 @@
 /* =========================
-   DATA PAGE — REFERENCE COMPACT
+DATA PAGE — LIKE REFERENCE
 ========================= */
 
 .data-page{
     display:none;
     flex-direction:column;
-    gap:8px;
-    padding:0 0 12px;
+    gap:10px;
+    padding:0 0 10px;
     color:#111827;
-
     width:100%;
     max-width:100%;
     box-sizing:border-box;
-
     overflow-x:hidden;
     touch-action:pan-y;
     overscroll-behavior-x:none;
@@ -23,48 +21,49 @@
 }
 
 /* =========================
-   STATS
+STATS
 ========================= */
 
 .stats-grid{
     width:100%;
     display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px 12px;
+}
+
+.stat-card,
+.league-card,
+.achievement-progress{
+    background:#ffffff;
+    border:1px solid rgba(17,24,39,.06);
+    box-shadow:0 8px 20px rgba(17,24,39,.055);
 }
 
 .stat-card{
     width:100%;
     min-width:0;
-    min-height:66px;
+    min-height:68px;
     box-sizing:border-box;
-
-    background:#ffffff;
-    border:1px solid rgba(17,24,39,.06);
-    border-radius:15px;
-
+    border-radius:16px;
     padding:10px 12px;
 
     display:flex;
     align-items:center;
-    gap:11px;
-
-    box-shadow:0 8px 22px rgba(17,24,39,.06);
+    gap:12px;
 }
 
 .stat-icon{
-    width:42px;
-    height:42px;
-    min-width:42px;
-
+    width:44px;
+    height:44px;
+    min-width:44px;
     border-radius:50%;
-    background:#eef8f2;
+    background:#eef9f3;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    font-size:20px;
+    font-size:22px;
     line-height:1;
 }
 
@@ -72,15 +71,14 @@
     min-width:0;
     display:flex;
     flex-direction:column;
-    gap:3px;
+    gap:4px;
 }
 
 .stat-title{
     color:#6b7280;
-    font-size:12px;
+    font-size:13px;
     font-weight:400;
-    line-height:1.1;
-
+    line-height:1.05;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -88,55 +86,82 @@
 
 .stat-value{
     color:#1f2937;
-    font-size:17px;
+    font-size:19px;
     font-weight:700;
-    line-height:1.1;
-
+    line-height:1.05;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
 }
 
+.stat-value.green,
 .stat-value.active,
 .stat-card .active{
     color:#16a34a;
 }
 
+/* individual soft icon backgrounds */
+.stat-card:nth-child(1) .stat-icon,
+.stat-card:nth-child(3) .stat-icon,
+.stat-card:nth-child(6) .stat-icon{ background:#eaf8f0; }
+.stat-card:nth-child(2) .stat-icon{ background:#eaf4ff; }
+.stat-card:nth-child(4) .stat-icon,
+.stat-card:nth-child(5) .stat-icon,
+.stat-card:nth-child(8) .stat-icon{ background:#fff7dc; }
+.stat-card:nth-child(7) .stat-icon{ background:#fff0ea; }
+
 /* =========================
-   LEAGUE
+LEAGUE — ONE SOLID BLOCK
 ========================= */
 
 .league-card{
     width:100%;
-    min-height:78px;
+    min-height:72px;
     box-sizing:border-box;
-
-    background:#ffffff;
-    border:1px solid rgba(17,24,39,.06);
-    border-radius:15px;
-
-    padding:14px 16px;
+    border-radius:16px;
+    padding:12px 14px;
 
     display:flex;
-    flex-direction:column;
-    justify-content:center;
-
-    box-shadow:0 8px 22px rgba(17,24,39,.06);
+    align-items:center;
+    gap:13px;
 }
 
-.league-card h3,
+.league-icon{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    border-radius:50%;
+    background:#f0f1f5;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:22px;
+    line-height:1;
+    filter:grayscale(1);
+    opacity:.9;
+}
+
+.league-info{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
 .league-title{
-    margin:0 0 4px;
-    color:#4b5563;
-    font-size:15px;
-    font-weight:500;
-    line-height:1.1;
+    margin:0;
+    color:#6b7280;
+    font-size:13px;
+    font-weight:400;
+    line-height:1.05;
 }
 
 .league-name{
     margin:0;
-    color:#111827;
-    font-size:22px;
+    color:#1f2937;
+    font-size:20px;
     font-weight:700;
     line-height:1.05;
 }
@@ -146,7 +171,7 @@
 }
 
 /* =========================
-   SECTIONS
+ACHIEVEMENTS
 ========================= */
 
 .section-header{
@@ -154,15 +179,14 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-
-    margin:6px 0 2px;
+    margin:0 0 0;
 }
 
 .section-header h3,
 .section-title{
     margin:0;
     color:#374151;
-    font-size:17px;
+    font-size:16px;
     font-weight:500;
     line-height:1.1;
 }
@@ -175,18 +199,12 @@
     cursor:pointer;
 }
 
-/* =========================
-   ACHIEVEMENTS
-========================= */
-
 .achievements-scroll{
     width:100%;
     display:flex;
     gap:8px;
-
     overflow-x:auto;
     padding:0 0 2px;
-
     scrollbar-width:none;
 }
 
@@ -195,32 +213,30 @@
 }
 
 .achievement-card{
-    min-width:74px;
-    max-width:74px;
-    min-height:100px;
+    min-width:75px;
+    max-width:75px;
+    min-height:104px;
     box-sizing:border-box;
 
     background:#ffffff;
     border:1px solid rgba(17,24,39,.06);
     border-radius:13px;
-
-    padding:10px 6px 8px;
+    padding:9px 6px 8px;
 
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:flex-start;
-
     text-align:center;
     flex-shrink:0;
 
-    box-shadow:0 7px 18px rgba(17,24,39,.06);
+    box-shadow:0 7px 18px rgba(17,24,39,.055);
 }
 
 .achievement-icon{
-    font-size:30px;
+    font-size:31px;
     line-height:1;
-    margin-bottom:8px;
+    margin-bottom:7px;
 }
 
 .achievement-name{
@@ -230,37 +246,32 @@
     line-height:1.1;
 }
 
-.achievement-card .received,
-.achievement-card .success,
 .achievement-status{
     display:block;
     margin-top:auto;
-
     color:#16a34a;
     font-size:10px;
     font-weight:600;
     line-height:1.1;
 }
 
+.achievement-status.locked{
+    color:#8b9098;
+    font-weight:500;
+}
+
 /* =========================
-   PROGRESS
+PROGRESS
 ========================= */
 
 .achievement-progress{
     width:100%;
     box-sizing:border-box;
-
-    background:#ffffff;
-    border:1px solid rgba(17,24,39,.06);
     border-radius:14px;
-
     padding:12px 14px;
-
     display:flex;
     flex-direction:column;
-    gap:9px;
-
-    box-shadow:0 7px 18px rgba(17,24,39,.06);
+    gap:10px;
 }
 
 .progress-text{
@@ -268,7 +279,6 @@
     font-size:14px;
     font-weight:400;
     line-height:1;
-
     display:flex;
     justify-content:space-between;
 }
@@ -276,7 +286,6 @@
 .progress-bar{
     width:100%;
     height:7px;
-
     background:#e5e7eb;
     border-radius:999px;
     overflow:hidden;
@@ -288,25 +297,17 @@
     border-radius:999px;
 }
 
-/* =========================
-   FOOTER
-========================= */
-
 .profile-footer{
     text-align:center;
     color:#6b7280;
     font-size:11px;
-    padding:4px 0 0;
+    padding:2px 0 0;
 }
-
-/* =========================
-   SMALL SCREENS
-========================= */
 
 @media (max-width:420px){
     .data-page{
         gap:9px;
-        padding:0 0 14px;
+        padding-bottom:8px;
     }
 
     .stats-grid{
@@ -320,39 +321,43 @@
         border-radius:14px;
     }
 
-    .stat-icon{
+    .stat-icon,
+    .league-icon{
         width:38px;
         height:38px;
         min-width:38px;
         font-size:18px;
     }
 
-    .stat-title{
+    .stat-title,
+    .league-title{
         font-size:11px;
     }
 
     .stat-value{
-        font-size:15px;
+        font-size:16px;
     }
 
     .league-card{
-        min-height:70px;
-        padding:12px 14px;
+        min-height:62px;
+        padding:10px 12px;
+        gap:10px;
+        border-radius:14px;
     }
 
     .league-name{
-        font-size:20px;
+        font-size:18px;
     }
 
     .section-header h3,
     .section-title{
-        font-size:16px;
+        font-size:15px;
     }
 
     .achievement-card{
         min-width:68px;
         max-width:68px;
-        min-height:92px;
+        min-height:94px;
     }
 
     .achievement-icon{
@@ -366,7 +371,7 @@
 
 @media (max-width:360px){
     .data-page{
-        padding:0 0 12px;
+        gap:8px;
     }
 
     .stat-card{
@@ -375,18 +380,24 @@
         gap:7px;
     }
 
-    .stat-icon{
+    .stat-icon,
+    .league-icon{
         width:34px;
         height:34px;
         min-width:34px;
         font-size:16px;
     }
 
-    .stat-title{
+    .stat-title,
+    .league-title{
         font-size:10px;
     }
 
     .stat-value{
         font-size:14px;
+    }
+
+    .league-name{
+        font-size:16px;
     }
 }
