@@ -37,9 +37,9 @@ export function getProfileDataPage() {
         </div>
 
         <div class="stat-card">
-            <div class="stat-icon">⭐</div>
+            <div class="stat-icon">ХР</div>
             <div class="stat-info">
-                <div class="stat-title">Звезды</div>
+                <div class="stat-title">Опыт</div>
                 <div class="stat-value active">1860</div>
             </div>
         </div>
