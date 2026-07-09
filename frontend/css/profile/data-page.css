@@ -110,16 +110,6 @@ STATS
     color:#16a34a;
 }
 
-/* individual soft icon backgrounds */
-.stat-card:nth-child(1) .stat-icon,
-.stat-card:nth-child(3) .stat-icon,
-.stat-card:nth-child(6) .stat-icon{ background:#eaf8f0; }
-.stat-card:nth-child(2) .stat-icon{ background:#eaf4ff; }
-.stat-card:nth-child(4) .stat-icon,
-.stat-card:nth-child(5) .stat-icon,
-.stat-card:nth-child(8) .stat-icon{ background:#fff7dc; }
-.stat-card:nth-child(7) .stat-icon{ background:#fff0ea; }
-
 /* =========================
 LEAGUE — ONE SOLID BLOCK
 ========================= */

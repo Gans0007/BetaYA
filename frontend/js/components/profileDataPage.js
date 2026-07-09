@@ -4,20 +4,20 @@ export function getProfileDataPage() {
     return `
     <div class="stats-grid">
 
-        ${statCard("img/data/3.png", "Зарегистрирован", "—", "profile-joined-at", "registration")}
-        ${statCard("img/data/4.png", "Premium", "—", "profile-premium", "active")}
-        ${statCard("img/data/5.png", "Привычки", "0", "profile-finished-habits", "active")}
-        ${statCard("img/data/6.png", "Челленджи", "0", "profile-finished-challenges", "active")}
-        ${statCard("img/data/7.png", "Опыт", "0", "profile-xp", "active")}
-        ${statCard("img/data/8.png", "Подтвержденные дни", "0", "profile-confirmed-days", "active")}
-        ${statCard("img/data/9.png", "Текущий стрик", "0 дней", "profile-current-streak", "active")}
-        ${statCard("img/data/1.png", "Максимальный стрик", "0 дней", "profile-max-streak", "active")}
+        ${statCard("img/data/1.png", "Зарегистрирован", "—", "profile-joined-at", "registration")}
+        ${statCard("img/data/2.png", "Premium", "—", "profile-premium", "active")}
+        ${statCard("img/data/3.png", "Привычки", "0", "profile-finished-habits", "active")}
+        ${statCard("img/data/4.png", "Челленджи", "0", "profile-finished-challenges", "active")}
+        ${statCard("img/data/5.png", "Опыт", "0", "profile-xp", "active")}
+        ${statCard("img/data/6.png", "Подтвержденные дни", "0", "profile-confirmed-days", "active")}
+        ${statCard("img/data/7.png", "Текущий стрик", "0 дней", "profile-current-streak", "active")}
+        ${statCard("img/data/8.png", "Максимальный стрик", "0 дней", "profile-max-streak", "active")}
 
     </div>
 
     <div class="league-card">
         <div class="league-icon">
-        <img src="img/data/2.png" alt="Лига" class="league-icon-img"></div>
+        <img src="img/data/9.png" alt="Лига" class="league-icon-img"></div>
         <div class="league-info">
             <div class="league-title">Лига</div>
             <div class="league-name" id="profile-league">—</div>
