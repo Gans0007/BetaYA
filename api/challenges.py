@@ -228,9 +228,9 @@ async def accept_challenge(request: Request):
 @router.get("/api/sources")
 async def get_sources():
     return {
-        "books": 12,
-        "audios": 8,
-        "videos": 15,
-        "documents": 9,
-        "links": 7
+        "books": 6,
+        "audios": 19,
+        "videos": 49,
+        "trainings": 3,
+        "mylife": 45
     }

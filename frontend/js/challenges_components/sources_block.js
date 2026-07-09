@@ -29,13 +29,13 @@ export function renderSourcesBlock(data){
 
             <div class="source-card purple">
                 <img src="/img/sources/trainings.png">
-                <div>Статьи</div>
+                <div>Тренировки</div>
                 <b>${data.trainings}</b>
             </div>
 
             <div class="source-card orange">
                 <img src="/img/sources/mylife.png">
-                <div>Ссылки</div>
+                <div>Жизнь</div>
                 <b>${data.mylife}</b>
             </div>
         </div>
