@@ -1,6 +1,6 @@
 import { renderHeatmap } from "../components/heatmap.js"
 import { renderGraph } from "../components/graph.js"
-import { getProfileDataPage } from "../components/profileDataPage.js"
+import { getUserProfileDataPage, renderUserProfileDataPage } from "../components/userProfileDataPage.js"
 
 let userProfileOverlay = null
 
@@ -96,7 +96,7 @@ export function initUserProfileModal(){
 
 </div>
         <div class="profile-page data-page">
-            ${getProfileDataPage()}
+            ${getUserProfileDataPage()}
         </div>
 
 </div>
@@ -307,6 +307,7 @@ tabs.forEach((tab,index)=>{
 
         renderHeatmap(heatmapContainer, data.heatmap || [])
         renderGraph(graphCanvas, data.graph || [])
+        renderUserProfileDataPage(data.data || data.user)
     }
 
     async function loadUserProfile(){
