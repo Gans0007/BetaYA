@@ -8,7 +8,7 @@ export function getProfileDataPage() {
             <div class="stat-icon">🗓️</div>
             <div class="stat-info">
                 <div class="stat-title">Зарегистрирован</div>
-                <div class="stat-value">14 июля 2026</div>
+                <div class="stat-value registration">14 июля 2026</div>
             </div>
         </div>
 

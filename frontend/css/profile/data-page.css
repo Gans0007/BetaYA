@@ -94,6 +94,12 @@ STATS
     text-overflow:ellipsis;
 }
 
+.stat-value.registration{
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:-0.2px;
+}
+
 .stat-value.green,
 .stat-value.active,
 .stat-card .active{
