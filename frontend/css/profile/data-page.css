@@ -353,20 +353,6 @@ PROGRESS
     .section-title{
         font-size:15px;
     }
-
-    .achievement-card{
-        min-width:68px;
-        max-width:68px;
-        min-height:94px;
-    }
-
-    .achievement-icon{
-        font-size:27px;
-    }
-
-    .achievement-name{
-        font-size:10px;
-    }
 }
 
 @media (max-width:360px){
