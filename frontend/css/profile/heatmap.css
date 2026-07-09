@@ -2,131 +2,123 @@
 WRAPPER
 ========================= */
 
-.heatmap-wrapper {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
+.heatmap-wrapper{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    column-gap:8px;
+    align-items:start;
+
+    max-width:100%;
+    overflow:hidden;
 }
 
 /* =========================
 ДНИ НЕДЕЛИ
 ========================= */
 
-.heatmap-days {
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    padding-top:2px;
+.heatmap-days{
+    display:grid;
+    grid-template-rows:repeat(7, 14px);
+    row-gap:4px;
 }
 
 .heatmap-day-label{
-    width:18px;
-    height:12px;
+    height:14px;
+    line-height:14px;
 
     display:flex;
     align-items:center;
     justify-content:flex-end;
 
-    line-height:12px;
     font-size:10px;
-    opacity: 0.5;
+    color:#6b7280;
+    opacity:1;
 }
 
 /* =========================
 GRID
 ========================= */
 
-.heatmap-grid {
-    display: flex;
-    gap: 4px;
+.heatmap-grid{
+    display:flex;
+    gap:4px;
 
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
 
-    padding-bottom: 6px;
+    padding-bottom:0;
+    scrollbar-width:none;
 }
 
-.heatmap-wrapper {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-
-    max-width: 100%;
-    overflow: hidden;
+.heatmap-grid::-webkit-scrollbar{
+    display:none;
 }
 
-.heatmap-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.heatmap-col{
+    display:grid;
+    grid-template-rows:repeat(7, 14px);
+    row-gap:4px;
 }
 
-.heatmap-cell {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-    background: #2a2d35;
-    transition: 0.2s;
+.heatmap-cell{
+    width:14px;
+    height:14px;
+    box-sizing:border-box;
+
+    border-radius:4px;
+    background:transparent;
+    border:1px solid rgba(0,0,0,.08);
+
+    opacity:1;
+    transition:.2s;
 }
 
-.heatmap-cell:hover {
-    transform: scale(1.2);
+.heatmap-cell:hover{
+    transform:scale(1.15);
 }
 
 /* =========================
-LIGHT THEME — HEATMAP FIX
+ПУСТЫЕ ДНИ
 ========================= */
 
-.heatmap-cell {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    opacity: 1;
-}
-
-/* пустые / неподтверждённые дни */
 .heatmap-cell.empty,
-.heatmap-cell.lvl-0 {
-    background: transparent !important;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    opacity: 1;
+.heatmap-cell.lvl-0{
+    background:transparent !important;
+    border:1px solid rgba(0,0,0,.08);
+    opacity:1;
 }
 
 /* дни не из текущего месяца */
+
 .heatmap-cell.out-month,
 .heatmap-cell.other-month,
-.heatmap-cell.muted {
-    background: transparent !important;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    opacity: 0.35;
+.heatmap-cell.muted{
+    background:transparent !important;
+    border:1px solid rgba(0,0,0,.04);
+    opacity:.35;
 }
 
-.lvl-0 { background: #2a2d35; }
-.lvl-1 { background: #0e4429; }
-.lvl-2 { background: #006d32; }
-.lvl-3 { background: #26a641; }
-.lvl-4 { background: #39d353; }
-.heatmap-cell.empty {
-    opacity: 0.2;
+/* =========================
+УРОВНИ АКТИВНОСТИ
+========================= */
+
+.heatmap-cell.lvl-1{
+    background:#d8f5df !important;
+    border-color:transparent;
 }
 
-/* подтверждения */
-.heatmap-cell.lvl-1 {
-    background: #d8f5df !important;
-    border-color: transparent;
+.heatmap-cell.lvl-2{
+    background:#8ee8a3 !important;
+    border-color:transparent;
 }
 
-.heatmap-cell.lvl-2 {
-    background: #8ee8a3 !important;
-    border-color: transparent;
+.heatmap-cell.lvl-3{
+    background:#34c759 !important;
+    border-color:transparent;
 }
 
-.heatmap-cell.lvl-3 {
-    background: #34c759 !important;
-    border-color: transparent;
-}
-
-.heatmap-cell.lvl-4 {
-    background: #128a36 !important;
-    border-color: transparent;
+.heatmap-cell.lvl-4{
+    background:#128a36 !important;
+    border-color:transparent;
 }
