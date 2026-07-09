@@ -7,7 +7,7 @@ SECTIONS
     border:1px solid rgba(17,24,39,.06);
     border-radius:16px;
     padding:12px 14px;
-    margin:0;
+    margin:10;
     box-shadow:0 8px 22px rgba(17,24,39,.05);
 }
 

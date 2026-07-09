@@ -13,16 +13,22 @@ WRAPPER
 ========================= */
 
 .heatmap-days {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; 
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding-top:2px;
 }
 
-.heatmap-day-label {
-    height: 12px;
-    display: flex;
-    align-items: center;
-    font-size: 10px;
+.heatmap-day-label{
+    width:18px;
+    height:12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    line-height:12px;
+    font-size:10px;
     opacity: 0.5;
 }
 
