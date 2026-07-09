@@ -436,3 +436,64 @@ async def view_profile(request: Request):
         "graph": graph,
         "is_view_only": True
     }
+
+@router.post("/api/profile/data")
+async def get_profile_data(request: Request):
+
+    try:
+        data = await request.json()
+    except:
+        data = {}
+
+    init_data = data.get("initData")
+
+    if not init_data:
+        return {"status": "error", "message": "missing_init_data"}
+
+    user_id = validate_telegram_data(init_data)
+    pool = await get_pool()
+
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("""
+        SELECT
+            u.joined_at,
+            COALESCE(u.has_access, false) AS has_access,
+
+            COALESCE(s.finished_habits, 0) AS finished_habits,
+            COALESCE(s.finished_challenges, 0) AS finished_challenges,
+            COALESCE(s.xp, 0)::int AS xp,
+            COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+            COALESCE(s.current_streak, 0) AS current_streak,
+            COALESCE(s.max_streak, 0) AS max_streak,
+            COALESCE(s.league, 'Бронза I') AS league
+
+        FROM users u
+        LEFT JOIN user_stats s ON u.user_id = s.user_id
+        WHERE u.user_id = $1
+        """, user_id)
+
+    if not row:
+        return {"status": "error", "message": "user_not_found"}
+
+    joined_at = row["joined_at"]
+
+    if joined_at:
+        joined_at = joined_at.strftime("%d.%m.%Y")
+    else:
+        joined_at = "—"
+
+    return {
+        "status": "ok",
+        "data": {
+            "joined_at": joined_at,
+            "has_access": bool(row["has_access"]),
+
+            "finished_habits": row["finished_habits"],
+            "finished_challenges": row["finished_challenges"],
+            "xp": row["xp"],
+            "total_confirmed_days": row["total_confirmed_days"],
+            "current_streak": row["current_streak"],
+            "max_streak": row["max_streak"],
+            "league": row["league"]
+        }
+    }

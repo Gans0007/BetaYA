@@ -1,72 +1,17 @@
 export function getProfileDataPage() {
+    setTimeout(loadProfileDataPageData, 0);
 
     return `
-
     <div class="stats-grid">
 
-        <div class="stat-card">
-            <div class="stat-icon">🗓️</div>
-            <div class="stat-info">
-                <div class="stat-title">Зарегистрирован</div>
-                <div class="stat-value registration">14 июля 2026</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">💎</div>
-            <div class="stat-info">
-                <div class="stat-title">Premium</div>
-                <div class="stat-value active">Активен</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-info">
-                <div class="stat-title">Привычки</div>
-                <div class="stat-value active">423</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-info">
-                <div class="stat-title">Челленджи</div>
-                <div class="stat-value active">27</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">ХР</div>
-            <div class="stat-info">
-                <div class="stat-title">Опыт</div>
-                <div class="stat-value active">1860</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">✅</div>
-            <div class="stat-info">
-                <div class="stat-title">Подтвержденные дни</div>
-                <div class="stat-value active">542</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">🔥</div>
-            <div class="stat-info">
-                <div class="stat-title">Текущий стрик</div>
-                <div class="stat-value active">18 дней</div>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">👑</div>
-            <div class="stat-info">
-                <div class="stat-title">Максимальный стрик</div>
-                <div class="stat-value active">43 дня</div>
-            </div>
-        </div>
+        ${statCard("🗓️", "Зарегистрирован", "—", "profile-joined-at", "registration")}
+        ${statCard("💎", "Premium", "—", "profile-premium", "active")}
+        ${statCard("✅", "Привычки", "0", "profile-finished-habits", "active")}
+        ${statCard("🏆", "Челленджи", "0", "profile-finished-challenges", "active")}
+        ${statCard("ХР", "Опыт", "0", "profile-xp", "active")}
+        ${statCard("✅", "Подтвержденные дни", "0", "profile-confirmed-days", "active")}
+        ${statCard("🔥", "Текущий стрик", "0 дней", "profile-current-streak", "active")}
+        ${statCard("👑", "Максимальный стрик", "0 дней", "profile-max-streak", "active")}
 
     </div>
 
@@ -74,7 +19,7 @@ export function getProfileDataPage() {
         <div class="league-icon">🏅</div>
         <div class="league-info">
             <div class="league-title">Лига</div>
-            <div class="league-name">Серебро I</div>
+            <div class="league-name" id="profile-league">—</div>
         </div>
     </div>
 
@@ -99,7 +44,7 @@ export function getProfileDataPage() {
 
         <div class="achievement-card">
             <div class="achievement-icon">⭐</div>
-            <div class="achievement-name">500 звезд</div>
+            <div class="achievement-name">500 XP</div>
             <div class="achievement-status">Получено</div>
         </div>
 
@@ -131,7 +76,102 @@ export function getProfileDataPage() {
     <div class="profile-footer">
         @LiteVAmbitionBot
     </div>
+    `;
+}
 
-    `
+function statCard(icon, title, value, id, valueClass = "") {
+    return `
+    <div class="stat-card">
+        <div class="stat-icon">${icon}</div>
+        <div class="stat-info">
+            <div class="stat-title">${title}</div>
+            <div class="stat-value ${valueClass}" id="${id}">${value}</div>
+        </div>
+    </div>
+    `;
+}
 
+async function loadProfileDataPageData() {
+    try {
+        const initData = window.Telegram?.WebApp?.initData;
+
+        if (!initData) {
+            console.warn("Telegram initData не найден");
+            return;
+        }
+
+        const response = await fetch("/api/profile/data", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                initData: initData
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result || result.status !== "ok" || !result.data) {
+            console.warn("Ошибка загрузки данных профиля:", result);
+            return;
+        }
+
+        const data = result.data;
+
+        setText("profile-joined-at", data.joined_at || "—");
+
+        setText(
+            "profile-premium",
+            data.has_access ? "Активен" : "Нет"
+        );
+
+        setText("profile-finished-habits", data.finished_habits ?? 0);
+        setText("profile-finished-challenges", data.finished_challenges ?? 0);
+        setText("profile-xp", data.xp ?? 0);
+        setText("profile-confirmed-days", data.total_confirmed_days ?? 0);
+
+        setText(
+            "profile-current-streak",
+            `${data.current_streak ?? 0} ${getDaysWord(data.current_streak ?? 0)}`
+        );
+
+        setText(
+            "profile-max-streak",
+            `${data.max_streak ?? 0} ${getDaysWord(data.max_streak ?? 0)}`
+        );
+
+        setText("profile-league", data.league || "Бронза I");
+
+    } catch (error) {
+        console.error("Ошибка profileDataPage:", error);
+    }
+}
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+
+    if (el) {
+        el.textContent = value;
+    }
+}
+
+function getDaysWord(number) {
+    number = Math.abs(number) % 100;
+
+    const lastDigit = number % 10;
+
+    if (number > 10 && number < 20) {
+        return "дней";
+    }
+
+    if (lastDigit === 1) {
+        return "день";
+    }
+
+    if (lastDigit >= 2 && lastDigit <= 4) {
+        return "дня";
+    }
+
+    return "дней";
 }
