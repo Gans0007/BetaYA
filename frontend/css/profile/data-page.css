@@ -213,15 +213,15 @@ ACHIEVEMENTS
 }
 
 .achievement-card{
-    min-width:75px;
-    max-width:75px;
-    min-height:104px;
+    min-width:110px;
+    max-width:110px;
+    min-height:150px;
     box-sizing:border-box;
 
     background:#ffffff;
     border:1px solid rgba(17,24,39,.06);
-    border-radius:13px;
-    padding:9px 6px 8px;
+    border-radius:16px;
+    padding:14px 10px 12px;
 
     display:flex;
     flex-direction:column;
@@ -234,14 +234,14 @@ ACHIEVEMENTS
 }
 
 .achievement-icon{
-    font-size:31px;
+    font-size:44px;
     line-height:1;
-    margin-bottom:7px;
+    margin-bottom:12px;
 }
 
 .achievement-name{
     color:#111827;
-    font-size:11px;
+    font-size:14px;
     font-weight:600;
     line-height:1.1;
 }
@@ -250,7 +250,7 @@ ACHIEVEMENTS
     display:block;
     margin-top:auto;
     color:#16a34a;
-    font-size:10px;
+    font-size:12px;
     font-weight:600;
     line-height:1.1;
 }
