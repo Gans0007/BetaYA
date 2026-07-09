@@ -274,9 +274,9 @@ async def view_profile(request: Request):
         start_date = today.replace(day=1)
 
         if today.month == 12:
-            next_month = today.replace(year=today.year+1, month=1, day=1)
+            next_month = today.replace(year=today.year + 1, month=1, day=1)
         else:
-            next_month = today.replace(month=today.month+1, day=1)
+            next_month = today.replace(month=today.month + 1, day=1)
 
         end_date = next_month - timedelta(days=1)
 
@@ -284,19 +284,23 @@ async def view_profile(request: Request):
         start_date = today.replace(month=1, day=1)
         end_date = today.replace(month=12, day=31)
 
-    else:
-        start_date = today - timedelta(days=6)
-        end_date = today 
-
     async with pool.acquire() as conn:
 
         user_row = await conn.fetchrow("""
         SELECT
-            COALESCE(s.current_streak, 0) as current_streak,
-            COALESCE(s.xp, 0)::float as xp,
-            COALESCE(s.league, 'Бронза I') as league,
-            COALESCE(u.nickname, u.username, u.first_name, 'Player') as nickname,
-            COALESCE(u.avatar, 'avatar_1.png') as avatar
+            u.joined_at,
+            COALESCE(u.has_access, false) AS has_access,
+
+            COALESCE(s.current_streak, 0) AS current_streak,
+            COALESCE(s.max_streak, 0) AS max_streak,
+            COALESCE(s.xp, 0)::float AS xp,
+            COALESCE(s.finished_habits, 0) AS finished_habits,
+            COALESCE(s.finished_challenges, 0) AS finished_challenges,
+            COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
+            COALESCE(s.league, 'Бронза I') AS league,
+
+            COALESCE(u.nickname, u.username, u.first_name, 'Player') AS nickname,
+            COALESCE(u.avatar, 'avatar_1.png') AS avatar
         FROM users u
         LEFT JOIN user_stats s ON u.user_id = s.user_id
         WHERE u.user_id = $1
@@ -315,6 +319,17 @@ async def view_profile(request: Request):
                     "xp_next": 100,
                     "xp_percent": 0
                 },
+                "data": {
+                    "joined_at": "—",
+                    "has_access": False,
+                    "finished_habits": 0,
+                    "finished_challenges": 0,
+                    "xp": 0,
+                    "total_confirmed_days": 0,
+                    "current_streak": 0,
+                    "max_streak": 0,
+                    "league": "Бронза I"
+                },
                 "behavior": {
                     "completed": 0,
                     "missed": 0,
@@ -325,7 +340,6 @@ async def view_profile(request: Request):
                 "is_view_only": True
             }
 
-        # 🔥 НОВАЯ ЛОГИКА — ВСЕ ПРИВЫЧКИ
         habits = await conn.fetch("""
         SELECT id, created_at, completed_at
         FROM habits
@@ -333,7 +347,7 @@ async def view_profile(request: Request):
         """, target_user_id)
 
         confirmations_rows = await conn.fetch("""
-        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
+        SELECT DATE(datetime) AS day, COUNT(DISTINCT habit_id) AS done_count
         FROM confirmations
         WHERE user_id = $1
         AND datetime >= $2
@@ -396,7 +410,7 @@ async def view_profile(request: Request):
         index = int((completed / total) * 100)
 
     xp_user = float(user_row["xp"] or 0)
-    current_league = user_row["league"]
+    current_league = user_row["league"] or "Бронза I"
 
     idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
 
@@ -415,6 +429,13 @@ async def view_profile(request: Request):
 
     league_obj = get_league_by_name(current_league) or LEAGUES[0]
 
+    joined_at = user_row["joined_at"]
+
+    if joined_at:
+        joined_at = joined_at.strftime("%d.%m.%Y")
+    else:
+        joined_at = "—"
+
     return {
         "user": {
             "nickname": user_row["nickname"],
@@ -426,6 +447,18 @@ async def view_profile(request: Request):
             "xp_current": int(xp_user),
             "xp_next": int(next_xp_need),
             "xp_percent": xp_percent
+        },
+        "data": {
+            "joined_at": joined_at,
+            "has_access": bool(user_row["has_access"]),
+
+            "finished_habits": user_row["finished_habits"],
+            "finished_challenges": user_row["finished_challenges"],
+            "xp": int(xp_user),
+            "total_confirmed_days": user_row["total_confirmed_days"],
+            "current_streak": user_row["current_streak"],
+            "max_streak": user_row["max_streak"],
+            "league": current_league
         },
         "behavior": {
             "completed": completed,
