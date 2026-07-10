@@ -110,11 +110,11 @@ export async function renderChallenges(){
     // 📚 Ресурсы для роста
     root.appendChild(
         renderSourcesBlock({
-            books: 12,
-            audios: 8,
-            videos: 15,
-            trainings: 9,
-            mylife: 7
+            books: 6,
+            audios: 19,
+            videos: 49,
+            trainings: 3,
+            mylife: 45
         })
     )
 }

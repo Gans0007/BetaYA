@@ -4,7 +4,6 @@ export function renderSourcesBlock(data){
 
     div.innerHTML = `
         <div class="sources-title">
-            <img src="/img/sources/resources.png">
             <span>Ресурсы для роста</span>
         </div>
 
