@@ -1,32 +1,44 @@
+/* =========================
+SOURCES / CLOSED CHANNEL
+========================= */
+
 .sources-section{
-    margin:22px 0 18px;
+    width:100%;
+    margin:18px 0 16px;
+    padding:14px 14px 12px;
+    box-sizing:border-box;
+
+    background:rgba(255,255,255,.96);
+    border:1px solid rgba(0,0,0,.04);
+    border-radius:24px;
+
+    box-shadow:0 8px 28px rgba(0,0,0,.07);
 }
 
 .sources-title{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:0 6px 12px;
-    font-size:22px;
-    font-weight:800;
-    color:#111;
-}
+    margin:0 0 12px;
+    text-align:center;
 
-.sources-title img{
-    width:24px;
-    height:24px;
-    object-fit:contain;
+    font-size:22px;
+    line-height:1.02;
+    font-weight:900;
+    color:#111;
 }
 
 .sources-grid{
     display:grid;
-    grid-template-columns:repeat(5, 1fr);
-    gap:8px;
+    grid-template-columns:repeat(5, minmax(0, 1fr));
+    gap:6px;
 }
 
 .source-card{
-    height:84px;
-    border-radius:18px;
+    min-width:0;
+    height:92px;
+    padding:8px 2px;
+    box-sizing:border-box;
+
+    border-radius:16px;
+
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -35,21 +47,28 @@
 }
 
 .source-card img{
-    width:26px;
-    height:26px;
+    width:27px;
+    height:27px;
     object-fit:contain;
 }
 
-.source-card div{
-    font-size:12px;
+.source-card span{
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+
+    text-align:center;
+    font-size:11px;
+    line-height:1.1;
     color:#111;
-    line-height:1;
 }
 
 .source-card b{
     font-size:18px;
-    color:#111;
     line-height:1;
+    font-weight:800;
+    color:#111;
 }
 
 .source-card.blue{ background:#eefaff; }
@@ -57,3 +76,143 @@
 .source-card.yellow{ background:#fff8e7; }
 .source-card.purple{ background:#f4f0ff; }
 .source-card.orange{ background:#fff0eb; }
+
+.sources-description{
+    margin:11px 0 8px;
+    text-align:center;
+
+    font-size:11px;
+    line-height:1.35;
+    color:#777;
+}
+
+.sources-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    margin:8px 0 10px;
+}
+
+.sources-divider span{
+    height:1px;
+    flex:1;
+    background:#e7e7e7;
+}
+
+.sources-divider b{
+    font-size:11px;
+    line-height:1;
+    color:#e4a400;
+}
+
+.sources-access-title{
+    margin-bottom:9px;
+    text-align:center;
+
+    font-size:14px;
+    line-height:1.2;
+    font-weight:800;
+    color:#171717;
+}
+
+.sources-benefits{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.source-benefit{
+    display:grid;
+    grid-template-columns:18px minmax(0, 1fr);
+    gap:8px;
+    align-items:start;
+}
+
+.source-benefit-mark{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:18px;
+    line-height:1;
+    font-weight:800;
+    color:#e0a000;
+}
+
+.source-benefit b{
+    display:block;
+    margin:0 0 1px;
+
+    font-size:13px;
+    line-height:1.15;
+    font-weight:800;
+    color:#171717;
+}
+
+.source-benefit p{
+    margin:0;
+
+    font-size:10.5px;
+    line-height:1.25;
+    color:#777;
+}
+
+.sources-join-button{
+    width:100%;
+    min-height:44px;
+    margin-top:12px;
+    padding:0 12px;
+
+    border:0;
+    border-radius:8px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    background:linear-gradient(180deg, #efa900 0%, #d99000 100%);
+    box-shadow:0 5px 14px rgba(214,143,0,.25);
+
+    color:#fff;
+    font-size:14px;
+    line-height:1;
+    font-weight:700;
+
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+
+.sources-join-button:active{
+    transform:scale(.985);
+}
+
+@media (max-width:360px){
+    .sources-section{
+        padding-left:10px;
+        padding-right:10px;
+    }
+
+    .sources-grid{
+        gap:4px;
+    }
+
+    .source-card{
+        height:86px;
+        border-radius:14px;
+    }
+
+    .source-card img{
+        width:24px;
+        height:24px;
+    }
+
+    .source-card span{
+        font-size:10px;
+    }
+
+    .source-card b{
+        font-size:17px;
+    }
+}
