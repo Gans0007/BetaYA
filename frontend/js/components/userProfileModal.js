@@ -1,8 +1,15 @@
-import { renderHeatmap } from "../components/heatmap.js"
-import { renderGraph } from "../components/graph.js"
-import { getUserProfileDataPage, renderUserProfileDataPage } from "../components/userProfileDataPage.js"
+import { renderHeatmap } from “../components/heatmap.js” import {
+renderGraph } from “../components/graph.js” import { initInfoTooltip }
+from “../components/infoTooltip.js” import { getUserProfileDataPage,
+renderUserProfileDataPage } from “../components/userProfileDataPage.js”
 
 let userProfileOverlay = null
+
+const PROFILE_INFO = { donut: “Показывает сколько привычек пользователь
+выполнил и сколько пропустил за выбранный период.”, gauge: “Индекс
+дисциплины рассчитывается на основе выполнения привычек.”, heatmap:
+“Активность пользователя по дням. Чем ярче — тем больше выполнено.”,
+graph: “Динамика прогресса пользователя со временем.” }
 
 export function initUserProfileModal(){
 
@@ -14,106 +21,150 @@ export function initUserProfileModal(){
     userProfileOverlay.innerHTML = `
     <div class="profile-modal">
 
-<div class="profile-tabs">
-    <div class="profile-tab-bg"></div>
+        <div class="profile-tabs">
+            <div class="profile-tab-bg"></div>
 
-    <div class="profile-tab active" data-tab="analytics">
-        📊 Аналитика
-    </div>
+            <div class="profile-tab active" data-tab="analytics">
+                <span>▮▮▮</span>
+                <span>Аналитика</span>
+            </div>
 
-    <div class="profile-tab" data-tab="data">
-        📋 Данные
-    </div>
-</div>
-
+            <div class="profile-tab" data-tab="data">
+                <span>☰</span>
+                <span>Данные</span>
+            </div>
+        </div>
 
         <div class="profile-modal-header">
             <div class="profile-header-left">
-                <img id="external-avatar" class="profile-avatar" src="img/avatar/avatar_1.png">
+                <div class="profile-avatar-wrap">
+                    <img
+                        id="external-avatar"
+                        class="profile-avatar"
+                        src="img/avatar/avatar_1.png"
+                        alt="Аватар"
+                    >
+                </div>
+
                 <div>
                     <div class="profile-name">...</div>
                     <div class="profile-sub">...</div>
                 </div>
             </div>
+
             <div class="profile-close">✕</div>
         </div>
 
         <div class="profile-modal-content">
 
-<div class="profile-page analytics-page active">
+            <div class="profile-page analytics-page active">
 
-            <div class="period-switcher">
-                <div class="switcher-bg"></div>
+                <div class="period-label">...</div>
 
-                <div class="period-option" data-period="week">Еженедельно</div>
-                <div class="period-option active" data-period="month">Ежемесячно</div>
-                <div class="period-option" data-period="year">Ежегодно</div>
-            </div>
+                <div class="period-switcher">
+                    <div class="switcher-bg"></div>
 
-            <div class="behavior-block">
+                    <div class="period-option" data-period="week">
+                        Еженедельно
+                    </div>
 
-                <div class="behavior-card">
-                    <div class="donut"></div>
+                    <div class="period-option active" data-period="month">
+                        Ежемесячно
+                    </div>
 
-                    <div class="donut-legend">
-                        <div class="legend-item green">
-                            <span></span> Выполнено: <b class="completed-val">0</b>
-                        </div>
-                        <div class="legend-item red">
-                            <span></span> Пропущено: <b class="missed-val">0</b>
-                        </div>
+                    <div class="period-option" data-period="year">
+                        Ежегодно
                     </div>
                 </div>
 
-                <div class="behavior-card">
-                    <div class="gauge">
-                        <div class="gauge-semicircle">
-                            <div class="gauge-arc"></div>
-                            <div class="gauge-pointer"></div>
+                <div class="behavior-block">
+
+                    <div class="behavior-card">
+                        <div class="card-header">
+                            <div class="section-title">Выполнение</div>
+                            <div class="info-btn" data-info="donut">i</div>
                         </div>
 
-                        <div class="gauge-info">
-                            <div class="gauge-value" data-value="0">0</div>
-                            <div class="gauge-label">Нейтрально</div>
+                        <div class="donut"></div>
+
+                        <div class="donut-legend">
+                            <div class="legend-item green">
+                                <span></span>
+                                Выполнено:
+                                <b class="completed-val">0</b>
+                            </div>
+
+                            <div class="legend-item red">
+                                <span></span>
+                                Пропущено:
+                                <b class="missed-val">0</b>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="behavior-card">
+                        <div class="card-header">
+                            <div class="section-title">Индекс</div>
+                            <div class="info-btn" data-info="gauge">i</div>
+                        </div>
+
+                        <div class="gauge">
+                            <div class="gauge-semicircle">
+                                <div class="gauge-arc"></div>
+                                <div class="gauge-pointer"></div>
+                            </div>
+
+                            <div class="gauge-info">
+                                <div class="gauge-value" data-value="0">0</div>
+                                <div class="gauge-label">Нейтрально</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="profile-section">
+                    <div class="card-header">
+                        <div class="section-title">Активность</div>
+                        <div class="info-btn" data-info="heatmap">i</div>
+                    </div>
+
+                    <div class="heatmap"></div>
+                </div>
+
+                <div class="profile-section">
+                    <div class="card-header">
+                        <div class="section-title">Прогресс</div>
+                        <div class="info-btn" data-info="graph">i</div>
+                    </div>
+
+                    <canvas class="graph"></canvas>
                 </div>
 
             </div>
 
-            <div class="profile-section">
-                <div class="section-title">Активность</div>
-                <div class="heatmap"></div>
+            <div class="profile-page data-page">
+                ${getUserProfileDataPage()}
             </div>
 
-            <div class="profile-section">
-    <div class="section-title">Прогресс</div>
-    <canvas class="graph"></canvas>
-</div>
-
-</div>
-
-
-</div>
-        <div class="profile-page data-page">
-            ${getUserProfileDataPage()}
         </div>
 
-</div>
-
-</div>
+    </div>
     `
 
     document.body.appendChild(userProfileOverlay)
+    initInfoTooltip(PROFILE_INFO)
 
     const closeBtn = userProfileOverlay.querySelector(".profile-close")
     const options = userProfileOverlay.querySelectorAll(".period-option")
     const bg = userProfileOverlay.querySelector(".switcher-bg")
-const tabs = userProfileOverlay.querySelectorAll(".profile-tab")
-const tabBg = userProfileOverlay.querySelector(".profile-tab-bg")
 
-const analyticsPage = userProfileOverlay.querySelector(".analytics-page")
-const dataPage = userProfileOverlay.querySelector(".data-page")
+    const tabs = userProfileOverlay.querySelectorAll(".profile-tab")
+    const tabBg = userProfileOverlay.querySelector(".profile-tab-bg")
+
+    const analyticsPage = userProfileOverlay.querySelector(".analytics-page")
+    const dataPage = userProfileOverlay.querySelector(".data-page")
+    const modalContent = userProfileOverlay.querySelector(".profile-modal-content")
 
     const state = {
         isOpen: false,
@@ -124,8 +175,8 @@ const dataPage = userProfileOverlay.querySelector(".data-page")
         cache: {}
     }
 
-    bg.style.transform = `translateX(100%)`
-    tabBg.style.transform = `translateX(0%)`
+    bg.style.transform = "translateX(100%)"
+    tabBg.style.transform = "translateX(0%)"
 
     options.forEach((opt, index) => {
         opt.addEventListener("click", () => {
@@ -133,7 +184,7 @@ const dataPage = userProfileOverlay.querySelector(".data-page")
             if(!state.userId) return
             if(state.range === opt.dataset.period && state.isOpen) return
 
-            options.forEach(o => o.classList.remove("active"))
+            options.forEach(item => item.classList.remove("active"))
             opt.classList.add("active")
 
             state.range = opt.dataset.period
@@ -143,39 +194,40 @@ const dataPage = userProfileOverlay.querySelector(".data-page")
         })
     })
 
-tabs.forEach((tab,index)=>{
+    tabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => {
 
-    tab.addEventListener("click",()=>{
+            tabs.forEach(item => item.classList.remove("active"))
+            tab.classList.add("active")
 
-        tabs.forEach(t=>t.classList.remove("active"))
-        tab.classList.add("active")
+            tabBg.style.transform = `translateX(${index * 100}%)`
 
-        tabBg.style.transform =
-            `translateX(${index*100}%)`
+            analyticsPage.classList.toggle(
+                "active",
+                tab.dataset.tab === "analytics"
+            )
 
-        analyticsPage.classList.remove("active")
-        dataPage.classList.remove("active")
+            dataPage.classList.toggle(
+                "active",
+                tab.dataset.tab === "data"
+            )
 
-        if(tab.dataset.tab==="analytics"){
-            analyticsPage.classList.add("active")
-        }else{
-            dataPage.classList.add("active")
-        }
-
+            if(modalContent){
+                modalContent.scrollTop = 0
+            }
+        })
     })
-
-})
 
     closeBtn.addEventListener("click", closeModal)
 
-    userProfileOverlay.addEventListener("click", (e) => {
-        if(e.target === userProfileOverlay){
+    userProfileOverlay.addEventListener("click", (event) => {
+        if(event.target === userProfileOverlay){
             closeModal()
         }
     })
 
-    document.addEventListener("keydown", (e) => {
-        if(e.key === "Escape" && state.isOpen){
+    document.addEventListener("keydown", (event) => {
+        if(event.key === "Escape" && state.isOpen){
             closeModal()
         }
     })
@@ -203,6 +255,7 @@ tabs.forEach((tab,index)=>{
         const pointer = userProfileOverlay.querySelector(".gauge-pointer")
         const valueEl = userProfileOverlay.querySelector(".gauge-value")
         const labelEl = userProfileOverlay.querySelector(".gauge-label")
+        const periodLabelEl = userProfileOverlay.querySelector(".period-label")
 
         nameEl.innerText = "Загрузка..."
         subEl.innerText = "..."
@@ -213,6 +266,7 @@ tabs.forEach((tab,index)=>{
         valueEl.innerText = "..."
         valueEl.dataset.value = "0"
         labelEl.innerText = "Загрузка..."
+        periodLabelEl.innerText = "..."
 
         valueEl.style.color = ""
         donut.style.background = "conic-gradient(#2a2d35 0% 100%)"
@@ -228,6 +282,7 @@ tabs.forEach((tab,index)=>{
         const pointer = userProfileOverlay.querySelector(".gauge-pointer")
         const valueEl = userProfileOverlay.querySelector(".gauge-value")
         const labelEl = userProfileOverlay.querySelector(".gauge-label")
+        const periodLabelEl = userProfileOverlay.querySelector(".period-label")
 
         nameEl.innerText = "Ошибка"
         subEl.innerText = "Не удалось загрузить"
@@ -237,7 +292,9 @@ tabs.forEach((tab,index)=>{
         valueEl.innerText = "0"
         valueEl.dataset.value = "0"
         labelEl.innerText = "Ошибка загрузки"
+        periodLabelEl.innerText = "—"
 
+        valueEl.style.color = ""
         donut.style.background = "conic-gradient(#2a2d35 0% 100%)"
         pointer.style.transform = "translateX(-50%) rotate(-90deg)"
     }
@@ -258,6 +315,7 @@ tabs.forEach((tab,index)=>{
 
         const heatmapContainer = userProfileOverlay.querySelector(".heatmap")
         const graphCanvas = userProfileOverlay.querySelector(".graph")
+        const periodLabelEl = userProfileOverlay.querySelector(".period-label")
 
         if(!data || !data.user || !data.behavior){
             renderErrorState()
@@ -287,27 +345,41 @@ tabs.forEach((tab,index)=>{
 
         pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`
 
-        const prev = Number(valueEl.dataset.value || 0)
+        const previousValue = Number(valueEl.dataset.value || 0)
         valueEl.dataset.value = String(safeIndex)
-        animateValue(valueEl, prev, safeIndex)
+        animateValue(valueEl, previousValue, safeIndex)
 
-        if(safeIndex < 40) valueEl.style.color = "#ef4444"
-        else if(safeIndex < 60) valueEl.style.color = "#facc15"
-        else valueEl.style.color = "#22c55e"
+        if(safeIndex < 40){
+            valueEl.style.color = "#ef4444"
+        }else if(safeIndex < 60){
+            valueEl.style.color = "#facc15"
+        }else{
+            valueEl.style.color = "#22c55e"
+        }
 
         let label = "Баланс"
 
-        if(safeIndex < 20) label = "Критическая лень"
-        else if(safeIndex < 40) label = "Лень"
-        else if(safeIndex < 60) label = "Баланс"
-        else if(safeIndex < 80) label = "Настойчивость"
-        else label = "Жесткая дисциплина"
+        if(safeIndex < 20){
+            label = "Критическая лень"
+        }else if(safeIndex < 40){
+            label = "Лень"
+        }else if(safeIndex < 60){
+            label = "Баланс"
+        }else if(safeIndex < 80){
+            label = "Настойчивость"
+        }else{
+            label = "Жесткая дисциплина"
+        }
 
         labelEl.innerText = label
 
         renderHeatmap(heatmapContainer, data.heatmap || [])
         renderGraph(graphCanvas, data.graph || [])
-        renderUserProfileDataPage(data.data || data.user)
+        renderUserProfileDataPage(data.data || {})
+
+        if(periodLabelEl){
+            periodLabelEl.innerText = data.period_label || ""
+        }
     }
 
     async function loadUserProfile(){
@@ -315,42 +387,31 @@ tabs.forEach((tab,index)=>{
 
         const cacheKey = `${state.userId}_${state.range}`
 
-        // ⚡ если есть кеш — используем сразу
         if(state.cache[cacheKey]){
             renderUserProfile(state.cache[cacheKey])
             return
         }
-
-        if(!state.userId || state.isLoading) return
 
         state.isLoading = true
         state.requestId += 1
 
         const currentRequestId = state.requestId
 
-        if(!state.cache[cacheKey]){
-            renderLoadingState()
-        }
+        renderLoadingState()
 
         try{
-            const res = await fetch("/api/profile/view", {
+            const response = await fetch("/api/profile/view", {
                 method: "POST",
-                headers: { "Content-Type":"application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({
                     user_id: state.userId,
                     range: state.range
                 })
             })
 
-            const data = await res.json()
-
-            if(data && data.user && data.behavior){
-                state.cache[cacheKey] = data
-            }
-
-            if(Object.keys(state.cache).length > 50){
-                state.cache = {}
-            }
+            const data = await response.json()
 
             if(currentRequestId !== state.requestId) return
 
@@ -359,10 +420,18 @@ tabs.forEach((tab,index)=>{
                 return
             }
 
+            state.cache[cacheKey] = data
+
+            if(Object.keys(state.cache).length > 50){
+                state.cache = {
+                    [cacheKey]: data
+                }
+            }
+
             renderUserProfile(data)
 
-        }catch(err){
-            console.error("User profile load error:", err)
+        }catch(error){
+            console.error("User profile load error:", error)
 
             if(currentRequestId === state.requestId){
                 renderErrorState()
@@ -383,18 +452,29 @@ tabs.forEach((tab,index)=>{
         state.isOpen = true
         state.isLoading = false
 
-        options.forEach(o => o.classList.remove("active"))
-        const monthOption = userProfileOverlay.querySelector('.period-option[data-period="month"]')
-        if(monthOption) monthOption.classList.add("active")
-        bg.style.transform = `translateX(100%)`
-tabs.forEach(t=>t.classList.remove("active"))
+        options.forEach(item => item.classList.remove("active"))
 
-tabs[0].classList.add("active")
+        const monthOption = userProfileOverlay.querySelector(
+            '.period-option[data-period="month"]'
+        )
 
-tabBg.style.transform = `translateX(0%)`
+        if(monthOption){
+            monthOption.classList.add("active")
+        }
 
-analyticsPage.classList.add("active")
-dataPage.classList.remove("active")
+        bg.style.transform = "translateX(100%)"
+
+        tabs.forEach(item => item.classList.remove("active"))
+        tabs[0].classList.add("active")
+
+        tabBg.style.transform = "translateX(0%)"
+
+        analyticsPage.classList.add("active")
+        dataPage.classList.remove("active")
+
+        if(modalContent){
+            modalContent.scrollTop = 0
+        }
 
         userProfileOverlay.classList.remove("hidden")
 
@@ -406,6 +486,7 @@ dataPage.classList.remove("active")
 
         await loadUserProfile()
     }
+
 }
 
 export async function openUserProfile(userId){
@@ -417,23 +498,33 @@ export async function openUserProfile(userId){
     if(!userProfileOverlay || !userProfileOverlay._openProfile) return
 
     await userProfileOverlay._openProfile(userId)
+
 }
 
-function animateValue(el, start, end, duration = 500){
+function animateValue(element, start, end, duration = 500){
 
     if(start === end){
-        el.innerText = end
+        element.innerText = end
         return
     }
 
     let startTime = null
 
     function step(timestamp){
-        if(!startTime) startTime = timestamp
-        const progress = Math.min((timestamp - startTime) / duration, 1)
+        if(!startTime){
+            startTime = timestamp
+        }
 
-        const value = Math.floor(progress * (end - start) + start)
-        el.innerText = value
+        const progress = Math.min(
+            (timestamp - startTime) / duration,
+            1
+        )
+
+        const value = Math.floor(
+            progress * (end - start) + start
+        )
+
+        element.innerText = value
 
         if(progress < 1){
             requestAnimationFrame(step)
@@ -441,4 +532,5 @@ function animateValue(el, start, end, duration = 500){
     }
 
     requestAnimationFrame(step)
+
 }
