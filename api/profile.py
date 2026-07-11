@@ -275,9 +275,16 @@ async def view_profile(request: Request):
         start_date = today.replace(day=1)
 
         if today.month == 12:
-            next_month = today.replace(year=today.year + 1, month=1, day=1)
+            next_month = today.replace(
+                year=today.year + 1,
+                month=1,
+                day=1
+            )
         else:
-            next_month = today.replace(month=today.month + 1, day=1)
+            next_month = today.replace(
+                month=today.month + 1,
+                day=1
+            )
 
         end_date = next_month - timedelta(days=1)
 
@@ -300,10 +307,23 @@ async def view_profile(request: Request):
             COALESCE(s.total_confirmed_days, 0) AS total_confirmed_days,
             COALESCE(s.league, 'Бронза I') AS league,
 
-            COALESCE(u.nickname, u.username, u.first_name, 'Player') AS nickname,
-            COALESCE(u.avatar, 'avatar_1.png') AS avatar
+            COALESCE(
+                u.nickname,
+                u.username,
+                u.first_name,
+                'Player'
+            ) AS nickname,
+
+            COALESCE(
+                u.avatar,
+                'avatar_1.png'
+            ) AS avatar
+
         FROM users u
-        LEFT JOIN user_stats s ON u.user_id = s.user_id
+
+        LEFT JOIN user_stats s
+            ON u.user_id = s.user_id
+
         WHERE u.user_id = $1
         """, target_user_id)
 
@@ -329,7 +349,10 @@ async def view_profile(request: Request):
                     "total_confirmed_days": 0,
                     "current_streak": 0,
                     "max_streak": 0,
-                    "league": "Бронза I"
+                    "league": "Бронза I",
+                    "achievements": [],
+                    "achievements_received": 0,
+                    "achievements_total": 0
                 },
                 "behavior": {
                     "completed": 0,
@@ -342,13 +365,18 @@ async def view_profile(request: Request):
             }
 
         habits = await conn.fetch("""
-        SELECT id, created_at, completed_at
+        SELECT
+            id,
+            created_at,
+            completed_at
         FROM habits
         WHERE user_id = $1
         """, target_user_id)
 
         confirmations_rows = await conn.fetch("""
-        SELECT DATE(datetime) AS day, COUNT(DISTINCT habit_id) AS done_count
+        SELECT
+            DATE(datetime) AS day,
+            COUNT(DISTINCT habit_id) AS done_count
         FROM confirmations
         WHERE user_id = $1
         AND datetime >= $2
@@ -356,7 +384,10 @@ async def view_profile(request: Request):
         GROUP BY DATE(datetime)
         """, target_user_id, start_date, end_date)
 
-        day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
+        day_counts = {
+            row["day"]: row["done_count"]
+            for row in confirmations_rows
+        }
 
         completed = 0
         missed = 0
@@ -369,7 +400,13 @@ async def view_profile(request: Request):
 
         def habit_exists_on_day(habit, day):
             start = habit["created_at"].date()
-            end = habit["completed_at"].date() if habit["completed_at"] else today
+
+            end = (
+                habit["completed_at"].date()
+                if habit["completed_at"]
+                else today
+            )
+
             return start <= day <= end
 
         while d <= end_date:
@@ -377,7 +414,9 @@ async def view_profile(request: Request):
             done = day_counts.get(d, 0)
 
             active_today = sum(
-                1 for h in habits if habit_exists_on_day(h, d)
+                1
+                for habit in habits
+                if habit_exists_on_day(habit, d)
             )
 
             if d <= real_end_date:
@@ -390,7 +429,10 @@ async def view_profile(request: Request):
             })
 
             if active_today > 0:
-                day_score = done - max(0, active_today - done)
+                day_score = (
+                    done -
+                    max(0, active_today - done)
+                )
             else:
                 day_score = 0
 
@@ -408,12 +450,24 @@ async def view_profile(request: Request):
     total = completed + missed
 
     if total > 0:
-        index = int((completed / total) * 100)
+        index = int(
+            (completed / total) * 100
+        )
 
     xp_user = float(user_row["xp"] or 0)
-    current_league = user_row["league"] or "Бронза I"
+    current_league = (
+        user_row["league"]
+        or "Бронза I"
+    )
 
-    idx = next((i for i, l in enumerate(LEAGUES) if l["name"] == current_league), 0)
+    idx = next(
+        (
+            i
+            for i, league in enumerate(LEAGUES)
+            if league["name"] == current_league
+        ),
+        0
+    )
 
     current_xp_need = LEAGUES[idx]["xp"]
 
@@ -425,10 +479,21 @@ async def view_profile(request: Request):
     xp_progress = xp_user - current_xp_need
     xp_range = next_xp_need - current_xp_need
 
-    xp_percent = int((xp_progress / xp_range) * 100) if xp_range > 0 else 100
-    xp_percent = max(0, min(100, xp_percent))
+    xp_percent = (
+        int((xp_progress / xp_range) * 100)
+        if xp_range > 0
+        else 100
+    )
 
-    league_obj = get_league_by_name(current_league) or LEAGUES[0]
+    xp_percent = max(
+        0,
+        min(100, xp_percent)
+    )
+
+    league_obj = (
+        get_league_by_name(current_league)
+        or LEAGUES[0]
+    )
 
     joined_at = user_row["joined_at"]
 
@@ -436,6 +501,55 @@ async def view_profile(request: Request):
         joined_at = joined_at.strftime("%d.%m.%Y")
     else:
         joined_at = "—"
+
+    current_streak = (
+        user_row["current_streak"]
+        or 0
+    )
+
+    all_achievements = []
+
+    for category_items in ALL_ACHIEVEMENTS.values():
+
+        for achievement in category_items:
+
+            unlocked = False
+
+            if achievement["condition_type"] == "streak":
+                unlocked = (
+                    current_streak
+                    >= achievement["condition_value"]
+                )
+
+            all_achievements.append({
+                "code": achievement["code"],
+                "category": achievement["category"],
+                "title": achievement["title"],
+                "description": achievement["description"],
+                "icon": achievement.get("icon"),
+                "image": achievement.get("image"),
+                "condition_type": achievement["condition_type"],
+                "condition_value": achievement["condition_value"],
+                "xp_reward": achievement.get(
+                    "xp_reward",
+                    0
+                ),
+                "usdt_reward": achievement.get(
+                    "usdt_reward",
+                    0
+                ),
+                "unlocked": unlocked
+            })
+
+    achievements_received = sum(
+        1
+        for achievement in all_achievements
+        if achievement["unlocked"]
+    )
+
+    achievements_total = len(
+        all_achievements
+    )
 
     return {
         "user": {
@@ -449,23 +563,52 @@ async def view_profile(request: Request):
             "xp_next": int(next_xp_need),
             "xp_percent": xp_percent
         },
+
         "data": {
             "joined_at": joined_at,
-            "has_access": bool(user_row["has_access"]),
+            "has_access": bool(
+                user_row["has_access"]
+            ),
 
-            "finished_habits": user_row["finished_habits"],
-            "finished_challenges": user_row["finished_challenges"],
+            "finished_habits": user_row[
+                "finished_habits"
+            ],
+
+            "finished_challenges": user_row[
+                "finished_challenges"
+            ],
+
             "xp": int(xp_user),
-            "total_confirmed_days": user_row["total_confirmed_days"],
-            "current_streak": user_row["current_streak"],
-            "max_streak": user_row["max_streak"],
-            "league": current_league
+
+            "total_confirmed_days": user_row[
+                "total_confirmed_days"
+            ],
+
+            "current_streak": user_row[
+                "current_streak"
+            ],
+
+            "max_streak": user_row[
+                "max_streak"
+            ],
+
+            "league": current_league,
+
+            "achievements": all_achievements,
+
+            "achievements_received":
+                achievements_received,
+
+            "achievements_total":
+                achievements_total
         },
+
         "behavior": {
             "completed": completed,
             "missed": missed,
             "index": index
         },
+
         "heatmap": heatmap,
         "graph": graph,
         "is_view_only": True
