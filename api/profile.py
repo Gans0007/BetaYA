@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
@@ -34,7 +35,23 @@ async def get_profile(request: Request):
     user_id = validate_telegram_data(init_data)
     pool = await get_pool()
 
-    today = datetime.now().date()
+    async with pool.acquire() as conn:
+        user_timezone = await conn.fetchval("""
+            SELECT COALESCE(timezone, 'Europe/Kyiv')
+            FROM users
+            WHERE user_id = $1
+        """, user_id)
+
+    user_timezone = user_timezone or "Europe/Kyiv"
+
+    try:
+        user_tz = ZoneInfo(user_timezone)
+    except Exception:
+        user_timezone = "Europe/Kyiv"
+        user_tz = ZoneInfo(user_timezone)
+
+    now_local = datetime.now(user_tz)
+    today = now_local.date()
 
     if range_type == "week":
         start_date = today - timedelta(days=today.weekday())
@@ -44,19 +61,45 @@ async def get_profile(request: Request):
         start_date = today.replace(day=1)
 
         if today.month == 12:
-            next_month = today.replace(year=today.year + 1, month=1, day=1)
+            next_month = today.replace(
+                year=today.year + 1,
+                month=1,
+                day=1
+            )
         else:
-            next_month = today.replace(month=today.month + 1, day=1)
+            next_month = today.replace(
+                month=today.month + 1,
+                day=1
+            )
 
         end_date = next_month - timedelta(days=1)
-
+ 
     elif range_type == "year":
-        start_date = today.replace(month=1, day=1)
-        end_date = today.replace(month=12, day=31)
+        start_date = today.replace(
+            month=1,
+            day=1
+        )
+
+        end_date = today.replace(
+            month=12,
+            day=31
+        )
 
     else:
-        start_date = today - timedelta(days=6)
+        start_date = today
         end_date = today
+
+    start_datetime = datetime.combine(
+        start_date,
+        datetime.min.time(),
+        tzinfo=user_tz
+    )
+
+    end_datetime_exclusive = datetime.combine(
+        end_date + timedelta(days=1),
+        datetime.min.time(),
+        tzinfo=user_tz
+    )  
 
     async with pool.acquire() as conn:
 
@@ -79,13 +122,21 @@ async def get_profile(request: Request):
         """, user_id)
 
         confirmations_rows = await conn.fetch("""
-        SELECT DATE(datetime) as day, COUNT(DISTINCT habit_id) as done_count
-        FROM confirmations
-        WHERE user_id = $1
-        AND datetime >= $2
-        AND datetime <= $3
-        GROUP BY DATE(datetime)
-        """, user_id, start_date, end_date)
+            SELECT
+                DATE(datetime AT TIME ZONE $4) AS day,
+                COUNT(DISTINCT habit_id) AS done_count
+            FROM confirmations
+            WHERE user_id = $1
+              AND datetime >= $2
+              AND datetime < $3
+              AND (confirmed = TRUE OR confirmed IS NULL)
+            GROUP BY DATE(datetime AT TIME ZONE $4)
+        """,
+            user_id,
+            start_datetime,
+            end_datetime_exclusive,
+            user_timezone
+        )
 
         day_counts = {r["day"]: r["done_count"] for r in confirmations_rows}
 
@@ -265,7 +316,24 @@ async def view_profile(request: Request):
         return {"status": "error", "message": "missing_user_id"}
 
     pool = await get_pool()
-    today = datetime.now().date()
+
+    async with pool.acquire() as conn:
+        user_timezone = await conn.fetchval("""
+            SELECT COALESCE(timezone, 'Europe/Kyiv')
+            FROM users
+            WHERE user_id = $1
+        """, target_user_id)
+
+    user_timezone = user_timezone or "Europe/Kyiv"
+
+    try:
+        user_tz = ZoneInfo(user_timezone)
+    except Exception:
+        user_timezone = "Europe/Kyiv"
+        user_tz = ZoneInfo(user_timezone)
+
+    now_local = datetime.now(user_tz)
+    today = now_local.date()
 
     if range_type == "week":
         start_date = today - timedelta(days=today.weekday())
@@ -289,8 +357,31 @@ async def view_profile(request: Request):
         end_date = next_month - timedelta(days=1)
 
     elif range_type == "year":
-        start_date = today.replace(month=1, day=1)
-        end_date = today.replace(month=12, day=31)
+        start_date = today.replace(
+            month=1,
+            day=1
+        )
+
+        end_date = today.replace(
+            month=12,
+            day=31
+        )
+
+    else:
+        start_date = today
+        end_date = today
+
+    start_datetime = datetime.combine(
+        start_date,
+        datetime.min.time(),
+        tzinfo=user_tz
+    )
+
+    end_datetime_exclusive = datetime.combine(
+        end_date + timedelta(days=1),
+        datetime.min.time(),
+        tzinfo=user_tz
+    )
 
     async with pool.acquire() as conn:
 
@@ -375,14 +466,20 @@ async def view_profile(request: Request):
 
         confirmations_rows = await conn.fetch("""
         SELECT
-            DATE(datetime) AS day,
+            DATE(datetime AT TIME ZONE $4) AS day,
             COUNT(DISTINCT habit_id) AS done_count
         FROM confirmations
         WHERE user_id = $1
-        AND datetime >= $2
-        AND datetime <= $3
-        GROUP BY DATE(datetime)
-        """, target_user_id, start_date, end_date)
+          AND datetime >= $2
+          AND datetime < $3
+          AND (confirmed = TRUE OR confirmed IS NULL)
+        GROUP BY DATE(datetime AT TIME ZONE $4)
+    """,
+        target_user_id,
+        start_datetime,
+        end_datetime_exclusive,
+        user_timezone
+    )
 
         day_counts = {
             row["day"]: row["done_count"]
