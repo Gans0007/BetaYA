@@ -16,7 +16,7 @@ async def get_global_rank(user_id: int) -> int | None:
             SELECT u.user_id, COALESCE(s.xp, 0) AS xp
             FROM users u
             LEFT JOIN user_stats s ON s.user_id = u.user_id
-            ORDER BY xp DESC
+            ORDER BY xp DESC, u.user_id ASC
         """)
 
     for idx, row in enumerate(users, start=1):

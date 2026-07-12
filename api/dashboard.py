@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from api.telegram_auth import validate_telegram_data
 from core.database import get_pool
 from services.xp_service import LEAGUES, get_league_by_name
+from services.leaderboard.season_service import get_current_season_info
 
 router = APIRouter()
 
@@ -333,76 +334,271 @@ async def get_leaderboard(request: Request):
 
     try:
         data = await request.json()
-    except:
+    except Exception:
         data = {}
 
     init_data = data.get("initData")
+    rating_type = data.get("ratingType", "global")
 
     if not init_data:
-        return {"leaders": []}
+        return {
+            "leaders": [],
+            "me": None,
+            "rating_type": rating_type
+        }
+
+    if rating_type not in ("global", "season"):
+        rating_type = "global"
 
     user_id = validate_telegram_data(init_data)
 
     pool = await get_pool()
 
+    # ==========================================
+    # СЕЗОННЫЙ РЕЙТИНГ
+    # ==========================================
+
+    if rating_type == "season":
+
+        season_info = get_current_season_info()
+        season_key = season_info["key"]
+
+        async with pool.acquire() as conn:
+
+            rows = await conn.fetch("""
+                WITH ranked AS (
+                    SELECT
+                        u.user_id,
+
+                        COALESCE(
+                            u.nickname,
+                            u.username,
+                            u.first_name,
+                            'Unknown'
+                        ) AS username,
+
+                        COALESCE(
+                            u.avatar,
+                            'avatar_1.png'
+                        ) AS avatar,
+
+                        COALESCE(
+                            s.league,
+                            'Бронза I'
+                        ) AS league,
+
+                        COALESCE(
+                            ss.season_xp,
+                            0
+                        ) AS xp,
+
+                        ROW_NUMBER() OVER (
+                            ORDER BY
+                                COALESCE(ss.season_xp, 0) DESC,
+                                u.user_id ASC
+                        ) AS rank
+
+                    FROM users u
+
+                    LEFT JOIN user_stats s
+                        ON s.user_id = u.user_id
+
+                    LEFT JOIN user_season_stats ss
+                        ON ss.user_id = u.user_id
+                        AND ss.season_key = $1
+                )
+
+                SELECT *
+                FROM ranked
+                ORDER BY rank
+                LIMIT 100
+            """, season_key)
+
+            my = await conn.fetchrow("""
+                WITH ranked AS (
+                    SELECT
+                        u.user_id,
+
+                        COALESCE(
+                            u.nickname,
+                            u.username,
+                            u.first_name,
+                            'You'
+                        ) AS username,
+
+                        COALESCE(
+                            u.avatar,
+                            'avatar_1.png'
+                        ) AS avatar,
+
+                        COALESCE(
+                            s.league,
+                            'Бронза I'
+                        ) AS league,
+
+                        COALESCE(
+                            ss.season_xp,
+                            0
+                        ) AS xp,
+
+                        ROW_NUMBER() OVER (
+                            ORDER BY
+                                COALESCE(ss.season_xp, 0) DESC,
+                                u.user_id ASC
+                        ) AS rank
+
+                    FROM users u
+
+                    LEFT JOIN user_stats s
+                        ON s.user_id = u.user_id
+
+                    LEFT JOIN user_season_stats ss
+                        ON ss.user_id = u.user_id
+                        AND ss.season_key = $1
+                )
+
+                SELECT *
+                FROM ranked
+                WHERE user_id = $2
+            """, season_key, user_id)
+
+        leaders = []
+
+        for row in rows:
+            leaders.append({
+                "user_id": row["user_id"],
+                "rank": row["rank"],
+                "avatar": row["avatar"],
+                "username": row["username"],
+                "league": row["league"],
+                "xp": float(row["xp"])
+            })
+
+        return {
+            "rating_type": "season",
+
+            "season": {
+                "key": season_info["key"],
+                "number": season_info["number"],
+                "name": season_info["name"],
+                "year": season_info["year"],
+                "start": season_info["start"].isoformat(),
+                "end": season_info["end"].isoformat(),
+                "days_left": season_info["days_left"]
+            },
+
+            "leaders": leaders,
+
+            "me": {
+                "rank": my["rank"] if my else None,
+                "avatar": my["avatar"] if my else "avatar_1.png",
+                "username": my["username"] if my else "You",
+                "league": my["league"] if my else "Бронза I",
+                "xp": float(my["xp"]) if my else 0
+            }
+        }
+
+    # ==========================================
+    # ГЛОБАЛЬНЫЙ РЕЙТИНГ
+    # ==========================================
+
     async with pool.acquire() as conn:
 
         rows = await conn.fetch("""
+            SELECT
+                u.user_id,
+                u.last_global_rank,
 
-        SELECT
-            u.user_id,
-            u.last_global_rank,
-            COALESCE(u.nickname, u.username, u.first_name, 'Unknown') as username,
-            COALESCE(u.avatar, 'avatar_1.png') as avatar,
-            COALESCE(s.league, 'Бронза I') as league,
-            s.xp
+                COALESCE(
+                    u.nickname,
+                    u.username,
+                    u.first_name,
+                    'Unknown'
+                ) AS username,
 
-        FROM users u
-        JOIN user_stats s ON s.user_id = u.user_id
+                COALESCE(
+                    u.avatar,
+                    'avatar_1.png'
+                ) AS avatar,
 
-        WHERE u.last_global_rank IS NOT NULL
+                COALESCE(
+                    s.league,
+                    'Бронза I'
+                ) AS league,
 
-        ORDER BY u.last_global_rank
-        LIMIT 100
+                COALESCE(
+                    s.xp,
+                    0
+                ) AS xp
 
+            FROM users u
+
+            LEFT JOIN user_stats s
+                ON s.user_id = u.user_id
+
+            WHERE u.last_global_rank IS NOT NULL
+
+            ORDER BY u.last_global_rank
+            LIMIT 100
         """)
 
         my = await conn.fetchrow("""
+            SELECT
+                u.last_global_rank,
 
-        SELECT
-            u.last_global_rank,
-            COALESCE(u.nickname, u.username, u.first_name, 'You') as username,
-            COALESCE(u.avatar, 'avatar_1.png') as avatar,
-            COALESCE(s.league, 'Бронза I') as league,
-            s.xp
+                COALESCE(
+                    u.nickname,
+                    u.username,
+                    u.first_name,
+                    'You'
+                ) AS username,
 
-        FROM users u
-        JOIN user_stats s ON s.user_id = u.user_id
+                COALESCE(
+                    u.avatar,
+                    'avatar_1.png'
+                ) AS avatar,
 
-        WHERE u.user_id=$1
+                COALESCE(
+                    s.league,
+                    'Бронза I'
+                ) AS league,
 
+                COALESCE(
+                    s.xp,
+                    0
+                ) AS xp
+
+            FROM users u
+
+            LEFT JOIN user_stats s
+                ON s.user_id = u.user_id
+
+            WHERE u.user_id = $1
         """, user_id)
 
     leaders = []
 
-    for r in rows:
-
+    for row in rows:
         leaders.append({
-            "user_id": r["user_id"],
-            "rank": r["last_global_rank"],
-            "avatar": r["avatar"],
-            "username": r["username"],
-            "league": r["league"],
-            "xp": int(r["xp"])
+            "user_id": row["user_id"],
+            "rank": row["last_global_rank"],
+            "avatar": row["avatar"],
+            "username": row["username"],
+            "league": row["league"],
+            "xp": float(row["xp"])
         })
 
     return {
+        "rating_type": "global",
+        "season": None,
+
         "leaders": leaders,
+
         "me": {
             "rank": my["last_global_rank"] if my else None,
             "avatar": my["avatar"] if my else "avatar_1.png",
             "username": my["username"] if my else "You",
             "league": my["league"] if my else "Бронза I",
-            "xp": int(my["xp"]) if my else 0
+            "xp": float(my["xp"]) if my else 0
         }
     }

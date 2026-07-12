@@ -13,6 +13,153 @@ body:has(#leaderboard-list) {
     letter-spacing: -1px;
 }
 
+/* =========================
+ПЕРЕКЛЮЧАТЕЛЬ РЕЙТИНГА
+========================= */
+
+.leaderboard-title {
+    margin-bottom: 12px;
+}
+
+.leaderboard-controls {
+    position: relative;
+    z-index: 10;
+
+    padding: 0 16px;
+    margin: 0 auto 58px;
+}
+
+.leaderboard-switcher {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+
+    padding: 5px;
+
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.07),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.leaderboard-switch {
+    min-width: 0;
+    height: 39px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 10px;
+
+    border: none;
+    border-radius: 14px;
+
+    background: transparent;
+    color: #777b84;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 850;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.15s ease;
+}
+
+.leaderboard-switch:active {
+    transform: scale(0.97);
+}
+
+.leaderboard-switch.active {
+    background: #ffffff;
+    color: #101010;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.09),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.035);
+}
+
+.leaderboard-switch-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.leaderboard-season-info {
+    min-height: 0;
+    height: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    overflow: hidden;
+
+    color: rgba(20, 20, 20, 0.68);
+    font-size: 11px;
+    font-weight: 750;
+
+    opacity: 0;
+    transition:
+        height 0.2s ease,
+        margin 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.leaderboard-season-info.visible {
+    height: 18px;
+    margin-top: 7px;
+    opacity: 1;
+}
+
+.season-info-divider {
+    color: #f0a000;
+}
+
+/* =========================
+СОСТОЯНИЯ
+========================= */
+
+#leaderboard-list {
+    transition: opacity 0.18s ease;
+}
+
+#leaderboard-list.leaderboard-loading {
+    opacity: 0.48;
+    pointer-events: none;
+}
+
+.leaderboard-empty {
+    margin: 0 16px;
+    padding: 24px 16px;
+
+    background: rgba(255, 255, 255, 0.84);
+    border-radius: 20px;
+
+    color: #737780;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+}
+
 #leaderboard-list {
     padding: 0 16px 100px;
     background: transparent;
@@ -267,10 +414,20 @@ body:has(#leaderboard-list) {
 /* MOBILE */
 
 @media (max-width: 390px) {
-    .leaderboard-title {
-        margin-bottom: 58px;
-        font-size: 22px;
-    }
+.leaderboard-title {
+    margin-bottom: 12px;
+    font-size: 22px;
+}
+
+.leaderboard-controls {
+    padding: 0 12px;
+    margin-bottom: 54px;
+}
+
+.leaderboard-switch {
+    height: 38px;
+    font-size: 12px;
+}
 
     .top-avatar {
         width: 82px;

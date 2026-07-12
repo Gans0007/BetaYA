@@ -48,6 +48,47 @@ async def create_users_table():
             )
         """)
 
+        # -------------------------------
+        # 🔹 Таблица сезонной статистики пользователей
+        # -------------------------------
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS user_season_stats (
+                id BIGSERIAL PRIMARY KEY,
+
+                user_id BIGINT NOT NULL
+                    REFERENCES users(user_id)
+                    ON DELETE CASCADE,
+
+                season_key VARCHAR(20) NOT NULL,
+
+                season_xp DOUBLE PRECISION NOT NULL DEFAULT 0,
+
+                last_season_rank INTEGER,
+
+                last_rank_update DATE,
+
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+                CONSTRAINT user_season_stats_user_season_unique
+                    UNIQUE(user_id, season_key)
+            )
+        """)
+
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_season_stats_season_key
+            ON user_season_stats(season_key)
+        """)
+
+        await conn.execute("""
+            CREATE INDEX IF NOT EXISTS idx_user_season_stats_ranking
+            ON user_season_stats(
+                season_key,
+                season_xp DESC,
+                user_id ASC
+            )
+        """)
+
 
         # -------------------------------
         # 🔹 Таблица привычек (habits)

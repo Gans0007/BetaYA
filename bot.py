@@ -28,6 +28,7 @@ from tasks.habit_reminder_tasks import habit_reminder_task
 from tasks.habit_reset_task import check_habit_resets
 from tasks.challenge_reset_task import check_challenge_resets
 from tasks.honor_global_task import honor_global_rank_daily
+from tasks.leaderboard.honor_season_task import honor_season_rank_daily
 
 from middlewares.subscription_middleware import SubscriptionMiddleware
 from services.message_queue import queue_consumer, QUEUE_CONFIRM
@@ -60,6 +61,7 @@ async def start_background_tasks(bot):
     tasks = []
 
     tasks.append(asyncio.create_task(honor_global_rank_daily(bot)))
+    tasks.append(asyncio.create_task(honor_season_rank_daily(bot)))
     tasks.append(asyncio.create_task(check_challenge_resets(bot)))
     tasks.append(asyncio.create_task(check_habit_resets(bot)))
     tasks.append(asyncio.create_task(habit_reminder_task(bot)))

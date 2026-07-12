@@ -2,6 +2,8 @@
 
 from datetime import date, timedelta
 
+from services.leaderboard.season_service import get_current_season_key
+
 
 # +1 завершённая привычка
 async def increment_finished_habits(conn, user_id: int):
@@ -34,12 +36,36 @@ async def increment_total_stars(conn, user_id: int, stars: int):
 
 # +XP
 async def increment_xp(conn, user_id: int, xp: float):
-    return await conn.execute("""
+
+    season_key = get_current_season_key()
+
+    # -------------------------
+    # Глобальный XP
+    # -------------------------
+    await conn.execute("""
         INSERT INTO user_stats (user_id, xp)
         VALUES ($1, $2)
         ON CONFLICT (user_id) DO UPDATE
-        SET xp = user_stats.xp + $2
+        SET xp = user_stats.xp + EXCLUDED.xp
     """, user_id, xp)
+
+    # -------------------------
+    # Сезонный XP
+    # -------------------------
+    await conn.execute("""
+        INSERT INTO user_season_stats (
+            user_id,
+            season_key,
+            season_xp
+        )
+        VALUES ($1, $2, $3)
+
+        ON CONFLICT (user_id, season_key)
+        DO UPDATE
+        SET
+            season_xp = user_season_stats.season_xp + EXCLUDED.season_xp,
+            updated_at = NOW()
+    """, user_id, season_key, xp)
 
 # +всего дней
 async def set_total_confirmed_days(conn, user_id: int, total_days: int):
