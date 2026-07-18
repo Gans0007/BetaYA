@@ -7,342 +7,456 @@ HEADER
   margin-bottom: 0;
 }
 
+
 /* =========================================
 PROFILE CARD
 ========================================= */
 
 .profile-card {
-  background: #ffffff;
-  border-radius: 22px;
-  padding: 18px 20px 18px;
-  margin-bottom: 0;
+  position: relative;
+
+  width: 100%;
+  height: 185px;
+
   overflow: hidden;
+  box-sizing: border-box;
+
+  border-radius: 24px;
+
+  background-image: var(--header-background);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.025);
+    0 12px 28px rgba(0, 0, 0, 0.14);
 }
+
 
 /* =========================================
-RESOURCES
+BACKGROUND SHADE
 ========================================= */
 
-.resources-bar {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 18px;
-  margin-bottom: 18px;
+.header-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(18, 29, 22, 0.2) 0%,
+      rgba(255, 255, 255, 0.03) 48%,
+      rgba(25, 35, 27, 0.12) 100%
+    );
+
+  pointer-events: none;
 }
 
-.resource,
-.resource-xp,
-.resource-stars {
-  position: relative;
-  height: 34px;
+
+/* =========================================
+AVATAR
+========================================= */
+
+.header-avatar {
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+
+  width: 154px;
+  height: 178px;
+
+  display: block;
+
+  object-fit: contain;
+  object-position: left bottom;
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+CENTER CONTENT
+========================================= */
+
+.header-main {
+  position: absolute;
+
+  left: 145px;
+  top: 30px;
+  bottom: 24px;
+  z-index: 3;
+
+  width: 170px;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+/* =========================================
+XP
+========================================= */
+
+.header-xp {
+  width: 155px;
+}
+
+.header-xp-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  color: #173c2d;
+
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.header-xp-text strong {
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.header-xp-text span {
+  color: rgba(22, 47, 37, 0.82);
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.header-xp-track {
+  position: relative;
+
+  width: 125px;
+  height: 5px;
+
+  margin-top: 9px;
 
   overflow: hidden;
   border-radius: 999px;
+
+  background: rgba(51, 78, 63, 0.17);
 }
 
-.resource-xp {
-  flex: 1 1 auto;
-  max-width: none;
-  min-width: 0;
-  background: #e9f8ef;
-}
-
-.resource-stars {
-  width: 112px;
-  flex: 0 0 112px;
-
-  background: #fff;
-
-  box-shadow:
-    0 6px 18px rgba(0,0,0,.04);
-}
-
-.resource-xp-fill {
+.header-xp-fill {
   position: absolute;
+
   left: 0;
   top: 0;
 
   height: 100%;
   width: 0%;
 
-  background: linear-gradient(90deg, #b9efcf 0%, #59cf80 100%);
   border-radius: inherit;
-  transition: width .4s ease;
+
+  background:
+    linear-gradient(
+      90deg,
+      #176448,
+      #6d9566
+    );
+
+  transition: width 0.4s ease;
 }
 
-.resource-stars-fill {
-  display: none;
-}
-
-.xp-top {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 800;
-  color: #fff;
-
-  text-shadow: 0 1px 4px rgba(0,0,0,.12);
-}
-
-.resource-stars .xp-top {
-  font-size: 15px;
-  font-weight: 800;
-  color: #111;
-  text-shadow: none;
-}
-
-.res-icon {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.res-value {
-  color: #111;
-  font-weight: 800;
-}
 
 /* =========================================
-PROFILE ROW
+USER INFO
 ========================================= */
 
-.profile-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.profile-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  min-width: 0;
-  flex: 1;
-}
-
-.profile-flag {
-  width: 68px;
-  height: 68px;
-
-  flex-shrink: 0;
-
-  border-radius: 13px;
-  object-fit: cover;
-}
-
-.profile-info {
+.header-user-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-
-  min-width: 0;
-  flex: 1;
+  gap: 5px;
 }
 
 .profile-name {
-  font-size: 20px;
-  line-height: 1.05;
-  font-weight: 800;
-  color: #050505;
+  max-width: 170px;
+
+  color: #171713;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 29px;
+  line-height: 1;
+  font-weight: 700;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  text-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .profile-clan {
-  font-size: 16px;
+  max-width: 170px;
+
+  color: #2c302c;
+
+  font-size: 15px;
   line-height: 1.1;
-  font-weight: 600;
-  color: #777;
+  font-weight: 500;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
+/* =========================================
+STARS
+========================================= */
+
+.header-stars {
+  position: absolute;
+
+  right: 19px;
+  top: 22px;
+  z-index: 4;
+
+  min-width: 102px;
+  height: 42px;
+
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  box-sizing: border-box;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  color: #171717;
+
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
+
+  box-shadow:
+    0 6px 17px rgba(0, 0, 0, 0.08);
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.header-star-icon {
+  font-size: 20px;
+
+  filter:
+    drop-shadow(
+      0 2px 3px rgba(205, 145, 18, 0.24)
+    );
+}
+
 
 /* =========================================
 LEAGUE
 ========================================= */
 
 .profile-league {
+  position: absolute;
+
+  right: 21px;
+  bottom: 17px;
+  z-index: 4;
+
+  width: 82px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-
+  justify-content: flex-end;
   gap: 3px;
-  flex-shrink: 0;
-}
-
-.league-text {
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 800;
-  color: #f0a51c;
-  white-space: nowrap;
-  text-align: center;
-  order: 2;
 }
 
 .profile-league img {
-  width: 54px;
-  height: 54px;
+  width: 60px;
+  height: 60px;
 
-  order: 1;
-  flex-shrink: 0;
+  display: block;
+
   object-fit: contain;
 
-  filter: drop-shadow(0 5px 9px rgba(198, 111, 16, 0.28));
+  cursor: pointer;
+
+  filter:
+    drop-shadow(
+      0 5px 8px rgba(39, 52, 41, 0.22)
+    );
 }
 
+.league-text {
+  width: 100%;
+
+  color: #20251f;
+
+  font-size: 13px;
+  line-height: 1.05;
+  font-weight: 600;
+
+  text-align: center;
+  white-space: nowrap;
+}
+
+
 /* =========================================
-CALENDAR GAP FIX
-уменьшает разрыв между хедером и календарем
+CALENDAR
 ========================================= */
 
 .header-calendar {
   margin-top: 10px !important;
 }
 
+
 /* =========================================
-MOBILE FIX
+MOBILE
 ========================================= */
 
 @media (max-width: 420px) {
 
-  .header {
-    padding: 10px 16px 0;
-    margin-bottom: 0;
-  }
-
   .profile-card {
+    height: 180px;
     border-radius: 22px;
-    padding: 18px 20px 18px;
-    margin-bottom: 0;
   }
 
-  .resources-bar {
-    gap: 18px;
-    margin-bottom: 18px;
+  .header-avatar {
+    width: 145px;
+    height: 173px;
   }
 
-  .profile-row {
-    gap: 8px;
+  .header-main {
+    left: 136px;
+    top: 29px;
+    bottom: 23px;
+
+    width: 158px;
   }
 
-  .profile-left {
-    gap: 12px;
+  .header-xp {
+    width: 145px;
   }
 
-  .profile-info {
-    gap: 2px;
-  }
-
-  .profile-flag {
-    width: 64px;
-    height: 64px;
-    border-radius: 12px;
+  .header-xp-track {
+    width: 119px;
   }
 
   .profile-name {
-    font-size: 20px;
+    max-width: 158px;
+    font-size: 27px;
   }
 
   .profile-clan {
-    font-size: 16px;
+    max-width: 158px;
+    font-size: 14px;
+  }
+
+  .header-stars {
+    right: 17px;
+    top: 20px;
+
+    min-width: 98px;
+    height: 40px;
+
+    padding: 0 12px;
+
+    font-size: 14px;
   }
 
   .profile-league {
-    gap: 3px;
-  }
-
-  .league-text {
-    font-size: 13px;
+    right: 18px;
+    bottom: 16px;
   }
 
   .profile-league img {
-    width: 52px;
-    height: 52px;
-  }
-
-  .header-calendar {
-    margin-top: 8px !important;
+    width: 57px;
+    height: 57px;
   }
 }
 
-@media (max-width: 360px) {
+
+@media (max-width: 370px) {
 
   .profile-card {
-    padding: 16px 18px 16px;
+    height: 168px;
   }
 
-  .resources-bar {
-    gap: 14px;
-    margin-bottom: 16px;
+  .header-avatar {
+    width: 132px;
+    height: 161px;
   }
 
-  .resource,
-  .resource-xp,
-  .resource-stars {
-    height: 34px;
+  .header-main {
+    left: 123px;
+    top: 27px;
+    bottom: 21px;
+
+    width: 143px;
   }
 
-  .resource-stars {
-    width: 96px;
-    flex-basis: 96px;
-  }
-
-  .xp-top,
-  .resource-stars .xp-top {
+  .header-xp-text {
     font-size: 14px;
   }
 
-  .res-icon {
-    font-size: 18px;
+  .header-xp-text strong {
+    font-size: 14px;
   }
 
-  .profile-flag {
-    width: 58px;
-    height: 58px;
+  .header-xp-track {
+    width: 105px;
   }
 
   .profile-name {
-    font-size: 18px;
+    max-width: 143px;
+    font-size: 24px;
   }
 
   .profile-clan {
-    font-size: 14px;
+    max-width: 143px;
+    font-size: 13px;
   }
 
-  .league-text {
+  .header-stars {
+    right: 13px;
+    top: 17px;
+
+    min-width: 87px;
+    height: 37px;
+
+    padding: 0 10px;
+
     font-size: 12px;
   }
 
-  .profile-league img {
-    width: 46px;
-    height: 46px;
+  .header-star-icon {
+    font-size: 17px;
   }
 
-  .header-calendar {
-    margin-top: 6px !important;
+  .profile-league {
+    right: 13px;
+    bottom: 13px;
+
+    width: 74px;
+  }
+
+  .profile-league img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .league-text {
+    font-size: 11px;
   }
 }

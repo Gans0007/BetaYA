@@ -6,97 +6,98 @@ export function renderHeader(user) {
         return
     }
 
-    const avatar = user.avatar || "avatar_1.png"
-    const headerTheme = user.header_theme || "header_default"
+    const avatar =
+        "/img/header_img/avatars_img/hunter.png"
+
+    const background =
+        "/img/header_img/background_header_img/forest.png"
 
     root.innerHTML = `
         <div
             class="profile-card"
-            data-header-theme="${headerTheme}"
+            style="--header-background: url('${background}')"
         >
-            <div class="resources-bar">
+            <div class="header-shade"></div>
 
-                <div class="resource resource-xp">
-                    <div
-                        class="resource-xp-fill"
-                        id="xp-fill"
-                        style="width: ${user.xp_percent || 0}%"
-                    ></div>
+            <img
+                id="player-avatar"
+                class="header-avatar"
+                src="${avatar}"
+                alt="Аватар"
+            >
 
-                    <div class="xp-top">
-                        XP
-                        <span id="xp-text">
-                            ${user.xp_current || 0} / ${user.xp_next || 0}
-                        </span>
+            <div class="header-main">
+
+                <div class="header-xp">
+
+                    <div class="header-xp-text">
+                        <strong>XP ${user.xp_current || 0}</strong>
+                        <span>/ ${user.xp_next || 0}</span>
                     </div>
-                </div>
 
-                <div class="resource resource-stars">
-                    <div
-                        class="resource-stars-fill"
-                        id="stars-fill"
-                        style="width: ${user.stars_percent || 0}%"
-                    ></div>
-
-                    <div class="xp-top">
-                        ⭐
-                        <span id="stars-text">
-                            ${user.stars_current || 0} / ${user.stars_next || 0}
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="profile-row">
-
-                <div class="profile-left">
-
-                    <img
-                        id="player-avatar"
-                        class="profile-flag"
-                        src="img/avatar/${avatar}"
-                        alt="Аватар"
-                    >
-
-                    <div class="profile-info">
+                    <div class="header-xp-track">
                         <div
-                            class="profile-name"
-                            id="player-name"
-                        >
-                            ${user.nickname || "Player"}
-                        </div>
-
-                        <div class="profile-clan">
-                            ${user.clan?.name || "Не в клане"}
-                        </div>
+                            id="xp-fill"
+                            class="header-xp-fill"
+                            style="width: ${user.xp_percent || 0}%"
+                        ></div>
                     </div>
 
                 </div>
 
-                <div class="profile-league">
+                <div class="header-user-info">
 
                     <div
-                        id="league-text"
-                        class="league-text"
+                        id="player-name"
+                        class="profile-name"
                     >
-                        ${user.league?.name || "—"}
+                        ${user.nickname || "Player"}
                     </div>
 
-                    <img
-                        id="league-icon"
-                        class="league-icon"
-                        src="${user.league?.icon || ""}"
-                        alt="Лига"
-                    >
+                    <div class="profile-clan">
+                        ${user.clan?.name || "Не в клане"}
+                    </div>
 
                 </div>
 
             </div>
+
+            <div class="header-stars">
+
+                <span class="header-star-icon">
+                    ⭐
+                </span>
+
+                <span id="stars-text">
+                    ${user.stars_current || 0} /
+                    ${user.stars_next || 0}
+                </span>
+
+            </div>
+
+            <div class="profile-league">
+
+                <img
+                    id="league-icon"
+                    class="league-icon"
+                    src="${user.league?.icon || ""}"
+                    alt="Лига"
+                >
+
+                <div
+                    id="league-text"
+                    class="league-text"
+                >
+                    ${user.league?.name || "—"}
+                </div>
+
+            </div>
+
         </div>
     `
 
-    const leagueIcon = root.querySelector("#league-icon")
+    const leagueIcon =
+        root.querySelector("#league-icon")
 
     if (leagueIcon) {
         leagueIcon.addEventListener("click", () => {
