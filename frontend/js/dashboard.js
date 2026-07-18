@@ -4,6 +4,7 @@ import { initNavigation } from "./navigation.js"
 import { renderChatUser, renderReferrals } from "./chat.js"
 import { initProfileModal } from "./components/profileModal.js"
 import { initUserProfileModal, openUserProfile } from "./components/userProfileModal.js"
+import { renderHeader } from "./header_components/header.js"
 
 const tg = window.Telegram.WebApp
 tg.expand()
@@ -50,7 +51,7 @@ async function loadDashboard(){
         // ==========================
         // USER
         // ==========================
-        renderUser(user)
+        renderHeader(user)
 
         // ==========================
         // HABITS
@@ -71,68 +72,6 @@ async function loadDashboard(){
 
 // 🔥 ВАЖНО: ДЕЛАЕМ ГЛОБАЛЬНОЙ
 window.renderDashboard = loadDashboard
-
-// ==========================
-// USER RENDER
-// ==========================
-
-function renderUser(user){
-
-    window.refLink = user.ref_link || ""
-
-    // имя
-    const nameEl = document.getElementById("player-name")
-    if(nameEl){
-        nameEl.innerText = user.nickname || "Player"
-    }
-
-    // XP текст
-    const xpText = document.getElementById("xp-text")
-    if(xpText){
-        xpText.innerText = `${user.xp_current} / ${user.xp_next}`
-    }
-
-    // STARS текст
-    const starsText = document.getElementById("stars-text")
-    if(starsText){
-        starsText.innerText = `${user.stars_current} / ${user.stars_next}`
-    }
-
-    // XP прогресс
-    const xpFill = document.getElementById("xp-fill")
-    if(xpFill){
-        xpFill.style.width = (user.xp_percent || 0) + "%"
-    }
-
-    // STARS прогресс
-    const starsFill = document.getElementById("stars-fill")
-    if(starsFill){
-        starsFill.style.width = (user.stars_percent || 0) + "%"
-    }
-
-    // аватар
-    const avatar = document.getElementById("player-avatar")
-    if(avatar){
-        avatar.src = `img/avatar/${user.avatar || "avatar_1.png"}`
-    }
-
-    // ==========================
-    // LEAGUE
-    // ==========================
-
-    const leagueText = document.getElementById("league-text")
-    const leagueIcon = document.getElementById("league-icon")
-
-    if(leagueText){
-        leagueText.innerText = user.league?.name || "—"
-    }
-
-    if(leagueIcon){
-        leagueIcon.src = user.league?.icon || ""
-        leagueIcon.onclick = openLeagueInfo
-    }
-
-}
 
 // ==========================
 // ЛИГА (инфо окно)
@@ -170,6 +109,8 @@ function openLeagueInfo(){
     modal.querySelector(".league-close").onclick = () => modal.remove()
     modal.querySelector(".league-overlay").onclick = () => modal.remove()
 }
+
+window.openLeagueInfo = openLeagueInfo
 
 // ==========================
 // USER CLICK HANDLER

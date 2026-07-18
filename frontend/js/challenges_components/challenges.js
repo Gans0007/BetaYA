@@ -113,7 +113,7 @@ export async function renderChallenges(){
             books: 6,
             audios: 19,
             videos: 49,
-            trainings: 3,
+            trainings: 8,
             mylife: 45
         })
     )
