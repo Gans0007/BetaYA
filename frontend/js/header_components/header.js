@@ -6,8 +6,11 @@ export function renderHeader(user) {
         return
     }
 
+    const avatarFile =
+        user?.avatar || "avatar_bronze_1.png"
+
     const avatar =
-        "/img/header_img/avatars_img/avatar_silver_1.png"
+        `/img/header_img/avatars_img/${avatarFile}`
 
     const background =
         "/img/header_img/background_header_img/background_silver_1.png"

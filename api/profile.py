@@ -241,7 +241,7 @@ async def get_profile(request: Request):
     return {
         "user": {
             "nickname": user_row["nickname"] if user_row else "Player",
-            "avatar": user_row["avatar"] if user_row else "avatar_1.png",
+            "avatar": league_obj["avatar"],
             "league": {
                 "name": league_obj["name"],
                 "icon": f"/img/leagues/{league_obj['icon']}"
@@ -651,7 +651,7 @@ async def view_profile(request: Request):
     return {
         "user": {
             "nickname": user_row["nickname"],
-            "avatar": user_row["avatar"],
+            "avatar": league_obj["avatar"],
             "league": {
                 "name": league_obj["name"],
                 "icon": f"/img/leagues/{league_obj['icon']}"

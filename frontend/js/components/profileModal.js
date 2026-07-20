@@ -3,11 +3,10 @@ import { renderGraph } from "../components/graph.js"
 import { initInfoTooltip } from "../components/infoTooltip.js"
 import { getProfileDataPage } from "../components/profileDataPage.js"
 
-const DEFAULT_AVATAR = "avatar_silver_1.png"
+const DEFAULT_AVATAR = "avatar_bronze_1.png"
 
-const AVAILABLE_AVATARS = [
-    "avatar_silver_1.png"
-]
+const AVATAR_PATTERN =
+    /^avatar_(bronze|silver|gold)_[1-5]\.png$/
 
 const PROFILE_INFO = {
     donut: "Показывает сколько привычек ты выполнил и сколько пропустил за выбранный период.",
@@ -226,8 +225,8 @@ tabs.forEach((tab,index)=>{
 function normalizeAvatar(fileName){
 
     if(
-        !fileName ||
-        !AVAILABLE_AVATARS.includes(fileName)
+        typeof fileName !== "string" ||
+        !AVATAR_PATTERN.test(fileName)
     ){
         return DEFAULT_AVATAR
     }

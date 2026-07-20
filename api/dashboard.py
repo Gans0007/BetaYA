@@ -104,7 +104,7 @@ async def get_user(request: Request):
     return {
         "nickname": row["nickname"] if row else "Player",
         "streak": row["current_streak"] if row else 0,
-        "avatar": row["avatar"] if row else "avatar_1.png",
+        "avatar": league_obj["avatar"],
         "xp": xp_user,
         "ref_link": ref_link,
         "league": {
@@ -298,7 +298,6 @@ async def get_referrals(request: Request):
         SELECT
             u.user_id,
             COALESCE(u.username, u.first_name, 'User') as name,
-            COALESCE(u.avatar, 'avatar_1.png') as avatar,
             COALESCE(s.xp,0) as xp
 
         FROM referrals r
