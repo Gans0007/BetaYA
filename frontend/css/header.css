@@ -56,26 +56,26 @@ BACKGROUND SHADE
 
 /* =========================================
 COMMON CONTENT CONTAINER
-Вся композиция теперь находится внутри
-одного ограниченного контейнера.
+Вся композиция собрана в одной группе
+и ограничена по ширине.
 ========================================= */
 
 .header-content {
   position: relative;
   z-index: 2;
 
-  width: min(390px, calc(100% - 28px));
+  width: min(346px, calc(100% - 26px));
   height: 100%;
 
   margin: 0 auto;
 
   display: grid;
   grid-template-columns:
+    108px
     126px
-    minmax(126px, 142px)
-    76px;
+    66px;
 
-  column-gap: 8px;
+  column-gap: 7px;
 
   align-items: center;
   justify-content: center;
@@ -91,7 +91,7 @@ AVATAR COLUMN
 .header-avatar-column {
   position: relative;
 
-  width: 126px;
+  width: 108px;
   height: 100%;
 
   align-self: stretch;
@@ -107,11 +107,11 @@ AVATAR
 .header-avatar {
   position: absolute;
 
-  left: 0;
-  bottom: -7px;
+  left: -1px;
+  bottom: -6px;
 
-  width: 132px;
-  height: 152px;
+  width: 118px;
+  height: 138px;
 
   display: block;
 
@@ -132,13 +132,15 @@ XP + USER INFO
   position: relative;
 
   width: 100%;
-  height: 102px;
+  height: 94px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
   min-width: 0;
+
+  transform: translateY(-2px);
 }
 
 
@@ -157,7 +159,7 @@ XP
 
   color: #173c2d;
 
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
   font-weight: 700;
 
@@ -172,14 +174,14 @@ XP
 .header-xp-text span {
   color: rgba(22, 47, 37, 0.78);
 
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
 }
 
 .header-xp-track {
   position: relative;
 
-  width: 98px;
+  width: 92px;
   height: 3px;
 
   margin-top: 5px;
@@ -235,7 +237,7 @@ USER INFO
     "Times New Roman",
     serif;
 
-  font-size: 22px;
+  font-size: 21px;
   line-height: 1;
   font-weight: 700;
 
@@ -271,8 +273,8 @@ STARS + LEAGUE
 .header-right {
   position: relative;
 
-  width: 76px;
-  height: 108px;
+  width: 66px;
+  height: 100px;
 
   display: flex;
   flex-direction: column;
@@ -280,6 +282,8 @@ STARS + LEAGUE
   justify-content: space-between;
 
   min-width: 0;
+
+  transform: translateY(-1px);
 }
 
 
@@ -290,15 +294,15 @@ STARS
 .header-stars {
   position: relative;
 
-  min-width: 76px;
-  height: 29px;
+  min-width: 66px;
+  height: 27px;
 
-  padding: 0 8px;
+  padding: 0 7px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
 
   box-sizing: border-box;
 
@@ -308,7 +312,7 @@ STARS
 
   color: #171717;
 
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1;
   font-weight: 800;
 
@@ -322,7 +326,7 @@ STARS
 }
 
 .header-star-icon {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
 
   flex-shrink: 0;
@@ -341,7 +345,7 @@ LEAGUE
 .profile-league {
   position: relative;
 
-  width: 66px;
+  width: 58px;
 
   display: flex;
   flex-direction: column;
@@ -351,8 +355,8 @@ LEAGUE
 }
 
 .profile-league img {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
 
   display: block;
   flex-shrink: 0;
@@ -372,7 +376,7 @@ LEAGUE
 
   color: #20251f;
 
-  font-size: 10px;
+  font-size: 9px;
   line-height: 1;
   font-weight: 600;
 
@@ -397,52 +401,52 @@ TABLET / TELEGRAM WEBVIEW
 @media (max-width: 520px) {
 
   .header-content {
-    width: min(370px, calc(100% - 24px));
+    width: min(338px, calc(100% - 22px));
 
     grid-template-columns:
-      120px
-      minmax(122px, 136px)
-      74px;
+      105px
+      122px
+      64px;
 
-    column-gap: 7px;
+    column-gap: 6px;
   }
 
   .header-avatar-column {
-    width: 120px;
+    width: 105px;
   }
 
   .header-avatar {
-    width: 128px;
-    height: 148px;
+    width: 115px;
+    height: 136px;
   }
 
   .header-main {
-    height: 100px;
+    height: 92px;
   }
 
   .header-right {
-    width: 74px;
-    height: 106px;
+    width: 64px;
+    height: 98px;
   }
 
   .header-stars {
-    min-width: 74px;
-    height: 28px;
+    min-width: 64px;
+    height: 26px;
 
-    padding: 0 7px;
+    padding: 0 6px;
   }
 
   .profile-name {
-    font-size: 21px;
+    font-size: 20px;
   }
 
   .profile-league {
-    width: 64px;
+    width: 56px;
   }
 
   .profile-league img {
-    width: 38px;
-    height: 38px;
+    width: 33px;
+    height: 33px;
   }
 }
 
@@ -463,34 +467,36 @@ MOBILE
   }
 
   .header-content {
-    width: calc(100% - 18px);
+    width: calc(100% - 16px);
 
     grid-template-columns:
-      112px
-      minmax(116px, 132px)
-      70px;
+      100px
+      116px
+      62px;
 
-    column-gap: 6px;
+    column-gap: 5px;
   }
 
   .header-avatar-column {
-    width: 112px;
+    width: 100px;
   }
 
   .header-avatar {
     left: -2px;
-    bottom: -7px;
+    bottom: -6px;
 
-    width: 122px;
-    height: 144px;
+    width: 110px;
+    height: 132px;
   }
 
   .header-main {
-    height: 96px;
+    height: 89px;
+
+    transform: translateY(-1px);
   }
 
   .header-xp-text {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .header-xp-text strong {
@@ -498,15 +504,15 @@ MOBILE
   }
 
   .header-xp-text span {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .header-xp-track {
-    width: 90px;
+    width: 86px;
   }
 
   .profile-name {
-    font-size: 20px;
+    font-size: 19px;
   }
 
   .profile-clan {
@@ -514,35 +520,35 @@ MOBILE
   }
 
   .header-right {
-    width: 70px;
-    height: 102px;
+    width: 62px;
+    height: 94px;
   }
 
   .header-stars {
-    min-width: 70px;
-    height: 27px;
+    min-width: 62px;
+    height: 25px;
 
-    padding: 0 7px;
+    padding: 0 6px;
     gap: 3px;
 
-    font-size: 10px;
+    font-size: 9px;
   }
 
   .header-star-icon {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .profile-league {
-    width: 60px;
+    width: 54px;
   }
 
   .profile-league img {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .league-text {
-    font-size: 9px;
+    font-size: 8px;
   }
 }
 
@@ -564,30 +570,30 @@ SMALL MOBILE
   }
 
   .header-content {
-    width: calc(100% - 12px);
+    width: calc(100% - 10px);
 
     grid-template-columns:
-      102px
-      minmax(104px, 118px)
-      64px;
+      92px
+      106px
+      58px;
 
     column-gap: 4px;
   }
 
   .header-avatar-column {
-    width: 102px;
+    width: 92px;
   }
 
   .header-avatar {
     left: -4px;
-    bottom: -7px;
+    bottom: -6px;
 
-    width: 112px;
-    height: 136px;
+    width: 102px;
+    height: 124px;
   }
 
   .header-main {
-    height: 92px;
+    height: 86px;
   }
 
   .header-xp-text,
@@ -600,14 +606,14 @@ SMALL MOBILE
   }
 
   .header-xp-track {
-    width: 78px;
+    width: 76px;
     height: 3px;
 
     margin-top: 4px;
   }
 
   .profile-name {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .profile-clan {
@@ -615,31 +621,31 @@ SMALL MOBILE
   }
 
   .header-right {
-    width: 64px;
-    height: 98px;
+    width: 58px;
+    height: 90px;
   }
 
   .header-stars {
-    min-width: 64px;
-    height: 25px;
+    min-width: 58px;
+    height: 24px;
 
-    padding: 0 6px;
-    gap: 3px;
+    padding: 0 5px;
+    gap: 2px;
 
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .header-star-icon {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .profile-league {
-    width: 56px;
+    width: 50px;
   }
 
   .profile-league img {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
   }
 
   .league-text {
