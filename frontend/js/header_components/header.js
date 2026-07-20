@@ -10,7 +10,7 @@ export function renderHeader(user) {
         "/img/header_img/avatars_img/avatar_silver_1.png"
 
     const background =
-        "/img/header_img/background_header_img/forest.png"
+        "/img/header_img/background_header_img/background_silver_1.png"
 
     const xpCurrent = user?.xp_current ?? 0
     const xpNext = user?.xp_next ?? 0
