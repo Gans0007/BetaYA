@@ -57,13 +57,13 @@ BACKGROUND SHADE
 
 /* =========================================
 AVATAR
-Персонаж немного уменьшен и собран плотнее с остальными элементами.
+Элементы собраны ближе к визуальному центру карточки.
 ========================================= */
 
 .header-avatar {
   position: absolute;
 
-  left: 8px;
+  left: 18px;
   bottom: -7px;
   z-index: 2;
 
@@ -87,7 +87,7 @@ CENTER CONTENT
 .header-main {
   position: absolute;
 
-  left: 145px;
+  left: calc(50% - 60px);
   top: 18px;
   bottom: 12px;
   z-index: 3;
@@ -222,7 +222,8 @@ STARS
 .header-stars {
   position: absolute;
 
-  right: 24px;
+  left: calc(50% + 100px);
+  right: auto;
   top: 12px;
   z-index: 4;
 
@@ -273,7 +274,8 @@ LEAGUE
 .profile-league {
   position: absolute;
 
-  right: 28px;
+  left: calc(50% + 112px);
+  right: auto;
   bottom: 7px;
   z-index: 4;
 
@@ -342,7 +344,7 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-avatar {
-    left: 7px;
+    left: 16px;
     bottom: -7px;
 
     width: 132px;
@@ -350,7 +352,7 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-main {
-    left: 140px;
+    left: calc(50% - 58px);
     top: 17px;
     bottom: 11px;
 
@@ -376,7 +378,8 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-stars {
-    right: 22px;
+    left: calc(50% + 96px);
+    right: auto;
     top: 11px;
 
     min-width: 78px;
@@ -392,7 +395,8 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .profile-league {
-    right: 26px;
+    left: calc(50% + 108px);
+    right: auto;
     bottom: 6px;
 
     width: 62px;
@@ -426,6 +430,7 @@ SMALL MOBILE
   }
 
   .header-avatar {
+    left: 10px;
     bottom: -7px;
 
     width: 124px;
@@ -433,7 +438,7 @@ SMALL MOBILE
   }
 
   .header-main {
-    left: 116px;
+    left: calc(50% - 62px);
     top: 16px;
     bottom: 10px;
 
@@ -470,7 +475,8 @@ SMALL MOBILE
   }
 
   .header-stars {
-    right: 9px;
+    left: calc(50% + 70px);
+    right: auto;
     top: 10px;
 
     min-width: 72px;
@@ -487,7 +493,8 @@ SMALL MOBILE
   }
 
   .profile-league {
-    right: 9px;
+    left: calc(50% + 80px);
+    right: auto;
     bottom: 5px;
 
     width: 58px;
