@@ -8,6 +8,26 @@ const DEFAULT_AVATAR = "avatar_bronze_1.png"
 const AVATAR_PATTERN =
     /^avatar_(bronze|silver|gold)_[1-5]\.png$/
 
+const AVAILABLE_AVATARS = [
+    "avatar_bronze_1.png",
+    "avatar_bronze_2.png",
+    "avatar_bronze_3.png",
+    "avatar_bronze_4.png",
+    "avatar_bronze_5.png",
+
+    "avatar_silver_1.png",
+    "avatar_silver_2.png",
+    "avatar_silver_3.png",
+    "avatar_silver_4.png",
+    "avatar_silver_5.png",
+
+    "avatar_gold_1.png",
+    "avatar_gold_2.png",
+    "avatar_gold_3.png",
+    "avatar_gold_4.png",
+    "avatar_gold_5.png"
+]
+
 const PROFILE_INFO = {
     donut: "Показывает сколько привычек ты выполнил и сколько пропустил за выбранный период.",
     gauge: "Индекс дисциплины — рассчитывается на основе выполнения привычек.",
@@ -54,7 +74,7 @@ export function initProfileModal(){
         <div class="profile-modal-header">
             <div class="profile-header-left">
                 <div class="profile-avatar-wrap">
-                    <img src="/img/header_img/avatars_img/avatar_silver_1.png" class="profile-avatar" id="profile-avatar-image">
+                    <img src="/img/header_img/avatars_img/avatar_bronze_1.png" class="profile-avatar" id="profile-avatar-image">
                     <div class="profile-avatar-edit">Сменить</div>
                 </div>
                 <div>
