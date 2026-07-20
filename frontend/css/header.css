@@ -71,9 +71,9 @@ COMMON CONTENT CONTAINER
 
   display: grid;
   grid-template-columns:
-    108px
-    126px
-    66px;
+    98px
+    142px
+    62px;
 
   column-gap: 7px;
 
@@ -91,7 +91,7 @@ AVATAR COLUMN
 .header-avatar-column {
   position: relative;
 
-  width: 108px;
+  width: 98px;
   height: 100%;
 
   align-self: stretch;
@@ -107,10 +107,10 @@ AVATAR
 .header-avatar {
   position: absolute;
 
-  left: -1px;
+  left: 6px;
   bottom: -6px;
 
-  width: 118px;
+  width: 120px;
   height: 138px;
 
   display: block;
@@ -136,11 +136,12 @@ XP + USER INFO
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
 
   min-width: 0;
 
-  transform: translateY(-2px);
+  transform: translate(-7px, -2px);
 }
 
 
@@ -181,7 +182,7 @@ XP
 .header-xp-track {
   position: relative;
 
-  width: 92px;
+  width: 122px;
   height: 3px;
 
   margin-top: 5px;
@@ -273,7 +274,7 @@ STARS + LEAGUE
 .header-right {
   position: relative;
 
-  width: 66px;
+  width: 62px;
   height: 100px;
 
   display: flex;
@@ -283,7 +284,7 @@ STARS + LEAGUE
 
   min-width: 0;
 
-  transform: translateY(-1px);
+  transform: translate(5px, -1px);
 }
 
 
@@ -404,19 +405,20 @@ TABLET / TELEGRAM WEBVIEW
     width: min(338px, calc(100% - 22px));
 
     grid-template-columns:
-      105px
-      122px
-      64px;
+      96px
+      138px
+      60px;
 
     column-gap: 6px;
   }
 
   .header-avatar-column {
-    width: 105px;
+    width: 96px;
   }
 
   .header-avatar {
-    width: 115px;
+    left: 5px;
+    width: 118px;
     height: 136px;
   }
 
@@ -425,7 +427,7 @@ TABLET / TELEGRAM WEBVIEW
   }
 
   .header-right {
-    width: 64px;
+    width: 60px;
     height: 98px;
   }
 
@@ -470,29 +472,29 @@ MOBILE
     width: calc(100% - 16px);
 
     grid-template-columns:
-      100px
-      116px
-      62px;
+      92px
+      132px
+      58px;
 
     column-gap: 5px;
   }
 
   .header-avatar-column {
-    width: 100px;
+    width: 92px;
   }
 
   .header-avatar {
-    left: -2px;
+    left: 4px;
     bottom: -6px;
 
-    width: 110px;
+    width: 114px;
     height: 132px;
   }
 
   .header-main {
     height: 89px;
 
-    transform: translateY(-1px);
+    transform: translate(-6px, -1px);
   }
 
   .header-xp-text {
@@ -508,7 +510,7 @@ MOBILE
   }
 
   .header-xp-track {
-    width: 86px;
+    width: 116px;
   }
 
   .profile-name {
@@ -520,7 +522,7 @@ MOBILE
   }
 
   .header-right {
-    width: 62px;
+    width: 58px;
     height: 94px;
   }
 
@@ -573,22 +575,22 @@ SMALL MOBILE
     width: calc(100% - 10px);
 
     grid-template-columns:
-      92px
-      106px
-      58px;
+      84px
+      122px
+      54px;
 
     column-gap: 4px;
   }
 
   .header-avatar-column {
-    width: 92px;
+    width: 84px;
   }
 
   .header-avatar {
-    left: -4px;
+    left: 2px;
     bottom: -6px;
 
-    width: 102px;
+    width: 106px;
     height: 124px;
   }
 
@@ -606,7 +608,7 @@ SMALL MOBILE
   }
 
   .header-xp-track {
-    width: 76px;
+    width: 106px;
     height: 3px;
 
     margin-top: 4px;
@@ -621,7 +623,7 @@ SMALL MOBILE
   }
 
   .header-right {
-    width: 58px;
+    width: 54px;
     height: 90px;
   }
 
