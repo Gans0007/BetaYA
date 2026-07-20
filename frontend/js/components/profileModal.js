@@ -223,14 +223,28 @@ tabs.forEach((tab,index)=>{
         })
     })
 
-    function getAvatarPath(fileName){
-        const safeAvatar = fileName || DEFAULT_AVATAR
+function normalizeAvatar(fileName){
 
-        return `/img/header_img/avatars_img/${safeAvatar}`
+    if(
+        !fileName ||
+        !AVAILABLE_AVATARS.includes(fileName)
+    ){
+        return DEFAULT_AVATAR
     }
 
+    return fileName
+}
+
+function getAvatarPath(fileName){
+
+    const safeAvatar =
+        normalizeAvatar(fileName)
+
+    return `/img/header_img/avatars_img/${safeAvatar}`
+}
+
     function updateAvatarEverywhere(fileName){
-        const safeAvatar = fileName || DEFAULT_AVATAR
+        const safeAvatar = normalizeAvatar(fileName)
 
         if(profileAvatarEl){
             profileAvatarEl.src = getAvatarPath(safeAvatar)
