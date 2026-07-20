@@ -63,7 +63,7 @@ AVATAR
 .header-avatar {
   position: absolute;
 
-  left: 0;
+  left: 8px;
   bottom: -7px;
   z-index: 2;
 
@@ -87,12 +87,12 @@ CENTER CONTENT
 .header-main {
   position: absolute;
 
-  left: 128px;
+  left: 145px;
   top: 18px;
   bottom: 12px;
   z-index: 3;
 
-  width: 146px;
+  width: 145px;
 
   display: flex;
   flex-direction: column;
@@ -222,7 +222,7 @@ STARS
 .header-stars {
   position: absolute;
 
-  right: 12px;
+  right: 24px;
   top: 12px;
   z-index: 4;
 
@@ -273,7 +273,7 @@ LEAGUE
 .profile-league {
   position: absolute;
 
-  right: 12px;
+  right: 28px;
   bottom: 7px;
   z-index: 4;
 
@@ -342,7 +342,7 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-avatar {
-    left: 0;
+    left: 7px;
     bottom: -7px;
 
     width: 132px;
@@ -350,11 +350,11 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-main {
-    left: 124px;
+    left: 140px;
     top: 17px;
     bottom: 11px;
 
-    width: 140px;
+    width: 142px;
   }
 
   .header-xp {
@@ -376,7 +376,7 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .header-stars {
-    right: 11px;
+    right: 22px;
     top: 11px;
 
     min-width: 78px;
@@ -392,7 +392,7 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .profile-league {
-    right: 11px;
+    right: 26px;
     bottom: 6px;
 
     width: 62px;
