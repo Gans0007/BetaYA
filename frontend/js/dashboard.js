@@ -53,6 +53,9 @@ async function loadDashboard(){
         // ==========================
         renderHeader(user)
 
+        // инициализация модалки после появления аватарки
+        initProfileModal()
+
         // ==========================
         // HABITS
         // ==========================
@@ -139,7 +142,6 @@ document.addEventListener("click", (e)=>{
 function init(){
     renderWeek()
     initNavigation()
-    initProfileModal()
     initUserProfileModal()
     loadDashboard()
 }
