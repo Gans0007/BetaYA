@@ -17,7 +17,7 @@ PROFILE CARD
   position: relative;
 
   width: 100%;
-  height: 148px;
+  height: 136px;
 
   overflow: hidden;
   box-sizing: border-box;
@@ -25,9 +25,9 @@ PROFILE CARD
   border-radius: 22px;
 
   background-image: var(--header-background);
-  background-position: center;
+  background-position: center 52%;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 108% auto;
 
   box-shadow:
     0 10px 24px rgba(0, 0, 0, 0.14);
@@ -57,19 +57,18 @@ BACKGROUND SHADE
 
 /* =========================================
 AVATAR
-Размер персонажа не уменьшаем.
-Карточка стала ниже, лишнее обрезается overflow.
+Персонаж немного уменьшен и собран плотнее с остальными элементами.
 ========================================= */
 
 .header-avatar {
   position: absolute;
 
   left: 0;
-  bottom: -8px;
+  bottom: -7px;
   z-index: 2;
 
-  width: 150px;
-  height: 172px;
+  width: 136px;
+  height: 156px;
 
   display: block;
 
@@ -88,12 +87,12 @@ CENTER CONTENT
 .header-main {
   position: absolute;
 
-  left: 141px;
-  top: 24px;
-  bottom: 16px;
+  left: 128px;
+  top: 18px;
+  bottom: 12px;
   z-index: 3;
 
-  width: 154px;
+  width: 146px;
 
   display: flex;
   flex-direction: column;
@@ -106,7 +105,7 @@ XP
 ========================================= */
 
 .header-xp {
-  width: 138px;
+  width: 130px;
 }
 
 .header-xp-text {
@@ -136,10 +135,10 @@ XP
 .header-xp-track {
   position: relative;
 
-  width: 104px;
-  height: 4px;
+  width: 100px;
+  height: 3px;
 
-  margin-top: 6px;
+  margin-top: 5px;
 
   overflow: hidden;
   border-radius: 999px;
@@ -176,11 +175,11 @@ USER INFO
 .header-user-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .profile-name {
-  max-width: 154px;
+  max-width: 146px;
 
   color: #171713;
 
@@ -189,7 +188,7 @@ USER INFO
     "Times New Roman",
     serif;
 
-  font-size: 25px;
+  font-size: 23px;
   line-height: 1;
   font-weight: 700;
 
@@ -202,7 +201,7 @@ USER INFO
 }
 
 .profile-clan {
-  max-width: 154px;
+  max-width: 146px;
 
   color: #30352f;
 
@@ -223,14 +222,14 @@ STARS
 .header-stars {
   position: absolute;
 
-  right: 14px;
-  top: 17px;
+  right: 12px;
+  top: 12px;
   z-index: 4;
 
-  min-width: 88px;
-  height: 34px;
+  min-width: 80px;
+  height: 30px;
 
-  padding: 0 10px;
+  padding: 0 9px;
 
   display: flex;
   align-items: center;
@@ -245,7 +244,7 @@ STARS
 
   color: #171717;
 
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   font-weight: 800;
 
@@ -257,7 +256,7 @@ STARS
 }
 
 .header-star-icon {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
 
   filter:
@@ -274,11 +273,11 @@ LEAGUE
 .profile-league {
   position: absolute;
 
-  right: 15px;
-  bottom: 9px;
+  right: 12px;
+  bottom: 7px;
   z-index: 4;
 
-  width: 70px;
+  width: 64px;
 
   display: flex;
   flex-direction: column;
@@ -288,8 +287,8 @@ LEAGUE
 }
 
 .profile-league img {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
 
   display: block;
   flex-shrink: 0;
@@ -338,70 +337,70 @@ MOBILE — ОСНОВНОЙ РАЗМЕР TELEGRAM
   }
 
   .profile-card {
-    height: 146px;
-    border-radius: 21px;
+    height: 132px;
+    border-radius: 20px;
   }
 
   .header-avatar {
     left: 0;
-    bottom: -8px;
+    bottom: -7px;
 
-    width: 146px;
-    height: 169px;
+    width: 132px;
+    height: 152px;
   }
 
   .header-main {
-    left: 136px;
-    top: 23px;
-    bottom: 15px;
+    left: 124px;
+    top: 17px;
+    bottom: 11px;
 
-    width: 148px;
+    width: 140px;
   }
 
   .header-xp {
-    width: 132px;
+    width: 124px;
   }
 
   .header-xp-track {
-    width: 100px;
+    width: 94px;
   }
 
   .profile-name {
-    max-width: 148px;
-    font-size: 24px;
+    max-width: 140px;
+    font-size: 22px;
   }
 
   .profile-clan {
-    max-width: 148px;
-    font-size: 12px;
+    max-width: 140px;
+    font-size: 11px;
   }
 
   .header-stars {
-    right: 13px;
-    top: 16px;
+    right: 11px;
+    top: 11px;
 
-    min-width: 84px;
-    height: 32px;
+    min-width: 78px;
+    height: 29px;
 
-    padding: 0 9px;
+    padding: 0 8px;
 
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .header-star-icon {
-    font-size: 15px;
+    font-size: 13px;
   }
 
   .profile-league {
-    right: 13px;
-    bottom: 8px;
+    right: 11px;
+    bottom: 6px;
 
-    width: 68px;
+    width: 62px;
   }
 
   .profile-league img {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
   }
 
   .league-text {
@@ -422,27 +421,27 @@ SMALL MOBILE
   }
 
   .profile-card {
-    height: 138px;
+    height: 126px;
     border-radius: 20px;
   }
 
   .header-avatar {
-    bottom: -8px;
+    bottom: -7px;
 
-    width: 136px;
-    height: 161px;
+    width: 124px;
+    height: 145px;
   }
 
   .header-main {
-    left: 126px;
-    top: 21px;
-    bottom: 14px;
+    left: 116px;
+    top: 16px;
+    bottom: 10px;
 
-    width: 132px;
+    width: 124px;
   }
 
   .header-xp {
-    width: 120px;
+    width: 112px;
   }
 
   .header-xp-text,
@@ -455,27 +454,27 @@ SMALL MOBILE
   }
 
   .header-xp-track {
-    width: 88px;
-    height: 4px;
-    margin-top: 5px;
+    width: 84px;
+    height: 3px;
+    margin-top: 4px;
   }
 
   .profile-name {
-    max-width: 132px;
-    font-size: 21px;
+    max-width: 124px;
+    font-size: 20px;
   }
 
   .profile-clan {
-    max-width: 132px;
-    font-size: 11px;
+    max-width: 124px;
+    font-size: 10px;
   }
 
   .header-stars {
-    right: 10px;
-    top: 13px;
+    right: 9px;
+    top: 10px;
 
-    min-width: 76px;
-    height: 30px;
+    min-width: 72px;
+    height: 27px;
 
     padding: 0 8px;
     gap: 4px;
@@ -488,15 +487,15 @@ SMALL MOBILE
   }
 
   .profile-league {
-    right: 10px;
-    bottom: 7px;
+    right: 9px;
+    bottom: 5px;
 
-    width: 62px;
+    width: 58px;
   }
 
   .profile-league img {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
 
   .league-text {
