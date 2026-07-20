@@ -3,10 +3,10 @@ import { renderGraph } from "../components/graph.js"
 import { initInfoTooltip } from "../components/infoTooltip.js"
 import { getProfileDataPage } from "../components/profileDataPage.js"
 
+const DEFAULT_AVATAR = "avatar_silver_1.png"
+
 const AVAILABLE_AVATARS = [
-    "avatar_1.png",
-    "avatar_2.png",
-    "avatar_3.png"
+    "avatar_silver_1.png"
 ]
 
 const PROFILE_INFO = {
@@ -18,10 +18,7 @@ const PROFILE_INFO = {
 
 export function initProfileModal(){
 
-    if(document.querySelector(".profile-overlay")) return
-
-    const dashboardAvatar = document.getElementById("player-avatar")
-    if(!dashboardAvatar) return
+    if(document.getElementById("my-profile-overlay")) return
 
     let profileState = {
         isOpen: false,
@@ -35,6 +32,7 @@ export function initProfileModal(){
     let profileData = null
 
     const overlay = document.createElement("div")
+    overlay.id = "my-profile-overlay"
     overlay.className = "profile-overlay hidden"
 
     overlay.innerHTML = `
@@ -57,7 +55,7 @@ export function initProfileModal(){
         <div class="profile-modal-header">
             <div class="profile-header-left">
                 <div class="profile-avatar-wrap">
-                    <img src="img/avatar/avatar_1.png" class="profile-avatar" id="profile-avatar-image">
+                    <img src="/img/header_img/avatars_img/avatar_silver_1.png" class="profile-avatar" id="profile-avatar-image">
                     <div class="profile-avatar-edit">Сменить</div>
                 </div>
                 <div>
@@ -73,7 +71,7 @@ export function initProfileModal(){
             <div class="avatar-picker-grid">
                 ${AVAILABLE_AVATARS.map(item => `
                     <button class="avatar-option" data-avatar="${item}" type="button">
-                        <img src="img/avatar/${item}" alt="${item}">
+                        <img src="/img/header_img/avatars_img/${item}" alt="${item}">
                     </button>
                 `).join("")}
             </div>
@@ -226,18 +224,24 @@ tabs.forEach((tab,index)=>{
     })
 
     function getAvatarPath(fileName){
-        return `img/avatar/${fileName || "avatar_1.png"}`
+        const safeAvatar = fileName || DEFAULT_AVATAR
+
+        return `/img/header_img/avatars_img/${safeAvatar}`
     }
 
     function updateAvatarEverywhere(fileName){
-        const safeAvatar = fileName || "avatar_1.png"
+        const safeAvatar = fileName || DEFAULT_AVATAR
 
         if(profileAvatarEl){
             profileAvatarEl.src = getAvatarPath(safeAvatar)
         }
 
-        if(dashboardAvatar){
-            dashboardAvatar.src = getAvatarPath(safeAvatar)
+        const currentDashboardAvatar =
+            document.getElementById("player-avatar")
+
+        if(currentDashboardAvatar){
+            currentDashboardAvatar.src =
+                getAvatarPath(safeAvatar)
         }
 
         if(profileData && profileData.user){
@@ -271,7 +275,7 @@ tabs.forEach((tab,index)=>{
             return
         }
 
-        const previousAvatar = profileData.user.avatar || "avatar_1.png"
+        const previousAvatar = profileData.user.avatar || DEFAULT_AVATAR
 
         profileState.isSavingAvatar = true
         updateAvatarEverywhere(newAvatar)
@@ -328,7 +332,7 @@ tabs.forEach((tab,index)=>{
 
         nameEl.innerText = user.nickname || "Player"
         subEl.innerText = user.league?.name || "—"
-        updateAvatarEverywhere(user.avatar || "avatar_1.png")
+        updateAvatarEverywhere(user.avatar || DEFAULT_AVATAR)
 
         const total = completed + missed || 1
         const percent = (completed / total) * 100
@@ -443,7 +447,7 @@ tabs.forEach((tab,index)=>{
         }
     }
 
-    dashboardAvatar.addEventListener("click", () => {
+    function openProfileModal(){
 
         if(profileState.isOpen) return
 
@@ -454,13 +458,17 @@ tabs.forEach((tab,index)=>{
         renderLoadingState()
 
         overlay.classList.remove("hidden")
-tabs.forEach(t=>t.classList.remove("active"))
-tabs[0].classList.add("active")
 
-tabBg.style.transform = `translateX(0%)`
+        tabs.forEach(tab => {
+            tab.classList.remove("active")
+        })
 
-analyticsPage.classList.add("active")
-dataPage.classList.remove("active")
+        tabs[0].classList.add("active")
+
+        tabBg.style.transform = "translateX(0%)"
+
+        analyticsPage.classList.add("active")
+        dataPage.classList.remove("active")
 
         setTimeout(() => {
             overlay.classList.add("active")
@@ -469,6 +477,16 @@ dataPage.classList.remove("active")
         document.body.style.overflow = "hidden"
 
         loadProfile()
+    }
+
+    document.addEventListener("click", event => {
+
+        const headerCard =
+            event.target.closest(".profile-card")
+
+        if(!headerCard) return
+
+        openProfileModal()
     })
 
     function closeModal(){

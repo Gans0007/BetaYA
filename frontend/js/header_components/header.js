@@ -135,15 +135,4 @@ export function renderHeader(user) {
         </div>
     `
 
-    const leagueIconElement =
-        root.querySelector("#league-icon")
-
-    if (leagueIconElement) {
-        leagueIconElement.addEventListener(
-            "click",
-            () => {
-                window.openLeagueInfo?.()
-            }
-        )
-    }
 }
