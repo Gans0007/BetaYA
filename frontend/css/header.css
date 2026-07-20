@@ -1,5 +1,8 @@
 /* =========================================
-HEADER
+   HEADER
+   Полностью выровненная композиция:
+   XP на одной линии со звёздами,
+   никнейм на одной линии с лигой.
 ========================================= */
 
 .header {
@@ -9,7 +12,7 @@ HEADER
 
 
 /* =========================================
-PROFILE CARD
+   PROFILE CARD
 ========================================= */
 
 .profile-card {
@@ -34,7 +37,7 @@ PROFILE CARD
 
 
 /* =========================================
-BACKGROUND SHADE
+   BACKGROUND SHADE
 ========================================= */
 
 .header-shade {
@@ -45,7 +48,7 @@ BACKGROUND SHADE
   background:
     linear-gradient(
       90deg,
-      rgba(15, 28, 20, 0.12) 0%,
+      rgba(15, 28, 20, 0.13) 0%,
       rgba(255, 255, 255, 0.01) 48%,
       rgba(24, 35, 27, 0.08) 100%
     );
@@ -55,27 +58,25 @@ BACKGROUND SHADE
 
 
 /* =========================================
-COMMON CONTENT CONTAINER
-Вся композиция собрана в одной группе
-и ограничена по ширине.
+   COMMON CONTENT CONTAINER
 ========================================= */
 
 .header-content {
   position: relative;
   z-index: 2;
 
-  width: min(346px, calc(100% - 26px));
+  width: min(350px, calc(100% - 20px));
   height: 100%;
 
   margin: 0 auto;
 
   display: grid;
   grid-template-columns:
-    98px
-    142px
-    62px;
+    106px
+    minmax(0, 1fr)
+    70px;
 
-  column-gap: 7px;
+  column-gap: 10px;
 
   align-items: center;
   justify-content: center;
@@ -85,29 +86,29 @@ COMMON CONTENT CONTAINER
 
 
 /* =========================================
-AVATAR COLUMN
+   AVATAR COLUMN
 ========================================= */
 
 .header-avatar-column {
   position: relative;
 
-  width: 98px;
+  width: 106px;
   height: 100%;
 
   align-self: stretch;
-
   overflow: visible;
 }
 
 
 /* =========================================
-AVATAR
+   AVATAR
+   Сдвинут ближе к правому краю своей колонки
 ========================================= */
 
 .header-avatar {
   position: absolute;
 
-  left: 6px;
+  right: -8px;
   bottom: -6px;
 
   width: 120px;
@@ -116,7 +117,7 @@ AVATAR
   display: block;
 
   object-fit: contain;
-  object-position: left bottom;
+  object-position: right bottom;
 
   pointer-events: none;
   user-select: none;
@@ -124,33 +125,37 @@ AVATAR
 
 
 /* =========================================
-CENTER CONTENT
-XP + USER INFO
+   CENTER COLUMN
+   Верхняя строка: XP
+   Нижняя строка: никнейм и клан
 ========================================= */
 
 .header-main {
   position: relative;
 
   width: 100%;
-  height: 94px;
+  height: 92px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 10px;
+  display: grid;
+  grid-template-rows: 34px 1fr;
+  row-gap: 10px;
+
+  align-self: center;
+  align-items: start;
 
   min-width: 0;
-
-  transform: translate(-7px, -2px);
 }
 
 
 /* =========================================
-XP
+   XP
 ========================================= */
 
 .header-xp {
   width: 100%;
+  min-width: 0;
+
+  align-self: start;
 }
 
 .header-xp-text {
@@ -169,6 +174,7 @@ XP
 
 .header-xp-text strong {
   font-size: 14px;
+  line-height: 1;
   font-weight: 850;
 }
 
@@ -176,13 +182,14 @@ XP
   color: rgba(22, 47, 37, 0.78);
 
   font-size: 9px;
+  line-height: 1;
   font-weight: 600;
 }
 
 .header-xp-track {
   position: relative;
 
-  width: 122px;
+  width: min(122px, 100%);
   height: 3px;
 
   margin-top: 5px;
@@ -216,15 +223,20 @@ XP
 
 
 /* =========================================
-USER INFO
+   USER INFO
 ========================================= */
 
 .header-user-info {
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 3px;
 
-  min-width: 0;
+  align-self: start;
 }
 
 .profile-name {
@@ -239,7 +251,7 @@ USER INFO
     serif;
 
   font-size: 21px;
-  line-height: 1;
+  line-height: 1.05;
   font-weight: 700;
 
   white-space: nowrap;
@@ -247,7 +259,7 @@ USER INFO
   text-overflow: ellipsis;
 
   text-shadow:
-    0 1px 2px rgba(255, 255, 255, 0.26);
+    0 1px 2px rgba(255, 255, 255, 0.28);
 }
 
 .profile-clan {
@@ -267,35 +279,39 @@ USER INFO
 
 
 /* =========================================
-RIGHT COLUMN
-STARS + LEAGUE
+   RIGHT COLUMN
+   Верхняя строка: звёзды
+   Нижняя строка: лига
 ========================================= */
 
 .header-right {
   position: relative;
 
-  width: 62px;
-  height: 100px;
+  width: 70px;
+  height: 92px;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-rows: 34px 1fr;
+  row-gap: 10px;
+
+  align-self: center;
+  align-items: start;
+  justify-items: center;
 
   min-width: 0;
-
-  transform: translate(5px, -1px);
 }
 
 
 /* =========================================
-STARS
+   STARS
+   На одной горизонтали с XP
 ========================================= */
 
 .header-stars {
   position: relative;
 
-  min-width: 66px;
+  width: 70px;
+  min-width: 70px;
   height: 27px;
 
   padding: 0 7px;
@@ -304,6 +320,8 @@ STARS
   align-items: center;
   justify-content: center;
   gap: 3px;
+
+  align-self: start;
 
   box-sizing: border-box;
 
@@ -340,19 +358,22 @@ STARS
 
 
 /* =========================================
-LEAGUE
+   LEAGUE
+   Начинается на одной горизонтали с никнеймом
 ========================================= */
 
 .profile-league {
   position: relative;
 
-  width: 58px;
+  width: 62px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 2px;
+
+  align-self: start;
 }
 
 .profile-league img {
@@ -383,11 +404,13 @@ LEAGUE
 
   text-align: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
 /* =========================================
-CALENDAR GAP
+   CALENDAR GAP
 ========================================= */
 
 .header-calendar {
@@ -396,43 +419,48 @@ CALENDAR GAP
 
 
 /* =========================================
-TABLET / TELEGRAM WEBVIEW
+   TABLET / TELEGRAM WEBVIEW
 ========================================= */
 
 @media (max-width: 520px) {
 
   .header-content {
-    width: min(338px, calc(100% - 22px));
+    width: min(342px, calc(100% - 18px));
 
     grid-template-columns:
-      96px
-      138px
-      60px;
+      102px
+      minmax(0, 1fr)
+      68px;
 
-    column-gap: 6px;
+    column-gap: 9px;
   }
 
   .header-avatar-column {
-    width: 96px;
+    width: 102px;
   }
 
   .header-avatar {
-    left: 5px;
+    right: -7px;
+
     width: 118px;
     height: 136px;
   }
 
-  .header-main {
-    height: 92px;
+  .header-main,
+  .header-right {
+    height: 90px;
+
+    grid-template-rows: 33px 1fr;
+    row-gap: 9px;
   }
 
   .header-right {
-    width: 60px;
-    height: 98px;
+    width: 68px;
   }
 
   .header-stars {
-    min-width: 64px;
+    width: 68px;
+    min-width: 68px;
     height: 26px;
 
     padding: 0 6px;
@@ -443,7 +471,7 @@ TABLET / TELEGRAM WEBVIEW
   }
 
   .profile-league {
-    width: 56px;
+    width: 60px;
   }
 
   .profile-league img {
@@ -454,7 +482,7 @@ TABLET / TELEGRAM WEBVIEW
 
 
 /* =========================================
-MOBILE
+   MOBILE
 ========================================= */
 
 @media (max-width: 420px) {
@@ -469,32 +497,34 @@ MOBILE
   }
 
   .header-content {
-    width: calc(100% - 16px);
+    width: calc(100% - 12px);
 
     grid-template-columns:
-      92px
-      132px
-      58px;
+      96px
+      minmax(0, 1fr)
+      64px;
 
-    column-gap: 5px;
+    column-gap: 8px;
   }
 
   .header-avatar-column {
-    width: 92px;
+    width: 96px;
   }
 
   .header-avatar {
-    left: 4px;
+    right: -7px;
     bottom: -6px;
 
     width: 114px;
     height: 132px;
   }
 
-  .header-main {
-    height: 89px;
+  .header-main,
+  .header-right {
+    height: 88px;
 
-    transform: translate(-6px, -1px);
+    grid-template-rows: 32px 1fr;
+    row-gap: 8px;
   }
 
   .header-xp-text {
@@ -510,7 +540,7 @@ MOBILE
   }
 
   .header-xp-track {
-    width: 116px;
+    width: min(116px, 100%);
   }
 
   .profile-name {
@@ -522,15 +552,15 @@ MOBILE
   }
 
   .header-right {
-    width: 58px;
-    height: 94px;
+    width: 64px;
   }
 
   .header-stars {
-    min-width: 62px;
+    width: 64px;
+    min-width: 64px;
     height: 25px;
 
-    padding: 0 6px;
+    padding: 0 5px;
     gap: 3px;
 
     font-size: 9px;
@@ -541,7 +571,7 @@ MOBILE
   }
 
   .profile-league {
-    width: 54px;
+    width: 58px;
   }
 
   .profile-league img {
@@ -556,7 +586,7 @@ MOBILE
 
 
 /* =========================================
-SMALL MOBILE
+   SMALL MOBILE
 ========================================= */
 
 @media (max-width: 370px) {
@@ -572,30 +602,34 @@ SMALL MOBILE
   }
 
   .header-content {
-    width: calc(100% - 10px);
+    width: calc(100% - 8px);
 
     grid-template-columns:
-      84px
-      122px
-      54px;
+      88px
+      minmax(0, 1fr)
+      58px;
 
-    column-gap: 4px;
+    column-gap: 6px;
   }
 
   .header-avatar-column {
-    width: 84px;
+    width: 88px;
   }
 
   .header-avatar {
-    left: 2px;
+    right: -6px;
     bottom: -6px;
 
     width: 106px;
     height: 124px;
   }
 
-  .header-main {
-    height: 86px;
+  .header-main,
+  .header-right {
+    height: 84px;
+
+    grid-template-rows: 30px 1fr;
+    row-gap: 7px;
   }
 
   .header-xp-text,
@@ -608,7 +642,7 @@ SMALL MOBILE
   }
 
   .header-xp-track {
-    width: 106px;
+    width: min(106px, 100%);
     height: 3px;
 
     margin-top: 4px;
@@ -623,15 +657,15 @@ SMALL MOBILE
   }
 
   .header-right {
-    width: 54px;
-    height: 90px;
+    width: 58px;
   }
 
   .header-stars {
+    width: 58px;
     min-width: 58px;
     height: 24px;
 
-    padding: 0 5px;
+    padding: 0 4px;
     gap: 2px;
 
     font-size: 8px;
@@ -642,7 +676,7 @@ SMALL MOBILE
   }
 
   .profile-league {
-    width: 50px;
+    width: 52px;
   }
 
   .profile-league img {
