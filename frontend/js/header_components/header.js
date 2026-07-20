@@ -7,7 +7,7 @@ export function renderHeader(user) {
     }
 
     const avatar =
-        "/img/header_img/avatars_img/hunter.png"
+        "/img/header_img/avatars_img/avatar_silver_1.png"
 
     const background =
         "/img/header_img/background_header_img/forest.png"
