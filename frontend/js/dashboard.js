@@ -45,8 +45,6 @@ async function loadDashboard(){
         const user = await userRes.json()
         window.currentUserAvatar = user.avatar || "avatar_1.png"
 
-        const habits = await habitsRes.json()
-        const referrals = await refRes.json()
 
         // ==========================
         // USER
@@ -55,6 +53,10 @@ async function loadDashboard(){
 
         // инициализация модалки после появления аватарки
         initProfileModal()
+
+        const habits = await habitsRes.json()
+        const referrals = await refRes.json()
+
 
         // ==========================
         // HABITS

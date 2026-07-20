@@ -298,6 +298,7 @@ async def get_referrals(request: Request):
         SELECT
             u.user_id,
             COALESCE(u.username, u.first_name, 'User') as name,
+            COALESCE(u.avatar, 'avatar_bronze_1.png') as avatar,
             COALESCE(s.xp,0) as xp
 
         FROM referrals r
