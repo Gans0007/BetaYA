@@ -3,21 +3,21 @@
    ========================================================= */
 
 :root {
-    --habits-v2-bg: #f8f9fb;
     --habits-v2-text: #232428;
-    --habits-v2-muted: #a1a3a9;
+    --habits-v2-muted: #a5a7ad;
     --habits-v2-blue: #2f7fe5;
     --habits-v2-button-bg: #eef5ff;
 }
 
 
 /* =========================================================
-   СТРАНИЦА DASHBOARD V2
+   СТРАНИЦА HABITS V2
    ========================================================= */
 
 #habits-v2-page {
     position: fixed;
     inset: 0;
+
     width: 100%;
     height: 100dvh;
     min-height: 100vh;
@@ -26,20 +26,19 @@
     padding: 0;
 
     overflow: hidden;
+
     background:
         radial-gradient(
             circle at 50% 45%,
-            rgba(255, 255, 255, 0.98) 0%,
-            rgba(250, 251, 253, 0.96) 52%,
-            rgba(246, 248, 251, 1) 100%
+            rgba(255, 255, 255, 0.99) 0%,
+            rgba(250, 251, 253, 0.97) 55%,
+            rgba(247, 249, 252, 1) 100%
         );
 }
 
-
-/* Убираем ограничения старого page-content */
-
 #habits-v2-page .page-content {
     position: relative;
+
     width: 100%;
     height: 100%;
     min-height: 100dvh;
@@ -52,19 +51,16 @@
 }
 
 
-/* Скрываем старую шапку при открытой странице привычек V2 */
+/* Скрываем старый игровой header только на странице V2 */
 
 #game-root:has(#habits-v2-page.active) #header-root {
     display: none !important;
 }
 
-
-/* Убираем возможные старые отступы game-root */
-
 #game-root:has(#habits-v2-page.active) {
+    min-height: 100dvh;
     margin: 0;
     padding: 0;
-    min-height: 100dvh;
 }
 
 
@@ -74,46 +70,37 @@
 
 .habits-v2-empty {
     position: relative;
+
     width: 100%;
     height: 100%;
     min-height: 100dvh;
 
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 
     box-sizing: border-box;
 
-    /*
-       Нижний padding оставляет пространство
-       под фиксированную навигацию.
-    */
     padding:
-        max(20px, env(safe-area-inset-top))
-        22px
-        calc(150px + env(safe-area-inset-bottom));
+        max(16px, env(safe-area-inset-top))
+        16px
+        calc(92px + env(safe-area-inset-bottom));
 }
-
-
-/* Центральный блок */
 
 .habits-v2-empty__content {
     position: relative;
+
     width: 100%;
-    max-width: 760px;
+    max-width: 390px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
-    /*
-       Небольшой подъём центрального блока,
-       как на референсе.
-    */
-    transform: translateY(-10px);
-
-    text-align: center;
     box-sizing: border-box;
+    text-align: center;
+
+    transform: translateY(24px);
 }
 
 
@@ -122,7 +109,7 @@
    ========================================================= */
 
 .habits-v2-empty__date {
-    margin: 0 0 36px;
+    margin: 0 0 24px;
 
     color: var(--habits-v2-muted);
 
@@ -135,10 +122,10 @@
         Arial,
         sans-serif;
 
-    font-size: clamp(20px, 4.15vw, 31px);
+    font-size: 18px;
     font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.025em;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 
     white-space: nowrap;
 
@@ -148,7 +135,7 @@
 
 
 /* =========================================================
-   ГЛАВНЫЙ ЗАГОЛОВОК
+   ОСНОВНОЙ ЗАГОЛОВОК
    ========================================================= */
 
 .habits-v2-empty__title {
@@ -165,10 +152,10 @@
         Arial,
         sans-serif;
 
-    font-size: clamp(36px, 7.4vw, 61px);
-    font-weight: 590;
-    line-height: 1.04;
-    letter-spacing: -0.046em;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
 
     white-space: nowrap;
 
@@ -182,7 +169,7 @@
    ========================================================= */
 
 .habits-v2-empty__subtitle {
-    margin-top: 8px;
+    margin-top: 5px;
 
     color: var(--habits-v2-muted);
 
@@ -195,10 +182,10 @@
         Arial,
         sans-serif;
 
-    font-size: clamp(35px, 7.15vw, 59px);
-    font-weight: 420;
-    line-height: 1.04;
-    letter-spacing: -0.045em;
+    font-size: 33px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
 
     white-space: nowrap;
 
@@ -208,32 +195,35 @@
 
 
 /* =========================================================
-   КНОПКА ДОБАВЛЕНИЯ
+   КНОПКА +
    ========================================================= */
 
 .habits-v2-empty__add-button {
     position: relative;
 
-    width: clamp(112px, 18.8vw, 154px);
-    height: clamp(112px, 18.8vw, 154px);
+    width: 96px;
+    height: 96px;
 
-    margin-top: 92px;
-    padding: 0;
+    margin-top: 54px;
+    padding: 0 0 6px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    border: 0;
+    flex: 0 0 auto;
+
+    border: none;
     border-radius: 50%;
     outline: none;
 
     color: var(--habits-v2-blue);
+
     background:
         radial-gradient(
             circle at 38% 28%,
-            #f8fbff 0%,
-            var(--habits-v2-button-bg) 58%,
+            #f9fcff 0%,
+            var(--habits-v2-button-bg) 60%,
             #e8f1fc 100%
         );
 
@@ -245,17 +235,20 @@
         Arial,
         sans-serif;
 
-    font-size: clamp(63px, 10vw, 82px);
+    font-size: 56px;
     font-weight: 250;
     line-height: 1;
 
     cursor: pointer;
     user-select: none;
+
     -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
 
     box-shadow:
-        0 18px 32px rgba(78, 105, 140, 0.17),
-        0 8px 15px rgba(78, 105, 140, 0.10),
+        0 14px 26px rgba(78, 105, 140, 0.15),
+        0 5px 12px rgba(78, 105, 140, 0.08),
         inset 0 1px 1px rgba(255, 255, 255, 0.95);
 
     transition:
@@ -264,99 +257,48 @@
         opacity 160ms ease;
 }
 
-
-/*
-   Визуально выравниваем символ +.
-   У стандартного текстового плюса часто немного смещена базовая линия.
-*/
-
-.habits-v2-empty__add-button {
-    padding-bottom: 9px;
-}
-
-
 .habits-v2-empty__add-button:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
 
     box-shadow:
-        0 10px 20px rgba(78, 105, 140, 0.14),
-        0 4px 9px rgba(78, 105, 140, 0.09),
+        0 8px 17px rgba(78, 105, 140, 0.13),
+        0 3px 8px rgba(78, 105, 140, 0.08),
         inset 0 1px 1px rgba(255, 255, 255, 0.95);
 }
-
-
-/* Убираем стандартный фокус браузера */
 
 .habits-v2-empty__add-button:focus {
     outline: none;
 }
 
-
 .habits-v2-empty__add-button:focus-visible {
     box-shadow:
-        0 18px 32px rgba(78, 105, 140, 0.17),
-        0 0 0 4px rgba(47, 127, 229, 0.15);
+        0 14px 26px rgba(78, 105, 140, 0.15),
+        0 0 0 4px rgba(47, 127, 229, 0.14);
 }
 
 
 /* =========================================================
-   АДАПТАЦИЯ ПОД УЗКИЕ ЭКРАНЫ
+   СРЕДНИЕ И БОЛЬШИЕ ТЕЛЕФОНЫ
    ========================================================= */
 
-@media (max-width: 430px) {
-
-    .habits-v2-empty {
-        padding-left: 14px;
-        padding-right: 14px;
-    }
+@media (min-width: 431px) {
 
     .habits-v2-empty__content {
-        transform: translateY(-8px);
+        max-width: 430px;
+        transform: translateY(20px);
     }
 
     .habits-v2-empty__date {
-        margin-bottom: 28px;
-        font-size: 20px;
+        margin-bottom: 26px;
+        font-size: 19px;
     }
 
     .habits-v2-empty__title {
-        font-size: 37px;
-        letter-spacing: -0.042em;
-    }
-
-    .habits-v2-empty__subtitle {
-        margin-top: 6px;
         font-size: 36px;
-        letter-spacing: -0.043em;
-    }
-
-    .habits-v2-empty__add-button {
-        width: 112px;
-        height: 112px;
-
-        margin-top: 66px;
-        padding-bottom: 7px;
-
-        font-size: 64px;
-    }
-}
-
-
-/* Очень узкие телефоны */
-
-@media (max-width: 370px) {
-
-    .habits-v2-empty__date {
-        margin-bottom: 24px;
-        font-size: 18px;
-    }
-
-    .habits-v2-empty__title {
-        font-size: 32px;
     }
 
     .habits-v2-empty__subtitle {
-        font-size: 31px;
+        font-size: 35px;
     }
 
     .habits-v2-empty__add-button {
@@ -365,24 +307,100 @@
 
         margin-top: 58px;
 
-        font-size: 58px;
+        font-size: 59px;
     }
 }
 
 
-/* Низкие экраны */
+/* =========================================================
+   УЗКИЕ ТЕЛЕФОНЫ
+   ========================================================= */
 
-@media (max-height: 700px) {
+@media (max-width: 370px) {
+
+    .habits-v2-empty {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
 
     .habits-v2-empty__content {
-        transform: translateY(5px);
+        max-width: 350px;
+        transform: translateY(18px);
     }
 
     .habits-v2-empty__date {
-        margin-bottom: 22px;
+        margin-bottom: 21px;
+        font-size: 17px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 30px;
+    }
+
+    .habits-v2-empty__subtitle {
+        margin-top: 4px;
+        font-size: 29px;
     }
 
     .habits-v2-empty__add-button {
-        margin-top: 48px;
+        width: 88px;
+        height: 88px;
+
+        margin-top: 46px;
+        padding-bottom: 5px;
+
+        font-size: 51px;
+    }
+}
+
+
+/* =========================================================
+   НИЗКИЕ ЭКРАНЫ TELEGRAM
+   ========================================================= */
+
+@media (max-height: 720px) {
+
+    .habits-v2-empty__content {
+        transform: translateY(8px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 18px;
+    }
+
+    .habits-v2-empty__add-button {
+        margin-top: 40px;
+    }
+}
+
+
+/* Совсем низкие экраны */
+
+@media (max-height: 620px) {
+
+    .habits-v2-empty__content {
+        transform: translateY(2px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 29px;
+    }
+
+    .habits-v2-empty__subtitle {
+        font-size: 28px;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 82px;
+        height: 82px;
+
+        margin-top: 34px;
+
+        font-size: 48px;
     }
 }
