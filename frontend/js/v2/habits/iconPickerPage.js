@@ -139,7 +139,7 @@ export function renderIconPickerPage(
                             class="habit-icon-picker__back-icon"
                             aria-hidden="true"
                         >
-                            ←
+                            ‹
                         </span>
                     </button>
 

@@ -299,16 +299,55 @@ body:has(.add-habit-v2) .bottom-nav {
     align-items: center;
     justify-content: center;
 
-    padding-bottom: 2px;
+    margin: 0;
+    padding: 0;
 
+    border: none;
     border-radius: 50%;
+    outline: none;
 
     color: var(--add-habit-blue);
     background: var(--add-habit-blue-soft);
 
-    font-size: 38px;
-    font-weight: 600;
+    font-size: inherit;
     line-height: 1;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    overflow: hidden;
+}
+
+
+/* выбраная иконка */
+
+.add-habit-v2__selected-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji",
+        sans-serif;
+
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+
+    transform: translateZ(0);
 }
 
 

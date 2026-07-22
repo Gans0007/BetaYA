@@ -131,23 +131,23 @@
 /* Кнопка назад */
 
 .habit-icon-picker__back-button {
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
 
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    flex: 0 0 50px;
+    flex: 0 0 44px;
 
     margin: 0;
     padding: 0;
 
     border: none;
-    border-radius: 14px;
+    border-radius: 0;
     outline: none;
 
-    color: #34363b;
+    color: #3788f5;
     background: transparent;
 
     cursor: pointer;
@@ -170,20 +170,25 @@
 .habit-icon-picker__back-icon {
     display: block;
 
-    margin-left: 1px;
-
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "SF Pro Display",
+        "SF Pro Text",
         Arial,
         sans-serif;
 
-    font-size: 47px;
+    font-size: 51px;
     font-weight: 300;
-    line-height: 1;
+    line-height: 0.75;
 
-    transform: translateY(1px);
+    transform: translateY(-2px);
+}
+
+.habit-icon-picker__back-button:active,
+.habit-icon-picker__back-button.is-pressed {
+    transform: scale(0.88);
+    opacity: 0.65;
 }
 
 
