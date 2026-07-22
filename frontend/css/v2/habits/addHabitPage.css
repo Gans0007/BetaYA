@@ -1,0 +1,896 @@
+/* =========================================================
+   ADD HABIT V2
+   Экран создания новой привычки
+   Mobile First
+   ========================================================= */
+
+:root {
+    --add-habit-bg: #f9fafc;
+    --add-habit-text: #20242c;
+    --add-habit-muted: #979ba6;
+    --add-habit-blue: #3788f5;
+    --add-habit-blue-soft: #eef5ff;
+    --add-habit-border: #cfe1ff;
+    --add-habit-white: rgba(255, 255, 255, 0.92);
+}
+
+
+/* =========================================================
+   ОБЩИЙ ЭКРАН
+   ========================================================= */
+
+.add-habit-v2 {
+    position: relative;
+
+    width: 100%;
+    min-height: 100dvh;
+
+    box-sizing: border-box;
+
+    padding:
+        calc(22px + env(safe-area-inset-top))
+        18px
+        calc(32px + env(safe-area-inset-bottom));
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    color: var(--add-habit-text);
+
+    background:
+        radial-gradient(
+            circle at 50% 12%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(250, 251, 253, 0.98) 48%,
+            rgba(247, 249, 252, 1) 100%
+        );
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    overscroll-behavior: contain;
+}
+
+
+/* На экране создания привычки нижняя навигация не показывается */
+
+body:has(.add-habit-v2) .bottom-nav {
+    display: none !important;
+}
+
+
+/* =========================================================
+   ВЕРХНЯЯ ПАНЕЛЬ
+   ========================================================= */
+
+.add-habit-v2__header {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 50px;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 32px;
+}
+
+
+/* Кнопка назад */
+
+.add-habit-v2__back-button {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    color: var(--add-habit-blue);
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        opacity 90ms ease;
+}
+
+.add-habit-v2__back-icon {
+    display: block;
+
+    font-size: 51px;
+    font-weight: 300;
+    line-height: 0.75;
+
+    transform: translateY(-2px);
+}
+
+.add-habit-v2__back-button:active,
+.add-habit-v2__back-button.is-pressed {
+    transform: scale(0.88);
+    opacity: 0.65;
+}
+
+
+/* Заголовок */
+
+.add-habit-v2__title {
+    min-width: 0;
+
+    margin: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--add-habit-text);
+
+    font-size: 27px;
+    font-weight: 650;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+}
+
+
+/* Кнопка сохранения */
+
+.add-habit-v2__save-button {
+    width: 50px;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    justify-self: end;
+
+    margin: 0;
+    padding: 0 0 4px;
+
+    border: none;
+    border-radius: 50%;
+    outline: none;
+
+    color: var(--add-habit-blue);
+
+    background:
+        radial-gradient(
+            circle at 35% 25%,
+            #f9fcff 0%,
+            #f0f6ff 62%,
+            #e9f1fd 100%
+        );
+
+    box-shadow:
+        0 10px 22px rgba(66, 112, 175, 0.11),
+        inset 0 1px 1px rgba(255, 255, 255, 0.96);
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        opacity 90ms ease,
+        box-shadow 90ms ease;
+}
+
+.add-habit-v2__save-icon {
+    font-size: 28px;
+    font-weight: 450;
+    line-height: 1;
+}
+
+.add-habit-v2__save-button:active,
+.add-habit-v2__save-button.is-pressed {
+    transform: scale(0.9);
+    opacity: 0.76;
+
+    box-shadow:
+        0 5px 12px rgba(66, 112, 175, 0.09),
+        inset 0 2px 4px rgba(55, 136, 245, 0.08);
+}
+
+
+/* =========================================================
+   ОСНОВНОЙ КОНТЕНТ
+   ========================================================= */
+
+.add-habit-v2__content {
+    width: 100%;
+    max-width: 500px;
+
+    margin: 0 auto;
+}
+
+.add-habit-v2__section {
+    width: 100%;
+    margin-bottom: 36px;
+}
+
+.add-habit-v2__section-label {
+    display: block;
+
+    margin: 0 0 16px;
+
+    color: #898e9a;
+
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+}
+
+
+/* =========================================================
+   ПОЛЕ НАЗВАНИЯ
+   ========================================================= */
+
+.add-habit-v2__name-field {
+    width: 100%;
+    min-height: 78px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    box-sizing: border-box;
+
+    padding: 12px 18px;
+
+    border: 1.5px solid var(--add-habit-border);
+    border-radius: 20px;
+
+    background: var(--add-habit-white);
+
+    box-shadow:
+        0 9px 22px rgba(70, 106, 155, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+
+    transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.add-habit-v2__name-field:focus-within {
+    border-color: var(--add-habit-blue);
+
+    box-shadow:
+        0 10px 24px rgba(55, 136, 245, 0.11),
+        0 0 0 3px rgba(55, 136, 245, 0.08);
+}
+
+
+/* Иконка возле поля */
+
+.add-habit-v2__name-icon {
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-bottom: 2px;
+
+    border-radius: 50%;
+
+    color: var(--add-habit-blue);
+    background: var(--add-habit-blue-soft);
+
+    font-size: 38px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+
+/* Input */
+
+.add-habit-v2__name-input {
+    min-width: 0;
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    outline: none;
+
+    color: var(--add-habit-text);
+    background: transparent;
+
+    font: inherit;
+    font-size: 21px;
+    font-weight: 570;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.add-habit-v2__name-input::placeholder {
+    color: #9da1ac;
+    opacity: 1;
+}
+
+.add-habit-v2__name-input::-webkit-search-cancel-button {
+    display: none;
+}
+
+
+/* =========================================================
+   БЫСТРЫЕ ВАРИАНТЫ
+   ========================================================= */
+
+.add-habit-v2__suggestions {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+
+    margin-top: 16px;
+    padding: 0 8px;
+
+    box-sizing: border-box;
+}
+
+.add-habit-v2__suggestion {
+    min-width: 0;
+    min-height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin: 0;
+    padding: 4px;
+
+    border: none;
+    outline: none;
+    background: transparent;
+
+    color: var(--add-habit-blue);
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        opacity 90ms ease;
+}
+
+.add-habit-v2__suggestion-icon {
+    flex: 0 0 auto;
+
+    font-size: 22px;
+    line-height: 1;
+}
+
+.add-habit-v2__suggestion-text {
+    min-width: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.add-habit-v2__suggestion:active,
+.add-habit-v2__suggestion.is-pressed {
+    transform: scale(0.96);
+    opacity: 0.64;
+}
+
+.add-habit-v2__suggestions-divider {
+    width: 1px;
+    height: 24px;
+
+    background: rgba(137, 142, 154, 0.32);
+}
+
+
+/* =========================================================
+   ЦВЕТА
+   ========================================================= */
+
+.add-habit-v2__colors {
+    width: calc(100% + 18px);
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-right: -18px;
+    padding: 2px 18px 4px 0;
+
+    box-sizing: border-box;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+.add-habit-v2__colors::-webkit-scrollbar {
+    display: none;
+}
+
+.add-habit-v2__color {
+    position: relative;
+
+    width: 58px;
+    height: 72px;
+
+    flex: 0 0 58px;
+
+    margin: 0;
+    padding: 0;
+
+    border: 2px solid transparent;
+    border-radius: 19px;
+    outline: none;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 100ms ease,
+        border-color 120ms ease,
+        box-shadow 120ms ease,
+        opacity 120ms ease;
+}
+
+
+/* Цветовые варианты */
+
+.add-habit-v2__color[data-habit-color="blue"] {
+    background:
+        linear-gradient(
+            145deg,
+            #edf5ff 0%,
+            #dbe9ff 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="green"] {
+    background:
+        linear-gradient(
+            145deg,
+            #ebfae9 0%,
+            #d7f1d5 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="purple"] {
+    background:
+        linear-gradient(
+            145deg,
+            #f2e9ff 0%,
+            #e4d5fa 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="orange"] {
+    background:
+        linear-gradient(
+            145deg,
+            #fff0e2 0%,
+            #f9d8bf 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="cyan"] {
+    background:
+        linear-gradient(
+            145deg,
+            #e4faff 0%,
+            #cceff5 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="pink"] {
+    background:
+        linear-gradient(
+            145deg,
+            #ffe9f4 0%,
+            #f5cee0 100%
+        );
+}
+
+.add-habit-v2__color[data-habit-color="yellow"] {
+    background:
+        linear-gradient(
+            145deg,
+            #fff8df 0%,
+            #f6e6b7 100%
+        );
+}
+
+
+/* Выбранный цвет */
+
+.add-habit-v2__color.is-selected {
+    border-color: var(--add-habit-blue);
+
+    box-shadow:
+        0 7px 18px rgba(55, 136, 245, 0.13),
+        inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.add-habit-v2__color:active,
+.add-habit-v2__color.is-pressed {
+    transform: scale(0.93);
+}
+
+
+/* Заблокированные цвета */
+
+.add-habit-v2__color.is-locked {
+    cursor: default;
+}
+
+.add-habit-v2__lock {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    filter: grayscale(1);
+    opacity: 0.55;
+
+    font-size: 20px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   РАЗМЕР КАРТОЧКИ
+   ========================================================= */
+
+.add-habit-v2__size-card {
+    width: 100%;
+    min-height: 128px;
+
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) 46px;
+    align-items: center;
+    gap: 14px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 18px;
+
+    border: 1.5px solid var(--add-habit-blue);
+    border-radius: 22px;
+    outline: none;
+
+    color: var(--add-habit-text);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(245, 249, 255, 0.96) 0%,
+            rgba(255, 255, 255, 0.94) 48%,
+            rgba(240, 246, 255, 0.97) 100%
+        );
+
+    box-shadow:
+        0 10px 25px rgba(67, 108, 165, 0.09),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+
+    font-family: inherit;
+    text-align: left;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        box-shadow 90ms ease;
+}
+
+.add-habit-v2__size-card:active,
+.add-habit-v2__size-card.is-pressed {
+    transform: scale(0.985);
+
+    box-shadow:
+        0 6px 15px rgba(67, 108, 165, 0.08),
+        inset 0 2px 5px rgba(55, 136, 245, 0.05);
+}
+
+
+/* Иконка размера */
+
+.add-habit-v2__size-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    color: var(--add-habit-blue);
+    background: var(--add-habit-blue-soft);
+
+    font-size: 30px;
+    line-height: 1;
+}
+
+
+/* Тексты */
+
+.add-habit-v2__size-copy {
+    min-width: 0;
+}
+
+.add-habit-v2__size-title {
+    margin-bottom: 6px;
+
+    color: var(--add-habit-text);
+
+    font-size: 20px;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.add-habit-v2__size-description {
+    color: #9297a2;
+
+    font-size: 15px;
+    font-weight: 520;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+}
+
+
+/* Галочка */
+
+.add-habit-v2__size-check {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    justify-self: end;
+
+    padding-bottom: 3px;
+
+    border-radius: 50%;
+
+    color: #ffffff;
+    background:
+        linear-gradient(
+            145deg,
+            #4b96f7 0%,
+            #287dea 100%
+        );
+
+    box-shadow:
+        0 8px 17px rgba(55, 136, 245, 0.22);
+
+    font-size: 25px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   МОБИЛЬНЫЕ АДАПТАЦИИ
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .add-habit-v2 {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .add-habit-v2__header {
+        grid-template-columns: 40px minmax(0, 1fr) 46px;
+        margin-bottom: 28px;
+    }
+
+    .add-habit-v2__title {
+        font-size: 24px;
+    }
+
+    .add-habit-v2__save-button {
+        width: 46px;
+        height: 46px;
+    }
+
+    .add-habit-v2__section {
+        margin-bottom: 31px;
+    }
+
+    .add-habit-v2__name-field {
+        min-height: 72px;
+        padding: 10px 14px;
+    }
+
+    .add-habit-v2__name-icon {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+    }
+
+    .add-habit-v2__name-input {
+        font-size: 19px;
+    }
+
+    .add-habit-v2__suggestion {
+        font-size: 13px;
+    }
+
+    .add-habit-v2__color {
+        width: 53px;
+        height: 66px;
+        flex-basis: 53px;
+    }
+
+    .add-habit-v2__size-card {
+        grid-template-columns: 48px minmax(0, 1fr) 40px;
+
+        min-height: 116px;
+
+        gap: 11px;
+        padding: 15px;
+    }
+
+    .add-habit-v2__size-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .add-habit-v2__size-title {
+        font-size: 18px;
+    }
+
+    .add-habit-v2__size-description {
+        font-size: 13px;
+    }
+
+    .add-habit-v2__size-check {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+
+/* Низкие экраны */
+
+@media (max-height: 720px) {
+
+    .add-habit-v2 {
+        padding-top: calc(14px + env(safe-area-inset-top));
+    }
+
+    .add-habit-v2__header {
+        margin-bottom: 24px;
+    }
+
+    .add-habit-v2__section {
+        margin-bottom: 27px;
+    }
+
+    .add-habit-v2__name-field {
+        min-height: 68px;
+    }
+
+    .add-habit-v2__color {
+        height: 62px;
+    }
+
+    .add-habit-v2__size-card {
+        min-height: 108px;
+    }
+}
+
+
+/* На устройствах с мышью */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .add-habit-v2__suggestion:hover {
+        opacity: 0.72;
+    }
+
+    .add-habit-v2__color:not(.is-locked):hover {
+        transform: translateY(-2px);
+    }
+
+    .add-habit-v2__back-button:hover,
+    .add-habit-v2__save-button:hover {
+        opacity: 0.8;
+    }
+}
+
+.add-habit-v2__name-field.has-error {
+    border-color: #ef6a6a;
+
+    animation: add-habit-error-shake 320ms ease;
+
+    box-shadow:
+        0 0 0 3px rgba(239, 106, 106, 0.09),
+        0 9px 22px rgba(70, 106, 155, 0.08);
+}
+
+@keyframes add-habit-error-shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-3px);
+    }
+}
