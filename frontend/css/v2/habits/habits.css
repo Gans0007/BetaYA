@@ -1,0 +1,388 @@
+/* =========================================================
+   HABITS V2 — ПУСТОЕ СОСТОЯНИЕ
+   ========================================================= */
+
+:root {
+    --habits-v2-bg: #f8f9fb;
+    --habits-v2-text: #232428;
+    --habits-v2-muted: #a1a3a9;
+    --habits-v2-blue: #2f7fe5;
+    --habits-v2-button-bg: #eef5ff;
+}
+
+
+/* =========================================================
+   СТРАНИЦА DASHBOARD V2
+   ========================================================= */
+
+#dashboard-page {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    min-height: 100vh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(250, 251, 253, 0.96) 52%,
+            rgba(246, 248, 251, 1) 100%
+        );
+}
+
+
+/* Убираем ограничения старого page-content */
+
+#dashboard-page .page-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+    background: transparent;
+}
+
+
+/* Скрываем старую шапку при открытой странице привычек V2 */
+
+#game-root:has(#dashboard-page.active) #header-root {
+    display: none !important;
+}
+
+
+/* Убираем возможные старые отступы game-root */
+
+#game-root:has(#dashboard-page.active) {
+    margin: 0;
+    padding: 0;
+    min-height: 100dvh;
+}
+
+
+/* =========================================================
+   ПУСТОЕ СОСТОЯНИЕ
+   ========================================================= */
+
+.habits-v2-empty {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-sizing: border-box;
+
+    /*
+       Нижний padding оставляет пространство
+       под фиксированную навигацию.
+    */
+    padding:
+        max(20px, env(safe-area-inset-top))
+        22px
+        calc(150px + env(safe-area-inset-bottom));
+}
+
+
+/* Центральный блок */
+
+.habits-v2-empty__content {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    /*
+       Небольшой подъём центрального блока,
+       как на референсе.
+    */
+    transform: translateY(-10px);
+
+    text-align: center;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ДАТА
+   ========================================================= */
+
+.habits-v2-empty__date {
+    margin: 0 0 36px;
+
+    color: var(--habits-v2-muted);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: clamp(20px, 4.15vw, 31px);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ГЛАВНЫЙ ЗАГОЛОВОК
+   ========================================================= */
+
+.habits-v2-empty__title {
+    margin: 0;
+
+    color: var(--habits-v2-text);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: clamp(36px, 7.4vw, 61px);
+    font-weight: 590;
+    line-height: 1.04;
+    letter-spacing: -0.046em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ПОДЗАГОЛОВОК
+   ========================================================= */
+
+.habits-v2-empty__subtitle {
+    margin-top: 8px;
+
+    color: var(--habits-v2-muted);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: clamp(35px, 7.15vw, 59px);
+    font-weight: 420;
+    line-height: 1.04;
+    letter-spacing: -0.045em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   КНОПКА ДОБАВЛЕНИЯ
+   ========================================================= */
+
+.habits-v2-empty__add-button {
+    position: relative;
+
+    width: clamp(112px, 18.8vw, 154px);
+    height: clamp(112px, 18.8vw, 154px);
+
+    margin-top: 92px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 50%;
+    outline: none;
+
+    color: var(--habits-v2-blue);
+    background:
+        radial-gradient(
+            circle at 38% 28%,
+            #f8fbff 0%,
+            var(--habits-v2-button-bg) 58%,
+            #e8f1fc 100%
+        );
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: clamp(63px, 10vw, 82px);
+    font-weight: 250;
+    line-height: 1;
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    box-shadow:
+        0 18px 32px rgba(78, 105, 140, 0.17),
+        0 8px 15px rgba(78, 105, 140, 0.10),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+
+    transition:
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        opacity 160ms ease;
+}
+
+
+/*
+   Визуально выравниваем символ +.
+   У стандартного текстового плюса часто немного смещена базовая линия.
+*/
+
+.habits-v2-empty__add-button {
+    padding-bottom: 9px;
+}
+
+
+.habits-v2-empty__add-button:active {
+    transform: scale(0.94);
+
+    box-shadow:
+        0 10px 20px rgba(78, 105, 140, 0.14),
+        0 4px 9px rgba(78, 105, 140, 0.09),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+}
+
+
+/* Убираем стандартный фокус браузера */
+
+.habits-v2-empty__add-button:focus {
+    outline: none;
+}
+
+
+.habits-v2-empty__add-button:focus-visible {
+    box-shadow:
+        0 18px 32px rgba(78, 105, 140, 0.17),
+        0 0 0 4px rgba(47, 127, 229, 0.15);
+}
+
+
+/* =========================================================
+   АДАПТАЦИЯ ПОД УЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-width: 430px) {
+
+    .habits-v2-empty {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .habits-v2-empty__content {
+        transform: translateY(-8px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 28px;
+        font-size: 20px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 37px;
+        letter-spacing: -0.042em;
+    }
+
+    .habits-v2-empty__subtitle {
+        margin-top: 6px;
+        font-size: 36px;
+        letter-spacing: -0.043em;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 112px;
+        height: 112px;
+
+        margin-top: 66px;
+        padding-bottom: 7px;
+
+        font-size: 64px;
+    }
+}
+
+
+/* Очень узкие телефоны */
+
+@media (max-width: 370px) {
+
+    .habits-v2-empty__date {
+        margin-bottom: 24px;
+        font-size: 18px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 32px;
+    }
+
+    .habits-v2-empty__subtitle {
+        font-size: 31px;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 102px;
+        height: 102px;
+
+        margin-top: 58px;
+
+        font-size: 58px;
+    }
+}
+
+
+/* Низкие экраны */
+
+@media (max-height: 700px) {
+
+    .habits-v2-empty__content {
+        transform: translateY(5px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 22px;
+    }
+
+    .habits-v2-empty__add-button {
+        margin-top: 48px;
+    }
+}
