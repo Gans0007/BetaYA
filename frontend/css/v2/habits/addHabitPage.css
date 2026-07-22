@@ -79,7 +79,7 @@ body:has(.add-habit-v2) .bottom-nav {
     align-items: center;
     gap: 8px;
 
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 
@@ -146,7 +146,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
     color: var(--add-habit-text);
 
-    font-size: 27px;
+    font-size: 23px;
     font-weight: 650;
     line-height: 1.1;
     letter-spacing: -0.035em;
@@ -241,7 +241,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
     color: #898e9a;
 
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.015em;
@@ -254,7 +254,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
 .add-habit-v2__name-field {
     width: 100%;
-    min-height: 78px;
+    min-height: 68px;
 
     display: flex;
     align-items: center;
@@ -290,8 +290,8 @@ body:has(.add-habit-v2) .bottom-nav {
 /* Иконка возле поля */
 
 .add-habit-v2__name-icon {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
 
     flex: 0 0 48px;
 
@@ -328,7 +328,7 @@ body:has(.add-habit-v2) .bottom-nav {
     background: transparent;
 
     font: inherit;
-    font-size: 21px;
+    font-size: 18px;
     font-weight: 570;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -462,8 +462,8 @@ body:has(.add-habit-v2) .bottom-nav {
 .add-habit-v2__color {
     position: relative;
 
-    width: 58px;
-    height: 72px;
+    width: 52px;
+    height: 52px;
 
     flex: 0 0 58px;
 
@@ -686,7 +686,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
     color: var(--add-habit-text);
 
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 650;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -695,7 +695,7 @@ body:has(.add-habit-v2) .bottom-nav {
 .add-habit-v2__size-description {
     color: #9297a2;
 
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 520;
     line-height: 1.45;
     letter-spacing: -0.01em;
@@ -705,8 +705,8 @@ body:has(.add-habit-v2) .bottom-nav {
 /* Галочка */
 
 .add-habit-v2__size-check {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
 
     display: flex;
     align-items: center;
