@@ -293,7 +293,7 @@ body:has(.add-habit-v2) .bottom-nav {
     width: 42px;
     height: 42px;
 
-    flex: 0 0 48px;
+    flex: 0 0 42px;
 
     display: flex;
     align-items: center;
