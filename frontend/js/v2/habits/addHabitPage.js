@@ -64,12 +64,19 @@ export function renderAddHabitPage() {
 
                     <div class="add-habit-v2__name-field">
 
-                        <div
+                        <button
                             class="add-habit-v2__name-icon"
-                            aria-hidden="true"
+                            type="button"
+                            data-action="open-icon-picker"
+                            aria-label="Выбрать значок привычки"
                         >
-                            ✱
-                        </div>
+                            <span
+                                class="add-habit-v2__selected-icon"
+                                aria-hidden="true"
+                            >
+                                ✱
+                            </span>
+                        </button>
 
                         <input
                             id="add-habit-name"
