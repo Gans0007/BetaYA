@@ -1,15 +1,24 @@
 /* =========================================================
-   HABIT ICON PICKER V3
+   ICON PICKER PAGE V2
    Светлый полноэкранный выбор эмодзи
+   Оформление по референсу
    ========================================================= */
 
 :root {
-    --icon-picker-bg: #f8f9fc;
-    --icon-picker-sheet: #fbfcfe;
-    --icon-picker-text: #20242c;
-    --icon-picker-muted: #7f8490;
-    --icon-picker-blue: #3788f5;
-    --icon-picker-blue-soft: #eaf3ff;
+    --icon-picker-bg: #f4f5f7;
+    --icon-picker-surface: #ffffff;
+
+    --icon-picker-text: #292b2f;
+    --icon-picker-muted: #6c6f75;
+
+    --icon-picker-item-bg: rgba(248, 248, 249, 0.96);
+    --icon-picker-item-border: rgba(45, 47, 52, 0.08);
+
+    --icon-picker-selected-border: #3f4146;
+    --icon-picker-selected-bg: #ffffff;
+
+    --icon-picker-button-border: rgba(50, 53, 59, 0.11);
+    --icon-picker-shadow: rgba(31, 38, 49, 0.06);
 }
 
 
@@ -24,21 +33,32 @@
 
     width: 100%;
     height: 100dvh;
+    min-height: 100vh;
 
     display: flex;
     align-items: stretch;
+    justify-content: center;
 
     box-sizing: border-box;
 
-    background: var(--icon-picker-bg);
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f1f2f4 0%,
+            #f5f6f8 100%
+        );
 }
 
 
 /* =========================================================
-   ОСНОВНОЙ КОНТЕЙНЕР
+   ОСНОВНОЙ БЕЛЫЙ ЭКРАН
    ========================================================= */
 
 .habit-icon-picker__sheet {
+    position: relative;
+
     width: 100%;
     height: 100%;
     min-height: 0;
@@ -55,9 +75,9 @@
     background:
         radial-gradient(
             circle at 50% 0%,
-            #ffffff 0%,
-            #fbfcfe 52%,
-            #f6f8fc 100%
+            rgba(255, 255, 255, 1) 0%,
+            rgba(253, 253, 254, 1) 42%,
+            rgba(250, 250, 251, 1) 100%
         );
 
     font-family:
@@ -75,58 +95,59 @@
 
 
 /* =========================================================
-   ФИКСИРОВАННАЯ ШАПКА
+   ВЕРХНЯЯ ПАНЕЛЬ
+   Только стрелка назад
    ========================================================= */
 
 .habit-icon-picker__header {
     position: relative;
-    z-index: 3;
+    z-index: 5;
 
     flex: 0 0 auto;
 
     width: 100%;
-    min-height: 60px;
+    min-height: 104px;
 
-    display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 44px;
-    align-items: center;
-    gap: 8px;
+    display: flex;
+    align-items: flex-end;
 
     box-sizing: border-box;
 
     padding:
-        calc(10px + env(safe-area-inset-top))
-        16px
-        8px;
+        calc(14px + env(safe-area-inset-top))
+        22px
+        14px;
 
     background:
         linear-gradient(
             180deg,
-            rgba(251, 252, 254, 0.98) 0%,
-            rgba(251, 252, 254, 0.94) 75%,
-            rgba(251, 252, 254, 0.84) 100%
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.97) 72%,
+            rgba(255, 255, 255, 0.88) 100%
         );
-
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
 }
 
 
+/* Кнопка назад */
+
 .habit-icon-picker__back-button {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
 
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
+    flex: 0 0 50px;
+
     margin: 0;
     padding: 0;
 
     border: none;
+    border-radius: 14px;
     outline: none;
 
-    color: var(--icon-picker-blue);
+    color: #34363b;
     background: transparent;
 
     cursor: pointer;
@@ -144,8 +165,12 @@
 }
 
 
+/* Стрелка */
+
 .habit-icon-picker__back-icon {
     display: block;
+
+    margin-left: 1px;
 
     font-family:
         -apple-system,
@@ -154,61 +179,44 @@
         Arial,
         sans-serif;
 
-    font-size: 51px;
+    font-size: 47px;
     font-weight: 300;
-    line-height: 0.75;
+    line-height: 1;
 
-    transform: translateY(-2px);
+    transform: translateY(1px);
 }
 
+
+/* Нажатие */
 
 .habit-icon-picker__back-button:active,
 .habit-icon-picker__back-button.is-pressed {
     transform: scale(0.88);
-    opacity: 0.65;
-}
-
-
-.habit-icon-picker__title {
-    min-width: 0;
-
-    margin: 0;
-
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-
-    color: var(--icon-picker-text);
-
-    font-size: 20px;
-    font-weight: 650;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-
-    text-align: center;
-}
-
-
-.habit-icon-picker__header-spacer {
-    width: 44px;
-    height: 44px;
+    opacity: 0.58;
 }
 
 
 /* =========================================================
-   СКРОЛЛИРУЕМАЯ ОБЛАСТЬ
+   ПРОКРУЧИВАЕМАЯ ОБЛАСТЬ
    ========================================================= */
 
 .habit-icon-picker__body {
+    position: relative;
+
     flex: 1 1 auto;
     min-height: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
 
     overflow-x: hidden;
     overflow-y: auto;
 
-    box-sizing: border-box;
-
-    padding: 8px 16px 18px;
+    padding:
+        8px
+        23px
+        26px;
 
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -217,13 +225,16 @@
 }
 
 
+/* Убираем полосу прокрутки */
+
 .habit-icon-picker__body::-webkit-scrollbar {
     display: none;
 }
 
 
 /* =========================================================
-   СЕТКА ЭМОДЗИ
+   СЕТКА
+   Ровно 6 эмодзи в строке
    ========================================================= */
 
 .habit-icon-picker__grid {
@@ -231,13 +242,22 @@
 
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px;
+
+    column-gap: 12px;
+    row-gap: 24px;
+
+    box-sizing: border-box;
 }
 
+
+/* =========================================================
+   КНОПКА ЭМОДЗИ
+   ========================================================= */
 
 .habit-icon-picker__item {
     position: relative;
 
+    width: 100%;
     min-width: 0;
     aspect-ratio: 1 / 1;
 
@@ -257,12 +277,13 @@
     background:
         linear-gradient(
             145deg,
-            rgba(248, 250, 254, 0.98),
-            rgba(238, 242, 248, 0.98)
+            rgba(250, 250, 251, 0.98) 0%,
+            rgba(246, 246, 248, 0.98) 100%
         );
 
     box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.94);
+        inset 0 1px 1px rgba(255, 255, 255, 0.95),
+        0 2px 8px rgba(32, 38, 48, 0.018);
 
     cursor: pointer;
     user-select: none;
@@ -275,17 +296,22 @@
 
     transition:
         transform 90ms ease,
-        border-color 120ms ease,
-        background 120ms ease,
-        box-shadow 120ms ease,
-        opacity 90ms ease;
+        opacity 90ms ease,
+        border-color 130ms ease,
+        background 130ms ease,
+        box-shadow 130ms ease;
 }
 
+
+/* Само эмодзи */
 
 .habit-icon-picker__emoji {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    width: 100%;
+    height: 100%;
 
     font-family:
         -apple-system,
@@ -295,50 +321,62 @@
         "Noto Color Emoji",
         sans-serif;
 
-    font-size: clamp(38px, 9.6vw, 48px);
+    font-size: clamp(29px, 7.7vw, 38px);
+    font-weight: 400;
     line-height: 1;
 
     transform: translateZ(0);
-}
 
-
-/* Выбранный вариант */
-
-.habit-icon-picker__item.is-selected {
-    border-color: var(--icon-picker-blue);
-
-    background:
-        linear-gradient(
-            145deg,
-            #f4f9ff,
-            var(--icon-picker-blue-soft)
-        );
-
-    box-shadow:
-        0 6px 15px rgba(55, 136, 245, 0.14),
-        inset 0 1px 1px rgba(255, 255, 255, 0.96);
-}
-
-
-.habit-icon-picker__item.is-selected .habit-icon-picker__emoji {
-    transform: scale(1.05);
-}
-
-
-.habit-icon-picker__item:active,
-.habit-icon-picker__item.is-pressed {
-    transform: scale(0.88);
-    opacity: 0.8;
+    transition:
+        transform 120ms ease,
+        filter 120ms ease;
 }
 
 
 /* =========================================================
-   ФИКСИРОВАННЫЙ НИЖНИЙ БЛОК
+   ВЫБРАННЫЙ ЭМОДЗИ
+   Тонкая тёмная обводка как в референсе
+   ========================================================= */
+
+.habit-icon-picker__item.is-selected {
+    border-color: var(--icon-picker-selected-border);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(251, 251, 252, 1) 100%
+        );
+
+    box-shadow:
+        0 3px 10px rgba(29, 34, 42, 0.045),
+        inset 0 1px 1px rgba(255, 255, 255, 1);
+}
+
+
+.habit-icon-picker__item.is-selected
+.habit-icon-picker__emoji {
+    transform: scale(1.04);
+}
+
+
+/* Нажатие */
+
+.habit-icon-picker__item:active,
+.habit-icon-picker__item.is-pressed {
+    transform: scale(0.88);
+    opacity: 0.76;
+}
+
+
+/* =========================================================
+   НИЖНЯЯ ОБЛАСТЬ
+   Фиксированная кнопка «Выбрать»
    ========================================================= */
 
 .habit-icon-picker__footer {
     position: relative;
-    z-index: 4;
+    z-index: 6;
 
     flex: 0 0 auto;
 
@@ -347,16 +385,16 @@
     box-sizing: border-box;
 
     padding:
-        10px
-        16px
-        calc(14px + env(safe-area-inset-bottom));
+        13px
+        23px
+        calc(18px + env(safe-area-inset-bottom));
 
     background:
         linear-gradient(
             180deg,
-            rgba(248, 249, 252, 0.72) 0%,
-            rgba(248, 249, 252, 0.96) 28%,
-            rgba(248, 249, 252, 1) 100%
+            rgba(250, 250, 251, 0.72) 0%,
+            rgba(250, 250, 251, 0.96) 24%,
+            rgba(250, 250, 251, 1) 100%
         );
 
     backdrop-filter: blur(16px);
@@ -364,41 +402,51 @@
 }
 
 
+/* Кнопка подтверждения */
+
 .habit-icon-picker__confirm {
     width: 100%;
-    min-height: 56px;
+    min-height: 66px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
 
     margin: 0;
-    padding: 0 20px;
+    padding: 0 24px;
 
-    border: 1px solid rgba(55, 136, 245, 0.12);
-    border-radius: 18px;
+    border: 1px solid var(--icon-picker-button-border);
+    border-radius: 25px;
     outline: none;
 
-    color: var(--icon-picker-blue);
+    color: #292b30;
 
     background:
         linear-gradient(
-            145deg,
-            rgba(248, 250, 254, 0.98),
-            rgba(239, 243, 249, 0.98)
+            180deg,
+            rgba(255, 255, 255, 0.99) 0%,
+            rgba(252, 252, 253, 0.99) 100%
         );
 
     box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.96),
-        0 6px 18px rgba(52, 79, 120, 0.07);
+        0 4px 16px var(--icon-picker-shadow),
+        inset 0 1px 1px rgba(255, 255, 255, 1);
 
     font-family:
         -apple-system,
         BlinkMacSystemFont,
         "SF Pro Display",
+        "SF Pro Text",
         Inter,
         Arial,
         sans-serif;
 
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 650;
     line-height: 1;
+    letter-spacing: -0.025em;
 
     cursor: pointer;
     user-select: none;
@@ -416,23 +464,66 @@
 }
 
 
+/* Нажатие кнопки */
+
 .habit-icon-picker__confirm:active,
 .habit-icon-picker__confirm.is-pressed {
     transform: scale(0.98);
-    opacity: 0.82;
+    opacity: 0.78;
 
     box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.94),
-        0 3px 10px rgba(52, 79, 120, 0.06);
+        0 2px 8px rgba(31, 38, 49, 0.045),
+        inset 0 2px 4px rgba(31, 38, 49, 0.025);
+}
+
+
+/* Фокус с клавиатуры */
+
+.habit-icon-picker__back-button:focus,
+.habit-icon-picker__item:focus,
+.habit-icon-picker__confirm:focus {
+    outline: none;
+}
+
+
+.habit-icon-picker__back-button:focus-visible,
+.habit-icon-picker__item:focus-visible,
+.habit-icon-picker__confirm:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(55, 136, 245, 0.12);
 }
 
 
 /* =========================================================
-   СКРЫТЬ НИЖНЮЮ НАВИГАЦИЮ
+   СКРЫВАЕМ НИЖНЮЮ НАВИГАЦИЮ
    ========================================================= */
 
 body:has(.habit-icon-picker) .bottom-nav {
     display: none !important;
+}
+
+
+/* =========================================================
+   СТАНДАРТНЫЕ ТЕЛЕФОНЫ
+   390–430px
+   ========================================================= */
+
+@media (min-width: 390px) and (max-width: 430px) {
+
+    .habit-icon-picker__body {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .habit-icon-picker__grid {
+        column-gap: 13px;
+        row-gap: 25px;
+    }
+
+    .habit-icon-picker__footer {
+        padding-left: 22px;
+        padding-right: 22px;
+    }
 }
 
 
@@ -443,45 +534,83 @@ body:has(.habit-icon-picker) .bottom-nav {
 @media (max-width: 380px) {
 
     .habit-icon-picker__header {
-        grid-template-columns: 40px minmax(0, 1fr) 40px;
-        padding-left: 13px;
-        padding-right: 13px;
+        min-height: 92px;
+
+        padding-left: 17px;
+        padding-right: 17px;
+        padding-bottom: 11px;
     }
 
     .habit-icon-picker__back-button {
-        width: 40px;
-        height: 40px;
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
     }
 
     .habit-icon-picker__back-icon {
-        font-size: 47px;
-    }
-
-    .habit-icon-picker__header-spacer {
-        width: 40px;
-        height: 40px;
-    }
-
-    .habit-icon-picker__title {
-        font-size: 18px;
+        font-size: 42px;
     }
 
     .habit-icon-picker__body {
-        padding-left: 13px;
-        padding-right: 13px;
+        padding:
+            7px
+            16px
+            21px;
     }
 
     .habit-icon-picker__grid {
-        gap: 7px;
+        column-gap: 9px;
+        row-gap: 20px;
     }
 
     .habit-icon-picker__emoji {
-        font-size: clamp(36px, 10vw, 44px);
+        font-size: clamp(26px, 7.8vw, 32px);
     }
 
     .habit-icon-picker__footer {
-        padding-left: 13px;
-        padding-right: 13px;
+        padding:
+            11px
+            16px
+            calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .habit-icon-picker__confirm {
+        min-height: 60px;
+        border-radius: 22px;
+
+        font-size: 20px;
+    }
+}
+
+
+/* =========================================================
+   БОЛЬШИЕ ТЕЛЕФОНЫ
+   ========================================================= */
+
+@media (min-width: 431px) {
+
+    .habit-icon-picker__header {
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+
+    .habit-icon-picker__body {
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+
+    .habit-icon-picker__grid {
+        column-gap: 14px;
+        row-gap: 26px;
+    }
+
+    .habit-icon-picker__emoji {
+        font-size: clamp(32px, 7vw, 41px);
+    }
+
+    .habit-icon-picker__footer {
+        padding-left: 26px;
+        padding-right: 26px;
     }
 }
 
@@ -493,32 +622,67 @@ body:has(.habit-icon-picker) .bottom-nav {
 @media (max-height: 720px) {
 
     .habit-icon-picker__header {
-        min-height: 52px;
-        padding-top: calc(6px + env(safe-area-inset-top));
-        padding-bottom: 5px;
+        min-height: 80px;
+
+        padding-top:
+            calc(8px + env(safe-area-inset-top));
+        padding-bottom: 8px;
     }
 
     .habit-icon-picker__body {
-        padding-top: 5px;
-        padding-bottom: 12px;
+        padding-top: 4px;
+        padding-bottom: 15px;
     }
 
     .habit-icon-picker__grid {
-        gap: 6px;
+        row-gap: 16px;
     }
 
     .habit-icon-picker__emoji {
-        font-size: clamp(34px, 8.8vw, 42px);
+        font-size: clamp(25px, 6.8vw, 33px);
     }
 
     .habit-icon-picker__footer {
-        padding-top: 8px;
+        padding-top: 9px;
         padding-bottom:
-            calc(10px + env(safe-area-inset-bottom));
+            calc(11px + env(safe-area-inset-bottom));
     }
 
     .habit-icon-picker__confirm {
-        min-height: 50px;
+        min-height: 56px;
+        border-radius: 21px;
+
+        font-size: 19px;
+    }
+}
+
+
+/* =========================================================
+   ОЧЕНЬ НИЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-height: 620px) {
+
+    .habit-icon-picker__header {
+        min-height: 70px;
+    }
+
+    .habit-icon-picker__body {
+        padding-top: 2px;
+        padding-bottom: 11px;
+    }
+
+    .habit-icon-picker__grid {
+        row-gap: 12px;
+    }
+
+    .habit-icon-picker__emoji {
+        font-size: clamp(23px, 6.4vw, 30px);
+    }
+
+    .habit-icon-picker__confirm {
+        min-height: 52px;
+        font-size: 18px;
     }
 }
 
@@ -529,15 +693,40 @@ body:has(.habit-icon-picker) .bottom-nav {
 
 @media (hover: hover) and (pointer: fine) {
 
-    .habit-icon-picker__item:hover {
-        transform: translateY(-2px);
+    .habit-icon-picker__back-button:hover {
+        opacity: 0.65;
     }
 
-    .habit-icon-picker__back-button:hover {
-        opacity: 0.72;
+    .habit-icon-picker__item:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 5px 14px rgba(31, 38, 49, 0.045),
+            inset 0 1px 1px rgba(255, 255, 255, 0.98);
+    }
+
+    .habit-icon-picker__item.is-selected:hover {
+        border-color: var(--icon-picker-selected-border);
     }
 
     .habit-icon-picker__confirm:hover {
-        opacity: 0.9;
+        box-shadow:
+            0 6px 18px rgba(31, 38, 49, 0.075),
+            inset 0 1px 1px rgba(255, 255, 255, 1);
+    }
+}
+
+
+/* =========================================================
+   УМЕНЬШЕННАЯ АНИМАЦИЯ
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .habit-icon-picker__back-button,
+    .habit-icon-picker__item,
+    .habit-icon-picker__emoji,
+    .habit-icon-picker__confirm {
+        transition: none;
     }
 }

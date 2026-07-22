@@ -5,7 +5,7 @@ import { renderIconPickerPage } from "./iconPickerPage.js"
 
 /* =========================================================
    ВРЕМЕННОЕ СОСТОЯНИЕ НОВОЙ ПРИВЫЧКИ
-   Пока данные не отправляются в API
+   Пока без API
    ========================================================= */
 
 const habitDraft = {
@@ -17,8 +17,8 @@ const habitDraft = {
 
 
 /* =========================================================
-   ОБЩАЯ АНИМАЦИЯ НАЖАТИЯ
-   Работает с мышью и на телефоне
+   АНИМАЦИЯ НАЖАТИЯ
+   Для телефона и компьютера
    ========================================================= */
 
 function addPressAnimation(element) {
@@ -74,7 +74,7 @@ function resetHabitDraft() {
 
 
 /* =========================================================
-   СОХРАНЕНИЕ ТЕКУЩИХ ДАННЫХ ИЗ ФОРМЫ
+   СОХРАНЯЕМ ДАННЫЕ ИЗ ЭКРАНА СОЗДАНИЯ В ЧЕРНОВИК
    ========================================================= */
 
 function updateDraftFromAddHabitPage() {
@@ -84,7 +84,9 @@ function updateDraftFromAddHabitPage() {
         return
     }
 
-    const nameInput = root.querySelector("#add-habit-name")
+    const nameInput = root.querySelector(
+        "#add-habit-name"
+    )
 
     const selectedIcon = root.querySelector(
         ".add-habit-v2__selected-icon"
@@ -98,24 +100,31 @@ function updateDraftFromAddHabitPage() {
         "[data-habit-size].is-selected"
     )
 
-    habitDraft.name = nameInput?.value || habitDraft.name
+    if (nameInput) {
+        habitDraft.name = nameInput.value
+    }
 
-    habitDraft.icon =
-        selectedIcon?.textContent?.trim() ||
-        habitDraft.icon
+    const iconValue =
+        selectedIcon?.textContent?.trim()
 
-    habitDraft.color =
-        selectedColor?.dataset.habitColor ||
-        habitDraft.color
+    if (iconValue) {
+        habitDraft.icon = iconValue
+    }
 
-    habitDraft.size =
-        selectedSize?.dataset.habitSize ||
-        habitDraft.size
+    if (selectedColor?.dataset.habitColor) {
+        habitDraft.color =
+            selectedColor.dataset.habitColor
+    }
+
+    if (selectedSize?.dataset.habitSize) {
+        habitDraft.size =
+            selectedSize.dataset.habitSize
+    }
 }
 
 
 /* =========================================================
-   ВОССТАНОВЛЕНИЕ ДАННЫХ НА ЭКРАНЕ СОЗДАНИЯ
+   ВОССТАНАВЛИВАЕМ ЧЕРНОВИК НА ЭКРАНЕ СОЗДАНИЯ
    ========================================================= */
 
 function restoreDraftToAddHabitPage() {
@@ -125,7 +134,9 @@ function restoreDraftToAddHabitPage() {
         return
     }
 
-    const nameInput = root.querySelector("#add-habit-name")
+    const nameInput = root.querySelector(
+        "#add-habit-name"
+    )
 
     const selectedIcon = root.querySelector(
         ".add-habit-v2__selected-icon"
@@ -151,7 +162,10 @@ function restoreDraftToAddHabitPage() {
         const isSelected =
             button.dataset.habitColor === habitDraft.color
 
-        button.classList.toggle("is-selected", isSelected)
+        button.classList.toggle(
+            "is-selected",
+            isSelected
+        )
 
         button.setAttribute(
             "aria-checked",
@@ -163,7 +177,10 @@ function restoreDraftToAddHabitPage() {
         const isSelected =
             button.dataset.habitSize === habitDraft.size
 
-        button.classList.toggle("is-selected", isSelected)
+        button.classList.toggle(
+            "is-selected",
+            isSelected
+        )
 
         button.setAttribute(
             "aria-pressed",
@@ -174,7 +191,7 @@ function restoreDraftToAddHabitPage() {
 
 
 /* =========================================================
-   ОТКРЫТИЕ ЭКРАНА СОЗДАНИЯ ПРИВЫЧКИ
+   ОТКРЫТИЕ ЭКРАНА СОЗДАНИЯ
    ========================================================= */
 
 function openAddHabitPage() {
@@ -247,7 +264,7 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       АНИМАЦИИ НАЖАТИЙ
+       АНИМАЦИИ
        --------------------------------------------------------- */
 
     addPressAnimation(backButton)
@@ -268,7 +285,7 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       ВВОД НАЗВАНИЯ
+       НАЗВАНИЕ ПРИВЫЧКИ
        --------------------------------------------------------- */
 
     nameInput?.addEventListener("input", () => {
@@ -277,7 +294,7 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       КНОПКА НАЗАД
+       НАЗАД НА ГЛАВНУЮ СТРАНИЦУ ПРИВЫЧЕК
        --------------------------------------------------------- */
 
     backButton?.addEventListener("click", () => {
@@ -289,7 +306,7 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       ОТКРЫТИЕ ВЫБОРА ИКОНКИ
+       ОТКРЫВАЕМ ВЫБОР ЭМОДЗИ
        --------------------------------------------------------- */
 
     iconButton?.addEventListener("click", () => {
@@ -345,7 +362,9 @@ function initAddHabitPageEvents() {
             }
 
             colorButtons.forEach((colorButton) => {
-                colorButton.classList.remove("is-selected")
+                colorButton.classList.remove(
+                    "is-selected"
+                )
 
                 colorButton.setAttribute(
                     "aria-checked",
@@ -363,13 +382,15 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       ВЫБОР РАЗМЕРА КАРТОЧКИ
+       ВЫБОР РАЗМЕРА
        --------------------------------------------------------- */
 
     sizeButtons.forEach((button) => {
         button.addEventListener("click", () => {
             sizeButtons.forEach((sizeButton) => {
-                sizeButton.classList.remove("is-selected")
+                sizeButton.classList.remove(
+                    "is-selected"
+                )
 
                 sizeButton.setAttribute(
                     "aria-pressed",
@@ -419,7 +440,7 @@ function initAddHabitPageEvents() {
         })
 
         /*
-         * Здесь позднее будет:
+         * Позднее здесь будет запрос:
          *
          * await createHabit({
          *     name: habitName,
@@ -438,7 +459,7 @@ function initAddHabitPageEvents() {
 
 
 /* =========================================================
-   ЭКРАН ВЫБОРА ИКОНКИ
+   ЭКРАН ВЫБОРА ЭМОДЗИ
    ========================================================= */
 
 function initIconPickerEvents() {
@@ -448,12 +469,16 @@ function initIconPickerEvents() {
         return
     }
 
-    const iconButtons = root.querySelectorAll(
-        "[data-habit-icon]"
+    const backButton = root.querySelector(
+        '[data-action="close-icon-picker"]'
     )
 
     const confirmButton = root.querySelector(
         '[data-action="confirm-habit-icon"]'
+    )
+
+    const iconButtons = root.querySelectorAll(
+        "[data-habit-icon]"
     )
 
 
@@ -461,21 +486,34 @@ function initIconPickerEvents() {
        АНИМАЦИИ
        --------------------------------------------------------- */
 
+    addPressAnimation(backButton)
+    addPressAnimation(confirmButton)
+
     iconButtons.forEach((button) => {
         addPressAnimation(button)
     })
 
-    addPressAnimation(confirmButton)
+
+    /* ---------------------------------------------------------
+       СТРЕЛКА НАЗАД
+       Выбранное значение сохраняется в черновике
+       --------------------------------------------------------- */
+
+    backButton?.addEventListener("click", () => {
+        openAddHabitPage()
+    })
 
 
     /* ---------------------------------------------------------
-       ВЫБОР ИКОНКИ
+       ВЫБОР ЭМОДЗИ
        --------------------------------------------------------- */
 
     iconButtons.forEach((button) => {
         button.addEventListener("click", () => {
             iconButtons.forEach((iconButton) => {
-                iconButton.classList.remove("is-selected")
+                iconButton.classList.remove(
+                    "is-selected"
+                )
 
                 iconButton.setAttribute(
                     "aria-pressed",
@@ -493,7 +531,7 @@ function initIconPickerEvents() {
 
 
     /* ---------------------------------------------------------
-       ПОДТВЕРЖДЕНИЕ ИКОНКИ
+       ПОДТВЕРЖДАЕМ ВЫБОР
        --------------------------------------------------------- */
 
     confirmButton?.addEventListener("click", () => {
