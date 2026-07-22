@@ -1,6 +1,6 @@
 /* =========================================================
-   HABIT ICON PICKER V2
-   Светлый мобильный экран выбора эмодзи
+   HABIT ICON PICKER V3
+   Светлый полноэкранный выбор эмодзи
    ========================================================= */
 
 :root {
@@ -30,30 +30,25 @@
 
     box-sizing: border-box;
 
-    background: #f8f9fc;
+    background: var(--icon-picker-bg);
 }
 
 
 /* =========================================================
-   НИЖНИЙ ЛИСТ
+   ОСНОВНОЙ КОНТЕЙНЕР
    ========================================================= */
 
 .habit-icon-picker__sheet {
     width: 100%;
     height: 100%;
-    max-height: none;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
 
     box-sizing: border-box;
 
-    padding:
-        calc(18px + env(safe-area-inset-top))
-        16px
-        calc(24px + env(safe-area-inset-bottom));
-
-    overflow-x: hidden;
-    overflow-y: auto;
-
-    border-radius: 0;
+    overflow: hidden;
 
     color: var(--icon-picker-text);
 
@@ -64,8 +59,6 @@
             #fbfcfe 52%,
             #f6f8fc 100%
         );
-
-    box-shadow: none;
 
     font-family:
         -apple-system,
@@ -78,32 +71,46 @@
 
     -webkit-font-smoothing: antialiased;
     text-rendering: geometricPrecision;
-
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
 }
 
 
 /* =========================================================
-   ШАПКА
+   ФИКСИРОВАННАЯ ШАПКА
    ========================================================= */
 
 .habit-icon-picker__header {
+    position: relative;
+    z-index: 3;
+
+    flex: 0 0 auto;
+
     width: 100%;
+    min-height: 60px;
 
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
     gap: 8px;
 
-    margin-bottom: 12px;
+    box-sizing: border-box;
+
+    padding:
+        calc(10px + env(safe-area-inset-top))
+        16px
+        8px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(251, 252, 254, 0.98) 0%,
+            rgba(251, 252, 254, 0.94) 75%,
+            rgba(251, 252, 254, 0.84) 100%
+        );
+
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
-
-/*
-   Стрелка сделана по той же логике,
-   что и .add-habit-v2__back-button
-*/
 
 .habit-icon-picker__back-button {
     width: 44px;
@@ -136,6 +143,7 @@
         opacity 90ms ease;
 }
 
+
 .habit-icon-picker__back-icon {
     display: block;
 
@@ -152,6 +160,7 @@
 
     transform: translateY(-2px);
 }
+
 
 .habit-icon-picker__back-button:active,
 .habit-icon-picker__back-button.is-pressed {
@@ -179,9 +188,37 @@
     text-align: center;
 }
 
+
 .habit-icon-picker__header-spacer {
     width: 44px;
     height: 44px;
+}
+
+
+/* =========================================================
+   СКРОЛЛИРУЕМАЯ ОБЛАСТЬ
+   ========================================================= */
+
+.habit-icon-picker__body {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    box-sizing: border-box;
+
+    padding: 8px 16px 18px;
+
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+}
+
+
+.habit-icon-picker__body::-webkit-scrollbar {
+    display: none;
 }
 
 
@@ -197,8 +234,6 @@
     gap: 8px;
 }
 
-
-/* Отдельная кнопка эмодзи */
 
 .habit-icon-picker__item {
     position: relative;
@@ -246,6 +281,7 @@
         opacity 90ms ease;
 }
 
+
 .habit-icon-picker__emoji {
     display: flex;
     align-items: center;
@@ -259,7 +295,7 @@
         "Noto Color Emoji",
         sans-serif;
 
-    font-size: 40px;
+    font-size: clamp(38px, 9.6vw, 48px);
     line-height: 1;
 
     transform: translateZ(0);
@@ -283,12 +319,11 @@
         inset 0 1px 1px rgba(255, 255, 255, 0.96);
 }
 
+
 .habit-icon-picker__item.is-selected .habit-icon-picker__emoji {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
-
-/* Мобильная анимация */
 
 .habit-icon-picker__item:active,
 .habit-icon-picker__item.is-pressed {
@@ -298,31 +333,60 @@
 
 
 /* =========================================================
-   КНОПКА «ВЫБРАТЬ»
+   ФИКСИРОВАННЫЙ НИЖНИЙ БЛОК
    ========================================================= */
+
+.habit-icon-picker__footer {
+    position: relative;
+    z-index: 4;
+
+    flex: 0 0 auto;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding:
+        10px
+        16px
+        calc(14px + env(safe-area-inset-bottom));
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(248, 249, 252, 0.72) 0%,
+            rgba(248, 249, 252, 0.96) 28%,
+            rgba(248, 249, 252, 1) 100%
+        );
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
 
 .habit-icon-picker__confirm {
     width: 100%;
-    min-height: 54px;
+    min-height: 56px;
 
-    margin: 14px 0 0;
+    margin: 0;
     padding: 0 20px;
 
     border: 1px solid rgba(55, 136, 245, 0.12);
     border-radius: 18px;
     outline: none;
 
-    color: #ffffff;
+    color: var(--icon-picker-blue);
 
     background:
         linear-gradient(
             145deg,
-            #4a97f8,
-            #287dea
+            rgba(248, 250, 254, 0.98),
+            rgba(239, 243, 249, 0.98)
         );
 
     box-shadow:
-        0 9px 20px rgba(55, 136, 245, 0.19);
+        inset 0 1px 1px rgba(255, 255, 255, 0.96),
+        0 6px 18px rgba(52, 79, 120, 0.07);
 
     font-family:
         -apple-system,
@@ -332,7 +396,7 @@
         Arial,
         sans-serif;
 
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 650;
     line-height: 1;
 
@@ -351,17 +415,20 @@
         box-shadow 90ms ease;
 }
 
+
 .habit-icon-picker__confirm:active,
 .habit-icon-picker__confirm.is-pressed {
     transform: scale(0.98);
-    opacity: 0.83;
+    opacity: 0.82;
 
     box-shadow:
-        0 5px 13px rgba(55, 136, 245, 0.15);
+        inset 0 1px 1px rgba(255, 255, 255, 0.94),
+        0 3px 10px rgba(52, 79, 120, 0.06);
 }
 
+
 /* =========================================================
-  СКРЫТЬ НАВИГАЦИЮ ТОЛЬКО В ВЫБОРЕ ЛОГО ДЛЯ ПРИВЫЧКИ
+   СКРЫТЬ НИЖНЮЮ НАВИГАЦИЮ
    ========================================================= */
 
 body:has(.habit-icon-picker) .bottom-nav {
@@ -375,14 +442,10 @@ body:has(.habit-icon-picker) .bottom-nav {
 
 @media (max-width: 380px) {
 
-    .habit-icon-picker__sheet {
-        padding-left: 13px;
-        padding-right: 13px;
-    }
-
     .habit-icon-picker__header {
         grid-template-columns: 40px minmax(0, 1fr) 40px;
-        margin-bottom: 10px;
+        padding-left: 13px;
+        padding-right: 13px;
     }
 
     .habit-icon-picker__back-button {
@@ -403,12 +466,22 @@ body:has(.habit-icon-picker) .bottom-nav {
         font-size: 18px;
     }
 
+    .habit-icon-picker__body {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
     .habit-icon-picker__grid {
         gap: 7px;
     }
 
     .habit-icon-picker__emoji {
-        font-size: 36px;
+        font-size: clamp(36px, 10vw, 44px);
+    }
+
+    .habit-icon-picker__footer {
+        padding-left: 13px;
+        padding-right: 13px;
     }
 }
 
@@ -419,16 +492,15 @@ body:has(.habit-icon-picker) .bottom-nav {
 
 @media (max-height: 720px) {
 
-    .habit-icon-picker__sheet {
-        max-height: 96dvh;
-
-        padding-top: 10px;
-        padding-bottom:
-            calc(12px + env(safe-area-inset-bottom));
+    .habit-icon-picker__header {
+        min-height: 52px;
+        padding-top: calc(6px + env(safe-area-inset-top));
+        padding-bottom: 5px;
     }
 
-    .habit-icon-picker__header {
-        margin-bottom: 7px;
+    .habit-icon-picker__body {
+        padding-top: 5px;
+        padding-bottom: 12px;
     }
 
     .habit-icon-picker__grid {
@@ -436,12 +508,17 @@ body:has(.habit-icon-picker) .bottom-nav {
     }
 
     .habit-icon-picker__emoji {
-        font-size: 34px;
+        font-size: clamp(34px, 8.8vw, 42px);
+    }
+
+    .habit-icon-picker__footer {
+        padding-top: 8px;
+        padding-bottom:
+            calc(10px + env(safe-area-inset-bottom));
     }
 
     .habit-icon-picker__confirm {
-        min-height: 49px;
-        margin-top: 10px;
+        min-height: 50px;
     }
 }
 
@@ -464,4 +541,3 @@ body:has(.habit-icon-picker) .bottom-nav {
         opacity: 0.9;
     }
 }
-
