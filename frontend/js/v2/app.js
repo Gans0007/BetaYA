@@ -1,4 +1,5 @@
 import { renderHabitsPage } from "./habits/habitsPage.js"
+import { initHabitsEvents } from "./habits/habitsEvents.js"
 
 function initV2() {
     const habitsV2Page = document.getElementById("habits-v2-page")
@@ -9,6 +10,7 @@ function initV2() {
     }
 
     renderHabitsPage()
+    initHabitsEvents()
 }
 
 document.addEventListener("DOMContentLoaded", initV2)

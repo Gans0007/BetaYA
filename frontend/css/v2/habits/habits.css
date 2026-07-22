@@ -252,18 +252,22 @@
         inset 0 1px 1px rgba(255, 255, 255, 0.95);
 
     transition:
-        transform 160ms ease,
-        box-shadow 160ms ease,
-        opacity 160ms ease;
+        transform 90ms ease,
+        box-shadow 90ms ease,
+        opacity 90ms ease;
+        touch-action: manipulation;
 }
 
+.habits-v2-empty__add-button.is-pressed,
 .habits-v2-empty__add-button:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
+
+    opacity: 0.88;
 
     box-shadow:
-        0 8px 17px rgba(78, 105, 140, 0.13),
-        0 3px 8px rgba(78, 105, 140, 0.08),
-        inset 0 1px 1px rgba(255, 255, 255, 0.95);
+        0 7px 14px rgba(78, 105, 140, 0.12),
+        0 2px 6px rgba(78, 105, 140, 0.07),
+        inset 0 2px 4px rgba(47, 127, 229, 0.08);
 }
 
 .habits-v2-empty__add-button:focus {
