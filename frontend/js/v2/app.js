@@ -1,10 +1,10 @@
 import { renderHabitsPage } from "./habits/habitsPage.js"
 
 function initV2() {
-    const dashboardPage = document.getElementById("dashboard-page")
+    const habitsV2Page = document.getElementById("habits-v2-page")
 
-    if (!dashboardPage) {
-        console.error("V2: не найдена страница #dashboard-page")
+    if (!habitsV2Page) {
+        console.error("V2: не найдена страница #habits-v2-page")
         return
     }
 

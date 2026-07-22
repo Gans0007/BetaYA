@@ -15,7 +15,7 @@
    СТРАНИЦА DASHBOARD V2
    ========================================================= */
 
-#dashboard-page {
+#habits-v2-page {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -38,7 +38,7 @@
 
 /* Убираем ограничения старого page-content */
 
-#dashboard-page .page-content {
+#habits-v2-page .page-content {
     position: relative;
     width: 100%;
     height: 100%;
@@ -54,14 +54,14 @@
 
 /* Скрываем старую шапку при открытой странице привычек V2 */
 
-#game-root:has(#dashboard-page.active) #header-root {
+#game-root:has(#habits-v2-page.active) #header-root {
     display: none !important;
 }
 
 
 /* Убираем возможные старые отступы game-root */
 
-#game-root:has(#dashboard-page.active) {
+#game-root:has(#habits-v2-page.active) {
     margin: 0;
     padding: 0;
     min-height: 100dvh;

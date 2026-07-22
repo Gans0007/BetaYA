@@ -1,9 +1,8 @@
 export function renderHabitsPage() {
-
-    const root = document.querySelector("#dashboard-page .page-content")
+    const root = document.getElementById("habits-v2-root")
 
     if (!root) {
-        console.error("V2: не найден .page-content")
+        console.error("V2: не найден #habits-v2-root")
         return
     }
 

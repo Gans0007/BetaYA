@@ -10,10 +10,11 @@ export function initNavigation(){
         challenges: document.getElementById("challenges-page"),
         chat: document.getElementById("chat-page"),
         leaderboard: document.getElementById("leaderboard-page"),
-        partners: document.getElementById("partners-page")
+        partners: document.getElementById("partners-page"),
+        "habits-v2": document.getElementById("habits-v2-page")
     }
 
-    const gamePages = ["dashboard", "challenges"]
+    const gamePages = ["dashboard", "challenges", "habits-v2"]
 
     let activePage = document.querySelector(".page.active") || pages.dashboard
 
