@@ -5,15 +5,20 @@
    ========================================================= */
 
 :root {
-    --add-habit-bg: #f9fafc;
-    --add-habit-text: #20242c;
-    --add-habit-muted: #979ba6;
-    --add-habit-blue: #3788f5;
-    --add-habit-blue-soft: #eef5ff;
-    --add-habit-border: #cfe1ff;
-    --add-habit-white: rgba(255, 255, 255, 0.92);
-}
 
+    --add-habit-bg: #F8F9FB;
+
+    --add-habit-primary: #24262B;
+    --add-habit-secondary: #868B94;
+    --add-habit-light: #B8BDC5;
+
+    --add-habit-border: #E4E6EA;
+
+    --add-habit-soft: #F6F7F9;
+
+    --add-habit-white: rgba(255,255,255,.94);
+
+}
 
 
 /* =========================================================
@@ -36,7 +41,7 @@
     overflow-x: hidden;
     overflow-y: auto;
 
-    color: var(--add-habit-text);
+    color: var(--add-habit-primary);
 
     background:
         radial-gradient(
@@ -101,7 +106,7 @@ body:has(.add-habit-v2) .bottom-nav {
     outline: none;
     background: transparent;
 
-    color: var(--add-habit-blue);
+    color: #303238;
 
     cursor: pointer;
     user-select: none;
@@ -145,7 +150,7 @@ body:has(.add-habit-v2) .bottom-nav {
     white-space: nowrap;
     text-overflow: ellipsis;
 
-    color: var(--add-habit-text);
+    color: var(--add-habit-primary);
 
     font-size: 23px;
     font-weight: 650;
@@ -173,7 +178,7 @@ body:has(.add-habit-v2) .bottom-nav {
     border-radius: 50%;
     outline: none;
 
-    color: var(--add-habit-blue);
+    color: #303238;
 
     background:
         radial-gradient(
@@ -240,7 +245,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
     margin: 0 0 16px;
 
-    color: #898e9a;
+    color: var(--add-habit-secondary);
 
     font-size: 15px;
     font-weight: 600;
@@ -265,7 +270,7 @@ body:has(.add-habit-v2) .bottom-nav {
 
     padding: 12px 18px;
 
-    border: 1.5px solid var(--add-habit-border);
+    border: 1px solid #E4E6EA;
     border-radius: 20px;
 
     background: var(--add-habit-white);
@@ -280,11 +285,11 @@ body:has(.add-habit-v2) .bottom-nav {
 }
 
 .add-habit-v2__name-field:focus-within {
-    border-color: var(--add-habit-blue);
+    border-color: #303238;
 
     box-shadow:
-        0 10px 24px rgba(55, 136, 245, 0.11),
-        0 0 0 3px rgba(55, 136, 245, 0.08);
+        0 6px 18px rgba(35,38,44,.04),
+        0 0 0 3px rgba(30,33,38,.03);
 }
 
 
@@ -307,8 +312,8 @@ body:has(.add-habit-v2) .bottom-nav {
     border-radius: 50%;
     outline: none;
 
-    color: var(--add-habit-blue);
-    background: var(--add-habit-blue-soft);
+    color: #303238;
+    background: #F6F7F9;
 
     font-size: inherit;
     line-height: 1;
@@ -364,7 +369,7 @@ body:has(.add-habit-v2) .bottom-nav {
     border: none;
     outline: none;
 
-    color: var(--add-habit-text);
+    color: var(--add-habit-primary);
     background: transparent;
 
     font: inherit;
@@ -378,7 +383,7 @@ body:has(.add-habit-v2) .bottom-nav {
 }
 
 .add-habit-v2__name-input::placeholder {
-    color: #9da1ac;
+    color: #B7BCC4;
     opacity: 1;
 }
 
@@ -391,85 +396,33 @@ body:has(.add-habit-v2) .bottom-nav {
    БЫСТРЫЕ ВАРИАНТЫ
    ========================================================= */
 
-.add-habit-v2__suggestions {
-    width: 100%;
-
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-    align-items: center;
-    gap: 12px;
-
-    margin-top: 16px;
-    padding: 0 8px;
-
-    box-sizing: border-box;
+.add-habit-v2__suggestions{
+display:flex;
+gap:10px;
+margin-top:18px;
+overflow-x:auto;
+overflow-y:hidden;
+padding-bottom:2px;
+scrollbar-width:none;
+-webkit-overflow-scrolling:touch;
 }
+.add-habit-v2__suggestions::-webkit-scrollbar{display:none;}
 
-.add-habit-v2__suggestion {
-    min-width: 0;
-    min-height: 40px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-
-    margin: 0;
-    padding: 4px;
-
-    border: none;
-    outline: none;
-    background: transparent;
-
-    color: var(--add-habit-blue);
-
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.2;
-
-    cursor: pointer;
-    user-select: none;
-
-    appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-
-    touch-action: manipulation;
-
-    transition:
-        transform 90ms ease,
-        opacity 90ms ease;
+.add-habit-v2__suggestion{
+flex:0 0 auto;
+padding:11px 18px;
+border:1px solid #E4E6EA;
+border-radius:18px;
+background:#fff;
+color:#676C75;
+font-size:14px;
+font-weight:600;
+white-space:nowrap;
+transition:.15s;
 }
-
-.add-habit-v2__suggestion-icon {
-    flex: 0 0 auto;
-
-    font-size: 22px;
-    line-height: 1;
+.add-habit-v2__suggestion:active{
+transform:scale(.96);
 }
-
-.add-habit-v2__suggestion-text {
-    min-width: 0;
-
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.add-habit-v2__suggestion:active,
-.add-habit-v2__suggestion.is-pressed {
-    transform: scale(0.96);
-    opacity: 0.64;
-}
-
-.add-habit-v2__suggestions-divider {
-    width: 1px;
-    height: 24px;
-
-    background: rgba(137, 142, 154, 0.32);
-}
-
 
 /* =========================================================
    ЦВЕТА
@@ -600,7 +553,7 @@ body:has(.add-habit-v2) .bottom-nav {
 /* Выбранный цвет */
 
 .add-habit-v2__color.is-selected {
-    border-color: var(--add-habit-blue);
+    border-color: #303238;
 
     box-shadow:
         0 7px 18px rgba(55, 136, 245, 0.13),
@@ -657,7 +610,7 @@ body:has(.add-habit-v2) .bottom-nav {
     border-radius: 22px;
     outline: none;
 
-    color: var(--add-habit-text);
+    color: var(--add-habit-primary);
 
     background:
         linear-gradient(
@@ -707,8 +660,8 @@ body:has(.add-habit-v2) .bottom-nav {
 
     border-radius: 50%;
 
-    color: var(--add-habit-blue);
-    background: var(--add-habit-blue-soft);
+    color: #303238;
+    background: #F6F7F9;
 
     font-size: 30px;
     line-height: 1;
@@ -724,7 +677,7 @@ body:has(.add-habit-v2) .bottom-nav {
 .add-habit-v2__size-title {
     margin-bottom: 6px;
 
-    color: var(--add-habit-text);
+    color: var(--add-habit-primary);
 
     font-size: 18px;
     font-weight: 650;
@@ -733,7 +686,7 @@ body:has(.add-habit-v2) .bottom-nav {
 }
 
 .add-habit-v2__size-description {
-    color: #9297a2;
+    color: var(--add-habit-light);
 
     font-size: 13px;
     font-weight: 520;
