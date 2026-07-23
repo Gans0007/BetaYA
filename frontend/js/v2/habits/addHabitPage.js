@@ -317,13 +317,6 @@ export function renderAddHabitPage() {
 
                         </div>
 
-                        <div
-                            class="add-habit-v2__size-check"
-                            aria-hidden="true"
-                        >
-                            ✓
-                        </div>
-
                     </button>
 
                 </section>
