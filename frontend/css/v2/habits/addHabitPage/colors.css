@@ -1,0 +1,227 @@
+/* =========================================================
+   ADD HABIT V2
+   Выбор цвета карточки
+   Mobile First
+========================================================= */
+
+
+/* =========================================================
+   ЦВЕТА
+========================================================= */
+
+.add-habit-v2__colors {
+    width: calc(100% + 18px);
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-right: -18px;
+    padding: 2px 18px 4px 0;
+
+    box-sizing: border-box;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+}
+
+
+.add-habit-v2__colors::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   КНОПКА ЦВЕТА
+========================================================= */
+
+.add-habit-v2__color {
+    position: relative;
+
+    width: 52px;
+    height: 52px;
+
+    flex: 0 0 58px;
+
+    margin: 0;
+    padding: 0;
+
+    border: 2px solid transparent;
+    border-radius: 19px;
+    outline: none;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 100ms ease,
+        border-color 120ms ease,
+        box-shadow 120ms ease,
+        opacity 120ms ease;
+}
+
+
+/* =========================================================
+   ЦВЕТОВЫЕ ВАРИАНТЫ
+========================================================= */
+
+.add-habit-v2__color[data-habit-color="blue"] {
+    background:
+        linear-gradient(
+            145deg,
+            #edf5ff 0%,
+            #dbe9ff 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="green"] {
+    background:
+        linear-gradient(
+            145deg,
+            #ebfae9 0%,
+            #d7f1d5 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="purple"] {
+    background:
+        linear-gradient(
+            145deg,
+            #f2e9ff 0%,
+            #e4d5fa 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="orange"] {
+    background:
+        linear-gradient(
+            145deg,
+            #fff0e2 0%,
+            #f9d8bf 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="cyan"] {
+    background:
+        linear-gradient(
+            145deg,
+            #e4faff 0%,
+            #cceff5 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="pink"] {
+    background:
+        linear-gradient(
+            145deg,
+            #ffe9f4 0%,
+            #f5cee0 100%
+        );
+}
+
+
+.add-habit-v2__color[data-habit-color="yellow"] {
+    background:
+        linear-gradient(
+            145deg,
+            #fff8df 0%,
+            #f6e6b7 100%
+        );
+}
+
+
+/* =========================================================
+   ВЫБРАННЫЙ ЦВЕТ
+========================================================= */
+
+.add-habit-v2__color.is-selected {
+    border-color: #303238;
+
+    box-shadow:
+        0 7px 18px rgba(55, 136, 245, 0.13),
+        inset 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+
+.add-habit-v2__color:active,
+.add-habit-v2__color.is-pressed {
+    transform: scale(0.93);
+}
+
+
+/* =========================================================
+   ЗАБЛОКИРОВАННЫЕ ЦВЕТА
+========================================================= */
+
+.add-habit-v2__color.is-locked {
+    cursor: default;
+}
+
+
+.add-habit-v2__lock {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    filter: grayscale(1);
+    opacity: 0.55;
+
+    font-size: 20px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   МОБИЛЬНАЯ АДАПТАЦИЯ
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .add-habit-v2__color {
+        width: 53px;
+        height: 66px;
+        flex-basis: 53px;
+    }
+}
+
+
+/* =========================================================
+   НИЗКИЕ ЭКРАНЫ
+========================================================= */
+
+@media (max-height: 720px) {
+
+    .add-habit-v2__color {
+        height: 62px;
+    }
+}
+
+
+/* =========================================================
+   УСТРОЙСТВА С МЫШЬЮ
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .add-habit-v2__color:not(.is-locked):hover {
+        transform: translateY(-2px);
+    }
+}
