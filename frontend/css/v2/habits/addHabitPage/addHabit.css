@@ -1,4 +1,106 @@
+/* =========================================================
+   ADD HABIT V2
+   Главный файл экрана добавления привычки
+========================================================= */
+
+
+/* =========================================================
+   ИМПОРТЫ
+========================================================= */
+
 @import url("./header.css");
 @import url("./name.css");
 @import url("./colors.css");
 @import url("./size.css");
+
+
+/* =========================================================
+   ОБЩИЕ ПЕРЕМЕННЫЕ
+========================================================= */
+
+:root {
+    --add-habit-bg: #F8F9FB;
+
+    --add-habit-primary: #24262B;
+    --add-habit-secondary: #676C75;
+    --add-habit-light: #B8BDC5;
+
+    --add-habit-border: #E4E6EA;
+    --add-habit-soft: #F6F7F9;
+
+    --add-habit-white: rgba(255, 255, 255, 0.94);
+}
+
+
+/* =========================================================
+   ОБЩИЙ ЭКРАН
+========================================================= */
+
+.add-habit-v2 {
+    position: relative;
+
+    width: 100%;
+    min-height: 100dvh;
+
+    box-sizing: border-box;
+
+    padding:
+        calc(22px + env(safe-area-inset-top))
+        18px
+        calc(32px + env(safe-area-inset-bottom));
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    color: var(--add-habit-primary);
+
+    background:
+        radial-gradient(
+            circle at 50% 12%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(250, 251, 253, 0.98) 48%,
+            rgba(247, 249, 252, 1) 100%
+        );
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+
+    overscroll-behavior: contain;
+}
+
+
+/* На экране создания привычки нижняя навигация скрыта */
+
+body:has(.add-habit-v2) .bottom-nav {
+    display: none !important;
+}
+
+
+/* =========================================================
+   АДАПТАЦИЯ ОБЩЕГО ЭКРАНА
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .add-habit-v2 {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+}
+
+
+@media (max-height: 720px) {
+
+    .add-habit-v2 {
+        padding-top: calc(14px + env(safe-area-inset-top));
+    }
+}
