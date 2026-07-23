@@ -52,7 +52,7 @@
     border-radius: 0;
     outline: none;
 
-    color: #3788f5;
+    color: #303238;
     background: transparent;
 
     cursor: pointer;
@@ -100,9 +100,8 @@
 .habit-icon-picker__back-button:active,
 .habit-icon-picker__back-button.is-pressed {
     transform: scale(0.88);
-    opacity: 0.58;
+    opacity: 0.65;
 }
-
 
 /* =========================================================
    FOCUS
