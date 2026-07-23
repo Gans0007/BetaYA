@@ -9,7 +9,7 @@
     --add-habit-bg: #F8F9FB;
 
     --add-habit-primary: #24262B;
-    --add-habit-secondary: #868B94;
+    --add-habit-secondary: #676C75;
     --add-habit-light: #B8BDC5;
 
     --add-habit-border: #E4E6EA;
@@ -414,7 +414,7 @@ padding:11px 18px;
 border:1px solid #E4E6EA;
 border-radius:18px;
 background:#fff;
-color:#676C75;
+color: #868B94;
 font-size:14px;
 font-weight:600;
 white-space:nowrap;
