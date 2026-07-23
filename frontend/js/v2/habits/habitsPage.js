@@ -1,4 +1,8 @@
-export function renderHabitsPage() {
+import { renderHabitsEmpty } from "./habitsEmpty.js"
+import { renderHabitsList } from "./habitsList.js"
+
+
+export function renderHabitsPage(habits = []) {
     const root = document.getElementById("habits-v2-root")
 
     if (!root) {
@@ -6,31 +10,17 @@ export function renderHabitsPage() {
         return
     }
 
-    root.innerHTML = `
-        <section class="habits-v2-empty">
-            <div class="habits-v2-empty__content">
+    if (!Array.isArray(habits)) {
+        console.error(
+            "V2: renderHabitsPage ожидал массив привычек"
+        )
 
-                <div class="habits-v2-empty__date">
-                    Вт, 21 июля
-                </div>
+        root.innerHTML = renderHabitsEmpty()
+        return
+    }
 
-                <h1 class="habits-v2-empty__title">
-                    Начните свой путь.
-                </h1>
-
-                <div class="habits-v2-empty__subtitle">
-                    Создайте привычку
-                </div>
-
-                <button
-                    class="habits-v2-empty__add-button"
-                    type="button"
-                    aria-label="Создать привычку"
-                >
-                    +
-                </button>
-
-            </div>
-        </section>
-    `
+    root.innerHTML =
+        habits.length === 0
+            ? renderHabitsEmpty()
+            : renderHabitsList(habits)
 }

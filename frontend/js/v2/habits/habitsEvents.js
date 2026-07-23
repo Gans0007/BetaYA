@@ -4,8 +4,15 @@ import { renderIconPickerPage } from "./iconPickerPage.js"
 
 
 /* =========================================================
-   ВРЕМЕННОЕ СОСТОЯНИЕ НОВОЙ ПРИВЫЧКИ
-   Пока без API
+   ВРЕМЕННОЕ ХРАНИЛИЩЕ ПРИВЫЧЕК
+   Позже будет заменено запросами к API
+   ========================================================= */
+
+const habits = []
+
+
+/* =========================================================
+   ЧЕРНОВИК НОВОЙ ПРИВЫЧКИ
    ========================================================= */
 
 const habitDraft = {
@@ -17,8 +24,25 @@ const habitDraft = {
 
 
 /* =========================================================
+   СОЗДАНИЕ ID
+   ========================================================= */
+
+function createHabitId() {
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+    ) {
+        return crypto.randomUUID()
+    }
+
+    return `habit-${Date.now()}-${Math.random()
+        .toString(16)
+        .slice(2)}`
+}
+
+
+/* =========================================================
    АНИМАЦИЯ НАЖАТИЯ
-   Для телефона и компьютера
    ========================================================= */
 
 function addPressAnimation(element) {
@@ -74,7 +98,7 @@ function resetHabitDraft() {
 
 
 /* =========================================================
-   СОХРАНЯЕМ ДАННЫЕ ИЗ ЭКРАНА СОЗДАНИЯ В ЧЕРНОВИК
+   СОХРАНЯЕМ ДАННЫЕ ФОРМЫ В ЧЕРНОВИК
    ========================================================= */
 
 function updateDraftFromAddHabitPage() {
@@ -124,7 +148,7 @@ function updateDraftFromAddHabitPage() {
 
 
 /* =========================================================
-   ВОССТАНАВЛИВАЕМ ЧЕРНОВИК НА ЭКРАНЕ СОЗДАНИЯ
+   ВОССТАНАВЛИВАЕМ ЧЕРНОВИК В ФОРМЕ
    ========================================================= */
 
 function restoreDraftToAddHabitPage() {
@@ -160,7 +184,8 @@ function restoreDraftToAddHabitPage() {
 
     colorButtons.forEach((button) => {
         const isSelected =
-            button.dataset.habitColor === habitDraft.color
+            button.dataset.habitColor ===
+            habitDraft.color
 
         button.classList.toggle(
             "is-selected",
@@ -175,7 +200,8 @@ function restoreDraftToAddHabitPage() {
 
     sizeButtons.forEach((button) => {
         const isSelected =
-            button.dataset.habitSize === habitDraft.size
+            button.dataset.habitSize ===
+            habitDraft.size
 
         button.classList.toggle(
             "is-selected",
@@ -191,10 +217,26 @@ function restoreDraftToAddHabitPage() {
 
 
 /* =========================================================
-   ОТКРЫТИЕ ЭКРАНА СОЗДАНИЯ
+   РЕНДЕР ГЛАВНОЙ СТРАНИЦЫ
    ========================================================= */
 
-function openAddHabitPage() {
+function openHabitsPage() {
+    renderHabitsPage(habits)
+    initHabitsPageEvents()
+}
+
+
+/* =========================================================
+   ОТКРЫТИЕ СТРАНИЦЫ СОЗДАНИЯ
+   ========================================================= */
+
+function openAddHabitPage({
+    resetDraft = false
+} = {}) {
+    if (resetDraft) {
+        resetHabitDraft()
+    }
+
     renderAddHabitPage()
     restoreDraftToAddHabitPage()
     initAddHabitPageEvents()
@@ -202,29 +244,109 @@ function openAddHabitPage() {
 
 
 /* =========================================================
-   ГЛАВНАЯ СТРАНИЦА ПРИВЫЧЕК
+   СОЗДАНИЕ ПРИВЫЧКИ
+   ========================================================= */
+
+function createHabitFromDraft() {
+    const habitName = habitDraft.name.trim()
+
+    if (!habitName) {
+        return null
+    }
+
+    const newHabit = {
+        id: createHabitId(),
+        name: habitName,
+        icon: habitDraft.icon,
+        color: habitDraft.color,
+        size: habitDraft.size,
+        createdAt: new Date().toISOString()
+    }
+
+    habits.push(newHabit)
+
+    return newHabit
+}
+
+
+/* =========================================================
+   СОБЫТИЯ ГЛАВНОЙ СТРАНИЦЫ
    ========================================================= */
 
 function initHabitsPageEvents() {
-    const addButton = document.querySelector(
-        ".habits-v2-empty__add-button"
-    )
+    const root = document.getElementById("habits-v2-root")
 
-    if (!addButton) {
+    if (!root) {
         return
     }
 
-    addPressAnimation(addButton)
+    const addButtons = root.querySelectorAll(
+        '[data-action="open-add-habit"], .habits-v2-empty__add-button'
+    )
 
-    addButton.addEventListener("click", () => {
-        resetHabitDraft()
-        openAddHabitPage()
+    addButtons.forEach((button) => {
+        addPressAnimation(button)
+
+        button.addEventListener("click", () => {
+            openAddHabitPage({
+                resetDraft: true
+            })
+        })
+    })
+
+    initHabitCardEvents()
+}
+
+
+/* =========================================================
+   СОБЫТИЯ КАРТОЧЕК
+   Пока только базовая заготовка
+   ========================================================= */
+
+function initHabitCardEvents() {
+    const root = document.getElementById("habits-v2-root")
+
+    if (!root) {
+        return
+    }
+
+    const habitCards = root.querySelectorAll(
+        "[data-habit-id]"
+    )
+
+    habitCards.forEach((card) => {
+        addPressAnimation(card)
+
+        card.addEventListener("click", () => {
+            const habitId =
+                card.dataset.habitId
+
+            const selectedHabit = habits.find(
+                (habit) => habit.id === habitId
+            )
+
+            if (!selectedHabit) {
+                return
+            }
+
+            console.log(
+                "Выбрана привычка:",
+                selectedHabit
+            )
+
+            /*
+             * Позже здесь будет открываться:
+             * страница привычки,
+             * меню привычки
+             * или подтверждение выполнения.
+             */
+        })
     })
 }
 
 
 /* =========================================================
-   ЭКРАН СОЗДАНИЯ ПРИВЫЧКИ
+   СОБЫТИЯ СТРАНИЦЫ СОЗДАНИЯ
    ========================================================= */
 
 function initAddHabitPageEvents() {
@@ -290,23 +412,27 @@ function initAddHabitPageEvents() {
 
     nameInput?.addEventListener("input", () => {
         habitDraft.name = nameInput.value
+
+        const nameField = nameInput.closest(
+            ".add-habit-v2__name-field"
+        )
+
+        nameField?.classList.remove("has-error")
     })
 
 
     /* ---------------------------------------------------------
-       НАЗАД НА ГЛАВНУЮ СТРАНИЦУ ПРИВЫЧЕК
+       ВОЗВРАТ НА ГЛАВНУЮ
        --------------------------------------------------------- */
 
     backButton?.addEventListener("click", () => {
         resetHabitDraft()
-
-        renderHabitsPage()
-        initHabitsPageEvents()
+        openHabitsPage()
     })
 
 
     /* ---------------------------------------------------------
-       ОТКРЫВАЕМ ВЫБОР ЭМОДЗИ
+       ОТКРЫТИЕ ВЫБОРА ИКОНКИ
        --------------------------------------------------------- */
 
     iconButton?.addEventListener("click", () => {
@@ -373,7 +499,11 @@ function initAddHabitPageEvents() {
             })
 
             button.classList.add("is-selected")
-            button.setAttribute("aria-checked", "true")
+
+            button.setAttribute(
+                "aria-checked",
+                "true"
+            )
 
             habitDraft.color =
                 button.dataset.habitColor || "blue"
@@ -399,7 +529,11 @@ function initAddHabitPageEvents() {
             })
 
             button.classList.add("is-selected")
-            button.setAttribute("aria-pressed", "true")
+
+            button.setAttribute(
+                "aria-pressed",
+                "true"
+            )
 
             habitDraft.size =
                 button.dataset.habitSize || "large"
@@ -408,14 +542,14 @@ function initAddHabitPageEvents() {
 
 
     /* ---------------------------------------------------------
-       СОХРАНЕНИЕ
-       Пока без API
+       СОХРАНЕНИЕ ПРИВЫЧКИ
        --------------------------------------------------------- */
 
     saveButton?.addEventListener("click", () => {
         updateDraftFromAddHabitPage()
 
-        const habitName = habitDraft.name.trim()
+        const habitName =
+            habitDraft.name.trim()
 
         if (!habitName) {
             const nameField = nameInput?.closest(
@@ -426,23 +560,30 @@ function initAddHabitPageEvents() {
             nameField?.classList.add("has-error")
 
             window.setTimeout(() => {
-                nameField?.classList.remove("has-error")
+                nameField?.classList.remove(
+                    "has-error"
+                )
             }, 450)
 
             return
         }
 
-        console.log("Новая привычка:", {
-            name: habitName,
-            icon: habitDraft.icon,
-            color: habitDraft.color,
-            size: habitDraft.size
-        })
+        const newHabit =
+            createHabitFromDraft()
+
+        if (!newHabit) {
+            return
+        }
+
+        console.log(
+            "Новая привычка:",
+            newHabit
+        )
 
         /*
-         * Позднее здесь будет запрос:
+         * Позже этот участок заменим на:
          *
-         * await createHabit({
+         * const newHabit = await createHabit({
          *     name: habitName,
          *     icon: habitDraft.icon,
          *     color: habitDraft.color,
@@ -451,15 +592,13 @@ function initAddHabitPageEvents() {
          */
 
         resetHabitDraft()
-
-        renderHabitsPage()
-        initHabitsPageEvents()
+        openHabitsPage()
     })
 }
 
 
 /* =========================================================
-   ЭКРАН ВЫБОРА ЭМОДЗИ
+   СОБЫТИЯ ВЫБОРА ИКОНКИ
    ========================================================= */
 
 function initIconPickerEvents() {
@@ -495,8 +634,7 @@ function initIconPickerEvents() {
 
 
     /* ---------------------------------------------------------
-       СТРЕЛКА НАЗАД
-       Выбранное значение сохраняется в черновике
+       ВОЗВРАТ В ФОРМУ
        --------------------------------------------------------- */
 
     backButton?.addEventListener("click", () => {
@@ -505,7 +643,7 @@ function initIconPickerEvents() {
 
 
     /* ---------------------------------------------------------
-       ВЫБОР ЭМОДЗИ
+       ВЫБОР ИКОНКИ
        --------------------------------------------------------- */
 
     iconButtons.forEach((button) => {
@@ -522,7 +660,11 @@ function initIconPickerEvents() {
             })
 
             button.classList.add("is-selected")
-            button.setAttribute("aria-pressed", "true")
+
+            button.setAttribute(
+                "aria-pressed",
+                "true"
+            )
 
             habitDraft.icon =
                 button.dataset.habitIcon || "✱"
@@ -531,7 +673,7 @@ function initIconPickerEvents() {
 
 
     /* ---------------------------------------------------------
-       ПОДТВЕРЖДАЕМ ВЫБОР
+       ПОДТВЕРЖДЕНИЕ ИКОНКИ
        --------------------------------------------------------- */
 
     confirmButton?.addEventListener("click", () => {
@@ -545,7 +687,13 @@ function initIconPickerEvents() {
    ========================================================= */
 
 export function initHabitsEvents() {
-    const iconPickerPage = document.querySelector(
+    const root = document.getElementById("habits-v2-root")
+
+    if (!root) {
+        return
+    }
+
+    const iconPickerPage = root.querySelector(
         ".habit-icon-picker"
     )
 
@@ -554,7 +702,7 @@ export function initHabitsEvents() {
         return
     }
 
-    const addHabitPage = document.querySelector(
+    const addHabitPage = root.querySelector(
         ".add-habit-v2"
     )
 
@@ -564,5 +712,11 @@ export function initHabitsEvents() {
         return
     }
 
+    /*
+     * При первом открытии страницы передаём
+     * текущий массив привычек.
+     */
+
+    renderHabitsPage(habits)
     initHabitsPageEvents()
 }

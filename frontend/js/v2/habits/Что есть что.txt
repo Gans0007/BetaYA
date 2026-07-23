@@ -1,0 +1,8 @@
+            ├── habitsPage.js      // Выбирает, что показать: пустой экран или список
+            ├── habitsEmpty.js     // Экран "У вас пока нет привычек"
+            ├── habitsList.js      // Контейнер со всеми привычками
+            ├── habitCard.js       // Одна карточка привычки
+            ├── habitsEvents.js    // Все обработчики событий
+            ├── habitsApi.js       // Работа с backend
+            ├── addHabitPage.js    // Создание привычки
+            ├── iconPickerPage.js  // Выбор иконки
