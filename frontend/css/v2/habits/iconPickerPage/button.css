@@ -18,7 +18,7 @@
     padding:
         52px
         23px
-        calc(18px + env(safe-area-inset-bottom));
+        calc(42px + env(safe-area-inset-bottom));
 
     background:
         linear-gradient(
@@ -160,7 +160,7 @@
         padding:
             44px
             16px
-            calc(14px + env(safe-area-inset-bottom));
+            calc(34px + env(safe-area-inset-bottom));
     }
 
     .habit-icon-picker__confirm {
@@ -195,7 +195,7 @@
     .habit-icon-picker__footer {
         padding-top: 40px;
         padding-bottom:
-            calc(11px + env(safe-area-inset-bottom));
+            calc(28px + env(safe-area-inset-bottom));
     }
 
     .habit-icon-picker__confirm {
