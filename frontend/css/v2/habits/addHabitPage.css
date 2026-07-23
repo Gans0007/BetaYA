@@ -397,31 +397,30 @@ body:has(.add-habit-v2) .bottom-nav {
    ========================================================= */
 
 .add-habit-v2__suggestions{
-display:flex;
-gap:10px;
-margin-top:18px;
-overflow-x:auto;
-overflow-y:hidden;
-padding-bottom:2px;
-scrollbar-width:none;
--webkit-overflow-scrolling:touch;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
 }
-.add-habit-v2__suggestions::-webkit-scrollbar{display:none;}
 
 .add-habit-v2__suggestion{
-flex:0 0 auto;
-padding:11px 18px;
-border:1px solid #E4E6EA;
-border-radius:18px;
-background:#fff;
-color: #868B94;
-font-size:14px;
-font-weight:600;
-white-space:nowrap;
-transition:.15s;
+    padding:0;
+    border:none;
+    background:transparent;
+    color:#868B94;
+    font-size:14px;
+    font-weight:600;
+    white-space:nowrap;
+    cursor:pointer;
 }
-.add-habit-v2__suggestion:active{
-transform:scale(.96);
+
+.add-habit-v2__divider{
+    flex:0 0 auto;
+    color:#D2D6DC;
+    font-size:15px;
+    user-select:none;
 }
 
 /* =========================================================

@@ -94,48 +94,31 @@ export function renderAddHabitPage() {
 
 
                     <!-- Быстрые варианты названия -->
-                    <div class="add-habit-v2__suggestions">
+<div class="add-habit-v2__suggestions">
 
-                        <button
-                            class="add-habit-v2__suggestion"
-                            type="button"
-                            data-habit-suggestion="Откладывать деньги"
-                        >
-                            <span
-                                class="add-habit-v2__suggestion-icon"
-                                aria-hidden="true"
-                            >
-                                ◫
-                            </span>
+    <button class="add-habit-v2__suggestion" data-habit-suggestion="Не тратить на фигню">
+        Не тратить на фигню
+    </button>
 
-                            <span class="add-habit-v2__suggestion-text">
-                                Откладывать деньги
-                            </span>
-                        </button>
+    <span class="add-habit-v2__divider">|</span>
 
-                        <div
-                            class="add-habit-v2__suggestions-divider"
-                            aria-hidden="true"
-                        ></div>
+    <button class="add-habit-v2__suggestion" data-habit-suggestion="Откладывать деньги">
+        Откладывать деньги
+    </button>
 
-                        <button
-                            class="add-habit-v2__suggestion"
-                            type="button"
-                            data-habit-suggestion="Планировать бюджет"
-                        >
-                            <span
-                                class="add-habit-v2__suggestion-icon"
-                                aria-hidden="true"
-                            >
-                                ◇
-                            </span>
+    <span class="add-habit-v2__divider">|</span>
 
-                            <span class="add-habit-v2__suggestion-text">
-                                Планировать бюджет
-                            </span>
-                        </button>
+    <button class="add-habit-v2__suggestion" data-habit-suggestion="Планировать бюджет">
+        Планировать бюджет
+    </button>
 
-                    </div>
+    <span class="add-habit-v2__divider">|</span>
+
+    <button class="add-habit-v2__suggestion" data-habit-suggestion="Читать книгу">
+        Читать книгу
+    </button>
+
+</div>
 
                 </section>
 
