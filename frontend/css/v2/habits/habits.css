@@ -408,3 +408,809 @@
         font-size: 48px;
     }
 }
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   HABITS V2 — СПИСОК ПРИВЫЧЕК
+   ========================================================= */
+
+.habits-v2-list {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+
+    box-sizing: border-box;
+
+    padding:
+        max(58px, env(safe-area-inset-top))
+        18px
+        calc(112px + env(safe-area-inset-bottom));
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background:
+        radial-gradient(
+            circle at 50% 18%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(250, 251, 253, 0.98) 55%,
+            rgba(247, 249, 252, 1) 100%
+        );
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.habits-v2-list::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   ВЕРХНЯЯ ЧАСТЬ
+   ========================================================= */
+
+.habits-v2-list__header {
+    width: 100%;
+
+    margin: 0 0 28px;
+    padding: 0 4px;
+
+    box-sizing: border-box;
+}
+
+.habits-v2-list__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+}
+
+.habits-v2-list__heading {
+    min-width: 0;
+}
+
+.habits-v2-list__date {
+    margin: 0 0 10px;
+
+    color: #a2a4aa;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    text-transform: uppercase;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+.habits-v2-list__title {
+    margin: 0;
+
+    color: #232428;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.045em;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   КНОПКИ В ШАПКЕ
+   ========================================================= */
+
+.habits-v2-list__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex: 0 0 auto;
+}
+
+.habits-v2-list__premium {
+    height: 48px;
+
+    padding: 0 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 24px;
+
+    color: #347ee8;
+    background: #edf4ff;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.habits-v2-list__add-button {
+    width: 48px;
+    height: 48px;
+
+    padding: 0 0 3px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    border: none;
+    border-radius: 50%;
+
+    color: #347ee8;
+    background: rgba(255, 255, 255, 0.96);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1;
+
+    box-shadow:
+        0 10px 24px rgba(36, 48, 72, 0.09),
+        0 3px 8px rgba(36, 48, 72, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 100ms ease,
+        opacity 100ms ease,
+        box-shadow 100ms ease;
+}
+
+.habits-v2-list__add-button.is-pressed,
+.habits-v2-list__add-button:active {
+    transform: scale(0.92);
+    opacity: 0.86;
+
+    box-shadow:
+        0 5px 12px rgba(36, 48, 72, 0.07),
+        inset 0 2px 4px rgba(52, 126, 232, 0.08);
+}
+
+
+/* =========================================================
+   ЗАГОЛОВОК «СЕГОДНЯ»
+   ========================================================= */
+
+.habits-v2-list__section-title {
+    margin: 0 4px 16px;
+
+    color: #2b2c31;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* =========================================================
+   КОНТЕЙНЕР КАРТОЧЕК
+   ========================================================= */
+
+.habits-v2-list__cards {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+
+/* =========================================================
+   БАЗОВАЯ КАРТОЧКА
+   ========================================================= */
+
+.habit-card {
+    --habit-accent: #58c467;
+    --habit-accent-rgb: 88, 196, 103;
+
+    position: relative;
+
+    width: 100%;
+    min-height: 164px;
+
+    box-sizing: border-box;
+
+    padding: 24px 22px 18px;
+
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 50px;
+    grid-template-rows: auto 1fr auto;
+    column-gap: 14px;
+    row-gap: 6px;
+
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(255, 255, 255, 0.92) 65%,
+            rgba(249, 250, 252, 0.94) 100%
+        );
+
+    box-shadow:
+        0 14px 32px rgba(42, 51, 70, 0.075),
+        0 4px 12px rgba(42, 51, 70, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    overflow: hidden;
+
+    cursor: pointer;
+    user-select: none;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 100ms ease,
+        box-shadow 100ms ease,
+        opacity 100ms ease;
+}
+
+.habit-card::before {
+    content: "";
+
+    position: absolute;
+    top: -60px;
+    left: -50px;
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(var(--habit-accent-rgb), 0.07) 0%,
+            rgba(var(--habit-accent-rgb), 0) 70%
+        );
+
+    pointer-events: none;
+}
+
+.habit-card.is-pressed,
+.habit-card:active {
+    transform: scale(0.985);
+    opacity: 0.93;
+
+    box-shadow:
+        0 8px 18px rgba(42, 51, 70, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   ЦВЕТА ПРИВЫЧЕК
+   Выбранный цвет автоматически применяется к карточке
+   ========================================================= */
+
+.habit-card--green {
+    --habit-accent: #58c467;
+    --habit-accent-rgb: 88, 196, 103;
+}
+
+.habit-card--blue {
+    --habit-accent: #4d8ff0;
+    --habit-accent-rgb: 77, 143, 240;
+}
+
+.habit-card--purple {
+    --habit-accent: #9a72e8;
+    --habit-accent-rgb: 154, 114, 232;
+}
+
+.habit-card--pink {
+    --habit-accent: #e875a6;
+    --habit-accent-rgb: 232, 117, 166;
+}
+
+.habit-card--red {
+    --habit-accent: #eb6b6b;
+    --habit-accent-rgb: 235, 107, 107;
+}
+
+.habit-card--orange {
+    --habit-accent: #ee9b51;
+    --habit-accent-rgb: 238, 155, 81;
+}
+
+.habit-card--yellow {
+    --habit-accent: #d6ad35;
+    --habit-accent-rgb: 214, 173, 53;
+}
+
+.habit-card--mint {
+    --habit-accent: #4dbda5;
+    --habit-accent-rgb: 77, 189, 165;
+}
+
+.habit-card--gray {
+    --habit-accent: #8b8e96;
+    --habit-accent-rgb: 139, 142, 150;
+}
+
+.habit-card--black {
+    --habit-accent: #303136;
+    --habit-accent-rgb: 48, 49, 54;
+}
+
+
+/* =========================================================
+   ИКОНКА / ЭМОДЗИ
+   ========================================================= */
+
+.habit-card__icon {
+    position: relative;
+    z-index: 1;
+
+    grid-column: 1;
+    grid-row: 1 / 3;
+
+    width: 56px;
+    min-width: 56px;
+    height: 56px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--habit-accent);
+
+    font-family:
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji",
+        sans-serif;
+
+    font-size: 43px;
+    font-weight: 400;
+    line-height: 1;
+
+    text-align: center;
+
+    overflow: visible;
+
+    /* Не используем filter и opacity,
+       поэтому эмодзи остаётся цветным */
+    filter: none;
+}
+
+
+/* Класс для обычных символов, если это не emoji */
+
+.habit-card__icon.is-symbol {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 40px;
+    font-weight: 500;
+
+    color: var(--habit-accent);
+}
+
+
+/* =========================================================
+   ТЕКСТ КАРТОЧКИ
+   ========================================================= */
+
+.habit-card__content {
+    position: relative;
+    z-index: 1;
+
+    grid-column: 2;
+    grid-row: 1 / 3;
+
+    min-width: 0;
+
+    padding-top: 3px;
+}
+
+.habit-card__name {
+    margin: 0;
+
+    color: #27282d;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.035em;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+.habit-card__description {
+    margin: 10px 0 0;
+
+    color: var(--habit-accent);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* Если название привычки тоже должно быть выбранного цвета */
+
+.habit-card--colored-title .habit-card__name {
+    color: var(--habit-accent);
+}
+
+
+/* =========================================================
+   КНОПКА ВЫПОЛНЕНИЯ
+   ========================================================= */
+
+.habit-card__check {
+    position: relative;
+    z-index: 1;
+
+    grid-column: 3;
+    grid-row: 1 / 3;
+
+    width: 48px;
+    height: 48px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    justify-self: end;
+
+    border: none;
+    border-radius: 50%;
+
+    color: var(--habit-accent);
+
+    background:
+        rgba(var(--habit-accent-rgb), 0.14);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 100ms ease,
+        background 150ms ease,
+        color 150ms ease;
+}
+
+.habit-card__check.is-pressed,
+.habit-card__check:active {
+    transform: scale(0.9);
+}
+
+.habit-card__check.is-completed {
+    color: #ffffff;
+    background: var(--habit-accent);
+}
+
+
+/* =========================================================
+   НИЖНЯЯ ЧАСТЬ КАРТОЧКИ
+   ========================================================= */
+
+.habit-card__footer {
+    position: relative;
+    z-index: 1;
+
+    grid-column: 1 / 4;
+    grid-row: 3;
+
+    width: 100%;
+
+    margin-top: 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+
+/* =========================================================
+   ПРОГРЕСС
+   ========================================================= */
+
+.habit-card__progress {
+    min-width: 0;
+    flex: 1 1 auto;
+
+    display: grid;
+    grid-template-columns: repeat(6, minmax(17px, 1fr));
+    gap: 8px;
+}
+
+.habit-card__progress-item {
+    height: 9px;
+
+    border-radius: 999px;
+
+    background: #e3e4e8;
+
+    box-shadow:
+        inset 0 1px 2px rgba(42, 46, 56, 0.04);
+}
+
+.habit-card__progress-item.is-completed {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(var(--habit-accent-rgb), 0.94) 0%,
+            var(--habit-accent) 100%
+        );
+
+    box-shadow:
+        0 2px 5px rgba(var(--habit-accent-rgb), 0.15);
+}
+
+
+/* =========================================================
+   СЕРИЯ
+   ========================================================= */
+
+.habit-card__streak {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    color: var(--habit-accent);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+.habit-card__streak-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   РАЗМЕР КАРТОЧКИ
+   ========================================================= */
+
+.habit-card--large {
+    min-height: 164px;
+}
+
+.habit-card--small {
+    min-height: 120px;
+    padding-top: 19px;
+    padding-bottom: 16px;
+}
+
+
+/* =========================================================
+   УЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-width: 370px) {
+
+    .habits-v2-list {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .habits-v2-list__title {
+        font-size: 32px;
+    }
+
+    .habits-v2-list__premium {
+        height: 44px;
+        padding: 0 15px;
+        font-size: 14px;
+    }
+
+    .habits-v2-list__add-button {
+        width: 44px;
+        height: 44px;
+        font-size: 31px;
+    }
+
+    .habit-card {
+        min-height: 154px;
+
+        padding: 21px 17px 17px;
+
+        grid-template-columns: 50px minmax(0, 1fr) 44px;
+        column-gap: 11px;
+    }
+
+    .habit-card__icon {
+        width: 50px;
+        min-width: 50px;
+        height: 50px;
+
+        font-size: 38px;
+    }
+
+    .habit-card__name {
+        font-size: 20px;
+    }
+
+    .habit-card__description {
+        margin-top: 8px;
+        font-size: 15px;
+    }
+
+    .habit-card__check {
+        width: 44px;
+        height: 44px;
+        font-size: 24px;
+    }
+
+    .habit-card__progress {
+        gap: 6px;
+    }
+
+    .habit-card__progress-item {
+        height: 8px;
+    }
+
+    .habit-card__streak {
+        font-size: 16px;
+    }
+}
+
+
+/* =========================================================
+   НИЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-height: 720px) {
+
+    .habits-v2-list {
+        padding-top:
+            max(38px, env(safe-area-inset-top));
+    }
+
+    .habits-v2-list__header {
+        margin-bottom: 22px;
+    }
+
+    .habits-v2-list__cards {
+        gap: 11px;
+    }
+
+    .habit-card {
+        min-height: 148px;
+    }
+}
+
+
