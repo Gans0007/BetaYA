@@ -6,7 +6,7 @@
 
 
 /* =========================================================
-   ЦВЕТА
+   КОНТЕЙНЕР ЦВЕТОВ
 ========================================================= */
 
 .add-habit-v2__colors {
@@ -17,7 +17,7 @@
     gap: 11px;
 
     margin-right: -18px;
-    padding: 2px 18px 4px 0;
+    padding: 8px 18px 12px 0;
 
     box-sizing: border-box;
 
@@ -28,7 +28,6 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
 }
-
 
 .add-habit-v2__colors::-webkit-scrollbar {
     display: none;
@@ -41,11 +40,12 @@
 
 .add-habit-v2__color {
     position: relative;
+    isolation: isolate;
 
     width: 52px;
     height: 52px;
 
-    flex: 0 0 58px;
+    flex: 0 0 52px;
 
     margin: 0;
     padding: 0;
@@ -53,6 +53,17 @@
     border: 2px solid transparent;
     border-radius: 19px;
     outline: none;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-soft-start),
+            var(--color-soft-end)
+        );
+
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.75),
+        0 3px 8px rgba(28, 31, 38, 0.04);
 
     cursor: pointer;
     user-select: none;
@@ -64,10 +75,53 @@
     touch-action: manipulation;
 
     transition:
-        transform 100ms ease,
-        border-color 120ms ease,
-        box-shadow 120ms ease,
-        opacity 120ms ease;
+        transform 180ms ease,
+        background 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease,
+        filter 220ms ease,
+        opacity 180ms ease;
+}
+
+
+/* =========================================================
+   ГРАДИЕНТНЫЙ КОНТУР
+========================================================= */
+
+.add-habit-v2__color::before {
+    content: "";
+
+    position: absolute;
+    z-index: -1;
+    inset: -3px;
+
+    padding: 2px;
+
+    border-radius: 21px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-border-start),
+            var(--color-border-middle),
+            var(--color-border-end)
+        );
+
+    opacity: 0;
+    transform: scale(0.95);
+
+    pointer-events: none;
+
+    transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+
+    -webkit-mask:
+        linear-gradient(#ffffff 0 0) content-box,
+        linear-gradient(#ffffff 0 0);
+
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 }
 
 
@@ -75,73 +129,202 @@
    ЦВЕТОВЫЕ ВАРИАНТЫ
 ========================================================= */
 
+
+/* Голубой */
+
 .add-habit-v2__color[data-habit-color="blue"] {
-    background:
-        linear-gradient(
-            145deg,
-            #edf5ff 0%,
-            #dbe9ff 100%
-        );
+    --color-soft-start: #edf5ff;
+    --color-soft-end: #dbe9ff;
+
+    --color-selected-start: #e4f1ff;
+    --color-selected-middle: #bcd8ff;
+    --color-selected-end: #8fbdff;
+
+    --color-border-start: #a7ccff;
+    --color-border-middle: #5c9cff;
+    --color-border-end: #2f7df1;
+
+    --color-shadow: rgba(47, 125, 241, 0.38);
 }
 
+
+/* Зелёный */
 
 .add-habit-v2__color[data-habit-color="green"] {
-    background:
-        linear-gradient(
-            145deg,
-            #ebfae9 0%,
-            #d7f1d5 100%
-        );
+    --color-soft-start: #ebfae9;
+    --color-soft-end: #d7f1d5;
+
+    --color-selected-start: #e2fadd;
+    --color-selected-middle: #bceaae;
+    --color-selected-end: #8cd779;
+
+    --color-border-start: #a8e697;
+    --color-border-middle: #62c84d;
+    --color-border-end: #399c2a;
+
+    --color-shadow: rgba(74, 184, 54, 0.36);
 }
 
+
+/* Фиолетовый */
 
 .add-habit-v2__color[data-habit-color="purple"] {
-    background:
-        linear-gradient(
-            145deg,
-            #f2e9ff 0%,
-            #e4d5fa 100%
-        );
+    --color-soft-start: #f2e9ff;
+    --color-soft-end: #e4d5fa;
+
+    --color-selected-start: #f0e4ff;
+    --color-selected-middle: #d3b6fa;
+    --color-selected-end: #b38bec;
+
+    --color-border-start: #d5b8ff;
+    --color-border-middle: #9d68e7;
+    --color-border-end: #7340bd;
+
+    --color-shadow: rgba(133, 77, 207, 0.36);
 }
 
+
+/* Оранжевый */
 
 .add-habit-v2__color[data-habit-color="orange"] {
-    background:
-        linear-gradient(
-            145deg,
-            #fff0e2 0%,
-            #f9d8bf 100%
-        );
+    --color-soft-start: #fff0e2;
+    --color-soft-end: #f9d8bf;
+
+    --color-selected-start: #ffead6;
+    --color-selected-middle: #ffc795;
+    --color-selected-end: #f49b58;
+
+    --color-border-start: #ffc393;
+    --color-border-middle: #f58b3d;
+    --color-border-end: #d86418;
+
+    --color-shadow: rgba(235, 112, 29, 0.36);
 }
 
+
+/* Красный */
+
+.add-habit-v2__color[data-habit-color="red"] {
+    --color-soft-start: #ffeceb;
+    --color-soft-end: #f7d0cf;
+
+    --color-selected-start: #ffe1df;
+    --color-selected-middle: #f8aaa5;
+    --color-selected-end: #e97870;
+
+    --color-border-start: #f8aaa5;
+    --color-border-middle: #e85e55;
+    --color-border-end: #be312b;
+
+    --color-shadow: rgba(215, 65, 57, 0.36);
+}
+
+
+/* Графитовый */
+
+.add-habit-v2__color[data-habit-color="graphite"] {
+    --color-soft-start: #e9eaec;
+    --color-soft-end: #cfd1d5;
+
+    --color-selected-start: #d9dadd;
+    --color-selected-middle: #a9abb0;
+    --color-selected-end: #71747a;
+
+    --color-border-start: #b9bbc0;
+    --color-border-middle: #676a70;
+    --color-border-end: #292b2f;
+
+    --color-shadow: rgba(41, 43, 47, 0.34);
+}
+
+
+/* Бирюзовый */
 
 .add-habit-v2__color[data-habit-color="cyan"] {
-    background:
-        linear-gradient(
-            145deg,
-            #e4faff 0%,
-            #cceff5 100%
-        );
+    --color-soft-start: #e4faff;
+    --color-soft-end: #cceff5;
+
+    --color-selected-start: #dcfaff;
+    --color-selected-middle: #a8e9f2;
+    --color-selected-end: #70cedc;
+
+    --color-border-start: #9ee9f4;
+    --color-border-middle: #42bfd0;
+    --color-border-end: #188a9d;
+
+    --color-shadow: rgba(40, 172, 192, 0.36);
 }
 
+
+/* Кофейный */
+
+.add-habit-v2__color[data-habit-color="brown"] {
+    --color-soft-start: #f3ebe4;
+    --color-soft-end: #ddcbbb;
+
+    --color-selected-start: #eee1d6;
+    --color-selected-middle: #c9a78b;
+    --color-selected-end: #9d7555;
+
+    --color-border-start: #d3b299;
+    --color-border-middle: #9c704e;
+    --color-border-end: #68472f;
+
+    --color-shadow: rgba(127, 86, 55, 0.34);
+}
+
+
+/* Розовый */
 
 .add-habit-v2__color[data-habit-color="pink"] {
-    background:
-        linear-gradient(
-            145deg,
-            #ffe9f4 0%,
-            #f5cee0 100%
-        );
+    --color-soft-start: #ffe9f4;
+    --color-soft-end: #f5cee0;
+
+    --color-selected-start: #ffe0ef;
+    --color-selected-middle: #f5a7ca;
+    --color-selected-end: #df74a3;
+
+    --color-border-start: #f5a8ca;
+    --color-border-middle: #dc6399;
+    --color-border-end: #b73370;
+
+    --color-shadow: rgba(210, 76, 137, 0.35);
 }
 
 
+/* Серебристый */
+
+.add-habit-v2__color[data-habit-color="silver"] {
+    --color-soft-start: #f8f9fa;
+    --color-soft-end: #dfe2e6;
+
+    --color-selected-start: #ffffff;
+    --color-selected-middle: #d8dce1;
+    --color-selected-end: #adb3bb;
+
+    --color-border-start: #f4f5f6;
+    --color-border-middle: #b5bbc3;
+    --color-border-end: #777e88;
+
+    --color-shadow: rgba(125, 133, 144, 0.34);
+}
+
+
+/* Жёлтый */
+
 .add-habit-v2__color[data-habit-color="yellow"] {
-    background:
-        linear-gradient(
-            145deg,
-            #fff8df 0%,
-            #f6e6b7 100%
-        );
+    --color-soft-start: #fff8df;
+    --color-soft-end: #f6e6b7;
+
+    --color-selected-start: #fff5ca;
+    --color-selected-middle: #f5dc82;
+    --color-selected-end: #e6bd46;
+
+    --color-border-start: #f8df83;
+    --color-border-middle: #dfb52e;
+    --color-border-end: #ae8010;
+
+    --color-shadow: rgba(212, 165, 28, 0.36);
 }
 
 
@@ -150,17 +333,46 @@
 ========================================================= */
 
 .add-habit-v2__color.is-selected {
-    border-color: #303238;
+    border-color: transparent;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--color-selected-start) 0%,
+            var(--color-selected-middle) 52%,
+            var(--color-selected-end) 100%
+        );
+
+    transform: translateY(-2px) scale(1.055);
+
+    filter:
+        saturate(1.14)
+        brightness(1.035);
 
     box-shadow:
-        0 7px 18px rgba(55, 136, 245, 0.13),
-        inset 0 1px 1px rgba(255, 255, 255, 0.8);
+        0 7px 18px var(--color-shadow),
+        0 0 12px var(--color-shadow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.88);
+}
+
+.add-habit-v2__color.is-selected::before {
+    opacity: 1;
+    transform: scale(1);
 }
 
 
+/* =========================================================
+   НАЖАТИЕ
+========================================================= */
+
 .add-habit-v2__color:active,
 .add-habit-v2__color.is-pressed {
-    transform: scale(0.93);
+    transform: scale(0.94);
+}
+
+.add-habit-v2__color.is-selected:active,
+.add-habit-v2__color.is-selected.is-pressed {
+    transform: translateY(-1px) scale(0.98);
 }
 
 
@@ -172,9 +384,22 @@
     cursor: default;
 }
 
+.add-habit-v2__color.is-locked::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    pointer-events: none;
+}
 
 .add-habit-v2__lock {
     position: absolute;
+    z-index: 2;
     inset: 0;
 
     display: flex;
@@ -184,34 +409,10 @@
     filter: grayscale(1);
     opacity: 0.55;
 
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
-}
 
-
-/* =========================================================
-   МОБИЛЬНАЯ АДАПТАЦИЯ
-========================================================= */
-
-@media (max-width: 380px) {
-
-    .add-habit-v2__color {
-        width: 53px;
-        height: 66px;
-        flex-basis: 53px;
-    }
-}
-
-
-/* =========================================================
-   НИЗКИЕ ЭКРАНЫ
-========================================================= */
-
-@media (max-height: 720px) {
-
-    .add-habit-v2__color {
-        height: 62px;
-    }
+    pointer-events: none;
 }
 
 
@@ -221,7 +422,53 @@
 
 @media (hover: hover) and (pointer: fine) {
 
-    .add-habit-v2__color:not(.is-locked):hover {
+    .add-habit-v2__color:not(.is-locked):not(.is-selected):hover {
         transform: translateY(-2px);
+
+        filter:
+            saturate(1.06)
+            brightness(1.02);
+
+        box-shadow:
+            0 6px 13px rgba(28, 31, 38, 0.08),
+            inset 0 1px 1px rgba(255, 255, 255, 0.82);
+    }
+}
+
+
+/* =========================================================
+   МАЛЕНЬКИЕ ЭКРАНЫ
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .add-habit-v2__colors {
+        gap: 9px;
+    }
+
+    .add-habit-v2__color {
+        width: 50px;
+        height: 50px;
+
+        flex-basis: 50px;
+
+        border-radius: 18px;
+    }
+
+    .add-habit-v2__color::before {
+        border-radius: 20px;
+    }
+}
+
+
+/* =========================================================
+   ОТКЛЮЧЕНИЕ АНИМАЦИЙ
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .add-habit-v2__color,
+    .add-habit-v2__color::before {
+        transition: none;
     }
 }
