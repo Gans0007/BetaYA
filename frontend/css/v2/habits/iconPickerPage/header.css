@@ -1,0 +1,183 @@
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.habit-icon-picker__header {
+    position: relative;
+    z-index: 5;
+
+    flex: 0 0 auto;
+
+    width: 100%;
+    min-height: 104px;
+
+    display: flex;
+    align-items: flex-end;
+
+    box-sizing: border-box;
+
+    padding:
+        calc(14px + env(safe-area-inset-top))
+        22px
+        14px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.97) 72%,
+            rgba(255, 255, 255, 0.88) 100%
+        );
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.habit-icon-picker__back-button {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    flex: 0 0 44px;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 0;
+    outline: none;
+
+    color: #3788f5;
+    background: transparent;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        opacity 90ms ease;
+}
+
+
+/* =========================================================
+   BACK ICON
+   ========================================================= */
+
+.habit-icon-picker__back-icon {
+    display: block;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Arial,
+        sans-serif;
+
+    font-size: 51px;
+    font-weight: 300;
+    line-height: 0.75;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   ACTIVE
+   ========================================================= */
+
+.habit-icon-picker__back-button:active,
+.habit-icon-picker__back-button.is-pressed {
+    transform: scale(0.88);
+    opacity: 0.58;
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+.habit-icon-picker__back-button:focus {
+    outline: none;
+}
+
+.habit-icon-picker__back-button:focus-visible {
+    box-shadow: 0 0 0 3px rgba(55, 136, 245, 0.12);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+    .habit-icon-picker__header {
+        min-height: 92px;
+
+        padding-left: 17px;
+        padding-right: 17px;
+        padding-bottom: 11px;
+    }
+
+    .habit-icon-picker__back-button {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+    }
+
+    .habit-icon-picker__back-icon {
+        font-size: 42px;
+    }
+}
+
+@media (min-width: 431px) {
+
+    .habit-icon-picker__header {
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+}
+
+@media (max-height: 720px) {
+
+    .habit-icon-picker__header {
+        min-height: 80px;
+
+        padding-top:
+            calc(8px + env(safe-area-inset-top));
+        padding-bottom: 8px;
+    }
+}
+
+@media (max-height: 620px) {
+
+    .habit-icon-picker__header {
+        min-height: 70px;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+
+    .habit-icon-picker__back-button:hover {
+        opacity: 0.65;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .habit-icon-picker__back-button {
+        transition: none;
+    }
+}
