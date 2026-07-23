@@ -1,207 +1,5 @@
 
 /* =========================================================
-   ОСНОВНОЙ КОНТЕНТ
-   ========================================================= */
-
-.add-habit-v2__content {
-    width: 100%;
-    max-width: 500px;
-
-    margin: 0 auto;
-}
-
-.add-habit-v2__section {
-    width: 100%;
-    margin-bottom: 36px;
-}
-
-.add-habit-v2__section-label {
-    display: block;
-
-    margin: 0 0 16px;
-
-    color: var(--add-habit-secondary);
-
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.015em;
-}
-
-
-/* =========================================================
-   ПОЛЕ НАЗВАНИЯ
-   ========================================================= */
-
-.add-habit-v2__name-field {
-    width: 100%;
-    min-height: 68px;
-
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    box-sizing: border-box;
-
-    padding: 12px 18px;
-
-    border: 1px solid #E4E6EA;
-    border-radius: 20px;
-
-    background: var(--add-habit-white);
-
-    box-shadow:
-        0 9px 22px rgba(70, 106, 155, 0.08),
-        inset 0 1px 1px rgba(255, 255, 255, 0.95);
-
-    transition:
-        border-color 150ms ease,
-        box-shadow 150ms ease;
-}
-
-.add-habit-v2__name-field:focus-within {
-    border-color: #303238;
-
-    box-shadow:
-        0 6px 18px rgba(35,38,44,.04),
-        0 0 0 3px rgba(30,33,38,.03);
-}
-
-
-/* Иконка возле поля */
-
-.add-habit-v2__name-icon {
-    width: 42px;
-    height: 42px;
-
-    flex: 0 0 42px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    margin: 0;
-    padding: 0;
-
-    border: none;
-    border-radius: 50%;
-    outline: none;
-
-    color: #303238;
-    background: #F6F7F9;
-
-    font-size: inherit;
-    line-height: 1;
-
-    cursor: pointer;
-    user-select: none;
-
-    appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-
-    touch-action: manipulation;
-
-    overflow: hidden;
-}
-
-
-/* выбраная иконка */
-
-.add-habit-v2__selected-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 28px;
-    height: 28px;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Apple Color Emoji",
-        "Segoe UI Emoji",
-        "Noto Color Emoji",
-        sans-serif;
-
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1;
-
-    transform: translateZ(0);
-}
-
-
-/* Input */
-
-.add-habit-v2__name-input {
-    min-width: 0;
-    width: 100%;
-
-    margin: 0;
-    padding: 0;
-
-    border: none;
-    outline: none;
-
-    color: var(--add-habit-primary);
-    background: transparent;
-
-    font: inherit;
-    font-size: 18px;
-    font-weight: 570;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-.add-habit-v2__name-input::placeholder {
-    color: #868B94;
-    opacity: 1;
-}
-
-.add-habit-v2__name-input::-webkit-search-cancel-button {
-    display: none;
-}
-
-
-/* =========================================================
-   БЫСТРЫЕ ВАРИАНТЫ
-   ========================================================= */
-
-.add-habit-v2__suggestions{
-    display:flex;
-    align-items:center;
-    gap:10px;
-
-    margin-top: 8px;
-
-    overflow-x:auto;
-    scrollbar-width:none;
-    -webkit-overflow-scrolling:touch;
-}
-
-.add-habit-v2__suggestion{
-    padding:0;
-    border:none;
-    background:transparent;
-    color:#B7BCC4;
-    font-size:14px;
-    font-weight:600;
-    white-space:nowrap;
-    cursor:pointer;
-}
-
-.add-habit-v2__divider{
-    flex:0 0 auto;
-    color:#D2D6DC;
-    font-size:15px;
-    user-select:none;
-}
-
-/* =========================================================
    ЦВЕТА
    ========================================================= */
 
@@ -511,28 +309,6 @@
 
 @media (max-width: 380px) {
 
-    .add-habit-v2__section {
-        margin-bottom: 31px;
-    }
-
-    .add-habit-v2__name-field {
-        min-height: 72px;
-        padding: 10px 14px;
-    }
-
-    .add-habit-v2__name-icon {
-        width: 44px;
-        height: 44px;
-        flex-basis: 44px;
-    }
-
-    .add-habit-v2__name-input {
-        font-size: 19px;
-    }
-
-    .add-habit-v2__suggestion {
-        font-size: 13px;
-    }
 
     .add-habit-v2__color {
         width: 53px;
@@ -573,15 +349,6 @@
 
 @media (max-height: 720px) {
 
-
-    .add-habit-v2__section {
-        margin-bottom: 27px;
-    }
-
-    .add-habit-v2__name-field {
-        min-height: 68px;
-    }
-
     .add-habit-v2__color {
         height: 62px;
     }
@@ -596,10 +363,6 @@
 
 @media (hover: hover) and (pointer: fine) {
 
-    .add-habit-v2__suggestion:hover {
-        opacity: 0.72;
-    }
-
     .add-habit-v2__color:not(.is-locked):hover {
         transform: translateY(-2px);
     }
@@ -607,31 +370,3 @@
 
 }
 
-.add-habit-v2__name-field.has-error {
-    border-color: #ef6a6a;
-
-    animation: add-habit-error-shake 320ms ease;
-
-    box-shadow:
-        0 0 0 3px rgba(239, 106, 106, 0.09),
-        0 9px 22px rgba(70, 106, 155, 0.08);
-}
-
-@keyframes add-habit-error-shake {
-    0%,
-    100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-5px);
-    }
-
-    50% {
-        transform: translateX(5px);
-    }
-
-    75% {
-        transform: translateX(-3px);
-    }
-}
