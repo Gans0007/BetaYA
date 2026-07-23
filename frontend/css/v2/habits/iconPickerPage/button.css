@@ -18,7 +18,7 @@
     padding:
         52px
         23px
-        calc(42px + env(safe-area-inset-bottom));
+        calc(100px + env(safe-area-inset-bottom));
 
     background:
         linear-gradient(
