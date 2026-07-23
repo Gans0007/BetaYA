@@ -19,7 +19,7 @@
     padding:
         8px
         23px
-        26px;
+        190px;
 
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -223,7 +223,7 @@
         padding:
             7px
             16px
-            21px;
+            170px;
     }
 
     .habit-icon-picker__grid {
@@ -269,7 +269,7 @@
 
     .habit-icon-picker__body {
         padding-top: 4px;
-        padding-bottom: 15px;
+        padding-bottom: 160px;
     }
 
     .habit-icon-picker__grid {
@@ -291,7 +291,7 @@
 
     .habit-icon-picker__body {
         padding-top: 2px;
-        padding-bottom: 11px;
+        padding-bottom: 150px;
     }
 
     .habit-icon-picker__grid {
