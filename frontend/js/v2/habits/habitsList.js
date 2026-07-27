@@ -7,7 +7,7 @@ export function renderHabitsList(habits) {
 
             <header class="habits-v2-list__header">
                 <div class="habits-v2-list__date">
-                    Вт, 21 июля
+                    ${formatCurrentDate()}
                 </div>
 
                 <h1 class="habits-v2-list__title">

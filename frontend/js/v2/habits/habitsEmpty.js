@@ -4,7 +4,7 @@ export function renderHabitsEmpty() {
             <div class="habits-v2-empty__content">
 
                 <div class="habits-v2-empty__date">
-                    Вт, 21 июля
+                    ${formatCurrentDate()}
                 </div>
 
                 <h1 class="habits-v2-empty__title">
