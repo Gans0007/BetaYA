@@ -12,9 +12,12 @@ import {
 
 import {
     getHabits,
+    getHabitById,
     getHabitsStatistics,
     addHabit,
-    selectHabit
+    updateHabit,
+    selectHabit,
+    setHabitsStatistics
 } from "./habitsStore.js"
 
 import {
@@ -205,7 +208,6 @@ const newHabit = {
 
     createdAt: new Date().toISOString()
 }
-
     return addHabit(newHabit)
 }
 
@@ -240,14 +242,112 @@ function initHabitsPageEvents() {
     initHabitCardEvents()
 }
 
+/* =========================================================
+   ИНДЕКС СЕГОДНЯШНЕГО ДНЯ В НЕДЕЛЕ
+
+   Массив прогресса строится так:
+   0 — понедельник
+   1 — вторник
+   2 — среда
+   3 — четверг
+   4 — пятница
+   5 — суббота
+   6 — воскресенье
+   ========================================================= */
+
+function getTodayWeekIndex() {
+    const nativeDayIndex = new Date().getDay()
+
+    return nativeDayIndex === 0
+        ? 6
+        : nativeDayIndex - 1
+}
+
+/* =========================================================
+   ЛОКАЛЬНОЕ ПОДТВЕРЖДЕНИЕ ПРИВЫЧКИ
+
+   Временно обновляет Store без API.
+   Позже эту функцию заменит запрос на backend.
+   ========================================================= */
+
+function confirmHabitLocally(habitId) {
+    const habit = getHabitById(habitId)
+
+    if (!habit) {
+        return null
+    }
+
+    if (habit.completedToday) {
+        return null
+    }
+
+    const xpReward = Math.max(
+        0,
+        Math.floor(Number(habit.xpReward) || 5)
+    )
+
+    const currentStreak = Math.max(
+        0,
+        Math.floor(Number(habit.streak) || 0)
+    )
+
+    const nextStreak = currentStreak + 1
+
+    const weekProgress = Array.from(
+        {
+            length: 7
+        },
+        (_, index) => Boolean(
+            habit.weekProgress?.[index]
+        )
+    )
+
+    weekProgress[getTodayWeekIndex()] = true
+
+    const updatedHabit = updateHabit(
+        habitId,
+        {
+            completedToday: true,
+            streak: nextStreak,
+            weekProgress,
+            completedAt: new Date().toISOString()
+        }
+    )
+
+    if (!updatedHabit) {
+        return null
+    }
+
+    const statistics = getHabitsStatistics()
+
+    setHabitsStatistics({
+        totalXp:
+            Math.max(
+                0,
+                Number(statistics.totalXp) || 0
+            ) + xpReward,
+
+        currentStreak:
+            Math.max(
+                Math.max(
+                    0,
+                    Number(statistics.currentStreak) || 0
+                ),
+                nextStreak
+            )
+    })
+
+    return updatedHabit
+}
 
 /* =========================================================
    СОБЫТИЯ КАРТОЧЕК
-   Пока только базовая заготовка
    ========================================================= */
 
 function initHabitCardEvents() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
         return
@@ -257,13 +357,28 @@ function initHabitCardEvents() {
         "[data-habit-id]"
     )
 
+
     habitCards.forEach((card) => {
+        const habitId = card.dataset.habitId
+
+        const confirmButton = card.querySelector(
+            '[data-action="confirm-habit"]'
+        )
+
+
+        /* -----------------------------------------------------
+           АНИМАЦИИ
+           ----------------------------------------------------- */
+
         addPressAnimation(card)
+        addPressAnimation(confirmButton)
+
+
+        /* -----------------------------------------------------
+           ОТКРЫТИЕ ПРИВЫЧКИ
+           ----------------------------------------------------- */
 
         card.addEventListener("click", () => {
-            const habitId =
-                card.dataset.habitId
-
             const selectedHabit =
                 selectHabit(habitId)
 
@@ -277,12 +392,43 @@ function initHabitCardEvents() {
             )
 
             /*
-             * Позже здесь будет открываться:
-             * страница привычки,
-             * меню привычки
-             * или подтверждение выполнения.
+             * Позже здесь откроется
+             * детальная страница привычки.
              */
         })
+
+
+        /* -----------------------------------------------------
+           ПОДТВЕРЖДЕНИЕ ВЫПОЛНЕНИЯ
+           ----------------------------------------------------- */
+
+        confirmButton?.addEventListener(
+            "click",
+            (event) => {
+                event.preventDefault()
+                event.stopPropagation()
+
+                const habit =
+                    getHabitById(habitId)
+
+                if (!habit) {
+                    return
+                }
+
+                if (habit.completedToday) {
+                    return
+                }
+
+                const confirmedHabit =
+                    confirmHabitLocally(habitId)
+
+                if (!confirmedHabit) {
+                    return
+                }
+
+                openHabitsPage()
+            }
+        )
     })
 }
 
