@@ -145,17 +145,46 @@ function restoreDraftToAddHabitPage() {
 
 /* =========================================================
    РЕНДЕР ГЛАВНОЙ СТРАНИЦЫ
+
+   preserveScroll:
+   true  — сохраняет текущее положение прокрутки;
+   false — открывает страницу с самого верха.
    ========================================================= */
 
-function openHabitsPage() {
+function openHabitsPage({
+    preserveScroll = false
+} = {}) {
+    const currentList = document.querySelector(
+        ".habits-v2-list"
+    )
+
+    const savedScrollTop = preserveScroll
+        ? currentList?.scrollTop || 0
+        : 0
+
     renderHabitsPage(
         getHabits(),
         getHabitsStatistics()
     )
 
     initHabitsPageEvents()
-}
 
+    if (!preserveScroll) {
+        return
+    }
+
+    const renderedList = document.querySelector(
+        ".habits-v2-list"
+    )
+
+    if (!renderedList) {
+        return
+    }
+
+    requestAnimationFrame(() => {
+        renderedList.scrollTop = savedScrollTop
+    })
+}
 /* =========================================================
    ОТКРЫТИЕ СТРАНИЦЫ СОЗДАНИЯ
    ========================================================= */
@@ -496,7 +525,9 @@ function initHabitCardEvents() {
                     return
                 }
 
-                openHabitsPage()
+                openHabitsPage({
+                    preserveScroll: true
+                })
             }
         )
     })
