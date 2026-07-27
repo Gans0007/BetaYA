@@ -16,68 +16,10 @@ import {
     selectHabit
 } from "./habitsStore.js"
 
-
-/* =========================================================
-   СОЗДАНИЕ ID
-   ========================================================= */
-
-function createHabitId() {
-    if (
-        typeof crypto !== "undefined" &&
-        typeof crypto.randomUUID === "function"
-    ) {
-        return crypto.randomUUID()
-    }
-
-    return `habit-${Date.now()}-${Math.random()
-        .toString(16)
-        .slice(2)}`
-}
-
-
-/* =========================================================
-   АНИМАЦИЯ НАЖАТИЯ
-   ========================================================= */
-
-function addPressAnimation(element) {
-    if (!element) {
-        return
-    }
-
-    let releaseTimer = null
-
-    const press = () => {
-        if (releaseTimer) {
-            window.clearTimeout(releaseTimer)
-        }
-
-        element.classList.add("is-pressed")
-    }
-
-    const release = () => {
-        releaseTimer = window.setTimeout(() => {
-            element.classList.remove("is-pressed")
-        }, 90)
-    }
-
-    element.addEventListener("pointerdown", press)
-    element.addEventListener("pointerup", release)
-    element.addEventListener("pointercancel", release)
-    element.addEventListener("pointerleave", release)
-
-    element.addEventListener("touchstart", press, {
-        passive: true
-    })
-
-    element.addEventListener("touchend", release, {
-        passive: true
-    })
-
-    element.addEventListener("touchcancel", release, {
-        passive: true
-    })
-}
-
+import {
+    createHabitId,
+    addPressAnimation
+} from "./habitsUtils.js"
 
 /* =========================================================
    СОХРАНЯЕМ ДАННЫЕ ФОРМЫ В ЧЕРНОВИК
