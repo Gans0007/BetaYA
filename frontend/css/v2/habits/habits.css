@@ -1119,6 +1119,12 @@ touch-action: manipulation;
     text-rendering: geometricPrecision;
 }
 
+/* =========================================================
+   СТАТУС ПРИВЫЧКИ
+
+   «В процессе» и «Выполнено +5 XP»
+   всегда имеют одинаковый цвет и насыщенность.
+   ========================================================= */
 
 .habit-card__description {
     width: 100%;
@@ -1150,8 +1156,10 @@ touch-action: manipulation;
 
 
 .habit-card__description.is-completed {
-    color: var(--habit-accent);
-    font-weight: 650;
+    color:
+        rgba(var(--habit-accent-rgb), 0.63);
+
+    font-weight: 550;
 }
 
 

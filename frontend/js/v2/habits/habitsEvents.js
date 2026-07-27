@@ -264,22 +264,31 @@ function getTodayWeekIndex() {
 }
 
 /* =========================================================
-   ЛОКАЛЬНОЕ ПОДТВЕРЖДЕНИЕ ПРИВЫЧКИ
+   ЛОКАЛЬНОЕ ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ ПРИВЫЧКИ
 
-   Временно обновляет Store без API.
-   Позже эту функцию заменит запрос на backend.
+   Первое нажатие:
+   - подтверждает привычку;
+   - добавляет XP;
+   - увеличивает серию;
+   - отмечает сегодняшний день.
+
+   Повторное нажатие:
+   - снимает подтверждение;
+   - возвращает XP;
+   - уменьшает серию;
+   - снимает отметку сегодняшнего дня.
    ========================================================= */
 
-function confirmHabitLocally(habitId) {
+function toggleHabitConfirmationLocally(habitId) {
     const habit = getHabitById(habitId)
 
     if (!habit) {
         return null
     }
 
-    if (habit.completedToday) {
-        return null
-    }
+    const wasCompleted = Boolean(
+        habit.completedToday
+    )
 
     const xpReward = Math.max(
         0,
@@ -291,7 +300,9 @@ function confirmHabitLocally(habitId) {
         Math.floor(Number(habit.streak) || 0)
     )
 
-    const nextStreak = currentStreak + 1
+    const nextStreak = wasCompleted
+        ? Math.max(0, currentStreak - 1)
+        : currentStreak + 1
 
     const weekProgress = Array.from(
         {
@@ -302,15 +313,19 @@ function confirmHabitLocally(habitId) {
         )
     )
 
-    weekProgress[getTodayWeekIndex()] = true
+    weekProgress[getTodayWeekIndex()] =
+        !wasCompleted
 
     const updatedHabit = updateHabit(
         habitId,
         {
-            completedToday: true,
+            completedToday: !wasCompleted,
             streak: nextStreak,
             weekProgress,
-            completedAt: new Date().toISOString()
+
+            completedAt: wasCompleted
+                ? null
+                : new Date().toISOString()
         }
     )
 
@@ -320,21 +335,38 @@ function confirmHabitLocally(habitId) {
 
     const statistics = getHabitsStatistics()
 
-    setHabitsStatistics({
-        totalXp:
-            Math.max(
-                0,
-                Number(statistics.totalXp) || 0
-            ) + xpReward,
+    const currentTotalXp = Math.max(
+        0,
+        Math.floor(
+            Number(statistics.totalXp) || 0
+        )
+    )
 
-        currentStreak:
-            Math.max(
-                Math.max(
-                    0,
-                    Number(statistics.currentStreak) || 0
-                ),
-                nextStreak
+    const nextTotalXp = wasCompleted
+        ? Math.max(
+            0,
+            currentTotalXp - xpReward
+        )
+        : currentTotalXp + xpReward
+
+    const highestHabitStreak = getHabits()
+        .reduce((highestStreak, storedHabit) => {
+            const storedStreak = Math.max(
+                0,
+                Math.floor(
+                    Number(storedHabit.streak) || 0
+                )
             )
+
+            return Math.max(
+                highestStreak,
+                storedStreak
+            )
+        }, 0)
+
+    setHabitsStatistics({
+        totalXp: nextTotalXp,
+        currentStreak: highestHabitStreak
     })
 
     return updatedHabit
@@ -354,15 +386,50 @@ function initHabitCardEvents() {
     }
 
     const habitCards = root.querySelectorAll(
-        "[data-habit-id]"
+        ".habit-card[data-habit-id]"
     )
 
-
     habitCards.forEach((card) => {
-        const habitId = card.dataset.habitId
+        const habitId =
+            card.dataset.habitId
 
         const confirmButton = card.querySelector(
             '[data-action="confirm-habit"]'
+        )
+
+
+        /* -----------------------------------------------------
+           НЕ ДАЁМ НАЖАТИЮ НА ГАЛОЧКУ ДОЙТИ ДО КАРТОЧКИ
+           ----------------------------------------------------- */
+
+        const stopConfirmEvent = (event) => {
+            event.stopPropagation()
+        }
+
+        confirmButton?.addEventListener(
+            "pointerdown",
+            stopConfirmEvent
+        )
+
+        confirmButton?.addEventListener(
+            "pointerup",
+            stopConfirmEvent
+        )
+
+        confirmButton?.addEventListener(
+            "touchstart",
+            stopConfirmEvent,
+            {
+                passive: true
+            }
+        )
+
+        confirmButton?.addEventListener(
+            "touchend",
+            stopConfirmEvent,
+            {
+                passive: true
+            }
         )
 
 
@@ -378,28 +445,40 @@ function initHabitCardEvents() {
            ОТКРЫТИЕ ПРИВЫЧКИ
            ----------------------------------------------------- */
 
-        card.addEventListener("click", () => {
-            const selectedHabit =
-                selectHabit(habitId)
+        card.addEventListener(
+            "click",
+            (event) => {
+                const clickedConfirmButton =
+                    event.target.closest(
+                        '[data-action="confirm-habit"]'
+                    )
 
-            if (!selectedHabit) {
-                return
+                if (clickedConfirmButton) {
+                    return
+                }
+
+                const selectedHabit =
+                    selectHabit(habitId)
+
+                if (!selectedHabit) {
+                    return
+                }
+
+                console.log(
+                    "Выбрана привычка:",
+                    selectedHabit
+                )
+
+                /*
+                 * Позже здесь будет открываться
+                 * детальная страница привычки.
+                 */
             }
-
-            console.log(
-                "Выбрана привычка:",
-                selectedHabit
-            )
-
-            /*
-             * Позже здесь откроется
-             * детальная страница привычки.
-             */
-        })
+        )
 
 
         /* -----------------------------------------------------
-           ПОДТВЕРЖДЕНИЕ ВЫПОЛНЕНИЯ
+           ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ
            ----------------------------------------------------- */
 
         confirmButton?.addEventListener(
@@ -408,21 +487,12 @@ function initHabitCardEvents() {
                 event.preventDefault()
                 event.stopPropagation()
 
-                const habit =
-                    getHabitById(habitId)
+                const updatedHabit =
+                    toggleHabitConfirmationLocally(
+                        habitId
+                    )
 
-                if (!habit) {
-                    return
-                }
-
-                if (habit.completedToday) {
-                    return
-                }
-
-                const confirmedHabit =
-                    confirmHabitLocally(habitId)
-
-                if (!confirmedHabit) {
+                if (!updatedHabit) {
                     return
                 }
 
@@ -431,8 +501,6 @@ function initHabitCardEvents() {
         )
     })
 }
-
-
 /* =========================================================
    СОБЫТИЯ СТРАНИЦЫ СОЗДАНИЯ
    ========================================================= */
