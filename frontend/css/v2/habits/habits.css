@@ -316,9 +316,8 @@
     }
 }
 
-
 /* =========================================================
-   УЗКИЕ ТЕЛЕФОНЫ
+   УЗКИЕ ТЕЛЕФОНЫ — ПУСТОЕ СОСТОЯНИЕ
    ========================================================= */
 
 @media (max-width: 370px) {
@@ -356,41 +355,6 @@
 
         font-size: 51px;
     }
-
-.habits-stats {
-    gap: 9px;
-    margin-bottom: 20px;
-}
-
-.habits-stats__card {
-    min-height: 84px;
-
-    padding: 14px 12px;
-
-    border-radius: 18px;
-}
-
-.habits-stats__main {
-    gap: 6px;
-}
-
-.habits-stats__icon {
-    width: 18px;
-    height: 20px;
-
-    font-size: 17px;
-}
-
-.habits-stats__value {
-    font-size: 15px;
-}
-
-.habits-stats__label {
-    margin-top: 7px;
-    font-size: 11px;
-}
-
-
 }
 
 
@@ -778,17 +742,6 @@
     -webkit-font-smoothing: antialiased;
 }
 
-/* =========================================================
-   КОНТЕЙНЕР КАРТОЧЕК
-   ========================================================= */
-
-.habits-v2-list__cards {
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
 
 /* =========================================================
    КАРТОЧКИ ПРИВЫЧЕК
@@ -814,27 +767,27 @@
     position: relative;
 
     width: 100%;
-    min-height: 190px;
+    min-height: 168px;
 
     display: grid;
     grid-template-columns:
         minmax(0, 1fr)
-        48px;
+        46px;
 
     grid-template-rows:
-        48px
-        minmax(60px, 1fr)
+        42px
+        minmax(48px, 1fr)
         auto;
 
-    column-gap: 16px;
-    row-gap: 8px;
+    column-gap: 14px;
+    row-gap: 5px;
 
     box-sizing: border-box;
 
     padding:
-        21px
-        21px
-        18px;
+        17px
+        19px
+        15px;
 
     border:
         1px solid
@@ -1327,15 +1280,15 @@
    ========================================================= */
 
 .habit-card--large {
-    min-height: 190px;
+    min-height: 168px;
 }
 
 
 .habit-card--small {
-    min-height: 150px;
+    min-height: 138px;
 
-    padding-top: 18px;
-    padding-bottom: 16px;
+    padding-top: 15px;
+    padding-bottom: 14px;
 }
 
 
@@ -1360,6 +1313,11 @@
 
         font-size: 31px;
     }
+
+
+    /* ---------------------------------------------------------
+       СТАТИСТИКА
+       --------------------------------------------------------- */
 
     .habits-stats {
         gap: 9px;
@@ -1394,42 +1352,56 @@
         font-size: 11px;
     }
 
-    .habit-card {
-        min-height: 176px;
+
+    /* ---------------------------------------------------------
+       КАРТОЧКА
+       --------------------------------------------------------- */
+
+    .habit-card,
+    .habit-card--large {
+        min-height: 158px;
 
         padding:
-            19px
             16px
-            16px;
+            15px
+            14px;
 
         grid-template-columns:
             minmax(0, 1fr)
-            43px;
+            42px;
 
         grid-template-rows:
-            43px
-            minmax(56px, 1fr)
+            40px
+            minmax(44px, 1fr)
             auto;
 
-        column-gap: 12px;
+        column-gap: 11px;
+        row-gap: 4px;
     }
 
     .habit-card__icon {
-        width: 35px;
-        height: 35px;
+        width: 34px;
+        height: 34px;
 
-        font-size: 22px;
+        font-size: 21px;
     }
 
     .habit-card__icon.is-symbol {
-        font-size: 29px;
+        font-size: 28px;
     }
 
     .habit-card__check {
-        width: 43px;
-        height: 43px;
+        width: 42px;
+        height: 42px;
 
         font-size: 22px;
+    }
+
+    .habit-card__content {
+        padding:
+            1px
+            0
+            2px;
     }
 
     .habit-card__name {
@@ -1439,6 +1411,10 @@
     .habit-card__description {
         margin-top: 6px;
         font-size: 14px;
+    }
+
+    .habit-card__footer {
+        margin-top: 5px;
     }
 
     .habit-card__progress {
@@ -1459,7 +1435,6 @@
     }
 }
 
-
 /* =========================================================
    НИЗКИЕ ЭКРАНЫ
    ========================================================= */
@@ -1479,15 +1454,11 @@
         gap: 11px;
     }
 
-    .habit-card {
-        min-height: 174px;
-    }
-
+    .habit-card,
     .habit-card--large {
-        min-height: 174px;
+        min-height: 158px;
     }
 }
-
 
 
 
