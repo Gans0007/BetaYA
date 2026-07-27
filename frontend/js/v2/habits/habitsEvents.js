@@ -2,6 +2,14 @@ import { renderHabitsPage } from "./habitsPage.js"
 import { renderAddHabitPage } from "./addHabitPage.js"
 import { renderIconPickerPage } from "./iconPickerPage.js"
 
+import {
+    getHabitDraft,
+    getHabitDraftValue,
+    setHabitDraftValue,
+    updateHabitDraft,
+    resetHabitDraft
+} from "./habitDraft.js"
+
 
 /* =========================================================
    ВРЕМЕННОЕ ХРАНИЛИЩЕ ПРИВЫЧЕК
@@ -9,18 +17,6 @@ import { renderIconPickerPage } from "./iconPickerPage.js"
    ========================================================= */
 
 const habits = []
-
-
-/* =========================================================
-   ЧЕРНОВИК НОВОЙ ПРИВЫЧКИ
-   ========================================================= */
-
-const habitDraft = {
-    name: "",
-    icon: "✱",
-    color: "blue",
-    size: "large"
-}
 
 
 /* =========================================================
@@ -86,23 +82,13 @@ function addPressAnimation(element) {
 
 
 /* =========================================================
-   СБРОС ЧЕРНОВИКА
-   ========================================================= */
-
-function resetHabitDraft() {
-    habitDraft.name = ""
-    habitDraft.icon = "✱"
-    habitDraft.color = "blue"
-    habitDraft.size = "large"
-}
-
-
-/* =========================================================
    СОХРАНЯЕМ ДАННЫЕ ФОРМЫ В ЧЕРНОВИК
    ========================================================= */
 
 function updateDraftFromAddHabitPage() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
         return
@@ -124,39 +110,37 @@ function updateDraftFromAddHabitPage() {
         "[data-habit-size].is-selected"
     )
 
-    if (nameInput) {
-        habitDraft.name = nameInput.value
-    }
-
     const iconValue =
         selectedIcon?.textContent?.trim()
 
-    if (iconValue) {
-        habitDraft.icon = iconValue
-    }
-
-    if (selectedColor?.dataset.habitColor) {
-        habitDraft.color =
-            selectedColor.dataset.habitColor
-    }
-
-    if (selectedSize?.dataset.habitSize) {
-        habitDraft.size =
-            selectedSize.dataset.habitSize
-    }
+    updateHabitDraft({
+        name: nameInput?.value ?? "",
+        icon:
+            iconValue ||
+            getHabitDraftValue("icon"),
+        color:
+            selectedColor?.dataset.habitColor ||
+            getHabitDraftValue("color"),
+        size:
+            selectedSize?.dataset.habitSize ||
+            getHabitDraftValue("size")
+    })
 }
-
 
 /* =========================================================
    ВОССТАНАВЛИВАЕМ ЧЕРНОВИК В ФОРМЕ
    ========================================================= */
 
 function restoreDraftToAddHabitPage() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
         return
     }
+
+    const draft = getHabitDraft()
 
     const nameInput = root.querySelector(
         "#add-habit-name"
@@ -175,17 +159,17 @@ function restoreDraftToAddHabitPage() {
     )
 
     if (nameInput) {
-        nameInput.value = habitDraft.name
+        nameInput.value = draft.name
     }
 
     if (selectedIcon) {
-        selectedIcon.textContent = habitDraft.icon
+        selectedIcon.textContent = draft.icon
     }
 
     colorButtons.forEach((button) => {
         const isSelected =
             button.dataset.habitColor ===
-            habitDraft.color
+            draft.color
 
         button.classList.toggle(
             "is-selected",
@@ -201,7 +185,7 @@ function restoreDraftToAddHabitPage() {
     sizeButtons.forEach((button) => {
         const isSelected =
             button.dataset.habitSize ===
-            habitDraft.size
+            draft.size
 
         button.classList.toggle(
             "is-selected",
@@ -214,7 +198,6 @@ function restoreDraftToAddHabitPage() {
         )
     })
 }
-
 
 /* =========================================================
    РЕНДЕР ГЛАВНОЙ СТРАНИЦЫ
@@ -248,7 +231,8 @@ function openAddHabitPage({
    ========================================================= */
 
 function createHabitFromDraft() {
-    const habitName = habitDraft.name.trim()
+    const draft = getHabitDraft()
+    const habitName = draft.name.trim()
 
     if (!habitName) {
         return null
@@ -257,9 +241,9 @@ function createHabitFromDraft() {
     const newHabit = {
         id: createHabitId(),
         name: habitName,
-        icon: habitDraft.icon,
-        color: habitDraft.color,
-        size: habitDraft.size,
+        icon: draft.icon,
+        color: draft.color,
+        size: draft.size,
         createdAt: new Date().toISOString()
     }
 
@@ -411,7 +395,10 @@ function initAddHabitPageEvents() {
        --------------------------------------------------------- */
 
     nameInput?.addEventListener("input", () => {
-        habitDraft.name = nameInput.value
+        setHabitDraftValue(
+            "name",
+            nameInput.value
+        )
 
         const nameField = nameInput.closest(
             ".add-habit-v2__name-field"
@@ -438,7 +425,9 @@ function initAddHabitPageEvents() {
     iconButton?.addEventListener("click", () => {
         updateDraftFromAddHabitPage()
 
-        renderIconPickerPage(habitDraft.icon)
+        renderIconPickerPage(
+            getHabitDraftValue("icon")
+        )
         initIconPickerEvents()
     })
 
@@ -457,7 +446,10 @@ function initAddHabitPageEvents() {
                 button.dataset.habitSuggestion || ""
 
             nameInput.value = suggestion
-            habitDraft.name = suggestion
+            setHabitDraftValue(
+                "name",
+                suggestion
+            )
 
             nameInput.focus()
 
@@ -505,8 +497,10 @@ function initAddHabitPageEvents() {
                 "true"
             )
 
-            habitDraft.color =
+            setHabitDraftValue(
+                "color",
                 button.dataset.habitColor || "blue"
+            )
         })
     })
 
@@ -535,8 +529,10 @@ function initAddHabitPageEvents() {
                 "true"
             )
 
-            habitDraft.size =
+            setHabitDraftValue(
+                "size",
                 button.dataset.habitSize || "large"
+            )
         })
     })
 
@@ -549,7 +545,7 @@ function initAddHabitPageEvents() {
         updateDraftFromAddHabitPage()
 
         const habitName =
-            habitDraft.name.trim()
+            getHabitDraftValue("name").trim()
 
         if (!habitName) {
             const nameField = nameInput?.closest(
@@ -666,8 +662,10 @@ function initIconPickerEvents() {
                 "true"
             )
 
-            habitDraft.icon =
+            setHabitDraftValue(
+                "icon",
                 button.dataset.habitIcon || "✱"
+            )
         })
     })
 
