@@ -195,7 +195,9 @@ function createHabitFromDraft() {
    ========================================================= */
 
 function initHabitsPageEvents() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
         return

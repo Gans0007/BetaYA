@@ -541,37 +541,6 @@
     flex: 0 0 auto;
 }
 
-.habits-v2-list__premium {
-    height: 48px;
-
-    padding: 0 20px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: none;
-    border-radius: 24px;
-
-    color: #347ee8;
-    background: #edf4ff;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Text",
-        Inter,
-        Arial,
-        sans-serif;
-
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
 .habits-v2-list__add-button {
     width: 48px;
     height: 48px;
@@ -1129,12 +1098,6 @@
 
     .habits-v2-list__title {
         font-size: 32px;
-    }
-
-    .habits-v2-list__premium {
-        height: 44px;
-        padding: 0 15px;
-        font-size: 14px;
     }
 
     .habits-v2-list__add-button {
