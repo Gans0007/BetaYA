@@ -10,13 +10,11 @@ import {
     resetHabitDraft
 } from "./habitsDraft.js"
 
-
-/* =========================================================
-   ВРЕМЕННОЕ ХРАНИЛИЩЕ ПРИВЫЧЕК
-   Позже будет заменено запросами к API
-   ========================================================= */
-
-const habits = []
+import {
+    getHabits,
+    addHabit,
+    selectHabit
+} from "./habitsStore.js"
 
 
 /* =========================================================
@@ -204,10 +202,9 @@ function restoreDraftToAddHabitPage() {
    ========================================================= */
 
 function openHabitsPage() {
-    renderHabitsPage(habits)
+    renderHabitsPage(getHabits())
     initHabitsPageEvents()
 }
-
 
 /* =========================================================
    ОТКРЫТИЕ СТРАНИЦЫ СОЗДАНИЯ
@@ -247,9 +244,7 @@ function createHabitFromDraft() {
         createdAt: new Date().toISOString()
     }
 
-    habits.push(newHabit)
-
-    return newHabit
+    return addHabit(newHabit)
 }
 
 
@@ -305,9 +300,8 @@ function initHabitCardEvents() {
             const habitId =
                 card.dataset.habitId
 
-            const selectedHabit = habits.find(
-                (habit) => habit.id === habitId
-            )
+            const selectedHabit =
+                selectHabit(habitId)
 
             if (!selectedHabit) {
                 return
@@ -715,6 +709,6 @@ export function initHabitsEvents() {
      * текущий массив привычек.
      */
 
-    renderHabitsPage(habits)
+    renderHabitsPage(getHabits())
     initHabitsPageEvents()
 }
