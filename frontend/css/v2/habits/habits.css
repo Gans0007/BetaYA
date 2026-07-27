@@ -251,11 +251,12 @@
         0 5px 12px rgba(78, 105, 140, 0.08),
         inset 0 1px 1px rgba(255, 255, 255, 0.95);
 
-    transition:
-        transform 90ms ease,
-        box-shadow 90ms ease,
-        opacity 90ms ease;
-        touch-action: manipulation;
+transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    opacity 90ms ease;
+
+touch-action: manipulation;
 }
 
 .habits-v2-empty__add-button.is-pressed,
