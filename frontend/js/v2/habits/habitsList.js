@@ -1,8 +1,15 @@
 import { renderHabitCard } from "./habitCard.js"
-import { formatCurrentDate } from "./habitsUtils.js"
+import { renderHabitsStats } from "./habitsStats.js"
+
+import {
+    formatCurrentDate
+} from "./habitsUtils.js"
 
 
-export function renderHabitsList(habits) {
+export function renderHabitsList(
+    habits,
+    statistics = {}
+) {
     return `
         <section class="habits-v2-list">
 
@@ -40,17 +47,12 @@ export function renderHabitsList(habits) {
             </header>
 
 
-            <section class="habits-v2-list__today">
+            ${renderHabitsStats(statistics)}
 
-                <h2 class="habits-v2-list__section-title">
-                    Сегодня
-                </h2>
 
-                <div class="habits-v2-list__cards">
-                    ${habits.map(renderHabitCard).join("")}
-                </div>
-
-            </section>
+            <div class="habits-v2-list__cards">
+                ${habits.map(renderHabitCard).join("")}
+            </div>
 
         </section>
     `

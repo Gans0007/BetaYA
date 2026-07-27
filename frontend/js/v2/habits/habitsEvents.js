@@ -12,6 +12,7 @@ import {
 
 import {
     getHabits,
+    getHabitsStatistics,
     addHabit,
     selectHabit
 } from "./habitsStore.js"
@@ -144,7 +145,11 @@ function restoreDraftToAddHabitPage() {
    ========================================================= */
 
 function openHabitsPage() {
-    renderHabitsPage(getHabits())
+    renderHabitsPage(
+        getHabits(),
+        getHabitsStatistics()
+    )
+
     initHabitsPageEvents()
 }
 
@@ -654,6 +659,10 @@ export function initHabitsEvents() {
      * текущий массив привычек.
      */
 
-    renderHabitsPage(getHabits())
+    renderHabitsPage(
+        getHabits(),
+        getHabitsStatistics()
+    )
+
     initHabitsPageEvents()
-}
+    }

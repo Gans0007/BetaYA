@@ -2,11 +2,19 @@ import { renderHabitsEmpty } from "./habitsEmpty.js"
 import { renderHabitsList } from "./habitsList.js"
 
 
-export function renderHabitsPage(habits = []) {
-    const root = document.getElementById("habits-v2-root")
+export function renderHabitsPage(
+    habits = [],
+    statistics = {}
+) {
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
-        console.error("V2: не найден #habits-v2-root")
+        console.error(
+            "V2: не найден #habits-v2-root"
+        )
+
         return
     }
 
@@ -22,5 +30,8 @@ export function renderHabitsPage(habits = []) {
     root.innerHTML =
         habits.length === 0
             ? renderHabitsEmpty()
-            : renderHabitsList(habits)
+            : renderHabitsList(
+                habits,
+                statistics
+            )
 }
