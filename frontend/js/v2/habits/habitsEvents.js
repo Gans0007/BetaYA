@@ -1,7 +1,8 @@
 import { renderHabitsPage } from "./habitsPage.js"
 import { renderAddHabitPage } from "./addHabitPage.js"
 import { renderIconPickerPage } from "./iconPickerPage.js"
-import { renderHabitDetailsPage } from "./habitDetailsPage.js"
+import { renderHabitDetailsPage } from "./viewHabitDetails/habitDetailsPage.js"
+import { initHabitDetailsEvents } from "./viewHabitDetails/habitDetailsEvents.js"
 
 import {
     getHabitDraft,
@@ -508,11 +509,29 @@ card.addEventListener(
         habitsListScrollTop =
             currentList?.scrollTop || 0
 
-        renderHabitDetailsPage(
-            selectedHabit
-        )
+renderHabitDetailsPage(
+    selectedHabit
+)
 
-        initHabitDetailsEvents()
+initHabitDetailsEvents({
+    onBack: () => {
+        openHabitsPage()
+
+        const renderedList =
+            document.querySelector(
+                ".habits-v2-list"
+            )
+
+        if (!renderedList) {
+            return
+        }
+
+        requestAnimationFrame(() => {
+            renderedList.scrollTop =
+                habitsListScrollTop
+        })
+    }
+})
     }
 )
 
@@ -894,53 +913,7 @@ function initIconPickerEvents() {
     })
 }
 
-/* =========================================================
-   СОБЫТИЯ ДЕТАЛЬНОЙ СТРАНИЦЫ
-   ========================================================= */
 
-function initHabitDetailsEvents() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
-
-    if (!root) {
-        return
-    }
-
-    const backButton = root.querySelector(
-        '[data-action="close-habit-details"]'
-    )
-
-    const menuButton = root.querySelector(
-        '[data-action="open-habit-menu"]'
-    )
-
-    addPressAnimation(backButton)
-    addPressAnimation(menuButton)
-
-    backButton?.addEventListener("click", () => {
-        openHabitsPage()
-
-        const renderedList = document.querySelector(
-            ".habits-v2-list"
-        )
-
-        if (!renderedList) {
-            return
-        }
-
-        requestAnimationFrame(() => {
-            renderedList.scrollTop =
-                habitsListScrollTop
-        })
-    })
-
-    menuButton?.addEventListener("click", () => {
-        console.log(
-            "Открыть меню привычки"
-        )
-    })
-}
 
 /* =========================================================
    ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
@@ -959,10 +932,29 @@ export function initHabitsEvents() {
         ".habit-details"
     )
 
-    if (habitDetailsPage) {
-        initHabitDetailsEvents()
-        return
-    }
+if (habitDetailsPage) {
+    initHabitDetailsEvents({
+        onBack: () => {
+            openHabitsPage()
+
+            const renderedList =
+                document.querySelector(
+                    ".habits-v2-list"
+                )
+
+            if (!renderedList) {
+                return
+            }
+
+            requestAnimationFrame(() => {
+                renderedList.scrollTop =
+                    habitsListScrollTop
+            })
+        }
+    })
+
+    return
+}
 
     const iconPickerPage = root.querySelector(
         ".habit-icon-picker"

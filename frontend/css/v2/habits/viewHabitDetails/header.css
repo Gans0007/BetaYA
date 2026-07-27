@@ -1,0 +1,103 @@
+/* =========================================================
+   ШАПКА ДЕТАЛЬНОЙ СТРАНИЦЫ
+   ========================================================= */
+
+.habit-details__header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* =========================================================
+   ОБЩИЕ СТИЛИ КНОПОК
+   ========================================================= */
+
+.habit-details__back-button,
+.habit-details__menu-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+    outline: none;
+
+    color: #292a2f;
+
+    background:
+        rgba(255, 255, 255, 0.9);
+
+    box-shadow:
+        0 8px 20px rgba(42, 51, 70, 0.065);
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 100ms ease,
+        opacity 100ms ease,
+        box-shadow 100ms ease;
+}
+
+
+.habit-details__back-button.is-pressed,
+.habit-details__menu-button.is-pressed,
+.habit-details__back-button:active,
+.habit-details__menu-button:active {
+    transform: scale(0.91);
+    opacity: 0.86;
+}
+
+
+/* =========================================================
+   СТРЕЛКА НАЗАД
+   ========================================================= */
+
+.habit-details__back-button {
+    padding-bottom: 5px;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+
+/* =========================================================
+   КНОПКА МЕНЮ
+   ========================================================= */
+
+.habit-details__menu-button {
+    padding-bottom: 10px;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+}
