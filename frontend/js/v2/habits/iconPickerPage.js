@@ -137,25 +137,29 @@ export function renderIconPickerPage(
                 aria-label="Выбор значка привычки"
             >
 
-                <!-- Верхняя панель -->
+<!-- Верхняя панель -->
 
-                <header class="habit-icon-picker__header">
+<header class="habit-icon-picker__header">
 
-                    <button
-                        class="habit-icon-picker__back-button"
-                        type="button"
-                        data-action="close-icon-picker"
-                        aria-label="Вернуться к созданию привычки"
-                    >
-                        <span
-                            class="habit-icon-picker__back-icon"
-                            aria-hidden="true"
-                        >
-                            ‹
-                        </span>
-                    </button>
+    <button
+        class="habit-icon-picker__back-button"
+        type="button"
+        data-action="close-icon-picker"
+        aria-label="Вернуться к созданию привычки"
+    >
+        <span
+            class="habit-icon-picker__back-icon"
+            aria-hidden="true"
+        >
+            ‹
+        </span>
+    </button>
 
-                </header>
+    <h1 class="habit-icon-picker__title">
+        Выберите иконку
+    </h1>
+
+</header>
 
 
                 <!-- Прокручиваемая сетка эмодзи -->

@@ -1,3 +1,4 @@
+
 /* =========================================================
    HEADER
    ========================================================= */
@@ -11,8 +12,10 @@
     width: 100%;
     min-height: 104px;
 
-    display: flex;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: end;
+    gap: 8px;
 
     box-sizing: border-box;
 
@@ -92,6 +95,44 @@
     transform: translateY(-2px);
 }
 
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.habit-icon-picker__title {
+    grid-column: 2;
+
+    min-width: 0;
+
+    margin: 0;
+    padding-bottom: 8px;
+
+    color: #292b2f;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 23px;
+    font-weight: 650;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+
+    text-align: center;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
 
 /* =========================================================
    ACTIVE
@@ -125,6 +166,11 @@
     .habit-icon-picker__header {
         min-height: 92px;
 
+        grid-template-columns:
+            46px
+            minmax(0, 1fr)
+            46px;
+
         padding-left: 17px;
         padding-right: 17px;
         padding-bottom: 11px;
@@ -138,6 +184,11 @@
 
     .habit-icon-picker__back-icon {
         font-size: 42px;
+    }
+
+    .habit-icon-picker__title {
+        padding-bottom: 9px;
+        font-size: 21px;
     }
 }
 
