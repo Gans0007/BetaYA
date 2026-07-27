@@ -46,6 +46,9 @@
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
 
+    align-items: start;
+    justify-items: center;
+
     column-gap: 12px;
     row-gap: 24px;
 
@@ -62,8 +65,12 @@
     position: relative;
 
     width: 100%;
+    height: auto;
     min-width: 0;
     aspect-ratio: 1 / 1;
+
+    justify-self: center;
+    align-self: start;
 
     display: flex;
     align-items: center;
@@ -73,7 +80,7 @@
     padding: 0;
 
     border: 1.5px solid transparent;
-    border-radius: 50%;
+    border-radius: 999px;
     outline: none;
 
     color: var(--icon-picker-muted);
