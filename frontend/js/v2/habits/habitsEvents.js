@@ -1,6 +1,7 @@
 import { renderHabitsPage } from "./habitsPage.js"
 import { renderAddHabitPage } from "./addHabitPage.js"
 import { renderIconPickerPage } from "./iconPickerPage.js"
+import { renderHabitDetailsPage } from "./habitDetailsPage.js"
 
 import {
     getHabitDraft,
@@ -402,6 +403,12 @@ function toggleHabitConfirmationLocally(habitId) {
 }
 
 /* =========================================================
+   ПОЛОЖЕНИЕ СПИСКА ПЕРЕД ОТКРЫТИЕМ ПРИВЫЧКИ
+   ========================================================= */
+
+let habitsListScrollTop = 0
+
+/* =========================================================
    СОБЫТИЯ КАРТОЧЕК
    ========================================================= */
 
@@ -474,37 +481,40 @@ function initHabitCardEvents() {
            ОТКРЫТИЕ ПРИВЫЧКИ
            ----------------------------------------------------- */
 
-        card.addEventListener(
-            "click",
-            (event) => {
-                const clickedConfirmButton =
-                    event.target.closest(
-                        '[data-action="confirm-habit"]'
-                    )
+card.addEventListener(
+    "click",
+    (event) => {
+        const clickedConfirmButton =
+            event.target.closest(
+                '[data-action="confirm-habit"]'
+            )
 
-                if (clickedConfirmButton) {
-                    return
-                }
+        if (clickedConfirmButton) {
+            return
+        }
 
-                const selectedHabit =
-                    selectHabit(habitId)
+        const selectedHabit =
+            selectHabit(habitId)
 
-                if (!selectedHabit) {
-                    return
-                }
+        if (!selectedHabit) {
+            return
+        }
 
-                console.log(
-                    "Выбрана привычка:",
-                    selectedHabit
-                )
+        const currentList =
+            document.querySelector(
+                ".habits-v2-list"
+            )
 
-                /*
-                 * Позже здесь будет открываться
-                 * детальная страница привычки.
-                 */
-            }
+        habitsListScrollTop =
+            currentList?.scrollTop || 0
+
+        renderHabitDetailsPage(
+            selectedHabit
         )
 
+        initHabitDetailsEvents()
+    }
+)
 
         /* -----------------------------------------------------
            ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ
@@ -885,13 +895,72 @@ function initIconPickerEvents() {
 }
 
 /* =========================================================
+   СОБЫТИЯ ДЕТАЛЬНОЙ СТРАНИЦЫ
+   ========================================================= */
+
+function initHabitDetailsEvents() {
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
+
+    if (!root) {
+        return
+    }
+
+    const backButton = root.querySelector(
+        '[data-action="close-habit-details"]'
+    )
+
+    const menuButton = root.querySelector(
+        '[data-action="open-habit-menu"]'
+    )
+
+    addPressAnimation(backButton)
+    addPressAnimation(menuButton)
+
+    backButton?.addEventListener("click", () => {
+        openHabitsPage()
+
+        const renderedList = document.querySelector(
+            ".habits-v2-list"
+        )
+
+        if (!renderedList) {
+            return
+        }
+
+        requestAnimationFrame(() => {
+            renderedList.scrollTop =
+                habitsListScrollTop
+        })
+    })
+
+    menuButton?.addEventListener("click", () => {
+        console.log(
+            "Открыть меню привычки"
+        )
+    })
+}
+
+/* =========================================================
    ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
    ========================================================= */
 
 export function initHabitsEvents() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
+        return
+    }
+
+    const habitDetailsPage = root.querySelector(
+        ".habit-details"
+    )
+
+    if (habitDetailsPage) {
+        initHabitDetailsEvents()
         return
     }
 

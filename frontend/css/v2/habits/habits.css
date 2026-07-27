@@ -1471,6 +1471,339 @@ touch-action: manipulation;
 
 
 
+/* =========================================================
+   ДЕТАЛЬНАЯ СТРАНИЦА ПРИВЫЧКИ
+   ========================================================= */
+
+.habit-details {
+    --habit-accent: #65b85d;
+    --habit-accent-rgb: 101, 184, 93;
+
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+
+    box-sizing: border-box;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding:
+        max(26px, env(safe-area-inset-top))
+        18px
+        calc(112px + env(safe-area-inset-bottom));
+
+    background:
+        radial-gradient(
+            circle at 50% 12%,
+            rgba(var(--habit-accent-rgb), 0.09) 0%,
+            rgba(255, 255, 255, 0.99) 38%,
+            rgba(248, 249, 251, 1) 100%
+        );
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+.habit-details::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* Цвета */
+
+.habit-details--blue {
+    --habit-accent: #4d8ff0;
+    --habit-accent-rgb: 77, 143, 240;
+}
+
+.habit-details--green {
+    --habit-accent: #65b85d;
+    --habit-accent-rgb: 101, 184, 93;
+}
+
+.habit-details--purple {
+    --habit-accent: #9872df;
+    --habit-accent-rgb: 152, 114, 223;
+}
+
+.habit-details--orange {
+    --habit-accent: #df9557;
+    --habit-accent-rgb: 223, 149, 87;
+}
+
+.habit-details--red {
+    --habit-accent: #df7470;
+    --habit-accent-rgb: 223, 116, 112;
+}
+
+.habit-details--graphite {
+    --habit-accent: #676a70;
+    --habit-accent-rgb: 103, 106, 112;
+}
+
+.habit-details--cyan {
+    --habit-accent: #42aebd;
+    --habit-accent-rgb: 66, 174, 189;
+}
+
+.habit-details--brown {
+    --habit-accent: #916b4f;
+    --habit-accent-rgb: 145, 107, 79;
+}
+
+.habit-details--pink {
+    --habit-accent: #d66e9d;
+    --habit-accent-rgb: 214, 110, 157;
+}
+
+.habit-details--silver {
+    --habit-accent: #858b94;
+    --habit-accent-rgb: 133, 139, 148;
+}
+
+.habit-details--yellow {
+    --habit-accent: #c49c28;
+    --habit-accent-rgb: 196, 156, 40;
+}
+
+
+/* Шапка */
+
+.habit-details__header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.habit-details__back-button,
+.habit-details__menu-button {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+    outline: none;
+
+    color: #292a2f;
+    background: rgba(255, 255, 255, 0.9);
+
+    box-shadow:
+        0 8px 20px rgba(42, 51, 70, 0.065);
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+.habit-details__back-button {
+    padding-bottom: 5px;
+
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+
+.habit-details__menu-button {
+    padding-bottom: 10px;
+
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+
+/* Основной контент */
+
+.habit-details__content {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding-top: 28px;
+}
+
+
+.habit-details__icon {
+    width: 76px;
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 25px;
+
+    background:
+        rgba(var(--habit-accent-rgb), 0.12);
+
+    font-family:
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji",
+        sans-serif;
+
+    font-size: 38px;
+    line-height: 1;
+}
+
+
+.habit-details__title {
+    max-width: 100%;
+
+    margin: 20px 0 0;
+
+    color: var(--habit-accent);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 29px;
+    font-weight: 650;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+
+    text-align: center;
+}
+
+
+.habit-details__status {
+    margin-top: 8px;
+
+    color:
+        rgba(var(--habit-accent-rgb), 0.63);
+
+    font-size: 16px;
+    font-weight: 550;
+}
+
+
+/* Статистика */
+
+.habit-details__stats {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 30px;
+}
+
+
+.habit-details__stat {
+    min-height: 90px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 16px 17px;
+
+    border:
+        1px solid
+        rgba(var(--habit-accent-rgb), 0.13);
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.82);
+
+    box-shadow:
+        0 8px 20px rgba(42, 51, 70, 0.045);
+}
+
+
+.habit-details__stat-main {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #292a2f;
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+
+.habit-details__stat-label {
+    margin-top: 8px;
+
+    color: #92959d;
+
+    font-size: 13px;
+    font-weight: 500;
+}
+
+
+/* Календарь-заглушка */
+
+.habit-details__calendar-placeholder {
+    width: 100%;
+
+    margin-top: 30px;
+}
+
+
+.habit-details__section-title {
+    margin: 0 0 14px;
+
+    color: #292a2f;
+
+    font-size: 22px;
+    font-weight: 650;
+}
+
+
+.habit-details__calendar-empty {
+    width: 100%;
+    min-height: 170px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    border:
+        1px dashed
+        rgba(var(--habit-accent-rgb), 0.24);
+
+    border-radius: 22px;
+
+    color: #a0a2a8;
+    background: rgba(255, 255, 255, 0.72);
+
+    font-size: 14px;
+    text-align: center;
+}
+
+
 
 
 
