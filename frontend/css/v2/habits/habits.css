@@ -357,36 +357,7 @@
         font-size: 51px;
     }
 
-    .habits-stats {
-        gap: 9px;
-        margin-bottom: 20px;
-    }
 
-    .habits-stats__card {
-        min-height: 84px;
-
-        gap: 8px;
-        padding: 13px 10px;
-
-        border-radius: 18px;
-    }
-
-    .habits-stats__icon {
-        width: 36px;
-        height: 36px;
-        flex-basis: 36px;
-
-        border-radius: 13px;
-        font-size: 20px;
-    }
-
-    .habits-stats__label {
-        font-size: 10px;
-    }
-
-    .habits-stats__value {
-        font-size: 16px;
-    }
 }
 
 
@@ -407,6 +378,39 @@
     .habits-v2-empty__add-button {
         margin-top: 40px;
     }
+
+.habits-stats {
+    gap: 9px;
+    margin-bottom: 20px;
+}
+
+.habits-stats__card {
+    min-height: 84px;
+
+    padding: 14px 12px;
+
+    border-radius: 18px;
+}
+
+.habits-stats__main {
+    gap: 6px;
+}
+
+.habits-stats__icon {
+    width: 18px;
+    height: 20px;
+
+    font-size: 17px;
+}
+
+.habits-stats__value {
+    font-size: 15px;
+}
+
+.habits-stats__label {
+    margin-top: 7px;
+    font-size: 11px;
+}
 }
 
 
@@ -628,7 +632,7 @@
 }
 
 /* =========================================================
-   ОБЩАЯ СТАТИСТИКА
+   СТАТИСТИКА ПРИВЫЧЕК
    ========================================================= */
 
 .habits-stats {
@@ -648,54 +652,60 @@
 
 .habits-stats__card {
     min-width: 0;
-    min-height: 92px;
+    min-height: 90px;
 
     display: flex;
-    align-items: center;
-    gap: 11px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 
     box-sizing: border-box;
 
-    padding: 16px 14px;
+    padding: 16px 17px;
 
-    border: 1px solid rgba(46, 49, 56, 0.07);
-    border-radius: 21px;
+    border: 1px solid rgba(57, 60, 66, 0.1);
+    border-radius: 20px;
 
     background:
         linear-gradient(
             145deg,
-            rgba(255, 255, 255, 0.98) 0%,
-            rgba(249, 250, 252, 0.96) 100%
+            rgba(255, 255, 255, 0.99) 0%,
+            rgba(251, 251, 252, 0.97) 100%
         );
 
     box-shadow:
-        0 10px 24px rgba(42, 51, 70, 0.055),
+        0 7px 18px rgba(42, 51, 70, 0.045),
         inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 
 /* =========================================================
-   ИКОНКА СТАТИСТИКИ
+   ВЕРХНЯЯ СТРОКА
+   Иконка и значение
    ========================================================= */
 
-.habits-stats__icon {
-    width: 42px;
-    height: 42px;
-
-    flex: 0 0 42px;
+.habits-stats__main {
+    min-width: 0;
 
     display: flex;
     align-items: center;
+    gap: 8px;
+}
+
+
+/* =========================================================
+   ИКОНКА
+   ========================================================= */
+
+.habits-stats__icon {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
 
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(247, 248, 250, 1) 0%,
-            rgba(238, 240, 244, 0.96) 100%
-        );
+    width: 20px;
+    height: 22px;
 
     font-family:
         "Apple Color Emoji",
@@ -703,43 +713,21 @@
         "Noto Color Emoji",
         sans-serif;
 
-    font-size: 23px;
+    font-size: 19px;
+    font-weight: 400;
     line-height: 1;
+
+    transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   ТЕКСТ СТАТИСТИКИ
+   ОСНОВНОЕ ЗНАЧЕНИЕ
    ========================================================= */
 
-.habits-stats__content {
-    min-width: 0;
-}
-
-
-.habits-stats__label {
-    margin-bottom: 6px;
-
-    color: #979aa2;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Text",
-        Inter,
-        Arial,
-        sans-serif;
-
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-
-    white-space: nowrap;
-}
-
-
 .habits-stats__value {
+    min-width: 0;
+
     color: #292a2f;
 
     font-family:
@@ -751,12 +739,46 @@
         Arial,
         sans-serif;
 
-    font-size: 18px;
-    font-weight: 650;
-    line-height: 1.1;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.15;
     letter-spacing: -0.025em;
 
     white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ПОДПИСЬ
+   ========================================================= */
+
+.habits-stats__label {
+    margin-top: 8px;
+
+    color: #92959d;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
 }
 
 /* =========================================================

@@ -1,13 +1,13 @@
 /* =========================================================
    HABITS STATS
 
-   Отображает общую статистику раздела привычек:
-   текущую серию и общее количество XP.
+   Общая статистика привычек:
+   текущая серия и суммарный XP.
    ========================================================= */
 
 
 /* =========================================================
-   БЕЗОПАСНОЕ ЧИСЛО
+   НОРМАЛИЗАЦИЯ ЧИСЛА
    ========================================================= */
 
 function normalizeStatValue(value) {
@@ -22,7 +22,7 @@ function normalizeStatValue(value) {
 
 
 /* =========================================================
-   ФОРМА СЛОВА «ДЕНЬ»
+   ФОРМАТИРОВАНИЕ ДНЕЙ
    ========================================================= */
 
 function formatDays(value) {
@@ -74,23 +74,26 @@ export function renderHabitsStats(statistics = {}) {
 
             <article class="habits-stats__card">
 
-                <div
-                    class="habits-stats__icon"
-                    aria-hidden="true"
-                >
-                    🔥
+                <div class="habits-stats__main">
+
+                    <span
+                        class="
+                            habits-stats__icon
+                            habits-stats__icon--streak
+                        "
+                        aria-hidden="true"
+                    >
+                        🔥
+                    </span>
+
+                    <span class="habits-stats__value">
+                        ${formatDays(currentStreak)}
+                    </span>
+
                 </div>
 
-                <div class="habits-stats__content">
-
-                    <div class="habits-stats__label">
-                        Текущая серия
-                    </div>
-
-                    <div class="habits-stats__value">
-                        ${formatDays(currentStreak)}
-                    </div>
-
+                <div class="habits-stats__label">
+                    Текущая серия
                 </div>
 
             </article>
@@ -98,23 +101,26 @@ export function renderHabitsStats(statistics = {}) {
 
             <article class="habits-stats__card">
 
-                <div
-                    class="habits-stats__icon"
-                    aria-hidden="true"
-                >
-                    ⭐
+                <div class="habits-stats__main">
+
+                    <span
+                        class="
+                            habits-stats__icon
+                            habits-stats__icon--xp
+                        "
+                        aria-hidden="true"
+                    >
+                        ⭐
+                    </span>
+
+                    <span class="habits-stats__value">
+                        ${totalXp}
+                    </span>
+
                 </div>
 
-                <div class="habits-stats__content">
-
-                    <div class="habits-stats__label">
-                        Всего XP
-                    </div>
-
-                    <div class="habits-stats__value">
-                        ${totalXp} XP
-                    </div>
-
+                <div class="habits-stats__label">
+                    Всего XP
                 </div>
 
             </article>
