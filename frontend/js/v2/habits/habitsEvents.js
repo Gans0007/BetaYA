@@ -182,14 +182,29 @@ function createHabitFromDraft() {
         return null
     }
 
-    const newHabit = {
-        id: createHabitId(),
-        name: habitName,
-        icon: draft.icon,
-        color: draft.color,
-        size: draft.size,
-        createdAt: new Date().toISOString()
-    }
+const newHabit = {
+    id: createHabitId(),
+    name: habitName,
+    icon: draft.icon,
+    color: draft.color,
+    size: draft.size,
+
+    completedToday: false,
+    streak: 0,
+    xpReward: 5,
+
+    weekProgress: [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+    ],
+
+    createdAt: new Date().toISOString()
+}
 
     return addHabit(newHabit)
 }
