@@ -1,5 +1,5 @@
 import { renderHabitCard } from "./habitCard.js"
-
+import { formatCurrentDate } from "./habitsUtils.js"
 
 export function renderHabitsList(habits) {
     return `

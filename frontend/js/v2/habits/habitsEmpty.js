@@ -1,3 +1,5 @@
+import { formatCurrentDate } from "./habitsUtils.js"
+
 export function renderHabitsEmpty() {
     return `
         <section class="habits-v2-empty">
