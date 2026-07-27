@@ -512,17 +512,6 @@ function initAddHabitPageEvents() {
             newHabit
         )
 
-        /*
-         * Позже этот участок заменим на:
-         *
-         * const newHabit = await createHabit({
-         *     name: habitName,
-         *     icon: habitDraft.icon,
-         *     color: habitDraft.color,
-         *     size: habitDraft.size
-         * })
-         */
-
         resetHabitDraft()
         openHabitsPage()
     })
