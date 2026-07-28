@@ -1,0 +1,180 @@
+/* =========================================================
+   HABITS LIST — АДАПТИВНЫЕ СТИЛИ
+   ========================================================= */
+
+
+/* =========================================================
+   УЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-width: 370px) {
+
+    /* ---------------------------------------------------------
+       СТРАНИЦА И ШАПКА
+       --------------------------------------------------------- */
+
+    .habits-v2-list {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .habits-v2-list__title {
+        font-size: 32px;
+    }
+
+    .habits-v2-list__add-button {
+        width: 44px;
+        height: 44px;
+
+        font-size: 31px;
+    }
+
+
+    /* ---------------------------------------------------------
+       СТАТИСТИКА
+       --------------------------------------------------------- */
+
+    .habits-stats {
+        gap: 9px;
+        margin-bottom: 20px;
+    }
+
+    .habits-stats__card {
+        min-height: 84px;
+
+        padding: 14px 12px;
+
+        border-radius: 18px;
+    }
+
+    .habits-stats__main {
+        gap: 6px;
+    }
+
+    .habits-stats__icon {
+        width: 18px;
+        height: 20px;
+
+        font-size: 17px;
+    }
+
+    .habits-stats__value {
+        font-size: 15px;
+    }
+
+    .habits-stats__label {
+        margin-top: 7px;
+
+        font-size: 11px;
+    }
+
+
+    /* ---------------------------------------------------------
+       КАРТОЧКА ПРИВЫЧКИ
+       --------------------------------------------------------- */
+
+    .habit-card,
+    .habit-card--large {
+        min-height: 158px;
+
+        padding:
+            16px
+            15px
+            14px;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            42px;
+
+        grid-template-rows:
+            40px
+            minmax(44px, 1fr)
+            auto;
+
+        column-gap: 11px;
+        row-gap: 4px;
+    }
+
+    .habit-card__icon {
+        width: 34px;
+        height: 34px;
+
+        font-size: 21px;
+    }
+
+    .habit-card__icon.is-symbol {
+        font-size: 28px;
+    }
+
+    .habit-card__check {
+        width: 42px;
+        height: 42px;
+
+        font-size: 22px;
+    }
+
+    .habit-card__content {
+        padding:
+            1px
+            0
+            2px;
+    }
+
+    .habit-card__name {
+        font-size: 18px;
+    }
+
+    .habit-card__description {
+        margin-top: 6px;
+
+        font-size: 14px;
+    }
+
+    .habit-card__footer {
+        margin-top: 5px;
+    }
+
+    .habit-card__progress {
+        gap: 5px;
+    }
+
+    .habit-card__progress-item {
+        height: 8px;
+    }
+
+    .habit-card__streak {
+        gap: 4px;
+
+        font-size: 15px;
+    }
+
+    .habit-card__streak-icon {
+        font-size: 17px;
+    }
+}
+
+
+/* =========================================================
+   НИЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-height: 720px) {
+
+    .habits-v2-list {
+        padding-top:
+            max(38px, env(safe-area-inset-top));
+    }
+
+    .habits-v2-list__header {
+        margin-bottom: 22px;
+    }
+
+    .habits-v2-list__cards {
+        gap: 11px;
+    }
+
+    .habit-card,
+    .habit-card--large {
+        min-height: 158px;
+    }
+}

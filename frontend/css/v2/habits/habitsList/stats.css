@@ -1,0 +1,149 @@
+/* =========================================================
+   СТАТИСТИКА ПРИВЫЧЕК
+   ========================================================= */
+
+.habits-stats {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+
+    margin: 0 0 24px;
+}
+
+
+/* =========================================================
+   КАРТОЧКА СТАТИСТИКИ
+   ========================================================= */
+
+.habits-stats__card {
+    min-width: 0;
+    min-height: 90px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    box-sizing: border-box;
+
+    padding: 16px 17px;
+
+    border: 1px solid rgba(57, 60, 66, 0.1);
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.99) 0%,
+            rgba(251, 251, 252, 0.97) 100%
+        );
+
+    box-shadow:
+        0 7px 18px rgba(42, 51, 70, 0.045),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   ВЕРХНЯЯ СТРОКА
+   Иконка и значение
+   ========================================================= */
+
+.habits-stats__main {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* =========================================================
+   ИКОНКА
+   ========================================================= */
+
+.habits-stats__icon {
+    flex: 0 0 auto;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 22px;
+
+    font-family:
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Noto Color Emoji",
+        sans-serif;
+
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   ОСНОВНОЕ ЗНАЧЕНИЕ
+   ========================================================= */
+
+.habits-stats__value {
+    min-width: 0;
+
+    color: #292a2f;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ПОДПИСЬ
+   ========================================================= */
+
+.habits-stats__label {
+    margin-top: 8px;
+
+    color: #92959d;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+}

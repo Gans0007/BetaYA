@@ -1,0 +1,176 @@
+/* =========================================================
+   HABITS V2 — СПИСОК ПРИВЫЧЕК
+   ========================================================= */
+
+.habits-v2-list {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+    min-height: 100dvh;
+
+    box-sizing: border-box;
+
+    padding:
+        max(58px, env(safe-area-inset-top))
+        18px
+        calc(112px + env(safe-area-inset-bottom));
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    background:
+        radial-gradient(
+            circle at 50% 18%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(250, 251, 253, 0.98) 55%,
+            rgba(247, 249, 252, 1) 100%
+        );
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.habits-v2-list::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   ВЕРХНЯЯ ЧАСТЬ
+   ========================================================= */
+
+.habits-v2-list__header {
+    width: 100%;
+
+    margin: 0 0 28px;
+    padding: 0 4px;
+
+    box-sizing: border-box;
+}
+
+.habits-v2-list__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+}
+
+.habits-v2-list__heading {
+    min-width: 0;
+}
+
+.habits-v2-list__date {
+    margin: 0 0 10px;
+
+    color: #a2a4aa;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    text-transform: uppercase;
+
+    -webkit-font-smoothing: antialiased;
+}
+
+.habits-v2-list__title {
+    margin: 0;
+
+    color: #232428;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.045em;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   КНОПКИ В ШАПКЕ
+   ========================================================= */
+
+.habits-v2-list__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex: 0 0 auto;
+}
+
+.habits-v2-list__add-button {
+    width: 48px;
+    height: 48px;
+
+    padding: 0 0 3px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    border: none;
+    border-radius: 50%;
+
+    color: #347ee8;
+    background: rgba(255, 255, 255, 0.96);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 34px;
+    font-weight: 300;
+    line-height: 1;
+
+    box-shadow:
+        0 10px 24px rgba(36, 48, 72, 0.09),
+        0 3px 8px rgba(36, 48, 72, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        transform 100ms ease,
+        opacity 100ms ease,
+        box-shadow 100ms ease;
+}
+
+.habits-v2-list__add-button.is-pressed,
+.habits-v2-list__add-button:active {
+    transform: scale(0.92);
+    opacity: 0.86;
+
+    box-shadow:
+        0 5px 12px rgba(36, 48, 72, 0.07),
+        inset 0 2px 4px rgba(52, 126, 232, 0.08);
+}
