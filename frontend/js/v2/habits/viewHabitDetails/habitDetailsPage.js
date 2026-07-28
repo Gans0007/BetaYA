@@ -274,14 +274,19 @@ const calendarHtml =
 
             <header class="habit-details__header">
 
-                <button
-                    class="habit-details__back-button"
-                    type="button"
-                    data-action="close-habit-details"
-                    aria-label="Вернуться к привычкам"
-                >
-                    ‹
-                </button>
+<button
+    class="habit-details__back-button"
+    type="button"
+    data-action="close-habit-details"
+    aria-label="Вернуться к привычкам"
+>
+    <span
+        class="material-symbols-rounded"
+        aria-hidden="true"
+    >
+        arrow_back_ios_new
+    </span>
+</button>
 
                 <button
                     class="habit-details__menu-button"

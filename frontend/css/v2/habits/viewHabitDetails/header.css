@@ -66,22 +66,21 @@
    ========================================================= */
 
 .habit-details__back-button {
-    padding-bottom: 4px;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        Inter,
-        Arial,
-        sans-serif;
-
-    font-size: 38px;
-    font-weight: 300;
-    line-height: 1;
+    padding: 0;
 }
 
 
+.habit-details__back-button .material-symbols-rounded {
+    font-size: 23px;
+
+    color: #292a2f;
+
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 500,
+        "GRAD" 0,
+        "opsz" 24;
+}
 /* =========================================================
    КНОПКА МЕНЮ
    ========================================================= */
