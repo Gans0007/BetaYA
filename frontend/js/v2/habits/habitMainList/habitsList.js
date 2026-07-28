@@ -1,9 +1,6 @@
 import { renderHabitCard } from "./habitCard.js"
 import { renderHabitsStats } from "./habitsStats.js"
-
-import {
-    formatCurrentDate
-} from "./habitsUtils.js"
+import { formatCurrentDate } from "../habitsUtils.js"
 
 
 export function renderHabitsList(

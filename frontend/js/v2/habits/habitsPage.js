@@ -1,5 +1,5 @@
 import { renderHabitsEmpty } from "./habitMainEmpty/habitsEmpty.js"
-import { renderHabitsList } from "./habitsList.js"
+import { renderHabitsList } from "./habitMainList/habitsList.js"
 
 
 export function renderHabitsPage(
