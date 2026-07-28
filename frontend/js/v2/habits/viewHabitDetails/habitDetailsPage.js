@@ -238,11 +238,30 @@ export function renderHabitDetailsPage(habit = {}) {
         ? `Выполнено +${normalizedXpReward} XP`
         : "В процессе"
 
-    const calendarHtml =
-        renderHabitCalendar({
-            completedDates,
-            createdAt
-        })
+/*
+   Пока API нет.
+
+   Если привычка подтверждена сегодня,
+   временно добавляем сегодняшнюю дату
+   в локальный календарь.
+*/
+
+const calendarCompletedDates = [
+    ...completedDates
+]
+
+if (completedToday) {
+    calendarCompletedDates.push(
+        new Date()
+    )
+}
+
+const calendarHtml =
+    renderHabitCalendar({
+        completedDates:
+            calendarCompletedDates,
+        createdAt
+    })
 
     root.innerHTML = `
         <section

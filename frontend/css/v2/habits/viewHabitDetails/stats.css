@@ -9,9 +9,9 @@
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-    gap: 12px;
+    gap: 10px;
 
-    margin-top: 30px;
+    margin-top: 22px;
 }
 
 
@@ -21,7 +21,7 @@
 
 .habit-details__stat {
     min-width: 0;
-    min-height: 90px;
+    min-height: 74px;
 
     display: flex;
     flex-direction: column;
@@ -29,19 +29,19 @@
 
     box-sizing: border-box;
 
-    padding: 16px 17px;
+    padding: 12px 14px;
 
     border:
         1px solid
-        rgba(var(--habit-accent-rgb), 0.13);
+        rgba(var(--habit-accent-rgb), 0.11);
 
-    border-radius: 20px;
+    border-radius: 18px;
 
     background:
-        rgba(255, 255, 255, 0.82);
+        rgba(255, 255, 255, 0.78);
 
     box-shadow:
-        0 8px 20px rgba(42, 51, 70, 0.045);
+        0 6px 16px rgba(42, 51, 70, 0.035);
 }
 
 
@@ -54,7 +54,7 @@
 
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 6px;
 
     color: #292a2f;
 
@@ -67,9 +67,9 @@
         Arial,
         sans-serif;
 
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.1;
 
     white-space: nowrap;
 }
@@ -80,9 +80,10 @@
    ========================================================= */
 
 .habit-details__stat-label {
-    margin-top: 8px;
+    margin-top: 6px;
 
-    color: #92959d;
+    color:
+        rgba(var(--habit-accent-rgb), 0.66);
 
     font-family:
         -apple-system,
@@ -92,9 +93,9 @@
         Arial,
         sans-serif;
 
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.15;
+    font-size: 12px;
+    font-weight: 520;
+    line-height: 1.1;
 
     white-space: nowrap;
 }
