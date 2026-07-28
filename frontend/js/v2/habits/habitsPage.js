@@ -1,4 +1,4 @@
-import { renderHabitsEmpty } from "./habitsEmpty.js"
+import { renderHabitsEmpty } from "./habitMainEmpty/habitsEmpty.js"
 import { renderHabitsList } from "./habitsList.js"
 
 

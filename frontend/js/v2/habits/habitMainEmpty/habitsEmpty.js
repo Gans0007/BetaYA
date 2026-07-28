@@ -1,4 +1,4 @@
-import { formatCurrentDate } from "./habitsUtils.js"
+import { formatCurrentDate } from "../habitsUtils.js"
 
 export function renderHabitsEmpty() {
     return `

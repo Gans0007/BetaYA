@@ -1,156 +1,105 @@
-import { renderHabitsPage } from "./habitsPage.js"
-import { renderAddHabitPage } from "./addHabitPage.js"
-import { renderIconPickerPage } from "./iconPickerPage.js"
-import { renderHabitDetailsPage } from "./viewHabitDetails/habitDetailsPage.js"
-import { initHabitDetailsEvents } from "./viewHabitDetails/habitDetailsEvents.js"
+/* =========================================================
+   HABITS EVENTS
+
+   Главный контроллер раздела привычек.
+
+   Отвечает за:
+   - первоначальный запуск раздела;
+   - рендер главной страницы;
+   - открытие страницы создания привычки;
+   - события карточек привычек;
+   - подтверждение выполнения;
+   - открытие деталей привычки;
+   - восстановление прокрутки списка.
+
+   Логика создания привычки находится отдельно:
+   habitMainEmpty/addHabitEvents.js
+   ========================================================= */
+
+
+/* =========================================================
+   РЕНДЕР ГЛАВНОЙ СТРАНИЦЫ
+   ========================================================= */
 
 import {
-    getHabitDraft,
-    getHabitDraftValue,
-    setHabitDraftValue,
-    updateHabitDraft,
-    resetHabitDraft
-} from "./habitsDraft.js"
+    renderHabitsPage
+} from "./habitsPage.js"
+
+
+/* =========================================================
+   СТРАНИЦА СОЗДАНИЯ ПРИВЫЧКИ
+   ========================================================= */
+
+import {
+    openAddHabitPage,
+    restoreDraftToAddHabitPage,
+    initAddHabitPageEvents
+} from "./habitMainEmpty/addHabitEvents.js"
+
+
+/* =========================================================
+   ПРОСМОТР ДЕТАЛЕЙ ПРИВЫЧКИ
+   ========================================================= */
+
+import {
+    renderHabitDetailsPage
+} from "./viewHabitDetails/habitDetailsPage.js"
+
+import {
+    initHabitDetailsEvents
+} from "./viewHabitDetails/habitDetailsEvents.js"
+
+
+/* =========================================================
+   STORE
+   ========================================================= */
 
 import {
     getHabits,
     getHabitById,
     getHabitsStatistics,
-    addHabit,
     updateHabit,
     selectHabit,
     setHabitsStatistics
 } from "./habitsStore.js"
 
+
+/* =========================================================
+   ОБЩИЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   ========================================================= */
+
 import {
-    createHabitId,
     addPressAnimation
 } from "./habitsUtils.js"
 
-/* =========================================================
-   СОХРАНЯЕМ ДАННЫЕ ФОРМЫ В ЧЕРНОВИК
-   ========================================================= */
-
-function updateDraftFromAddHabitPage() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
-
-    if (!root) {
-        return
-    }
-
-    const nameInput = root.querySelector(
-        "#add-habit-name"
-    )
-
-    const selectedIcon = root.querySelector(
-        ".add-habit-v2__selected-icon"
-    )
-
-    const selectedColor = root.querySelector(
-        "[data-habit-color].is-selected"
-    )
-
-    const selectedSize = root.querySelector(
-        "[data-habit-size].is-selected"
-    )
-
-    const iconValue =
-        selectedIcon?.textContent?.trim()
-
-    updateHabitDraft({
-        name: nameInput?.value ?? "",
-        icon:
-            iconValue ||
-            getHabitDraftValue("icon"),
-        color:
-            selectedColor?.dataset.habitColor ||
-            getHabitDraftValue("color"),
-        size:
-            selectedSize?.dataset.habitSize ||
-            getHabitDraftValue("size")
-    })
-}
 
 /* =========================================================
-   ВОССТАНАВЛИВАЕМ ЧЕРНОВИК В ФОРМЕ
+   ПОЛОЖЕНИЕ СПИСКА
+
+   Запоминаем прокрутку перед открытием деталей привычки,
+   чтобы после возврата пользователь оказался на прежнем месте.
    ========================================================= */
 
-function restoreDraftToAddHabitPage() {
-    const root = document.getElementById(
+let habitsListScrollTop = 0
+
+
+/* =========================================================
+   ПОЛУЧИТЬ КОРНЕВОЙ КОНТЕЙНЕР
+   ========================================================= */
+
+function getHabitsRoot() {
+    return document.getElementById(
         "habits-v2-root"
     )
-
-    if (!root) {
-        return
-    }
-
-    const draft = getHabitDraft()
-
-    const nameInput = root.querySelector(
-        "#add-habit-name"
-    )
-
-    const selectedIcon = root.querySelector(
-        ".add-habit-v2__selected-icon"
-    )
-
-    const colorButtons = root.querySelectorAll(
-        "[data-habit-color]"
-    )
-
-    const sizeButtons = root.querySelectorAll(
-        "[data-habit-size]"
-    )
-
-    if (nameInput) {
-        nameInput.value = draft.name
-    }
-
-    if (selectedIcon) {
-        selectedIcon.textContent = draft.icon
-    }
-
-    colorButtons.forEach((button) => {
-        const isSelected =
-            button.dataset.habitColor ===
-            draft.color
-
-        button.classList.toggle(
-            "is-selected",
-            isSelected
-        )
-
-        button.setAttribute(
-            "aria-checked",
-            String(isSelected)
-        )
-    })
-
-    sizeButtons.forEach((button) => {
-        const isSelected =
-            button.dataset.habitSize ===
-            draft.size
-
-        button.classList.toggle(
-            "is-selected",
-            isSelected
-        )
-
-        button.setAttribute(
-            "aria-pressed",
-            String(isSelected)
-        )
-    })
 }
+
 
 /* =========================================================
    РЕНДЕР ГЛАВНОЙ СТРАНИЦЫ
 
    preserveScroll:
-   true  — сохраняет текущее положение прокрутки;
-   false — открывает страницу с самого верха.
+   true  — сохраняет текущую прокрутку списка;
+   false — открывает страницу с начала.
    ========================================================= */
 
 function openHabitsPage({
@@ -184,62 +133,27 @@ function openHabitsPage({
     }
 
     requestAnimationFrame(() => {
-        renderedList.scrollTop = savedScrollTop
+        renderedList.scrollTop =
+            savedScrollTop
     })
 }
+
+
 /* =========================================================
    ОТКРЫТИЕ СТРАНИЦЫ СОЗДАНИЯ
+
+   Передаём openHabitsPage в addHabitEvents.js,
+   чтобы форма могла:
+
+   - вернуться назад;
+   - открыть список после сохранения привычки.
    ========================================================= */
 
-function openAddHabitPage({
-    resetDraft = false
-} = {}) {
-    if (resetDraft) {
-        resetHabitDraft()
-    }
-
-    renderAddHabitPage()
-    restoreDraftToAddHabitPage()
-    initAddHabitPageEvents()
-}
-
-
-/* =========================================================
-   СОЗДАНИЕ ПРИВЫЧКИ
-   ========================================================= */
-
-function createHabitFromDraft() {
-    const draft = getHabitDraft()
-    const habitName = draft.name.trim()
-
-    if (!habitName) {
-        return null
-    }
-
-const newHabit = {
-    id: createHabitId(),
-    name: habitName,
-    icon: draft.icon,
-    color: draft.color,
-    size: draft.size,
-
-    completedToday: false,
-    streak: 0,
-    xpReward: 5,
-
-    weekProgress: [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-    ],
-
-    createdAt: new Date().toISOString()
-}
-    return addHabit(newHabit)
+function openNewHabitPage() {
+    openAddHabitPage({
+        resetDraft: true,
+        onOpenHabitsPage: openHabitsPage
+    })
 }
 
 
@@ -248,35 +162,52 @@ const newHabit = {
    ========================================================= */
 
 function initHabitsPageEvents() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
+    const root = getHabitsRoot()
 
     if (!root) {
+        console.warn(
+            "Habits Events: не найден #habits-v2-root"
+        )
+
         return
     }
 
+
+    /* ---------------------------------------------------------
+       КНОПКИ ДОБАВЛЕНИЯ ПРИВЫЧКИ
+
+       Работает и для:
+       - пустой страницы;
+       - страницы со списком привычек.
+       --------------------------------------------------------- */
+
     const addButtons = root.querySelectorAll(
-        '[data-action="open-add-habit"], .habits-v2-empty__add-button'
+        '[data-action="open-add-habit"]'
     )
 
     addButtons.forEach((button) => {
         addPressAnimation(button)
 
-        button.addEventListener("click", () => {
-            openAddHabitPage({
-                resetDraft: true
-            })
-        })
+        button.addEventListener(
+            "click",
+            openNewHabitPage
+        )
     })
+
+
+    /* ---------------------------------------------------------
+       СОБЫТИЯ КАРТОЧЕК
+       --------------------------------------------------------- */
 
     initHabitCardEvents()
 }
 
-/* =========================================================
-   ИНДЕКС СЕГОДНЯШНЕГО ДНЯ В НЕДЕЛЕ
 
-   Массив прогресса строится так:
+/* =========================================================
+   ИНДЕКС СЕГОДНЯШНЕГО ДНЯ
+
+   Индексы массива weekProgress:
+
    0 — понедельник
    1 — вторник
    2 — среда
@@ -287,15 +218,17 @@ function initHabitsPageEvents() {
    ========================================================= */
 
 function getTodayWeekIndex() {
-    const nativeDayIndex = new Date().getDay()
+    const nativeDayIndex =
+        new Date().getDay()
 
     return nativeDayIndex === 0
         ? 6
         : nativeDayIndex - 1
 }
 
+
 /* =========================================================
-   ЛОКАЛЬНОЕ ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ ПРИВЫЧКИ
+   ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ ПРИВЫЧКИ
 
    Первое нажатие:
    - подтверждает привычку;
@@ -310,8 +243,12 @@ function getTodayWeekIndex() {
    - снимает отметку сегодняшнего дня.
    ========================================================= */
 
-function toggleHabitConfirmationLocally(habitId) {
-    const habit = getHabitById(habitId)
+function toggleHabitConfirmationLocally(
+    habitId
+) {
+    const habit = getHabitById(
+        habitId
+    )
 
     if (!habit) {
         return null
@@ -323,29 +260,48 @@ function toggleHabitConfirmationLocally(habitId) {
 
     const xpReward = Math.max(
         0,
-        Math.floor(Number(habit.xpReward) || 5)
+        Math.floor(
+            Number(habit.xpReward) || 5
+        )
     )
 
     const currentStreak = Math.max(
         0,
-        Math.floor(Number(habit.streak) || 0)
+        Math.floor(
+            Number(habit.streak) || 0
+        )
     )
 
     const nextStreak = wasCompleted
-        ? Math.max(0, currentStreak - 1)
+        ? Math.max(
+            0,
+            currentStreak - 1
+        )
         : currentStreak + 1
+
+
+    /* ---------------------------------------------------------
+       ВСЕГДА ФОРМИРУЕМ РОВНО 7 ДНЕЙ
+       --------------------------------------------------------- */
 
     const weekProgress = Array.from(
         {
             length: 7
         },
-        (_, index) => Boolean(
-            habit.weekProgress?.[index]
-        )
+        (_, index) => {
+            return Boolean(
+                habit.weekProgress?.[index]
+            )
+        }
     )
 
     weekProgress[getTodayWeekIndex()] =
         !wasCompleted
+
+
+    /* ---------------------------------------------------------
+       ОБНОВЛЯЕМ ПРИВЫЧКУ
+       --------------------------------------------------------- */
 
     const updatedHabit = updateHabit(
         habitId,
@@ -364,7 +320,13 @@ function toggleHabitConfirmationLocally(habitId) {
         return null
     }
 
-    const statistics = getHabitsStatistics()
+
+    /* ---------------------------------------------------------
+       ОБНОВЛЯЕМ ОБЩИЙ XP
+       --------------------------------------------------------- */
+
+    const statistics =
+        getHabitsStatistics()
 
     const currentTotalXp = Math.max(
         0,
@@ -380,20 +342,39 @@ function toggleHabitConfirmationLocally(habitId) {
         )
         : currentTotalXp + xpReward
 
-    const highestHabitStreak = getHabits()
-        .reduce((highestStreak, storedHabit) => {
-            const storedStreak = Math.max(
-                0,
-                Math.floor(
-                    Number(storedHabit.streak) || 0
-                )
-            )
 
-            return Math.max(
+    /* ---------------------------------------------------------
+       ОПРЕДЕЛЯЕМ САМУЮ ВЫСОКУЮ ТЕКУЩУЮ СЕРИЮ
+       --------------------------------------------------------- */
+
+    const highestHabitStreak = getHabits()
+        .reduce(
+            (
                 highestStreak,
-                storedStreak
-            )
-        }, 0)
+                storedHabit
+            ) => {
+                const storedStreak =
+                    Math.max(
+                        0,
+                        Math.floor(
+                            Number(
+                                storedHabit.streak
+                            ) || 0
+                        )
+                    )
+
+                return Math.max(
+                    highestStreak,
+                    storedStreak
+                )
+            },
+            0
+        )
+
+
+    /* ---------------------------------------------------------
+       СОХРАНЯЕМ СТАТИСТИКУ
+       --------------------------------------------------------- */
 
     setHabitsStatistics({
         totalXp: nextTotalXp,
@@ -403,20 +384,76 @@ function toggleHabitConfirmationLocally(habitId) {
     return updatedHabit
 }
 
+
 /* =========================================================
-   ПОЛОЖЕНИЕ СПИСКА ПЕРЕД ОТКРЫТИЕМ ПРИВЫЧКИ
+   ВОССТАНОВИТЬ ПОЗИЦИЮ СПИСКА
    ========================================================= */
 
-let habitsListScrollTop = 0
+function restoreHabitsListScroll() {
+    const renderedList =
+        document.querySelector(
+            ".habits-v2-list"
+        )
+
+    if (!renderedList) {
+        return
+    }
+
+    requestAnimationFrame(() => {
+        renderedList.scrollTop =
+            habitsListScrollTop
+    })
+}
+
 
 /* =========================================================
-   СОБЫТИЯ КАРТОЧЕК
+   ВОЗВРАТ ИЗ ДЕТАЛЕЙ ПРИВЫЧКИ
+   ========================================================= */
+
+function handleHabitDetailsBack() {
+    openHabitsPage()
+
+    restoreHabitsListScroll()
+}
+
+
+/* =========================================================
+   ОТКРЫТИЕ ДЕТАЛЕЙ ПРИВЫЧКИ
+   ========================================================= */
+
+function openHabitDetails(habitId) {
+    const selectedHabit = selectHabit(
+        habitId
+    )
+
+    if (!selectedHabit) {
+        return
+    }
+
+    const currentList =
+        document.querySelector(
+            ".habits-v2-list"
+        )
+
+    habitsListScrollTop =
+        currentList?.scrollTop || 0
+
+    renderHabitDetailsPage(
+        selectedHabit
+    )
+
+    initHabitDetailsEvents({
+        onBack: handleHabitDetailsBack
+    })
+}
+
+
+/* =========================================================
+   СОБЫТИЯ КАРТОЧЕК ПРИВЫЧЕК
    ========================================================= */
 
 function initHabitCardEvents() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
+    const root = getHabitsRoot()
 
     if (!root) {
         return
@@ -430,16 +467,30 @@ function initHabitCardEvents() {
         const habitId =
             card.dataset.habitId
 
+        if (!habitId) {
+            return
+        }
+
         const confirmButton = card.querySelector(
             '[data-action="confirm-habit"]'
         )
 
 
         /* -----------------------------------------------------
-           НЕ ДАЁМ НАЖАТИЮ НА ГАЛОЧКУ ДОЙТИ ДО КАРТОЧКИ
+           АНИМАЦИИ НАЖАТИЯ
            ----------------------------------------------------- */
 
-        const stopConfirmEvent = (event) => {
+        addPressAnimation(card)
+        addPressAnimation(confirmButton)
+
+
+        /* -----------------------------------------------------
+           НЕ ДАЁМ СОБЫТИЮ ГАЛОЧКИ ДОЙТИ ДО КАРТОЧКИ
+           ----------------------------------------------------- */
+
+        const stopConfirmEvent = (
+            event
+        ) => {
             event.stopPropagation()
         }
 
@@ -471,72 +522,30 @@ function initHabitCardEvents() {
 
 
         /* -----------------------------------------------------
-           АНИМАЦИИ
+           ОТКРЫТИЕ ДЕТАЛЕЙ
            ----------------------------------------------------- */
 
-        addPressAnimation(card)
-        addPressAnimation(confirmButton)
+        card.addEventListener(
+            "click",
+            (event) => {
+                const clickedConfirmButton =
+                    event.target.closest(
+                        '[data-action="confirm-habit"]'
+                    )
+
+                if (clickedConfirmButton) {
+                    return
+                }
+
+                openHabitDetails(
+                    habitId
+                )
+            }
+        )
 
 
         /* -----------------------------------------------------
-           ОТКРЫТИЕ ПРИВЫЧКИ
-           ----------------------------------------------------- */
-
-card.addEventListener(
-    "click",
-    (event) => {
-        const clickedConfirmButton =
-            event.target.closest(
-                '[data-action="confirm-habit"]'
-            )
-
-        if (clickedConfirmButton) {
-            return
-        }
-
-        const selectedHabit =
-            selectHabit(habitId)
-
-        if (!selectedHabit) {
-            return
-        }
-
-        const currentList =
-            document.querySelector(
-                ".habits-v2-list"
-            )
-
-        habitsListScrollTop =
-            currentList?.scrollTop || 0
-
-renderHabitDetailsPage(
-    selectedHabit
-)
-
-initHabitDetailsEvents({
-    onBack: () => {
-        openHabitsPage()
-
-        const renderedList =
-            document.querySelector(
-                ".habits-v2-list"
-            )
-
-        if (!renderedList) {
-            return
-        }
-
-        requestAnimationFrame(() => {
-            renderedList.scrollTop =
-                habitsListScrollTop
-        })
-    }
-})
-    }
-)
-
-        /* -----------------------------------------------------
-           ПЕРЕКЛЮЧЕНИЕ ВЫПОЛНЕНИЯ
+           ПОДТВЕРЖДЕНИЕ ПРИВЫЧКИ
            ----------------------------------------------------- */
 
         confirmButton?.addEventListener(
@@ -561,409 +570,47 @@ initHabitDetailsEvents({
         )
     })
 }
-/* =========================================================
-   СОБЫТИЯ СТРАНИЦЫ СОЗДАНИЯ
-   ========================================================= */
-
-function initAddHabitPageEvents() {
-    const root = document.getElementById("habits-v2-root")
-
-    if (!root) {
-        return
-    }
-
-    const backButton = root.querySelector(
-        '[data-action="close-add-habit"]'
-    )
-
-    const saveButton = root.querySelector(
-        '[data-action="save-habit"]'
-    )
-
-    const iconButton = root.querySelector(
-        '[data-action="open-icon-picker"]'
-    )
-
-    const nameInput = root.querySelector(
-        "#add-habit-name"
-    )
-
-    const suggestionButtons = root.querySelectorAll(
-        "[data-habit-suggestion]"
-    )
-
-    const colorButtons = root.querySelectorAll(
-        "[data-habit-color]"
-    )
-
-    const sizeButtons = root.querySelectorAll(
-        "[data-habit-size]"
-    )
-
-
-    /* ---------------------------------------------------------
-       АНИМАЦИИ
-       --------------------------------------------------------- */
-
-    addPressAnimation(backButton)
-    addPressAnimation(saveButton)
-    addPressAnimation(iconButton)
-
-    suggestionButtons.forEach((button) => {
-        addPressAnimation(button)
-    })
-
-    colorButtons.forEach((button) => {
-        addPressAnimation(button)
-    })
-
-    sizeButtons.forEach((button) => {
-        addPressAnimation(button)
-    })
-
-
-    /* ---------------------------------------------------------
-       НАЗВАНИЕ ПРИВЫЧКИ
-       --------------------------------------------------------- */
-
-    nameInput?.addEventListener("input", () => {
-        setHabitDraftValue(
-            "name",
-            nameInput.value
-        )
-
-        const nameField = nameInput.closest(
-            ".add-habit-v2__name-field"
-        )
-
-        nameField?.classList.remove("has-error")
-    })
-
-
-    /* ---------------------------------------------------------
-       ВОЗВРАТ НА ГЛАВНУЮ
-       --------------------------------------------------------- */
-
-    backButton?.addEventListener("click", () => {
-        resetHabitDraft()
-        openHabitsPage()
-    })
-
-
-    /* ---------------------------------------------------------
-       ОТКРЫТИЕ ВЫБОРА ИКОНКИ
-       --------------------------------------------------------- */
-
-    iconButton?.addEventListener("click", () => {
-        updateDraftFromAddHabitPage()
-
-        renderIconPickerPage(
-            getHabitDraftValue("icon")
-        )
-        initIconPickerEvents()
-    })
-
-
-    /* ---------------------------------------------------------
-       БЫСТРЫЕ НАЗВАНИЯ
-       --------------------------------------------------------- */
-
-    suggestionButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            if (!nameInput) {
-                return
-            }
-
-            const suggestion =
-                button.dataset.habitSuggestion || ""
-
-            nameInput.value = suggestion
-            setHabitDraftValue(
-                "name",
-                suggestion
-            )
-
-            nameInput.focus()
-
-            nameInput.dispatchEvent(
-                new Event("input", {
-                    bubbles: true
-                })
-            )
-        })
-    })
-
-
-    /* ---------------------------------------------------------
-       ВЫБОР ЦВЕТА
-       --------------------------------------------------------- */
-
-    colorButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const isLocked =
-                button.dataset.locked === "true"
-
-            if (isLocked) {
-                console.log(
-                    "Этот цвет доступен только с Premium"
-                )
-
-                return
-            }
-
-            colorButtons.forEach((colorButton) => {
-                colorButton.classList.remove(
-                    "is-selected"
-                )
-
-                colorButton.setAttribute(
-                    "aria-checked",
-                    "false"
-                )
-            })
-
-            button.classList.add("is-selected")
-
-            button.setAttribute(
-                "aria-checked",
-                "true"
-            )
-
-            setHabitDraftValue(
-                "color",
-                button.dataset.habitColor || "blue"
-            )
-        })
-    })
-
-
-    /* ---------------------------------------------------------
-       ВЫБОР РАЗМЕРА
-       --------------------------------------------------------- */
-
-    sizeButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            sizeButtons.forEach((sizeButton) => {
-                sizeButton.classList.remove(
-                    "is-selected"
-                )
-
-                sizeButton.setAttribute(
-                    "aria-pressed",
-                    "false"
-                )
-            })
-
-            button.classList.add("is-selected")
-
-            button.setAttribute(
-                "aria-pressed",
-                "true"
-            )
-
-            setHabitDraftValue(
-                "size",
-                button.dataset.habitSize || "large"
-            )
-        })
-    })
-
-
-    /* ---------------------------------------------------------
-       СОХРАНЕНИЕ ПРИВЫЧКИ
-       --------------------------------------------------------- */
-
-    saveButton?.addEventListener("click", () => {
-        updateDraftFromAddHabitPage()
-
-        const habitName =
-            getHabitDraftValue("name").trim()
-
-        if (!habitName) {
-            const nameField = nameInput?.closest(
-                ".add-habit-v2__name-field"
-            )
-
-            nameInput?.focus()
-            nameField?.classList.add("has-error")
-
-            window.setTimeout(() => {
-                nameField?.classList.remove(
-                    "has-error"
-                )
-            }, 450)
-
-            return
-        }
-
-        const newHabit =
-            createHabitFromDraft()
-
-        if (!newHabit) {
-            return
-        }
-
-        console.log(
-            "Новая привычка:",
-            newHabit
-        )
-
-        resetHabitDraft()
-        openHabitsPage()
-    })
-}
-
-
-function initIconPickerEvents() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
-
-    if (!root) {
-        return
-    }
-
-    const backButton = root.querySelector(
-        '[data-action="close-icon-picker"]'
-    )
-
-    const confirmButton = root.querySelector(
-        '[data-action="confirm-habit-icon"]'
-    )
-
-    const iconButtons = root.querySelectorAll(
-        "[data-habit-icon]"
-    )
-
-
-    /* ---------------------------------------------------------
-       ВРЕМЕННО ВЫБРАННАЯ ИКОНКА
-
-       Она не записывается в черновик, пока пользователь
-       не нажмёт кнопку «Выбрать».
-       --------------------------------------------------------- */
-
-    let pendingIcon =
-        getHabitDraftValue("icon")
-
-
-    /* ---------------------------------------------------------
-       АНИМАЦИИ
-       --------------------------------------------------------- */
-
-    addPressAnimation(backButton)
-    addPressAnimation(confirmButton)
-
-    iconButtons.forEach((button) => {
-        addPressAnimation(button)
-    })
-
-
-    /* ---------------------------------------------------------
-       ВОЗВРАТ БЕЗ СОХРАНЕНИЯ
-       --------------------------------------------------------- */
-
-    backButton?.addEventListener("click", () => {
-        openAddHabitPage()
-    })
-
-
-    /* ---------------------------------------------------------
-       ВРЕМЕННЫЙ ВЫБОР ИКОНКИ
-       --------------------------------------------------------- */
-
-    iconButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            iconButtons.forEach((iconButton) => {
-                iconButton.classList.remove(
-                    "is-selected"
-                )
-
-                iconButton.setAttribute(
-                    "aria-pressed",
-                    "false"
-                )
-            })
-
-            button.classList.add("is-selected")
-
-            button.setAttribute(
-                "aria-pressed",
-                "true"
-            )
-
-            pendingIcon =
-                button.dataset.habitIcon || "✱"
-        })
-    })
-
-
-    /* ---------------------------------------------------------
-       ПОДТВЕРЖДЕНИЕ ИКОНКИ
-       Только здесь записываем её в черновик.
-       --------------------------------------------------------- */
-
-    confirmButton?.addEventListener("click", () => {
-        setHabitDraftValue(
-            "icon",
-            pendingIcon
-        )
-
-        openAddHabitPage()
-    })
-}
-
 
 
 /* =========================================================
-   ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
+   ОБЩАЯ ИНИЦИАЛИЗАЦИЯ РАЗДЕЛА
    ========================================================= */
 
 export function initHabitsEvents() {
-    const root = document.getElementById(
-        "habits-v2-root"
-    )
+    const root = getHabitsRoot()
 
     if (!root) {
+        console.warn(
+            "Habits Events: не найден #habits-v2-root"
+        )
+
         return
     }
+
+
+    /* ---------------------------------------------------------
+       ЕСЛИ УЖЕ ОТКРЫТА СТРАНИЦА ДЕТАЛЕЙ
+       --------------------------------------------------------- */
 
     const habitDetailsPage = root.querySelector(
         ".habit-details"
     )
 
-if (habitDetailsPage) {
-    initHabitDetailsEvents({
-        onBack: () => {
-            openHabitsPage()
+    if (habitDetailsPage) {
+        initHabitDetailsEvents({
+            onBack: handleHabitDetailsBack
+        })
 
-            const renderedList =
-                document.querySelector(
-                    ".habits-v2-list"
-                )
-
-            if (!renderedList) {
-                return
-            }
-
-            requestAnimationFrame(() => {
-                renderedList.scrollTop =
-                    habitsListScrollTop
-            })
-        }
-    })
-
-    return
-}
-
-    const iconPickerPage = root.querySelector(
-        ".habit-icon-picker"
-    )
-
-    if (iconPickerPage) {
-        initIconPickerEvents()
         return
     }
+
+
+    /* ---------------------------------------------------------
+       ЕСЛИ УЖЕ ОТКРЫТА СТРАНИЦА СОЗДАНИЯ
+
+       Например, initHabitsEvents вызвали повторно после
+       повторной инициализации приложения.
+       --------------------------------------------------------- */
 
     const addHabitPage = root.querySelector(
         ".add-habit-v2"
@@ -971,19 +618,23 @@ if (habitDetailsPage) {
 
     if (addHabitPage) {
         restoreDraftToAddHabitPage()
-        initAddHabitPageEvents()
+
+        initAddHabitPageEvents({
+            onOpenHabitsPage:
+                openHabitsPage
+        })
+
         return
     }
 
-    /*
-     * При первом открытии страницы передаём
-     * текущий массив привычек.
-     */
 
-    renderHabitsPage(
-        getHabits(),
-        getHabitsStatistics()
-    )
+    /* ---------------------------------------------------------
+       ГЛАВНАЯ СТРАНИЦА
 
-    initHabitsPageEvents()
-    }
+       При первом запуске рендерим:
+       - пустой экран, если привычек нет;
+       - список, если привычки существуют.
+       --------------------------------------------------------- */
+
+    openHabitsPage()
+}
