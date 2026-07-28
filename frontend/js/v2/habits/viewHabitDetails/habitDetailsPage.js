@@ -2,8 +2,180 @@ import {
     escapeHabitDetailsHtml,
     normalizeHabitDetailsNumber,
     formatHabitDetailsDays,
-    getHabitDuration
+    getHabitDuration,
+    createHabitDetailsCalendar
 } from "./habitDetailsUtils.js"
+
+
+/* =========================================================
+   ДНИ НЕДЕЛИ
+   ========================================================= */
+
+const HABIT_DETAILS_WEEK_DAYS = [
+    "Пн",
+    "Вт",
+    "Ср",
+    "Чт",
+    "Пт",
+    "Сб",
+    "Вс"
+]
+
+
+/* =========================================================
+   РЕНДЕР ДНЕЙ НЕДЕЛИ
+   ========================================================= */
+
+function renderHabitCalendarWeekDays() {
+    return HABIT_DETAILS_WEEK_DAYS
+        .map(
+            (dayName) => `
+                <div
+                    class="habit-calendar__weekday"
+                    aria-hidden="true"
+                >
+                    ${dayName}
+                </div>
+            `
+        )
+        .join("")
+}
+
+
+/* =========================================================
+   РЕНДЕР ЯЧЕЙКИ КАЛЕНДАРЯ
+   ========================================================= */
+
+function renderHabitCalendarCell(cell) {
+    if (cell.type === "empty") {
+        return `
+            <div
+                class="
+                    habit-calendar__day
+                    habit-calendar__day--empty
+                "
+                aria-hidden="true"
+            ></div>
+        `
+    }
+
+    const classNames = [
+        "habit-calendar__day"
+    ]
+
+    if (cell.isCompleted) {
+        classNames.push(
+            "habit-calendar__day--completed"
+        )
+    }
+
+    if (cell.isToday) {
+        classNames.push(
+            "habit-calendar__day--today"
+        )
+    }
+
+    if (cell.isBeforeCreated) {
+        classNames.push(
+            "habit-calendar__day--before-created"
+        )
+    }
+
+    if (cell.isFuture) {
+        classNames.push(
+            "habit-calendar__day--future"
+        )
+    }
+
+    const stateLabel = []
+
+    if (cell.isCompleted) {
+        stateLabel.push("выполнено")
+    }
+
+    if (cell.isToday) {
+        stateLabel.push("сегодня")
+    }
+
+    if (cell.isBeforeCreated) {
+        stateLabel.push(
+            "до создания привычки"
+        )
+    }
+
+    if (cell.isFuture) {
+        stateLabel.push("будущий день")
+    }
+
+    const ariaLabel = stateLabel.length
+        ? `${cell.day}, ${stateLabel.join(", ")}`
+        : String(cell.day)
+
+    return `
+        <div
+            class="${classNames.join(" ")}"
+            data-date="${cell.dateKey}"
+            aria-label="${ariaLabel}"
+        >
+            <span class="habit-calendar__day-number">
+                ${cell.day}
+            </span>
+
+            ${
+                cell.isToday
+                    ? `
+                        <span
+                            class="habit-calendar__today-dot"
+                            aria-hidden="true"
+                        ></span>
+                    `
+                    : ""
+            }
+        </div>
+    `
+}
+
+
+/* =========================================================
+   РЕНДЕР КАЛЕНДАРЯ
+   ========================================================= */
+
+function renderHabitCalendar({
+    completedDates,
+    createdAt
+}) {
+    const calendar =
+        createHabitDetailsCalendar({
+            completedDates,
+            createdAt
+        })
+
+    const cellsHtml =
+        calendar.cells
+            .map(renderHabitCalendarCell)
+            .join("")
+
+    return `
+        <section
+            class="habit-details__calendar"
+            aria-label="Календарь привычки"
+        >
+
+            <h2 class="habit-calendar__month">
+                ${calendar.monthName}
+            </h2>
+
+            <div class="habit-calendar__weekdays">
+                ${renderHabitCalendarWeekDays()}
+            </div>
+
+            <div class="habit-calendar__grid">
+                ${cellsHtml}
+            </div>
+
+        </section>
+    `
+}
 
 
 /* =========================================================
@@ -29,7 +201,16 @@ export function renderHabitDetailsPage(habit = {}) {
         completedToday = false,
         streak = 0,
         xpReward = 5,
-        createdAt = null
+        createdAt = null,
+
+        /*
+           Пока API нет.
+
+           completedDates временно приходит
+           из локального объекта привычки / Store.
+        */
+
+        completedDates = []
     } = habit
 
     const safeId =
@@ -56,6 +237,12 @@ export function renderHabitDetailsPage(habit = {}) {
     const statusText = completedToday
         ? `Выполнено +${normalizedXpReward} XP`
         : "В процессе"
+
+    const calendarHtml =
+        renderHabitCalendar({
+            completedDates,
+            createdAt
+        })
 
     root.innerHTML = `
         <section
@@ -160,19 +347,7 @@ export function renderHabitDetailsPage(habit = {}) {
                 </section>
 
 
-                <section
-                    class="habit-details__calendar-placeholder"
-                >
-
-                    <h2 class="habit-details__section-title">
-                        Календарь
-                    </h2>
-
-                    <div class="habit-details__calendar-empty">
-                        Календарь добавим следующим шагом
-                    </div>
-
-                </section>
+                ${calendarHtml}
 
             </main>
 
