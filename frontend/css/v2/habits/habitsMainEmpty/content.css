@@ -1,0 +1,88 @@
+/* =========================================================
+   ДАТА
+   ========================================================= */
+
+.habits-v2-empty__date {
+    margin: 0 0 24px;
+
+    color: var(--habits-v2-muted);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ОСНОВНОЙ ЗАГОЛОВОК
+   ========================================================= */
+
+.habits-v2-empty__title {
+    margin: 0;
+
+    color: var(--habits-v2-text);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+/* =========================================================
+   ПОДЗАГОЛОВОК
+   ========================================================= */
+
+.habits-v2-empty__subtitle {
+    margin: 5px 0 0;
+
+    color: var(--habits-v2-muted);
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 33px;
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+
+    white-space: nowrap;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}

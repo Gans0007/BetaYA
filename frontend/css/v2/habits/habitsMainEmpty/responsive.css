@@ -1,0 +1,140 @@
+/* =========================================================
+   HABITS MAIN EMPTY — АДАПТИВНЫЕ СТИЛИ
+   ========================================================= */
+
+
+/* =========================================================
+   СРЕДНИЕ И БОЛЬШИЕ ТЕЛЕФОНЫ
+   ========================================================= */
+
+@media (min-width: 431px) {
+
+    .habits-v2-empty__content {
+        max-width: 430px;
+
+        transform: translateY(20px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 26px;
+
+        font-size: 19px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 36px;
+    }
+
+    .habits-v2-empty__subtitle {
+        font-size: 35px;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 102px;
+        height: 102px;
+
+        margin-top: 58px;
+
+        font-size: 59px;
+    }
+}
+
+
+/* =========================================================
+   УЗКИЕ ТЕЛЕФОНЫ
+   ========================================================= */
+
+@media (max-width: 370px) {
+
+    .habits-v2-empty {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .habits-v2-empty__content {
+        max-width: 350px;
+
+        transform: translateY(18px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 21px;
+
+        font-size: 17px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 30px;
+    }
+
+    .habits-v2-empty__subtitle {
+        margin-top: 4px;
+
+        font-size: 29px;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 88px;
+        height: 88px;
+
+        margin-top: 46px;
+        padding-bottom: 5px;
+
+        font-size: 51px;
+    }
+}
+
+
+/* =========================================================
+   НИЗКИЕ ЭКРАНЫ TELEGRAM
+   ========================================================= */
+
+@media (max-height: 720px) {
+
+    .habits-v2-empty__content {
+        transform: translateY(8px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 18px;
+    }
+
+    .habits-v2-empty__add-button {
+        margin-top: 40px;
+    }
+}
+
+
+/* =========================================================
+   СОВСЕМ НИЗКИЕ ЭКРАНЫ
+   ========================================================= */
+
+@media (max-height: 620px) {
+
+    .habits-v2-empty__content {
+        transform: translateY(2px);
+    }
+
+    .habits-v2-empty__date {
+        margin-bottom: 15px;
+
+        font-size: 16px;
+    }
+
+    .habits-v2-empty__title {
+        font-size: 29px;
+    }
+
+    .habits-v2-empty__subtitle {
+        font-size: 28px;
+    }
+
+    .habits-v2-empty__add-button {
+        width: 82px;
+        height: 82px;
+
+        margin-top: 34px;
+
+        font-size: 48px;
+    }
+}
