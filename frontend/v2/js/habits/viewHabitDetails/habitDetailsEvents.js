@@ -2,6 +2,11 @@ import {
     addPressAnimation
 } from "../habitsUtils.js"
 
+import {
+    initHabitDetailsMenu,
+    destroyHabitDetailsMenu
+} from "./habitDetailsMenu.js"
+
 
 /* =========================================================
    HABIT DETAILS EVENTS
@@ -25,7 +30,7 @@ export function initHabitDetailsEvents({
     )
 
     const menuButton = root.querySelector(
-        '[data-action="open-habit-menu"]'
+        '[data-action="toggle-habit-menu"]'
     )
 
 
@@ -38,32 +43,24 @@ export function initHabitDetailsEvents({
 
 
     /* =========================================================
+       МЕНЮ
+       ========================================================= */
+
+    initHabitDetailsMenu(root)
+
+
+    /* =========================================================
        ВОЗВРАТ К СПИСКУ
        ========================================================= */
 
     backButton?.addEventListener(
         "click",
         () => {
+            destroyHabitDetailsMenu()
+
             if (typeof onBack === "function") {
                 onBack()
             }
-        }
-    )
-
-
-    /* =========================================================
-       МЕНЮ
-
-       Пока только заглушка.
-       Реальную логику добавим, когда начнём меню.
-       ========================================================= */
-
-    menuButton?.addEventListener(
-        "click",
-        () => {
-            console.log(
-                "Открыть меню привычки"
-            )
         }
     )
 }

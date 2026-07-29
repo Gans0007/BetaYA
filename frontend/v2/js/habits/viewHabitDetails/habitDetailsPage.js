@@ -288,14 +288,86 @@ const calendarHtml =
     </span>
 </button>
 
-<button
-    class="habit-details__menu-button"
-    type="button"
-    data-action="open-habit-menu"
-    aria-label="Открыть меню привычки"
->
-    ⋯
-</button>
+<div class="habit-details__menu-wrapper">
+
+    <button
+        class="habit-details__menu-button"
+        type="button"
+        data-action="toggle-habit-menu"
+        aria-label="Открыть меню привычки"
+        aria-expanded="false"
+        aria-controls="habit-details-menu"
+    >
+        ⋯
+    </button>
+
+    <div
+        id="habit-details-menu"
+        class="habit-details__menu"
+        role="menu"
+        aria-hidden="true"
+    >
+
+        <button
+            class="habit-details__menu-item"
+            type="button"
+            data-action="confirm-habit"
+            role="menuitem"
+        >
+            <span
+                class="material-symbols-rounded habit-details__menu-icon"
+                aria-hidden="true"
+            >
+                check_circle
+            </span>
+
+            <span>
+                Подтвердить
+            </span>
+        </button>
+
+        <button
+            class="habit-details__menu-item"
+            type="button"
+            data-action="edit-habit"
+            role="menuitem"
+        >
+            <span
+                class="material-symbols-rounded habit-details__menu-icon"
+                aria-hidden="true"
+            >
+                edit
+            </span>
+
+            <span>
+                Редактировать
+            </span>
+        </button>
+
+        <button
+            class="
+                habit-details__menu-item
+                habit-details__menu-item--danger
+            "
+            type="button"
+            data-action="delete-habit"
+            role="menuitem"
+        >
+            <span
+                class="material-symbols-rounded habit-details__menu-icon"
+                aria-hidden="true"
+            >
+                delete
+            </span>
+
+            <span>
+                Удалить
+            </span>
+        </button>
+
+    </div>
+
+</div>
 
             </header>
 

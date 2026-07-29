@@ -76,3 +76,218 @@
     font-weight: 600;
     line-height: 1;
 }
+
+/* =========================================================
+   ОБЁРТКА МЕНЮ
+========================================================= */
+
+.habit-details__menu-wrapper {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================================================
+   ВЫПАДАЮЩЕЕ МЕНЮ
+========================================================= */
+
+.habit-details__menu {
+    position: absolute;
+    z-index: 20;
+
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 210px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.74);
+    border-radius: 22px;
+
+    background:
+        rgba(31, 33, 29, 0.94);
+
+    box-shadow:
+        0 18px 45px rgba(24, 28, 22, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    opacity: 0;
+    visibility: hidden;
+
+    transform:
+        translateY(-6px)
+        scale(0.96);
+
+    transform-origin: top right;
+
+    pointer-events: none;
+
+    transition:
+        opacity 160ms ease,
+        visibility 160ms ease,
+        transform 160ms ease;
+}
+
+
+/* Открытое состояние */
+
+.habit-details__menu.is-open {
+    opacity: 1;
+    visibility: visible;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   ПУНКТ МЕНЮ
+========================================================= */
+
+.habit-details__menu-item {
+    width: 100%;
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    margin: 0;
+    padding: 10px 12px;
+
+    border: none;
+    border-radius: 15px;
+    outline: none;
+
+    color: rgba(255, 255, 255, 0.92);
+
+    background: transparent;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        Inter,
+        Arial,
+        sans-serif;
+
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-align: left;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        background 100ms ease,
+        transform 100ms ease,
+        opacity 100ms ease;
+}
+
+
+.habit-details__menu-item:active {
+    transform: scale(0.97);
+
+    background:
+        rgba(255, 255, 255, 0.09);
+}
+
+
+/* =========================================================
+   ИКОНКИ МЕНЮ
+========================================================= */
+
+.habit-details__menu-icon {
+    width: 24px;
+    height: 24px;
+
+    flex: 0 0 24px;
+
+    font-size: 22px;
+
+    color: currentColor;
+
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 450,
+        "GRAD" 0,
+        "opsz" 24;
+}
+
+
+/* =========================================================
+   УДАЛЕНИЕ
+========================================================= */
+
+.habit-details__menu-item--danger {
+    color: #ff6969;
+}
+
+
+/* =========================================================
+   УСТРОЙСТВА С МЫШЬЮ
+========================================================= */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .habit-details__menu-item:hover {
+        background:
+            rgba(255, 255, 255, 0.08);
+    }
+
+    .habit-details__menu-item--danger:hover {
+        background:
+            rgba(255, 84, 84, 0.1);
+    }
+}
+
+
+/* =========================================================
+   МАЛЕНЬКИЕ ЭКРАНЫ
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .habit-details__menu {
+        width: 200px;
+
+        border-radius: 20px;
+    }
+
+    .habit-details__menu-item {
+        min-height: 46px;
+
+        font-size: 15px;
+    }
+}
+
+
+/* =========================================================
+   ОТКЛЮЧЕНИЕ АНИМАЦИЙ
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .habit-details__menu,
+    .habit-details__menu-item {
+        transition: none;
+    }
+}
