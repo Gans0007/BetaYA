@@ -184,11 +184,11 @@
         sans-serif;
 
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.25;
 
     letter-spacing:
-        -0.035em;
+        -0.025em;
 
     text-wrap: balance;
 }

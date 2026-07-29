@@ -302,11 +302,9 @@ export function openHabitDeleteConfirm({
        ПОКАЗЫВАЕМ С АНИМАЦИЕЙ
        --------------------------------------------------------- */
 
-    requestAnimationFrame(() => {
-        modal.classList.add(
-            "is-visible"
-        )
+modal.classList.add(
+    "is-visible"
+)
 
-        deleteButton?.focus()
-    })
+deleteButton?.focus()
 }
