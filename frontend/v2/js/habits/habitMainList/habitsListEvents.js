@@ -33,6 +33,10 @@ import {
     openHabitDetailsMenu
 } from "../viewHabitDetails/habitDetailsMenu.js"
 
+import {
+    openHabitDeleteConfirm
+} from "../viewHabitDetails/habitDeleteConfirm.js"
+
 
 /* =========================================================
    СТРАНИЦА РЕДАКТИРОВАНИЯ
@@ -598,12 +602,25 @@ function initCurrentHabitDetailsEvents(
         },
 
         onDelete: () => {
-            handleHabitDetailsDelete(
-                habitId,
-                {
-                    onOpenHabitsPage
+            openHabitDeleteConfirm({
+                onDelete: () => {
+                    handleHabitDetailsDelete(
+                        habitId,
+                        {
+                            onOpenHabitsPage
+                        }
+                    )
+                },
+
+                onKeep: () => {
+                    refreshHabitDetails(
+                        habitId,
+                        {
+                            onOpenHabitsPage
+                        }
+                    )
                 }
-            )
+            })
         }
     })
 }
