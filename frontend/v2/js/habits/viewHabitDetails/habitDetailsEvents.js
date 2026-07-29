@@ -4,7 +4,6 @@ import {
 
 import {
     initHabitDetailsMenu,
-    closeHabitDetailsMenu,
     destroyHabitDetailsMenu
 } from "./habitDetailsMenu.js"
 
@@ -101,10 +100,10 @@ export function initHabitDetailsEvents({
     /* =========================================================
        ПОДТВЕРЖДЕНИЕ / СНЯТИЕ ПОДТВЕРЖДЕНИЯ
 
-       Сам файл не изменяет Store.
+       Меню здесь не закрываем.
 
-       Он только сообщает внешней логике,
-       что пользователь нажал кнопку подтверждения.
+       После обновления страницы внешняя логика
+       заново откроет меню на новом DOM.
        ========================================================= */
 
     confirmButton?.addEventListener(
@@ -112,8 +111,6 @@ export function initHabitDetailsEvents({
         (event) => {
             event.preventDefault()
             event.stopPropagation()
-
-            closeHabitDetailsMenu(root)
 
             if (typeof onConfirm !== "function") {
                 console.warn(
@@ -123,7 +120,9 @@ export function initHabitDetailsEvents({
                 return
             }
 
-            onConfirm()
+            onConfirm({
+                keepMenuOpen: true
+            })
         }
     )
 }

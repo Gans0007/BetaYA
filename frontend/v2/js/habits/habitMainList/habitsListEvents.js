@@ -29,6 +29,10 @@ import {
     initHabitDetailsEvents
 } from "../viewHabitDetails/habitDetailsEvents.js"
 
+import {
+    openHabitDetailsMenu
+} from "../viewHabitDetails/habitDetailsMenu.js"
+
 
 /* =========================================================
    STORE
@@ -392,17 +396,19 @@ function initCurrentHabitDetailsEvents(
             )
         },
 
-        onConfirm: () => {
+        onConfirm: ({
+            keepMenuOpen = false
+        } = {}) => {
             handleHabitDetailsConfirmation(
                 habitId,
                 {
-                    onOpenHabitsPage
+                    onOpenHabitsPage,
+                    keepMenuOpen
                 }
             )
         }
     })
 }
-
 
 /* =========================================================
    ПЕРЕРИСОВАТЬ ДЕТАЛЬНУЮ СТРАНИЦУ
@@ -410,13 +416,15 @@ function initCurrentHabitDetailsEvents(
    После изменения Store:
    - получает свежую привычку;
    - заново рисует детали;
-   - заново подключает события.
+   - заново подключает события;
+   - при необходимости заново открывает меню.
    ========================================================= */
 
 function refreshHabitDetails(
     habitId,
     {
-        onOpenHabitsPage = null
+        onOpenHabitsPage = null,
+        keepMenuOpen = false
     } = {}
 ) {
     const updatedHabit = getHabitById(
@@ -441,9 +449,23 @@ function refreshHabitDetails(
             onOpenHabitsPage
         }
     )
+
+
+    /* ---------------------------------------------------------
+       ВОЗВРАЩАЕМ МЕНЮ В ОТКРЫТОЕ СОСТОЯНИЕ
+
+       renderHabitDetailsPage заменяет старый DOM,
+       поэтому открываем уже новое меню.
+       --------------------------------------------------------- */
+
+    if (keepMenuOpen) {
+        const root = getHabitsRoot()
+
+        requestAnimationFrame(() => {
+            openHabitDetailsMenu(root)
+        })
+    }
 }
-
-
 /* =========================================================
    ПОДТВЕРЖДЕНИЕ ИЗ ДЕТАЛЬНОЙ СТРАНИЦЫ
 
@@ -451,10 +473,20 @@ function refreshHabitDetails(
    которая используется в карточке списка.
    ========================================================= */
 
+/* =========================================================
+   ПОДТВЕРЖДЕНИЕ ИЗ ДЕТАЛЬНОЙ СТРАНИЦЫ
+
+   Использует ту же функцию подтверждения,
+   которая используется в карточке списка.
+
+   После обновления меню остаётся открытым.
+   ========================================================= */
+
 function handleHabitDetailsConfirmation(
     habitId,
     {
-        onOpenHabitsPage = null
+        onOpenHabitsPage = null,
+        keepMenuOpen = false
     } = {}
 ) {
     const updatedHabit =
@@ -469,12 +501,11 @@ function handleHabitDetailsConfirmation(
     refreshHabitDetails(
         habitId,
         {
-            onOpenHabitsPage
+            onOpenHabitsPage,
+            keepMenuOpen
         }
     )
 }
-
-
 /* =========================================================
    ОТКРЫТЬ ДЕТАЛИ ПРИВЫЧКИ
    ========================================================= */
