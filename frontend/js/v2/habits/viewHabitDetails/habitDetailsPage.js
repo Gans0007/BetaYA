@@ -280,13 +280,12 @@ const calendarHtml =
     data-action="close-habit-details"
     aria-label="Вернуться к привычкам"
 >
-    <span
-        class="material-symbols-rounded"
-        aria-hidden="true"
-    >
-        arrow_back_ios_new
-    </span>
-</button>
+<span
+    class="material-symbols-rounded back-icon"
+    aria-hidden="true"
+>
+    arrow_back_ios_new
+</span>
 
                 <button
                     class="habit-details__menu-button"
