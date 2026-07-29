@@ -38,16 +38,19 @@ export function renderAddHabitPage() {
                     Новая привычка
                 </h1>
 
-                <button
-                    class="add-habit-v2__save-button"
-                    type="button"
-                    data-action="save-habit"
-                    aria-label="Сохранить привычку"
-                >
-                    <span class="add-habit-v2__save-icon" aria-hidden="true">
-                        ✓
-                    </span>
-                </button>
+<button
+    class="add-habit-v2__save-button"
+    type="button"
+    data-action="save-habit"
+    aria-label="Сохранить привычку"
+>
+    <span
+        class="material-symbols-rounded save-icon"
+        aria-hidden="true"
+    >
+        check
+    </span>
+</button>
 
             </header>
 

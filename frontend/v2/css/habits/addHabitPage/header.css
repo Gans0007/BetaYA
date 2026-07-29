@@ -92,14 +92,6 @@
         box-shadow 90ms ease;
 }
 
-
-.add-habit-v2__save-icon {
-    font-size: 28px;
-    font-weight: 450;
-    line-height: 1;
-}
-
-
 .add-habit-v2__save-button:active,
 .add-habit-v2__save-button.is-pressed {
     transform: scale(0.9);
