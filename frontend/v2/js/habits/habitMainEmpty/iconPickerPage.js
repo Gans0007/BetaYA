@@ -142,17 +142,17 @@ export function renderIconPickerPage(
 <header class="habit-icon-picker__header">
 
     <button
-        class="habit-icon-picker__back-button"
+        class="habit-icon-picker__back-button back-button"
         type="button"
         data-action="close-icon-picker"
         aria-label="Вернуться к созданию привычки"
     >
-        <span
-            class="habit-icon-picker__back-icon"
-            aria-hidden="true"
-        >
-            ‹
-        </span>
+<span
+    class="material-symbols-rounded back-icon"
+    aria-hidden="true"
+>
+    arrow_back_ios_new
+</span>
     </button>
 
     <h1 class="habit-icon-picker__title">
