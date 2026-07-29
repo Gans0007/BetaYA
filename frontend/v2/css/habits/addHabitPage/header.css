@@ -20,61 +20,6 @@
     margin-bottom: 24px;
 }
 
-
-/* =========================================================
-   КНОПКА НАЗАД
-========================================================= */
-
-.add-habit-v2__back-button {
-    width: 44px;
-    height: 44px;
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-
-    margin: 0;
-    padding: 0;
-
-    border: none;
-    outline: none;
-
-    color: #303238;
-    background: transparent;
-
-    cursor: pointer;
-    user-select: none;
-
-    appearance: none;
-    -webkit-appearance: none;
-    -webkit-tap-highlight-color: transparent;
-
-    touch-action: manipulation;
-
-    transition:
-        transform 90ms ease,
-        opacity 90ms ease;
-}
-
-
-.add-habit-v2__back-icon {
-    display: block;
-
-    font-size: 51px;
-    font-weight: 300;
-    line-height: 0.75;
-
-    transform: translateY(-2px);
-}
-
-
-.add-habit-v2__back-button:active,
-.add-habit-v2__back-button.is-pressed {
-    transform: scale(0.88);
-    opacity: 0.65;
-}
-
-
 /* =========================================================
    ЗАГОЛОВОК
 ========================================================= */

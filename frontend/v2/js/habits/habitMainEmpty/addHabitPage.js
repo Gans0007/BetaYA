@@ -26,9 +26,12 @@ export function renderAddHabitPage() {
                     data-action="close-add-habit"
                     aria-label="Вернуться к привычкам"
                 >
-                    <span class="add-habit-v2__back-icon" aria-hidden="true">
-                        ‹
-                    </span>
+<span
+    class="material-symbols-rounded back-icon"
+    aria-hidden="true"
+>
+    arrow_back_ios_new
+</span>
                 </button>
 
                 <h1 class="add-habit-v2__title">

@@ -51,20 +51,3 @@
 
     background: transparent;
 }
-
-
-/* =========================================================
-   СКРЫТИЕ СТАРОГО ИГРОВОГО HEADER
-   ========================================================= */
-
-#game-root:has(#habits-v2-page.active) #header-root {
-    display: none !important;
-}
-
-
-#game-root:has(#habits-v2-page.active) {
-    min-height: 100dvh;
-
-    margin: 0;
-    padding: 0;
-}

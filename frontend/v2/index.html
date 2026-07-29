@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="
+            width=device-width,
+            initial-scale=1.0,
+            maximum-scale=1.0,
+            user-scalable=no,
+            viewport-fit=cover
+        "
+    >
+
+    <meta
+        name="theme-color"
+        content="#F8F9FB"
+    >
+
+    <title>Your Ambitions</title>
+
+
+    <!-- =====================================================
+    HABITS V2 — ОБЩАЯ ОБОЛОЧКА
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/habits.css"
+    >
+
+
+    <!-- =====================================================
+    HABITS V2 — ПУСТАЯ ГЛАВНАЯ СТРАНИЦА
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/habitsMainEmpty/habitsMain.css"
+    >
+
+
+    <!-- =====================================================
+    HABITS V2 — ДОБАВЛЕНИЕ ПРИВЫЧКИ
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/addHabitPage/addHabit.css"
+    >
+
+
+    <!-- =====================================================
+    HABITS V2 — ВЫБОР ИКОНКИ
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/iconPickerPage/iconPicker.css"
+    >
+
+
+    <!-- =====================================================
+    HABITS V2 — СПИСОК ПРИВЫЧЕК
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/habitsList/habitsList.css"
+    >
+
+
+    <!-- =====================================================
+    HABITS V2 — ДЕТАЛЬНАЯ СТРАНИЦА ПРИВЫЧКИ
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/habits/viewHabitDetails/habitDetails.css"
+    >
+
+
+    <!-- =====================================================
+    V2 — ОБЩИЕ ИКОНКИ
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/common/icons.css"
+    >
+
+
+    <!-- =====================================================
+    GOOGLE MATERIAL SYMBOLS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap"
+    >
+
+
+    <!-- =====================================================
+    TELEGRAM MINI APP API
+    ====================================================== -->
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+    КОРЕНЬ ВСЕГО ПРИЛОЖЕНИЯ V2
+    ====================================================== -->
+
+    <div id="app">
+
+
+        <!-- =================================================
+        СТРАНИЦА ПРИВЫЧЕК V2
+        ================================================== -->
+
+        <main
+            id="habits-v2-page"
+            class="page active"
+        >
+
+            <div
+                id="habits-v2-root"
+                class="page-content"
+            ></div>
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+    ИНИЦИАЛИЗАЦИЯ TELEGRAM WEB APP
+    ====================================================== -->
+
+    <script>
+        const telegramWebApp =
+            window.Telegram?.WebApp
+
+        if (telegramWebApp) {
+            telegramWebApp.ready()
+            telegramWebApp.expand()
+
+            window.telegramWebApp =
+                telegramWebApp
+
+            window.initData =
+                telegramWebApp.initData
+        } else {
+            console.warn(
+                "Telegram WebApp API недоступен. Приложение запущено вне Telegram."
+            )
+
+            window.initData = ""
+        }
+    </script>
+
+
+    <!-- =====================================================
+    ГЛАВНАЯ ТОЧКА ВХОДА JAVASCRIPT V2
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="./js/app.js"
+    ></script>
+
+</body>
+
+</html>

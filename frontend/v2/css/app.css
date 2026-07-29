@@ -1,0 +1,66 @@
+/* =========================================================
+   V2 — ГЛАВНАЯ ТОЧКА ВХОДА СТИЛЕЙ
+   ========================================================= */
+
+
+/* Сброс и базовая оболочка */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    min-height: 100dvh;
+    overflow: hidden;
+
+    background: #f8f9fb;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        Inter,
+        Arial,
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+}
+
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+
+button {
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+}
+
+
+/* Общие элементы */
+
+@import url("./common/icons.css");
+
+
+/* Раздел привычек */
+
+@import url("./habits/habits.css");

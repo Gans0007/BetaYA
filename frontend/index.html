@@ -18,15 +18,7 @@
     <link rel="stylesheet" href="css/partners_style/partners.css">
     <link rel="stylesheet" href="/css/partners_style/settings.css">
     <link rel="stylesheet" href="css/challenges_style/challenges.css">
-    <link rel="stylesheet" href="css/v2/habits/habits.css">
 
-
-    <link rel="stylesheet" href="css/v2/habits/habitsMainEmpty/habitsMain.css">
-    <link rel="stylesheet" href="css/v2/habits/addHabitPage/addHabit.css">
-    <link rel="stylesheet" href="css/v2/habits/iconPickerPage/iconPicker.css">
-    <link rel="stylesheet" href="css/v2/habits/habitsList/habitsList.css">
-    <link rel="stylesheet" href="css/v2/habits/viewHabitDetails/habitDetails.css">
-    <link rel="stylesheet" href="css/v2/common/icons.css">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap"/>
 
@@ -79,13 +71,6 @@
             </div>
 
         </div>
-
-<!-- HABITS V2 -->
-<div id="habits-v2-page" class="page">
-    <div class="page-content" id="habits-v2-root"></div>
-</div>
-</div>
-
 
     <!-- ======================
     ДРУГИЕ СТРАНИЦЫ (без header)
@@ -172,39 +157,109 @@
 <!-- ======================
 BOTTOM NAVIGATION
 ====================== -->
-<div class="bottom-nav">
 
-    <div class="nav-item  active" data-page="challenges">
-        <img src="img/nav/challenges_light.png" class="nav-icon">
-        <span class="nav-label">Челленджи</span>
+<nav class="bottom-nav">
+
+    <div
+        class="nav-item active"
+        data-page="challenges"
+    >
+        <img
+            src="img/nav/challenges_light.png"
+            class="nav-icon"
+            alt=""
+        >
+
+        <span class="nav-label">
+            Челленджи
+        </span>
     </div>
 
-    <div class="nav-item" data-page="dashboard">
-        <img src="img/nav/habits_light.png" class="nav-icon">
-        <span class="nav-label">Привычки</span>
+
+    <div
+        class="nav-item"
+        data-page="dashboard"
+    >
+        <img
+            src="img/nav/habits_light.png"
+            class="nav-icon"
+            alt=""
+        >
+
+        <span class="nav-label">
+            Привычки
+        </span>
     </div>
 
-    <div class="nav-item" data-page="chat">
-        <img src="img/nav/chat_light.png" class="nav-icon">
-        <span class="nav-label">Общение</span>
+
+    <div
+        class="nav-item"
+        data-page="chat"
+    >
+        <img
+            src="img/nav/chat_light.png"
+            class="nav-icon"
+            alt=""
+        >
+
+        <span class="nav-label">
+            Общение
+        </span>
     </div>
 
-    <div class="nav-item" data-page="leaderboard">
-        <img src="img/nav/leaderboard_light.png" class="nav-icon">
-        <span class="nav-label">Рейтинг</span>
+
+    <div
+        class="nav-item"
+        data-page="leaderboard"
+    >
+        <img
+            src="img/nav/leaderboard_light.png"
+            class="nav-icon"
+            alt=""
+        >
+
+        <span class="nav-label">
+            Рейтинг
+        </span>
     </div>
 
-    <div class="nav-item" data-page="partners">
-        <img src="img/nav/partners_light.png" class="nav-icon">
-        <span class="nav-label">Ещё</span>
+
+    <div
+        class="nav-item"
+        data-page="partners"
+    >
+        <img
+            src="img/nav/partners_light.png"
+            class="nav-icon"
+            alt=""
+        >
+
+        <span class="nav-label">
+            Ещё
+        </span>
     </div>
 
-<div class="nav-item" data-page="habits-v2">
-    <span class="nav-icon">✨</span>
-    <span class="nav-label">Привычки V2</span>
-</div>
 
-</div>
+    <!-- ПЕРЕХОД В ОТДЕЛЬНОЕ ПРИЛОЖЕНИЕ V2 -->
+
+    <a
+        class="nav-item"
+        href="./v2/index.html"
+        aria-label="Открыть тестовую версию привычек V2"
+    >
+        <span
+            class="nav-icon"
+            aria-hidden="true"
+        >
+            ✨
+        </span>
+
+        <span class="nav-label">
+            Привычки V2
+        </span>
+    </a>
+
+</nav>
 
 <!-- ======================
 SCRIPTS
@@ -218,7 +273,6 @@ window.initData = tg.initData
 <script type="module" src="js/navigation.js"></script>
 <script type="module" src="js/dashboard.js"></script>
 <script src="js/leaderboard.js"></script>
-<script type="module" src="js/v2/app.js"></script>
 <script type="module" src="js/challenges.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>

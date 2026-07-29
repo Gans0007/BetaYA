@@ -133,3 +133,8 @@ SAFE SPACE
     padding-bottom: 100px;
 
 }
+
+.bottom-nav .nav-item {
+    color: inherit;
+    text-decoration: none;
+}

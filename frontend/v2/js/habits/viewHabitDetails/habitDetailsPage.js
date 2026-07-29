@@ -280,21 +280,22 @@ const calendarHtml =
     data-action="close-habit-details"
     aria-label="Вернуться к привычкам"
 >
-<span
-    class="material-symbols-rounded back-icon"
-    aria-hidden="true"
->
-    arrow_back_ios_new
-</span>
+    <span
+        class="material-symbols-rounded back-icon"
+        aria-hidden="true"
+    >
+        arrow_back_ios_new
+    </span>
+</button>
 
-                <button
-                    class="habit-details__menu-button"
-                    type="button"
-                    data-action="open-habit-menu"
-                    aria-label="Открыть меню привычки"
-                >
-                    ⋯
-                </button>
+<button
+    class="habit-details__menu-button"
+    type="button"
+    data-action="open-habit-menu"
+    aria-label="Открыть меню привычки"
+>
+    ⋯
+</button>
 
             </header>
 
