@@ -35,6 +35,18 @@ import {
 
 
 /* =========================================================
+   СТРАНИЦА РЕДАКТИРОВАНИЯ
+   ========================================================= */
+
+import {
+    openAddHabitPage
+} from "../habitMainEmpty/addHabitEvents.js"
+
+import {
+    startHabitEditDraft
+} from "../habitMainEmpty/habitsDraft.js"
+
+/* =========================================================
    STORE
    ========================================================= */
 
@@ -374,12 +386,103 @@ function handleHabitDetailsBack(
 
 
 /* =========================================================
+   ОТКРЫТЬ РЕДАКТИРОВАНИЕ ПРИВЫЧКИ
+
+   Перед открытием формы:
+   - получаем актуальную привычку из Store;
+   - переносим редактируемые поля в черновик;
+   - открываем Add Habit Page в режиме редактирования.
+
+   При отмене:
+   - возвращаемся в детали без изменений.
+
+   После сохранения:
+   - получаем обновлённую привычку из Store;
+   - заново рисуем детальную страницу;
+   - подключаем события.
+   ========================================================= */
+
+function openHabitEditPage(
+    habitId,
+    {
+        onOpenHabitsPage = null
+    } = {}
+) {
+    const habit = getHabitById(
+        habitId
+    )
+
+    if (!habit) {
+        console.warn(
+            `Habits List Events: невозможно редактировать привычку "${habitId}"`
+        )
+
+        return
+    }
+
+
+    /* ---------------------------------------------------------
+       ЗАПОЛНЯЕМ ЧЕРНОВИК ДАННЫМИ ПРИВЫЧКИ
+       --------------------------------------------------------- */
+
+    const editDraft =
+        startHabitEditDraft(
+            habit
+        )
+
+    if (!editDraft) {
+        console.warn(
+            `Habits List Events: не удалось создать черновик редактирования "${habitId}"`
+        )
+
+        return
+    }
+
+
+    /* ---------------------------------------------------------
+       ОТКРЫВАЕМ ФОРМУ РЕДАКТИРОВАНИЯ
+       --------------------------------------------------------- */
+
+    openAddHabitPage({
+        resetDraft: false,
+
+        onOpenHabitsPage,
+
+        onCancel: () => {
+            refreshHabitDetails(
+                habitId,
+                {
+                    onOpenHabitsPage
+                }
+            )
+        },
+
+        onHabitSaved: (
+            savedHabit
+        ) => {
+            const savedHabitId =
+                savedHabit?.id ||
+                habitId
+
+            refreshHabitDetails(
+                savedHabitId,
+                {
+                    onOpenHabitsPage
+                }
+            )
+        }
+    })
+}
+
+
+/* =========================================================
    ПОДКЛЮЧИТЬ СОБЫТИЯ ДЕТАЛЬНОЙ СТРАНИЦЫ
 
    Используется:
    - после первого открытия;
    - после подтверждения;
    - после снятия подтверждения;
+   - после редактирования;
    - после повторного рендера страницы.
    ========================================================= */
 
@@ -404,6 +507,15 @@ function initCurrentHabitDetailsEvents(
                 {
                     onOpenHabitsPage,
                     keepMenuOpen
+                }
+            )
+        },
+
+        onEdit: () => {
+            openHabitEditPage(
+                habitId,
+                {
+                    onOpenHabitsPage
                 }
             )
         }

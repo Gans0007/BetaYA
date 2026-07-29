@@ -17,7 +17,8 @@ import {
    - возврат к списку привычек;
    - открытие меню;
    - подтверждение привычки;
-   - снятие подтверждения привычки.
+   - снятие подтверждения привычки;
+   - запуск редактирования привычки.
    ========================================================= */
 
 
@@ -27,7 +28,8 @@ import {
 
 export function initHabitDetailsEvents({
     onBack = null,
-    onConfirm = null
+    onConfirm = null,
+    onEdit = null
 } = {}) {
     const root = document.getElementById(
         "habits-v2-root"
@@ -58,6 +60,10 @@ export function initHabitDetailsEvents({
         '[data-action="confirm-habit"]'
     )
 
+    const editButton = root.querySelector(
+        '[data-action="edit-habit"]'
+    )
+
 
     /* =========================================================
        АНИМАЦИИ НАЖАТИЯ
@@ -66,6 +72,7 @@ export function initHabitDetailsEvents({
     addPressAnimation(backButton)
     addPressAnimation(menuButton)
     addPressAnimation(confirmButton)
+    addPressAnimation(editButton)
 
 
     /* =========================================================
@@ -123,6 +130,36 @@ export function initHabitDetailsEvents({
             onConfirm({
                 keepMenuOpen: true
             })
+        }
+    )
+
+
+    /* =========================================================
+       РЕДАКТИРОВАНИЕ ПРИВЫЧКИ
+
+       Перед переходом:
+       - предотвращаем всплытие;
+       - уничтожаем события меню;
+       - передаём управление внешнему контроллеру.
+       ========================================================= */
+
+    editButton?.addEventListener(
+        "click",
+        (event) => {
+            event.preventDefault()
+            event.stopPropagation()
+
+            destroyHabitDetailsMenu()
+
+            if (typeof onEdit !== "function") {
+                console.warn(
+                    "Habit Details Events: не передан onEdit"
+                )
+
+                return
+            }
+
+            onEdit()
         }
     )
 }

@@ -1,19 +1,23 @@
 /* =========================================================
-   HABITS EVENTS
+   ADD HABIT EVENTS
 
-   Главный контроллер раздела привычек.
+   Логика страницы создания и редактирования привычки.
 
    Отвечает за:
-   - первоначальный запуск раздела;
-   - рендер главной страницы;
-   - открытие страницы создания привычки;
-   - события карточек привычек;
-   - подтверждение выполнения;
-   - открытие деталей привычки;
-   - восстановление прокрутки списка.
+   - создание новой привычки;
+   - редактирование существующей привычки;
+   - работу с черновиком;
+   - выбор названия;
+   - выбор цвета;
+   - выбор размера;
+   - переход к выбору эмодзи;
+   - сохранение изменений;
+   - возврат с формы.
+   ========================================================= */
 
-   Логика создания привычки находится отдельно:
-   habitMainEmpty/addHabitEvents.js
+
+/* =========================================================
+   РЕНДЕР СТРАНИЦ
    ========================================================= */
 
 import {
@@ -24,21 +28,45 @@ import {
     renderIconPickerPage
 } from "./iconPickerPage.js"
 
+
+/* =========================================================
+   СОБЫТИЯ ВЫБОРА ЭМОДЗИ
+   ========================================================= */
+
 import {
     initIconPickerEvents
 } from "./iconPickerEvents.js"
+
+
+/* =========================================================
+   ЧЕРНОВИК ПРИВЫЧКИ
+   ========================================================= */
 
 import {
     getHabitDraft,
     getHabitDraftValue,
     setHabitDraftValue,
     updateHabitDraft,
-    resetHabitDraft
+    resetHabitDraft,
+    startNewHabitDraft,
+    getEditingHabitId,
+    isHabitDraftEditing
 } from "./habitsDraft.js"
 
+
+/* =========================================================
+   STORE
+   ========================================================= */
+
 import {
-    addHabit
+    addHabit,
+    updateHabit
 } from "../habitsStore.js"
+
+
+/* =========================================================
+   ОБЩИЕ УТИЛИТЫ
+   ========================================================= */
 
 import {
     createHabitId,
@@ -47,7 +75,7 @@ import {
 
 
 /* =========================================================
-   КОНТЕЙНЕР РАЗДЕЛА
+   КОРНЕВОЙ КОНТЕЙНЕР
    ========================================================= */
 
 function getHabitsRoot() {
@@ -96,7 +124,8 @@ export function updateDraftFromAddHabitPage() {
         selectedIcon?.textContent?.trim()
 
     updateHabitDraft({
-        name: nameInput?.value ?? "",
+        name:
+            nameInput?.value ?? "",
 
         icon:
             iconValue ||
@@ -116,7 +145,10 @@ export function updateDraftFromAddHabitPage() {
 /* =========================================================
    ВОССТАНОВИТЬ ЧЕРНОВИК В ФОРМЕ
 
-   Используется после возвращения со страницы выбора эмодзи.
+   Используется:
+   - после открытия страницы;
+   - после возвращения со страницы выбора эмодзи;
+   - при редактировании существующей привычки.
    ========================================================= */
 
 export function restoreDraftToAddHabitPage() {
@@ -154,7 +186,8 @@ export function restoreDraftToAddHabitPage() {
        --------------------------------------------------------- */
 
     if (nameInput) {
-        nameInput.value = draft.name
+        nameInput.value =
+            draft.name
     }
 
 
@@ -163,7 +196,8 @@ export function restoreDraftToAddHabitPage() {
        --------------------------------------------------------- */
 
     if (selectedIcon) {
-        selectedIcon.textContent = draft.icon
+        selectedIcon.textContent =
+            draft.icon
     }
 
 
@@ -211,31 +245,54 @@ export function restoreDraftToAddHabitPage() {
 
 
 /* =========================================================
-   СОЗДАТЬ ПРИВЫЧКУ ИЗ ЧЕРНОВИКА
+   ПОЛУЧИТЬ ПРОВЕРЕННОЕ НАЗВАНИЕ
+   ========================================================= */
+
+function getNormalizedHabitName() {
+    return String(
+        getHabitDraftValue("name") || ""
+    ).trim()
+}
+
+
+/* =========================================================
+   СОЗДАТЬ НОВУЮ ПРИВЫЧКУ ИЗ ЧЕРНОВИКА
    ========================================================= */
 
 export function createHabitFromDraft() {
     const draft = getHabitDraft()
 
-    const habitName = String(
-        draft.name || ""
-    ).trim()
+    const habitName =
+        getNormalizedHabitName()
 
     if (!habitName) {
         return null
     }
 
     const newHabit = {
-        id: createHabitId(),
+        id:
+            createHabitId(),
 
-        name: habitName,
-        icon: draft.icon || "✱",
-        color: draft.color || "blue",
-        size: draft.size || "large",
+        name:
+            habitName,
 
-        completedToday: false,
-        streak: 0,
-        xpReward: 5,
+        icon:
+            draft.icon || "✱",
+
+        color:
+            draft.color || "blue",
+
+        size:
+            draft.size || "large",
+
+        completedToday:
+            false,
+
+        streak:
+            0,
+
+        xpReward:
+            5,
 
         weekProgress: [
             false,
@@ -247,38 +304,135 @@ export function createHabitFromDraft() {
             false
         ],
 
-        createdAt: new Date().toISOString(),
-        completedAt: null
+        completedDates: [],
+
+        createdAt:
+            new Date().toISOString(),
+
+        completedAt:
+            null
     }
 
-    return addHabit(newHabit)
+    return addHabit(
+        newHabit
+    )
 }
 
 
 /* =========================================================
-   ОТКРЫТЬ СТРАНИЦУ СОЗДАНИЯ ПРИВЫЧКИ
+   ОБНОВИТЬ СУЩЕСТВУЮЩУЮ ПРИВЫЧКУ ИЗ ЧЕРНОВИКА
+
+   Изменяются только:
+   - название;
+   - иконка;
+   - цвет;
+   - размер.
+
+   Остальные данные привычки Store сохраняет:
+   - серию;
+   - XP;
+   - календарь;
+   - историю подтверждений;
+   - дату создания;
+   - сегодняшний статус.
+   ========================================================= */
+
+export function updateHabitFromDraft() {
+    const editingHabitId =
+        getEditingHabitId()
+
+    if (!editingHabitId) {
+        console.warn(
+            "Add Habit Events: отсутствует ID редактируемой привычки"
+        )
+
+        return null
+    }
+
+    const draft = getHabitDraft()
+
+    const habitName =
+        getNormalizedHabitName()
+
+    if (!habitName) {
+        return null
+    }
+
+    return updateHabit(
+        editingHabitId,
+        {
+            name:
+                habitName,
+
+            icon:
+                draft.icon || "✱",
+
+            color:
+                draft.color || "blue",
+
+            size:
+                draft.size || "large"
+        }
+    )
+}
+
+
+/* =========================================================
+   СОХРАНИТЬ ЧЕРНОВИК
+
+   Автоматически определяет режим:
+
+   создание:
+   addHabit()
+
+   редактирование:
+   updateHabit()
+   ========================================================= */
+
+export function saveHabitFromDraft() {
+    if (isHabitDraftEditing()) {
+        return updateHabitFromDraft()
+    }
+
+    return createHabitFromDraft()
+}
+
+
+/* =========================================================
+   ОТКРЫТЬ СТРАНИЦУ СОЗДАНИЯ ИЛИ РЕДАКТИРОВАНИЯ
 
    resetDraft:
-   true  — пользователь создаёт новую привычку;
-   false — пользователь вернулся со страницы эмодзи.
+   true — начать создание новой привычки;
+   false — сохранить текущий черновик.
 
    onOpenHabitsPage:
-   функция возврата на главную страницу привычек.
+   резервный возврат на главную страницу.
+
+   onHabitSaved:
+   вызывается после успешного сохранения.
+
+   onCancel:
+   вызывается при нажатии стрелки назад.
    ========================================================= */
 
 export function openAddHabitPage({
     resetDraft = false,
-    onOpenHabitsPage = null
+    onOpenHabitsPage = null,
+    onHabitSaved = null,
+    onCancel = null
 } = {}) {
     if (resetDraft) {
-        resetHabitDraft()
+        startNewHabitDraft()
     }
 
     renderAddHabitPage()
+
     restoreDraftToAddHabitPage()
 
     initAddHabitPageEvents({
-        onOpenHabitsPage
+        onOpenHabitsPage,
+        onHabitSaved,
+        onCancel
     })
 }
 
@@ -287,14 +441,17 @@ export function openAddHabitPage({
    ПОКАЗАТЬ ОШИБКУ ПУСТОГО НАЗВАНИЯ
    ========================================================= */
 
-function showNameValidationError(nameInput) {
+function showNameValidationError(
+    nameInput
+) {
     if (!nameInput) {
         return
     }
 
-    const nameField = nameInput.closest(
-        ".add-habit-v2__name-field"
-    )
+    const nameField =
+        nameInput.closest(
+            ".add-habit-v2__name-field"
+        )
 
     nameInput.focus()
 
@@ -319,7 +476,8 @@ function selectHabitColor(
     colorButtons
 ) {
     const isLocked =
-        selectedButton.dataset.locked === "true"
+        selectedButton.dataset.locked ===
+        "true"
 
     if (isLocked) {
         console.log(
@@ -394,11 +552,84 @@ function selectHabitSize(
 
 
 /* =========================================================
-   СОБЫТИЯ СТРАНИЦЫ СОЗДАНИЯ
+   ВЕРНУТЬСЯ СО СТРАНИЦЫ ФОРМЫ
+   ========================================================= */
+
+function handleAddHabitBack({
+    onOpenHabitsPage = null,
+    onCancel = null
+} = {}) {
+    resetHabitDraft()
+
+    if (typeof onCancel === "function") {
+        onCancel()
+        return
+    }
+
+    if (
+        typeof onOpenHabitsPage ===
+        "function"
+    ) {
+        onOpenHabitsPage()
+        return
+    }
+
+    console.warn(
+        "Add Habit Events: не передан обработчик возврата"
+    )
+}
+
+
+/* =========================================================
+   ОБРАБОТАТЬ УСПЕШНОЕ СОХРАНЕНИЕ
+   ========================================================= */
+
+function handleHabitSaved(
+    savedHabit,
+    {
+        wasEditing = false,
+        onHabitSaved = null,
+        onOpenHabitsPage = null
+    } = {}
+) {
+    resetHabitDraft()
+
+    if (
+        typeof onHabitSaved ===
+        "function"
+    ) {
+        onHabitSaved(
+            savedHabit,
+            {
+                wasEditing
+            }
+        )
+
+        return
+    }
+
+    if (
+        typeof onOpenHabitsPage ===
+        "function"
+    ) {
+        onOpenHabitsPage()
+        return
+    }
+
+    console.warn(
+        "Add Habit Events: привычка сохранена, но не передан обработчик перехода"
+    )
+}
+
+
+/* =========================================================
+   СОБЫТИЯ СТРАНИЦЫ СОЗДАНИЯ / РЕДАКТИРОВАНИЯ
    ========================================================= */
 
 export function initAddHabitPageEvents({
-    onOpenHabitsPage = null
+    onOpenHabitsPage = null,
+    onHabitSaved = null,
+    onCancel = null
 } = {}) {
     const root = getHabitsRoot()
 
@@ -431,17 +662,20 @@ export function initAddHabitPageEvents({
         "#add-habit-name"
     )
 
-    const suggestionButtons = root.querySelectorAll(
-        "[data-habit-suggestion]"
-    )
+    const suggestionButtons =
+        root.querySelectorAll(
+            "[data-habit-suggestion]"
+        )
 
-    const colorButtons = root.querySelectorAll(
-        "[data-habit-color]"
-    )
+    const colorButtons =
+        root.querySelectorAll(
+            "[data-habit-color]"
+        )
 
-    const sizeButtons = root.querySelectorAll(
-        "[data-habit-size]"
-    )
+    const sizeButtons =
+        root.querySelectorAll(
+            "[data-habit-size]"
+        )
 
 
     /* =====================================================
@@ -477,9 +711,10 @@ export function initAddHabitPageEvents({
                 nameInput.value
             )
 
-            const nameField = nameInput.closest(
-                ".add-habit-v2__name-field"
-            )
+            const nameField =
+                nameInput.closest(
+                    ".add-habit-v2__name-field"
+                )
 
             nameField?.classList.remove(
                 "has-error"
@@ -489,27 +724,22 @@ export function initAddHabitPageEvents({
 
 
     /* =====================================================
-       ВОЗВРАТ НА ГЛАВНУЮ
+       ВОЗВРАТ НАЗАД
 
-       При выходе со страницы создания черновик удаляется.
+       При создании:
+       возвращаемся на главную страницу.
+
+       При редактировании:
+       позже вернёмся в детали привычки через onCancel.
        ===================================================== */
 
     backButton?.addEventListener(
         "click",
         () => {
-            resetHabitDraft()
-
-            if (
-                typeof onOpenHabitsPage ===
-                "function"
-            ) {
-                onOpenHabitsPage()
-                return
-            }
-
-            console.warn(
-                "Add Habit Events: не передан onOpenHabitsPage"
-            )
+            handleAddHabitBack({
+                onOpenHabitsPage,
+                onCancel
+            })
         }
     )
 
@@ -518,6 +748,7 @@ export function initAddHabitPageEvents({
        ОТКРЫТЬ ВЫБОР ЭМОДЗИ
 
        Сначала сохраняем заполненную форму в черновик.
+       Режим редактирования при этом не сбрасывается.
        ===================================================== */
 
     iconButton?.addEventListener(
@@ -533,7 +764,9 @@ export function initAddHabitPageEvents({
                 onBackToAddHabitPage: () => {
                     openAddHabitPage({
                         resetDraft: false,
-                        onOpenHabitsPage
+                        onOpenHabitsPage,
+                        onHabitSaved,
+                        onCancel
                     })
                 }
             })
@@ -554,10 +787,11 @@ export function initAddHabitPageEvents({
                 }
 
                 const suggestion =
-                    button.dataset.habitSuggestion ||
-                    ""
+                    button.dataset
+                        .habitSuggestion || ""
 
-                nameInput.value = suggestion
+                nameInput.value =
+                    suggestion
 
                 setHabitDraftValue(
                     "name",
@@ -615,6 +849,9 @@ export function initAddHabitPageEvents({
 
     /* =====================================================
        СОХРАНЕНИЕ ПРИВЫЧКИ
+
+       Перед сохранением запоминаем режим,
+       потому что resetHabitDraft() позже его сбросит.
        ===================================================== */
 
     saveButton?.addEventListener(
@@ -622,10 +859,8 @@ export function initAddHabitPageEvents({
         () => {
             updateDraftFromAddHabitPage()
 
-            const habitName = String(
-                getHabitDraftValue("name") ||
-                ""
-            ).trim()
+            const habitName =
+                getNormalizedHabitName()
 
             if (!habitName) {
                 showNameValidationError(
@@ -635,34 +870,36 @@ export function initAddHabitPageEvents({
                 return
             }
 
-            const newHabit =
-                createHabitFromDraft()
+            const wasEditing =
+                isHabitDraftEditing()
 
-            if (!newHabit) {
+            const savedHabit =
+                saveHabitFromDraft()
+
+            if (!savedHabit) {
                 console.error(
-                    "Add Habit Events: не удалось создать привычку"
+                    wasEditing
+                        ? "Add Habit Events: не удалось обновить привычку"
+                        : "Add Habit Events: не удалось создать привычку"
                 )
 
                 return
             }
 
             console.log(
-                "Новая привычка:",
-                newHabit
+                wasEditing
+                    ? "Привычка обновлена:"
+                    : "Новая привычка:",
+                savedHabit
             )
 
-            resetHabitDraft()
-
-            if (
-                typeof onOpenHabitsPage ===
-                "function"
-            ) {
-                onOpenHabitsPage()
-                return
-            }
-
-            console.warn(
-                "Add Habit Events: привычка создана, но не передан onOpenHabitsPage"
+            handleHabitSaved(
+                savedHabit,
+                {
+                    wasEditing,
+                    onHabitSaved,
+                    onOpenHabitsPage
+                }
             )
         }
     )

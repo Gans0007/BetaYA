@@ -1,21 +1,63 @@
 /**
- * Экран создания новой привычки.
+ * Экран создания и редактирования привычки.
  *
  * Этот файл отвечает только за разметку.
  * Все события страницы обрабатываются
  * в addHabitEvents.js.
  */
 
+import {
+    isHabitDraftEditing
+} from "./habitsDraft.js"
+
+
+/* =========================================================
+   РЕНДЕР СТРАНИЦЫ СОЗДАНИЯ / РЕДАКТИРОВАНИЯ
+   ========================================================= */
+
 export function renderAddHabitPage() {
-    const root = document.getElementById("habits-v2-root")
+    const root = document.getElementById(
+        "habits-v2-root"
+    )
 
     if (!root) {
-        console.error("Add Habit V2: не найден контейнер #habits-v2-root")
+        console.error(
+            "Add Habit V2: не найден контейнер #habits-v2-root"
+        )
+
         return
     }
 
+
+    /* =====================================================
+       РЕЖИМ СТРАНИЦЫ
+       ===================================================== */
+
+    const isEditing =
+        isHabitDraftEditing()
+
+    const pageTitle = isEditing
+        ? "Редактирование привычки"
+        : "Новая привычка"
+
+    const backButtonLabel = isEditing
+        ? "Вернуться к привычке"
+        : "Вернуться к привычкам"
+
+    const saveButtonLabel = isEditing
+        ? "Сохранить изменения"
+        : "Сохранить привычку"
+
+
+    /* =====================================================
+       РАЗМЕТКА
+       ===================================================== */
+
     root.innerHTML = `
-        <section class="add-habit-v2">
+        <section
+            class="add-habit-v2"
+            data-page-mode="${isEditing ? "edit" : "create"}"
+        >
 
             <!-- Верхняя панель -->
             <header class="add-habit-v2__header">
@@ -24,33 +66,33 @@ export function renderAddHabitPage() {
                     class="add-habit-v2__back-button back-button"
                     type="button"
                     data-action="close-add-habit"
-                    aria-label="Вернуться к привычкам"
+                    aria-label="${backButtonLabel}"
                 >
-<span
-    class="material-symbols-rounded back-icon"
-    aria-hidden="true"
->
-    arrow_back_ios_new
-</span>
+                    <span
+                        class="material-symbols-rounded back-icon"
+                        aria-hidden="true"
+                    >
+                        arrow_back_ios_new
+                    </span>
                 </button>
 
                 <h1 class="add-habit-v2__title">
-                    Новая привычка
+                    ${pageTitle}
                 </h1>
 
-<button
-    class="add-habit-v2__save-button"
-    type="button"
-    data-action="save-habit"
-    aria-label="Сохранить привычку"
->
-    <span
-        class="material-symbols-rounded save-icon"
-        aria-hidden="true"
-    >
-        check
-    </span>
-</button>
+                <button
+                    class="add-habit-v2__save-button"
+                    type="button"
+                    data-action="save-habit"
+                    aria-label="${saveButtonLabel}"
+                >
+                    <span
+                        class="material-symbols-rounded save-icon"
+                        aria-hidden="true"
+                    >
+                        check
+                    </span>
+                </button>
 
             </header>
 
@@ -100,31 +142,53 @@ export function renderAddHabitPage() {
 
 
                     <!-- Быстрые варианты названия -->
-<div class="add-habit-v2__suggestions">
+                    <div class="add-habit-v2__suggestions">
 
-    <button class="add-habit-v2__suggestion" data-habit-suggestion="Не тратить на фигню">
-        Не тратить на фигню
-    </button>
+                        <button
+                            class="add-habit-v2__suggestion"
+                            type="button"
+                            data-habit-suggestion="Не тратить на фигню"
+                        >
+                            Не тратить на фигню
+                        </button>
 
-    <span class="add-habit-v2__divider">|</span>
+                        <span class="add-habit-v2__divider">
+                            |
+                        </span>
 
-    <button class="add-habit-v2__suggestion" data-habit-suggestion="Откладывать деньги">
-        Откладывать деньги
-    </button>
+                        <button
+                            class="add-habit-v2__suggestion"
+                            type="button"
+                            data-habit-suggestion="Откладывать деньги"
+                        >
+                            Откладывать деньги
+                        </button>
 
-    <span class="add-habit-v2__divider">|</span>
+                        <span class="add-habit-v2__divider">
+                            |
+                        </span>
 
-    <button class="add-habit-v2__suggestion" data-habit-suggestion="Планировать бюджет">
-        Планировать бюджет
-    </button>
+                        <button
+                            class="add-habit-v2__suggestion"
+                            type="button"
+                            data-habit-suggestion="Планировать бюджет"
+                        >
+                            Планировать бюджет
+                        </button>
 
-    <span class="add-habit-v2__divider">|</span>
+                        <span class="add-habit-v2__divider">
+                            |
+                        </span>
 
-    <button class="add-habit-v2__suggestion" data-habit-suggestion="Читать книгу">
-        Читать книгу
-    </button>
+                        <button
+                            class="add-habit-v2__suggestion"
+                            type="button"
+                            data-habit-suggestion="Читать книгу"
+                        >
+                            Читать книгу
+                        </button>
 
-</div>
+                    </div>
 
                 </section>
 
@@ -136,155 +200,155 @@ export function renderAddHabitPage() {
                         Цвет
                     </div>
 
-<div
-    class="add-habit-v2__colors"
-    role="radiogroup"
-    aria-label="Цвет карточки привычки"
->
+                    <div
+                        class="add-habit-v2__colors"
+                        role="radiogroup"
+                        aria-label="Цвет карточки привычки"
+                    >
 
-    <!-- 1. Доступен -->
-    <button
-        class="add-habit-v2__color is-selected"
-        type="button"
-        data-habit-color="blue"
-        role="radio"
-        aria-checked="true"
-        aria-label="Голубой цвет"
-    ></button>
+                        <!-- 1. Доступен -->
+                        <button
+                            class="add-habit-v2__color is-selected"
+                            type="button"
+                            data-habit-color="blue"
+                            role="radio"
+                            aria-checked="true"
+                            aria-label="Голубой цвет"
+                        ></button>
 
-    <!-- 2. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="green"
-        role="radio"
-        aria-checked="false"
-        aria-label="Зелёный цвет"
-    ></button>
+                        <!-- 2. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="green"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Зелёный цвет"
+                        ></button>
 
-    <!-- 3. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="purple"
-        role="radio"
-        aria-checked="false"
-        aria-label="Фиолетовый цвет"
-    ></button>
+                        <!-- 3. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="purple"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Фиолетовый цвет"
+                        ></button>
 
-    <!-- 4. Закрыт -->
-    <button
-        class="add-habit-v2__color is-locked"
-        type="button"
-        data-habit-color="orange"
-        data-locked="true"
-        role="radio"
-        aria-checked="false"
-        aria-label="Оранжевый цвет, доступен с Premium"
-    >
-        <span
-            class="add-habit-v2__lock"
-            aria-hidden="true"
-        >
-            🔒
-        </span>
-    </button>
+                        <!-- 4. Закрыт -->
+                        <button
+                            class="add-habit-v2__color is-locked"
+                            type="button"
+                            data-habit-color="orange"
+                            data-locked="true"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Оранжевый цвет, доступен с Premium"
+                        >
+                            <span
+                                class="add-habit-v2__lock"
+                                aria-hidden="true"
+                            >
+                                🔒
+                            </span>
+                        </button>
 
-    <!-- 5. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="red"
-        role="radio"
-        aria-checked="false"
-        aria-label="Красный цвет"
-    ></button>
+                        <!-- 5. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="red"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Красный цвет"
+                        ></button>
 
-    <!-- 6. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="graphite"
-        role="radio"
-        aria-checked="false"
-        aria-label="Графитовый цвет"
-    ></button>
+                        <!-- 6. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="graphite"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Графитовый цвет"
+                        ></button>
 
-    <!-- 7. Закрыт -->
-    <button
-        class="add-habit-v2__color is-locked"
-        type="button"
-        data-habit-color="cyan"
-        data-locked="true"
-        role="radio"
-        aria-checked="false"
-        aria-label="Бирюзовый цвет, доступен с Premium"
-    >
-        <span
-            class="add-habit-v2__lock"
-            aria-hidden="true"
-        >
-            🔒
-        </span>
-    </button>
+                        <!-- 7. Закрыт -->
+                        <button
+                            class="add-habit-v2__color is-locked"
+                            type="button"
+                            data-habit-color="cyan"
+                            data-locked="true"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Бирюзовый цвет, доступен с Premium"
+                        >
+                            <span
+                                class="add-habit-v2__lock"
+                                aria-hidden="true"
+                            >
+                                🔒
+                            </span>
+                        </button>
 
-    <!-- 8. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="brown"
-        role="radio"
-        aria-checked="false"
-        aria-label="Кофейный цвет"
-    ></button>
+                        <!-- 8. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="brown"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Кофейный цвет"
+                        ></button>
 
-    <!-- 9. Закрыт -->
-    <button
-        class="add-habit-v2__color is-locked"
-        type="button"
-        data-habit-color="pink"
-        data-locked="true"
-        role="radio"
-        aria-checked="false"
-        aria-label="Розовый цвет, доступен с Premium"
-    >
-        <span
-            class="add-habit-v2__lock"
-            aria-hidden="true"
-        >
-            🔒
-        </span>
-    </button>
+                        <!-- 9. Закрыт -->
+                        <button
+                            class="add-habit-v2__color is-locked"
+                            type="button"
+                            data-habit-color="pink"
+                            data-locked="true"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Розовый цвет, доступен с Premium"
+                        >
+                            <span
+                                class="add-habit-v2__lock"
+                                aria-hidden="true"
+                            >
+                                🔒
+                            </span>
+                        </button>
 
-    <!-- 10. Доступен -->
-    <button
-        class="add-habit-v2__color"
-        type="button"
-        data-habit-color="silver"
-        role="radio"
-        aria-checked="false"
-        aria-label="Серебристый цвет"
-    ></button>
+                        <!-- 10. Доступен -->
+                        <button
+                            class="add-habit-v2__color"
+                            type="button"
+                            data-habit-color="silver"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Серебристый цвет"
+                        ></button>
 
-    <!-- 11. Закрыт -->
-    <button
-        class="add-habit-v2__color is-locked"
-        type="button"
-        data-habit-color="yellow"
-        data-locked="true"
-        role="radio"
-        aria-checked="false"
-        aria-label="Жёлтый цвет, доступен с Premium"
-    >
-        <span
-            class="add-habit-v2__lock"
-            aria-hidden="true"
-        >
-            🔒
-        </span>
-    </button>
+                        <!-- 11. Закрыт -->
+                        <button
+                            class="add-habit-v2__color is-locked"
+                            type="button"
+                            data-habit-color="yellow"
+                            data-locked="true"
+                            role="radio"
+                            aria-checked="false"
+                            aria-label="Жёлтый цвет, доступен с Premium"
+                        >
+                            <span
+                                class="add-habit-v2__lock"
+                                aria-hidden="true"
+                            >
+                                🔒
+                            </span>
+                        </button>
 
-</div>
+                    </div>
 
                 </section>
 
