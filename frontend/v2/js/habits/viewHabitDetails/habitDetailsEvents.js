@@ -18,7 +18,8 @@ import {
    - открытие меню;
    - подтверждение привычки;
    - снятие подтверждения привычки;
-   - запуск редактирования привычки.
+   - запуск редактирования привычки;
+   - запуск удаления привычки.
    ========================================================= */
 
 
@@ -29,7 +30,8 @@ import {
 export function initHabitDetailsEvents({
     onBack = null,
     onConfirm = null,
-    onEdit = null
+    onEdit = null,
+    onDelete = null
 } = {}) {
     const root = document.getElementById(
         "habits-v2-root"
@@ -64,6 +66,10 @@ export function initHabitDetailsEvents({
         '[data-action="edit-habit"]'
     )
 
+    const deleteButton = root.querySelector(
+        '[data-action="delete-habit"]'
+    )
+
 
     /* =========================================================
        АНИМАЦИИ НАЖАТИЯ
@@ -73,6 +79,7 @@ export function initHabitDetailsEvents({
     addPressAnimation(menuButton)
     addPressAnimation(confirmButton)
     addPressAnimation(editButton)
+    addPressAnimation(deleteButton)
 
 
     /* =========================================================
@@ -106,11 +113,6 @@ export function initHabitDetailsEvents({
 
     /* =========================================================
        ПОДТВЕРЖДЕНИЕ / СНЯТИЕ ПОДТВЕРЖДЕНИЯ
-
-       Меню здесь не закрываем.
-
-       После обновления страницы внешняя логика
-       заново откроет меню на новом DOM.
        ========================================================= */
 
     confirmButton?.addEventListener(
@@ -136,11 +138,6 @@ export function initHabitDetailsEvents({
 
     /* =========================================================
        РЕДАКТИРОВАНИЕ ПРИВЫЧКИ
-
-       Перед переходом:
-       - предотвращаем всплытие;
-       - уничтожаем события меню;
-       - передаём управление внешнему контроллеру.
        ========================================================= */
 
     editButton?.addEventListener(
@@ -160,6 +157,34 @@ export function initHabitDetailsEvents({
             }
 
             onEdit()
+        }
+    )
+
+
+    /* =========================================================
+       УДАЛЕНИЕ ПРИВЫЧКИ
+
+       Здесь привычку не удаляем.
+       Только передаём действие внешнему контроллеру.
+       ========================================================= */
+
+    deleteButton?.addEventListener(
+        "click",
+        (event) => {
+            event.preventDefault()
+            event.stopPropagation()
+
+            destroyHabitDetailsMenu()
+
+            if (typeof onDelete !== "function") {
+                console.warn(
+                    "Habit Details Events: не передан onDelete"
+                )
+
+                return
+            }
+
+            onDelete()
         }
     )
 }

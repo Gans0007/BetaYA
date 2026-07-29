@@ -55,11 +55,11 @@ import {
     getHabitById,
     getHabitsStatistics,
     updateHabit,
+    removeHabit,
     selectHabit,
     getSelectedHabit,
     setHabitsStatistics
 } from "../habitsStore.js"
-
 
 /* =========================================================
    ОБЩИЕ УТИЛИТЫ
@@ -476,6 +476,83 @@ function openHabitEditPage(
 
 
 /* =========================================================
+   УДАЛИТЬ ПРИВЫЧКУ ИЗ ДЕТАЛЬНОЙ СТРАНИЦЫ
+
+   После удаления:
+   - выбранная привычка очищается в Store;
+   - текущая серия пересчитывается;
+   - накопленный XP сохраняется;
+   - открывается главная страница привычек.
+
+   XP не уменьшаем, потому что пользователь уже заработал
+   его за выполненные действия.
+   ========================================================= */
+
+function handleHabitDetailsDelete(
+    habitId,
+    {
+        onOpenHabitsPage = null
+    } = {}
+) {
+    const habit = getHabitById(
+        habitId
+    )
+
+    if (!habit) {
+        console.warn(
+            `Habits List Events: невозможно удалить привычку "${habitId}"`
+        )
+
+        return null
+    }
+
+    const removedHabit = removeHabit(
+        habitId
+    )
+
+    if (!removedHabit) {
+        console.warn(
+            `Habits List Events: не удалось удалить привычку "${habitId}"`
+        )
+
+        return null
+    }
+
+
+    /* ---------------------------------------------------------
+       ПЕРЕСЧИТЫВАЕМ ТЕКУЩУЮ СЕРИЮ
+
+       getHighestHabitStreak() вызывается уже после удаления,
+       поэтому удалённая привычка в расчёт не попадёт.
+       --------------------------------------------------------- */
+
+    setHabitsStatistics({
+        currentStreak:
+            getHighestHabitStreak()
+    })
+
+
+    /* ---------------------------------------------------------
+       ВОЗВРАЩАЕМСЯ НА ГЛАВНУЮ СТРАНИЦУ
+       --------------------------------------------------------- */
+
+    if (
+        typeof onOpenHabitsPage !==
+        "function"
+    ) {
+        console.warn(
+            "Habits List Events: привычка удалена, но не передан onOpenHabitsPage"
+        )
+
+        return removedHabit
+    }
+
+    onOpenHabitsPage()
+
+    return removedHabit
+}
+
+/* =========================================================
    ПОДКЛЮЧИТЬ СОБЫТИЯ ДЕТАЛЬНОЙ СТРАНИЦЫ
 
    Используется:
@@ -513,6 +590,15 @@ function initCurrentHabitDetailsEvents(
 
         onEdit: () => {
             openHabitEditPage(
+                habitId,
+                {
+                    onOpenHabitsPage
+                }
+            )
+        },
+
+        onDelete: () => {
+            handleHabitDetailsDelete(
                 habitId,
                 {
                     onOpenHabitsPage
