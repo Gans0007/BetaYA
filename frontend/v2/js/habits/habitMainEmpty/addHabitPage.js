@@ -21,7 +21,7 @@ export function renderAddHabitPage() {
             <header class="add-habit-v2__header">
 
                 <button
-                    class="add-habit-v2__back-button"
+                    class="add-habit-v2__back-button back-button"
                     type="button"
                     data-action="close-add-habit"
                     aria-label="Вернуться к привычкам"

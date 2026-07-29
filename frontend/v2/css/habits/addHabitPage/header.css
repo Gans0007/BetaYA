@@ -151,7 +151,6 @@
 
 @media (hover: hover) and (pointer: fine) {
 
-    .add-habit-v2__back-button:hover,
     .add-habit-v2__save-button:hover {
         opacity: 0.8;
     }
