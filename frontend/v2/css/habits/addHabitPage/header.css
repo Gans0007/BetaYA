@@ -13,7 +13,7 @@
     width: 100%;
 
     display: grid;
-    grid-template-columns: 44px minmax(0, 1fr) 50px;
+    grid-template-columns: 50px minmax(0, 1fr) 50px;
     align-items: center;
     gap: 8px;
 
@@ -110,7 +110,7 @@
 @media (max-width: 380px) {
 
     .add-habit-v2__header {
-        grid-template-columns: 40px minmax(0, 1fr) 46px;
+        grid-template-columns: 46px minmax(0, 1fr) 46px;
         margin-bottom: 28px;
     }
 
