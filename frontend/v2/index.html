@@ -17,7 +17,7 @@
 
     <meta
         name="theme-color"
-        content="#F8F9FB"
+        content="#f8f9fb"
     >
 
     <title>Your Ambitions</title>
@@ -27,21 +27,30 @@
     HABITS V2 — ОБЩАЯ ОБОЛОЧКА
     ====================================================== -->
 
-    <link rel="stylesheet" href="./css/habits/habits.css">
+    <link
+        rel="stylesheet"
+        href="./css/habits/habits.css"
+    >
 
 
     <!-- =====================================================
     HABITS V2 — ПУСТАЯ ГЛАВНАЯ СТРАНИЦА
     ====================================================== -->
 
-    <link rel="stylesheet" href="./css/habits/habitsMainEmpty/habitsMain.css">
+    <link
+        rel="stylesheet"
+        href="./css/habits/habitsMainEmpty/habitsMain.css"
+    >
 
 
     <!-- =====================================================
     HABITS V2 — ДОБАВЛЕНИЕ ПРИВЫЧКИ
     ====================================================== -->
 
-    <link rel="stylesheet" href="./css/habits/addHabitPage/addHabit.css">
+    <link
+        rel="stylesheet"
+        href="./css/habits/addHabitPage/addHabit.css"
+    >
 
 
     <!-- =====================================================
@@ -65,7 +74,7 @@
 
 
     <!-- =====================================================
-    HABITS V2 — ДЕТАЛЬНАЯ СТРАНИЦА ПРИВЫЧКИ
+    HABITS V2 — ДЕТАЛИ ПРИВЫЧКИ
     ====================================================== -->
 
     <link
@@ -81,6 +90,16 @@
     <link
         rel="stylesheet"
         href="./css/common/icons.css"
+    >
+
+
+    <!-- =====================================================
+    V2 — НИЖНЯЯ НАВИГАЦИЯ
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="./css/navigation.css"
     >
 
 
@@ -105,33 +124,118 @@
 <body>
 
     <!-- =====================================================
-    КОРЕНЬ ВСЕГО ПРИЛОЖЕНИЯ V2
+    КОРЕНЬ ПРИЛОЖЕНИЯ V2
     ====================================================== -->
 
     <div id="app">
 
 
         <!-- =================================================
-        СТРАНИЦА ПРИВЫЧЕК V2
+        СТРАНИЦА ПРИВЫЧЕК
         ================================================== -->
 
         <main
             id="habits-v2-page"
             class="page active"
         >
-
             <div
                 id="habits-v2-root"
                 class="page-content"
             ></div>
-
         </main>
+
+
+        <!-- =================================================
+        НИЖНЯЯ НАВИГАЦИЯ V2
+
+        Пока работает только визуально.
+        Переключение страниц не подключено.
+        ================================================== -->
+
+        <nav
+            class="v2-bottom-nav"
+            aria-label="Основная навигация"
+        >
+
+            <button
+                class="v2-bottom-nav__item is-active"
+                type="button"
+                aria-current="page"
+                aria-label="Привычки"
+            >
+                <span
+                    class="v2-bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    🏠
+                </span>
+
+                <span class="v2-bottom-nav__label">
+                    Привычки
+                </span>
+            </button>
+
+
+            <button
+                class="v2-bottom-nav__item"
+                type="button"
+                aria-label="Челленджи"
+            >
+                <span
+                    class="v2-bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    🏆
+                </span>
+
+                <span class="v2-bottom-nav__label">
+                    Челленджи
+                </span>
+            </button>
+
+
+            <button
+                class="v2-bottom-nav__item"
+                type="button"
+                aria-label="Лидерборд"
+            >
+                <span
+                    class="v2-bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    👥
+                </span>
+
+                <span class="v2-bottom-nav__label">
+                    Лидерборд
+                </span>
+            </button>
+
+
+            <button
+                class="v2-bottom-nav__item"
+                type="button"
+                aria-label="Профиль"
+            >
+                <span
+                    class="v2-bottom-nav__icon"
+                    aria-hidden="true"
+                >
+                    👤
+                </span>
+
+                <span class="v2-bottom-nav__label">
+                    Профиль
+                </span>
+            </button>
+
+        </nav>
 
     </div>
 
 
     <!-- =====================================================
-    ИНИЦИАЛИЗАЦИЯ TELEGRAM WEB APP
+    TELEGRAM WEB APP
     ====================================================== -->
 
     <script>
@@ -158,7 +262,7 @@
 
 
     <!-- =====================================================
-    ГЛАВНАЯ ТОЧКА ВХОДА JAVASCRIPT V2
+    ГЛАВНАЯ ТОЧКА ВХОДА V2
     ====================================================== -->
 
     <script

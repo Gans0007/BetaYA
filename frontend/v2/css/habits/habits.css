@@ -7,6 +7,78 @@
     --habits-v2-muted: #a5a7ad;
     --habits-v2-blue: #2f7fe5;
     --habits-v2-button-bg: #eef5ff;
+
+    --v2-navigation-height: 76px;
+    --v2-navigation-bottom-gap: 12px;
+    --v2-navigation-content-gap: 20px;
+}
+
+
+/* =========================================================
+   БАЗОВАЯ НОРМАЛИЗАЦИЯ
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    color: var(--habits-v2-text);
+    background: #f8f9fb;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    overflow: hidden;
+
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+
+/* =========================================================
+   КОРЕНЬ ПРИЛОЖЕНИЯ
+   ========================================================= */
+
+#app {
+    position: relative;
+
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
 }
 
 
@@ -19,8 +91,8 @@
     inset: 0;
 
     width: 100%;
+    height: 100vh;
     height: 100dvh;
-    min-height: 100vh;
 
     margin: 0;
     padding: 0;
@@ -37,17 +109,54 @@
 }
 
 
+/* =========================================================
+   КОНТЕНТ СТРАНИЦЫ
+
+   Нижний padding резервирует место под навигацию.
+   ========================================================= */
+
 #habits-v2-page .page-content {
     position: relative;
 
     width: 100%;
     height: 100%;
-    min-height: 100dvh;
 
     margin: 0;
-    padding: 0;
 
-    overflow: hidden;
+    padding:
+        0
+        0
+        calc(
+            var(--v2-navigation-height)
+            + var(--v2-navigation-bottom-gap)
+            + var(--v2-navigation-content-gap)
+            + env(safe-area-inset-bottom)
+        );
+
+    overflow-x: hidden;
+    overflow-y: auto;
 
     background: transparent;
+
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: none;
+}
+
+#habits-v2-page .page-content::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* =========================================================
+   СОСТОЯНИЕ СТРАНИЦЫ
+   ========================================================= */
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
 }
