@@ -1,3 +1,7 @@
+/* =========================================================
+   GOOGLE MATERIAL SYMBOLS
+========================================================= */
+
 .material-symbols-rounded {
     display: inline-flex;
     align-items: center;
@@ -28,19 +32,78 @@
 
 
 /* =========================================================
-   BACK ICON
+   ОБЩАЯ КНОПКА НАЗАД
+========================================================= */
+
+.back-button {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 44px;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 0;
+    outline: none;
+
+    color: #292a2f;
+
+    background: transparent;
+    box-shadow: none;
+
+    cursor: pointer;
+    user-select: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    touch-action: manipulation;
+
+    transition:
+        transform 90ms ease,
+        opacity 90ms ease;
+}
+
+
+/* Нажатие пальцем или мышкой */
+
+.back-button:active,
+.back-button.is-pressed {
+    transform: scale(0.92);
+    opacity: 0.7;
+}
+
+
+/* Наведение только на устройствах с мышкой */
+
+@media (hover: hover) and (pointer: fine) {
+    .back-button:hover {
+        opacity: 0.75;
+    }
+}
+
+
+/* =========================================================
+   ИКОНКА НАЗАД
 ========================================================= */
 
 .back-icon {
-
     font-size: 23px;
 
-    color: #292a2f;
+    color: currentColor;
+
+    pointer-events: none;
 
     font-variation-settings:
         "FILL" 0,
         "wght" 500,
         "GRAD" 0,
         "opsz" 24;
-
 }

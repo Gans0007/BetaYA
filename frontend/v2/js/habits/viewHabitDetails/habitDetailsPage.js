@@ -275,7 +275,7 @@ const calendarHtml =
             <header class="habit-details__header">
 
 <button
-    class="habit-details__back-button"
+    class="habit-details__back-button back-button"
     type="button"
     data-action="close-habit-details"
     aria-label="Вернуться к привычкам"
