@@ -11,6 +11,7 @@
    - изменение XP;
    - изменение текущей серии;
    - обновление недельного прогресса;
+   - обновление календаря детальной страницы;
    - сохранение позиции прокрутки;
    - возврат из деталей к списку.
    ========================================================= */
@@ -39,6 +40,7 @@ import {
     getHabitsStatistics,
     updateHabit,
     selectHabit,
+    getSelectedHabit,
     setHabitsStatistics
 } from "../habitsStore.js"
 
@@ -368,6 +370,112 @@ function handleHabitDetailsBack(
 
 
 /* =========================================================
+   ПОДКЛЮЧИТЬ СОБЫТИЯ ДЕТАЛЬНОЙ СТРАНИЦЫ
+
+   Используется:
+   - после первого открытия;
+   - после подтверждения;
+   - после снятия подтверждения;
+   - после повторного рендера страницы.
+   ========================================================= */
+
+function initCurrentHabitDetailsEvents(
+    habitId,
+    {
+        onOpenHabitsPage = null
+    } = {}
+) {
+    initHabitDetailsEvents({
+        onBack: () => {
+            handleHabitDetailsBack(
+                onOpenHabitsPage
+            )
+        },
+
+        onConfirm: () => {
+            handleHabitDetailsConfirmation(
+                habitId,
+                {
+                    onOpenHabitsPage
+                }
+            )
+        }
+    })
+}
+
+
+/* =========================================================
+   ПЕРЕРИСОВАТЬ ДЕТАЛЬНУЮ СТРАНИЦУ
+
+   После изменения Store:
+   - получает свежую привычку;
+   - заново рисует детали;
+   - заново подключает события.
+   ========================================================= */
+
+function refreshHabitDetails(
+    habitId,
+    {
+        onOpenHabitsPage = null
+    } = {}
+) {
+    const updatedHabit = getHabitById(
+        habitId
+    )
+
+    if (!updatedHabit) {
+        console.warn(
+            `Habits List Events: невозможно обновить детали привычки "${habitId}"`
+        )
+
+        return
+    }
+
+    renderHabitDetailsPage(
+        updatedHabit
+    )
+
+    initCurrentHabitDetailsEvents(
+        habitId,
+        {
+            onOpenHabitsPage
+        }
+    )
+}
+
+
+/* =========================================================
+   ПОДТВЕРЖДЕНИЕ ИЗ ДЕТАЛЬНОЙ СТРАНИЦЫ
+
+   Использует ту же функцию подтверждения,
+   которая используется в карточке списка.
+   ========================================================= */
+
+function handleHabitDetailsConfirmation(
+    habitId,
+    {
+        onOpenHabitsPage = null
+    } = {}
+) {
+    const updatedHabit =
+        toggleHabitConfirmationLocally(
+            habitId
+        )
+
+    if (!updatedHabit) {
+        return
+    }
+
+    refreshHabitDetails(
+        habitId,
+        {
+            onOpenHabitsPage
+        }
+    )
+}
+
+
+/* =========================================================
    ОТКРЫТЬ ДЕТАЛИ ПРИВЫЧКИ
    ========================================================= */
 
@@ -395,13 +503,12 @@ export function openHabitDetails(
         selectedHabit
     )
 
-    initHabitDetailsEvents({
-        onBack: () => {
-            handleHabitDetailsBack(
-                onOpenHabitsPage
-            )
+    initCurrentHabitDetailsEvents(
+        habitId,
+        {
+            onOpenHabitsPage
         }
-    })
+    )
 }
 
 
@@ -429,13 +536,24 @@ export function initOpenedHabitDetailsEvents({
         return
     }
 
-    initHabitDetailsEvents({
-        onBack: () => {
-            handleHabitDetailsBack(
-                onOpenHabitsPage
-            )
+    const habitId =
+        habitDetailsPage.dataset.habitId ||
+        getSelectedHabit()?.id
+
+    if (!habitId) {
+        console.warn(
+            "Habits List Events: у открытой страницы деталей отсутствует habitId"
+        )
+
+        return
+    }
+
+    initCurrentHabitDetailsEvents(
+        habitId,
+        {
+            onOpenHabitsPage
         }
-    })
+    )
 }
 
 
@@ -538,7 +656,7 @@ function initSingleHabitCardEvents(
 
 
     /* ---------------------------------------------------------
-       ПОДТВЕРЖДЕНИЕ ПРИВЫЧКИ
+       ПОДТВЕРЖДЕНИЕ ПРИВЫЧКИ В СПИСКЕ
        --------------------------------------------------------- */
 
     confirmButton?.addEventListener(

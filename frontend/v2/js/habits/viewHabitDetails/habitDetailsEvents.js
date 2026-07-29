@@ -4,6 +4,7 @@ import {
 
 import {
     initHabitDetailsMenu,
+    closeHabitDetailsMenu,
     destroyHabitDetailsMenu
 } from "./habitDetailsMenu.js"
 
@@ -12,18 +13,39 @@ import {
    HABIT DETAILS EVENTS
 
    События детальной страницы привычки.
+
+   Отвечает за:
+   - возврат к списку привычек;
+   - открытие меню;
+   - подтверждение привычки;
+   - снятие подтверждения привычки.
+   ========================================================= */
+
+
+/* =========================================================
+   ИНИЦИАЛИЗАЦИЯ СОБЫТИЙ ДЕТАЛЬНОЙ СТРАНИЦЫ
    ========================================================= */
 
 export function initHabitDetailsEvents({
-    onBack
+    onBack = null,
+    onConfirm = null
 } = {}) {
     const root = document.getElementById(
         "habits-v2-root"
     )
 
     if (!root) {
+        console.warn(
+            "Habit Details Events: не найден #habits-v2-root"
+        )
+
         return
     }
+
+
+    /* =========================================================
+       ЭЛЕМЕНТЫ СТРАНИЦЫ
+       ========================================================= */
 
     const backButton = root.querySelector(
         '[data-action="close-habit-details"]'
@@ -33,17 +55,22 @@ export function initHabitDetailsEvents({
         '[data-action="toggle-habit-menu"]'
     )
 
+    const confirmButton = root.querySelector(
+        '[data-action="confirm-habit"]'
+    )
+
 
     /* =========================================================
-       АНИМАЦИИ
+       АНИМАЦИИ НАЖАТИЯ
        ========================================================= */
 
     addPressAnimation(backButton)
     addPressAnimation(menuButton)
+    addPressAnimation(confirmButton)
 
 
     /* =========================================================
-       МЕНЮ
+       ИНИЦИАЛИЗАЦИЯ МЕНЮ
        ========================================================= */
 
     initHabitDetailsMenu(root)
@@ -58,9 +85,45 @@ export function initHabitDetailsEvents({
         () => {
             destroyHabitDetailsMenu()
 
-            if (typeof onBack === "function") {
-                onBack()
+            if (typeof onBack !== "function") {
+                console.warn(
+                    "Habit Details Events: не передан onBack"
+                )
+
+                return
             }
+
+            onBack()
+        }
+    )
+
+
+    /* =========================================================
+       ПОДТВЕРЖДЕНИЕ / СНЯТИЕ ПОДТВЕРЖДЕНИЯ
+
+       Сам файл не изменяет Store.
+
+       Он только сообщает внешней логике,
+       что пользователь нажал кнопку подтверждения.
+       ========================================================= */
+
+    confirmButton?.addEventListener(
+        "click",
+        (event) => {
+            event.preventDefault()
+            event.stopPropagation()
+
+            closeHabitDetailsMenu(root)
+
+            if (typeof onConfirm !== "function") {
+                console.warn(
+                    "Habit Details Events: не передан onConfirm"
+                )
+
+                return
+            }
+
+            onConfirm()
         }
     )
 }
